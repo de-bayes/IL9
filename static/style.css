@@ -162,9 +162,12 @@ p {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 2rem 3rem;
+    padding: 1.5rem 3rem;
     position: relative;
     z-index: 10;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .landing-nav-left {
@@ -221,9 +224,10 @@ p {
 }
 
 .landing-bottom {
-    display: flex;
+    display: grid;
+    grid-template-columns: 200px 1fr 250px;
     align-items: flex-end;
-    justify-content: space-between;
+    gap: 3rem;
     padding: 2rem 3rem 3rem;
     position: relative;
     z-index: 10;
@@ -249,6 +253,8 @@ p {
 .landing-tagline {
     max-width: 280px;
     text-align: center;
+    align-self: center;
+    padding-bottom: 1rem;
 }
 
 .landing-tagline p {
@@ -288,6 +294,19 @@ p {
     background: radial-gradient(ellipse at center, #0066FF 0%, #0044CC 30%, transparent 70%);
     filter: blur(60px);
     opacity: 0.9;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.cyan-glow {
+    position: absolute;
+    top: -15%;
+    left: -15%;
+    width: 60%;
+    height: 70%;
+    background: radial-gradient(ellipse at center, #00D9FF 0%, #00A8CC 25%, transparent 60%);
+    filter: blur(70px);
+    opacity: 0.7;
     pointer-events: none;
     z-index: 1;
 }
@@ -948,7 +967,7 @@ p {
     }
 
     .landing-bottom {
-        flex-direction: column;
+        grid-template-columns: 1fr;
         gap: 2rem;
         align-items: flex-start;
         padding: 2rem 1.5rem;
@@ -957,6 +976,8 @@ p {
     .landing-tagline {
         max-width: 100%;
         text-align: left;
+        align-self: flex-start;
+        padding-bottom: 0;
     }
 
     .landing-cta {
@@ -973,6 +994,13 @@ p {
         height: 60%;
         bottom: -10%;
         right: -20%;
+    }
+
+    .cyan-glow {
+        width: 80%;
+        height: 50%;
+        top: -10%;
+        left: -30%;
     }
 }
 
