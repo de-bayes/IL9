@@ -26,12 +26,14 @@
 
 html[data-theme="light"] {
     --bg-primary: #C4B5A0;
-    --bg-card: #FFFFFF;
+    --bg-card: #D9CBBD;
     --text-primary: #1A1A1A;
     --text-secondary: #666666;
     --border-color: #B5A68F;
     --accent-primary: #000000;
     --accent-light: #F5F5F5;
+    --btn-primary-bg: #B5A68F;
+    --btn-primary-text: #1A1A1A;
 }
 
 /* ==================== Global Styles ==================== */
@@ -231,6 +233,12 @@ a {
 .btn-primary {
     background-color: var(--accent-primary);
     color: var(--bg-primary);
+}
+
+html[data-theme="light"] .btn-primary {
+    background-color: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: 2px solid #9B8C7D;
 }
 
 .btn-primary:hover {
