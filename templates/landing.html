@@ -3,159 +3,68 @@
 {% block title %}IL9Cast - Illinois 9th District Forecast{% endblock %}
 
 {% block content %}
-<script>
-// Hide navbar and footer on landing page
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelector('.navbar').style.display = 'none';
-    document.querySelector('.footer').style.display = 'none';
-    document.querySelector('.main-content').style.padding = '0';
-});
-</script>
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title glitch" data-text="IL9CAST">IL9CAST</h1>
+        <p class="hero-subtitle">2026 Democratic Primary Forecast</p>
+        <p class="hero-description">Real-time predictions for Illinois's 9th Congressional District.</p>
 
-<div class="desktop-container">
-    <div class="branding-corner">IL9<span class="cast-italic">Cast</span></div>
-
-    <!-- The Model Window -->
-    <div class="window draggable-window" id="modelWindow" style="left: 100px; top: 100px;">
-        <div class="window-header">
-            <span class="window-icon">📊</span>
-            <span class="window-title">The Model</span>
-            <div class="window-buttons">
-                <button class="window-btn minimize-btn" onclick="minimizeWindow('modelWindow')">_</button>
-                <button class="window-btn maximize-btn" onclick="maximizeWindow('modelWindow')">□</button>
-                <button class="window-btn close-btn" onclick="closeWindow('modelWindow')">✕</button>
-            </div>
-        </div>
-        <div class="window-content">
-            <p class="icon-large">📊</p>
-            <p class="window-label">The Model</p>
-            <button class="open-btn" onclick="location.href='/odds'">Open</button>
+        <div class="cta-group">
+            <a href="/odds" class="cta-button primary">View Forecast</a>
+            <a href="/methodology" class="cta-button secondary">How It Works</a>
         </div>
     </div>
+</section>
 
-    <!-- Methodology Window -->
-    <div class="window draggable-window" id="methodWindow" style="left: 450px; top: 150px;">
-        <div class="window-header">
-            <span class="window-icon">📖</span>
-            <span class="window-title">Methodology</span>
-            <div class="window-buttons">
-                <button class="window-btn minimize-btn" onclick="minimizeWindow('methodWindow')">_</button>
-                <button class="window-btn maximize-btn" onclick="maximizeWindow('methodWindow')">□</button>
-                <button class="window-btn close-btn" onclick="closeWindow('methodWindow')">✕</button>
-            </div>
-        </div>
-        <div class="window-content">
-            <p class="icon-large">📖</p>
-            <p class="window-label">Methodology</p>
-            <button class="open-btn" onclick="location.href='/methodology'">Open</button>
-        </div>
+<section class="featured-section">
+    <div class="section-header">
+        <h2>Current Forecast</h2>
+        <p class="section-subtitle">Live odds and probabilities</p>
     </div>
 
-    <!-- About Window -->
-    <div class="window draggable-window" id="aboutWindow" style="left: 280px; top: 300px;">
-        <div class="window-header">
-            <span class="window-icon">ℹ️</span>
-            <span class="window-title">About</span>
-            <div class="window-buttons">
-                <button class="window-btn minimize-btn" onclick="minimizeWindow('aboutWindow')">_</button>
-                <button class="window-btn maximize-btn" onclick="maximizeWindow('aboutWindow')">□</button>
-                <button class="window-btn close-btn" onclick="closeWindow('aboutWindow')">✕</button>
-            </div>
-        </div>
-        <div class="window-content">
-            <p class="icon-large">ℹ️</p>
-            <p class="window-label">About IL9Cast</p>
-            <p class="about-text">Illinois 9th District Democratic Primary Forecast</p>
-            <p class="about-text" style="font-size: 0.8rem; margin-top: 0.5rem;">Created by Ryan McComb</p>
-        </div>
+    <div class="candidate-preview" id="candidatePreview">
+        <div class="loading">Loading forecast data...</div>
     </div>
-</div>
+</section>
+
+<section class="cta-section">
+    <div class="cta-content">
+        <h2>Ready to explore the model?</h2>
+        <a href="/odds" class="cta-button primary large">Start Exploring</a>
+    </div>
+</section>
 
 <script>
-let draggedElement = null;
-let offsetX = 0;
-let offsetY = 0;
+async function loadFeatured() {
+    try {
+        const response = await fetch('/api/forecast');
+        const data = await response.json();
 
-// Make windows draggable
-document.querySelectorAll('.draggable-window').forEach(win => {
-    const header = win.querySelector('.window-header');
+        const sorted = [...data.candidates].sort((a, b) => b.probability - a.probability);
+        const top3 = sorted.slice(0, 3);
 
-    header.addEventListener('mousedown', (e) => {
-        draggedElement = win;
-        offsetX = e.clientX - win.offsetLeft;
-        offsetY = e.clientY - win.offsetTop;
-        win.style.zIndex = getMaxZIndex() + 1;
-    });
-});
-
-document.addEventListener('mousemove', (e) => {
-    if (draggedElement) {
-        draggedElement.style.left = (e.clientX - offsetX) + 'px';
-        draggedElement.style.top = (e.clientY - offsetY) + 'px';
-    }
-});
-
-document.addEventListener('mouseup', () => {
-    draggedElement = null;
-});
-
-// Resize functionality
-document.querySelectorAll('.window').forEach(win => {
-    const resizeHandle = document.createElement('div');
-    resizeHandle.className = 'resize-handle';
-    win.appendChild(resizeHandle);
-
-    resizeHandle.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        const startX = e.clientX;
-        const startY = e.clientY;
-        const startWidth = win.offsetWidth;
-        const startHeight = win.offsetHeight;
-
-        const moveResize = (e) => {
-            win.style.width = (startWidth + e.clientX - startX) + 'px';
-            win.style.height = (startHeight + e.clientY - startY) + 'px';
-        };
-
-        const stopResize = () => {
-            document.removeEventListener('mousemove', moveResize);
-            document.removeEventListener('mouseup', stopResize);
-        };
-
-        document.addEventListener('mousemove', moveResize);
-        document.addEventListener('mouseup', stopResize);
-    });
-});
-
-function minimizeWindow(id) {
-    const win = document.getElementById(id);
-    win.style.display = 'none';
-}
-
-function maximizeWindow(id) {
-    const win = document.getElementById(id);
-    if (win.style.width !== '90vw') {
-        win.style.width = '90vw';
-        win.style.height = '90vh';
-        win.style.left = '5vw';
-        win.style.top = '5vh';
-    } else {
-        win.style.width = '300px';
-        win.style.height = 'auto';
+        const preview = document.getElementById('candidatePreview');
+        preview.innerHTML = `
+            <div class="candidates-grid">
+                ${top3.map((candidate, idx) => `
+                    <div class="candidate-card" style="animation-delay: ${idx * 0.1}s">
+                        <div class="candidate-rank">#${idx + 1}</div>
+                        <h3>${candidate.name}</h3>
+                        <p class="role">${candidate.party_role}</p>
+                        <div class="odds-display">
+                            <span class="odds-number">${candidate.probability}%</span>
+                            <span class="odds-label">Win Probability</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('candidatePreview').innerHTML = '';
     }
 }
 
-function closeWindow(id) {
-    const win = document.getElementById(id);
-    win.style.display = 'none';
-}
-
-function getMaxZIndex() {
-    return Math.max(
-        ...Array.from(document.querySelectorAll('.window')).map(el =>
-            parseInt(window.getComputedStyle(el).zIndex) || 0
-        )
-    );
-}
+document.addEventListener('DOMContentLoaded', loadFeatured);
 </script>
 {% endblock %}
