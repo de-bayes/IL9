@@ -73,6 +73,10 @@ a {
     transition: var(--transition);
 }
 
+.desktop-container ~ .navbar {
+    display: none;
+}
+
 .nav-container {
     max-width: 1400px;
     margin: 0 auto;
@@ -169,6 +173,158 @@ a {
     max-width: 1400px;
     margin: 0 auto;
     padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+/* ==================== 90s Desktop Landing ==================== */
+
+.desktop-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #000080 0%, #1084d7 100%);
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+}
+
+.branding-corner {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    font-family: 'MS Sans Serif', Arial, sans-serif;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #FFFFFF;
+    z-index: 1000;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+}
+
+.cast-italic {
+    font-style: italic;
+}
+
+.window {
+    position: fixed;
+    width: 300px;
+    height: auto;
+    min-height: 200px;
+    background: linear-gradient(to right, #000080, #1084d7);
+    border: 2px solid;
+    border-color: #DFDFDF #808080 #808080 #DFDFDF;
+    box-shadow: inset 1px 1px 0 #FFFFFF;
+    font-family: 'MS Sans Serif', Arial, sans-serif;
+    font-size: 11px;
+    cursor: default;
+}
+
+.window-header {
+    background: linear-gradient(to right, #000080, #1084d7);
+    color: #FFFFFF;
+    padding: 2px 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    cursor: move;
+    border-bottom: 2px solid #C0C0C0;
+}
+
+.window-icon {
+    font-size: 1.2rem;
+    margin-right: 4px;
+}
+
+.window-title {
+    flex: 1;
+    font-weight: bold;
+    font-size: 11px;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+}
+
+.window-buttons {
+    display: flex;
+    gap: 2px;
+}
+
+.window-btn {
+    width: 16px;
+    height: 14px;
+    padding: 0;
+    margin: 0;
+    background: linear-gradient(to bottom, #DFDFDF, #808080);
+    border: 1px solid;
+    border-color: #DFDFDF #808080 #808080 #DFDFDF;
+    font-family: 'MS Sans Serif', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000000;
+}
+
+.window-btn:active {
+    border-color: #808080 #DFDFDF #DFDFDF #808080;
+}
+
+.window-content {
+    background: #C0C0C0;
+    padding: 8px;
+    text-align: center;
+    border: 2px solid;
+    border-color: #FFFFFF #808080 #808080 #FFFFFF;
+}
+
+.icon-large {
+    font-size: 2.5rem;
+    margin: 10px 0 5px 0;
+    line-height: 1;
+}
+
+.window-label {
+    font-family: 'MS Sans Serif', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    margin: 8px 0;
+    color: #000000;
+}
+
+.about-text {
+    font-family: 'MS Sans Serif', Arial, sans-serif;
+    font-size: 11px;
+    color: #000000;
+    margin: 4px 0;
+}
+
+.open-btn {
+    background: linear-gradient(to bottom, #DFDFDF, #808080);
+    border: 2px solid;
+    border-color: #DFDFDF #808080 #808080 #DFDFDF;
+    color: #000000;
+    font-family: 'MS Sans Serif', Arial, sans-serif;
+    font-size: 11px;
+    padding: 3px 12px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.open-btn:active {
+    border-color: #808080 #DFDFDF #DFDFDF #808080;
+}
+
+.resize-handle {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(to bottom, #DFDFDF, #808080);
+    border: 2px solid;
+    border-color: #FFFFFF #000000 #000000 #FFFFFF;
+    cursor: se-resize;
 }
 
 /* ==================== Hero Section ==================== */
