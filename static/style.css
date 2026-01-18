@@ -208,6 +208,73 @@ a {
     line-height: 1.8;
 }
 
+.candidate-showcase {
+    margin: var(--spacing-xl) 0;
+}
+
+.showcase-box {
+    width: 100%;
+    max-width: 500px;
+    height: 300px;
+    margin: 0 auto;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="light"] .showcase-box {
+    display: none;
+}
+
+.showcase-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.4));
+    padding: var(--spacing-lg);
+    text-align: center;
+    color: white;
+    width: 100%;
+}
+
+.showcase-name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.showcase-odds {
+    font-size: 2.8rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.showcase-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.9;
+}
+
+.showcase-loading {
+    text-align: center;
+    padding: var(--spacing-lg);
+    color: var(--text-secondary);
+    display: none;
+}
+
+html[data-theme="light"] .showcase-loading {
+    display: block;
+}
+
 .hero-ctas,
 .hero-buttons {
     display: flex;

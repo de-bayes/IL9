@@ -6,10 +6,43 @@
 <section class="hero">
     <div class="hero-content">
         <h1 class="hero-title">IL9CAST</h1>
+
+        <div class="candidate-showcase" id="candidateShowcase">
+            <div class="showcase-loading">Loading candidate data...</div>
+        </div>
+
         <div class="hero-buttons">
             <a href="/odds" class="btn btn-primary">Current Projections</a>
             <a href="/methodology" class="btn btn-secondary">Methodology</a>
         </div>
     </div>
 </section>
+
+<script>
+async function loadShowcase() {
+    try {
+        const response = await fetch('/api/forecast');
+        const data = await response.json();
+
+        // Get frontrunner
+        const frontrunner = [...data.candidates].sort((a, b) => b.probability - a.probability)[0];
+
+        const showcase = document.getElementById('candidateShowcase');
+        showcase.innerHTML = `
+            <div class="showcase-box" style="background-image: url('{{ url_for('static', filename='images/gradient.png') }}')">
+                <div class="showcase-overlay">
+                    <div class="showcase-name">${frontrunner.name}</div>
+                    <div class="showcase-odds">${frontrunner.probability}%</div>
+                    <div class="showcase-label">Win Probability</div>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error loading showcase:', error);
+        document.getElementById('candidateShowcase').innerHTML = '';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadShowcase);
+</script>
 {% endblock %}
