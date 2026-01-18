@@ -3,68 +3,51 @@
 {% block title %}IL9Cast - Illinois 9th District Forecast{% endblock %}
 
 {% block content %}
-<section class="hero-section">
-    <div class="hero-content">
-        <h1 class="hero-title glitch" data-text="IL9CAST">IL9CAST</h1>
-        <p class="hero-subtitle">2026 Democratic Primary Forecast</p>
-        <p class="hero-description">Real-time predictions for Illinois's 9th Congressional District.</p>
-
-        <div class="cta-group">
-            <a href="/odds" class="cta-button primary">View Forecast</a>
-            <a href="/methodology" class="cta-button secondary">How It Works</a>
+<div class="landing-wrapper">
+    <div class="landing-nav">
+        <div class="landing-nav-left">
+            <span class="nav-label">IL9CAST IS THE FORECAST MODEL FOR</span>
+            <span class="nav-subtitle">Illinois 9th District Democratic Primary</span>
+        </div>
+        <div class="landing-nav-right">
+            <span class="brand-text">IL9Cast</span>
         </div>
     </div>
-</section>
 
-<section class="featured-section">
-    <div class="section-header">
-        <h2>Current Forecast</h2>
-        <p class="section-subtitle">Live odds and probabilities</p>
+    <div class="landing-hero">
+        <h1 class="landing-title">
+            Forecast<br>
+            <em>for</em> democracy
+        </h1>
     </div>
 
-    <div class="candidate-preview" id="candidatePreview">
-        <div class="loading">Loading forecast data...</div>
-    </div>
-</section>
+    <div class="landing-bottom">
+        <div class="landing-status">
+            <span class="status-label">Live forecast updates</span>
+            <span class="status-value">6 candidates tracked</span>
+        </div>
 
-<section class="cta-section">
-    <div class="cta-content">
-        <h2>Ready to explore the model?</h2>
-        <a href="/odds" class="cta-button primary large">Start Exploring</a>
+        <div class="landing-tagline">
+            <p>Your real-time forecasting model for the 2026 primary, updated daily.</p>
+        </div>
+
+        <div class="landing-cta">
+            <a href="/odds" class="cta-pill">View the forecast</a>
+        </div>
     </div>
-</section>
+
+    <div class="blue-glow"></div>
+</div>
 
 <script>
-async function loadFeatured() {
-    try {
-        const response = await fetch('/api/forecast');
-        const data = await response.json();
-
-        const sorted = [...data.candidates].sort((a, b) => b.probability - a.probability);
-        const top3 = sorted.slice(0, 3);
-
-        const preview = document.getElementById('candidatePreview');
-        preview.innerHTML = `
-            <div class="candidates-grid">
-                ${top3.map((candidate, idx) => `
-                    <div class="candidate-card" style="animation-delay: ${idx * 0.1}s">
-                        <div class="candidate-rank">#${idx + 1}</div>
-                        <h3>${candidate.name}</h3>
-                        <p class="role">${candidate.party_role}</p>
-                        <div class="odds-display">
-                            <span class="odds-number">${candidate.probability}%</span>
-                            <span class="odds-label">Win Probability</span>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-    } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('candidatePreview').innerHTML = '';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', loadFeatured);
+// Hide default navbar and footer on landing
+document.addEventListener('DOMContentLoaded', () => {
+    const navbar = document.querySelector('.navbar');
+    const footer = document.querySelector('.footer');
+    const main = document.querySelector('.main-content');
+    if (navbar) navbar.style.display = 'none';
+    if (footer) footer.style.display = 'none';
+    if (main) main.style.padding = '0';
+});
 </script>
 {% endblock %}

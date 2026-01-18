@@ -144,6 +144,154 @@ p {
     border-color: var(--accent);
 }
 
+/* ==================== Landing Page (Figurative Style) ==================== */
+
+.landing-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000000;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.landing-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 2rem 3rem;
+    position: relative;
+    z-index: 10;
+}
+
+.landing-nav-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.nav-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+}
+
+.nav-subtitle {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.landing-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.brand-text {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #FFFFFF;
+    letter-spacing: 0.02em;
+}
+
+.landing-hero {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 3rem;
+    position: relative;
+    z-index: 10;
+}
+
+.landing-title {
+    font-family: 'Times New Roman', Times, Georgia, serif;
+    font-size: 5.5rem;
+    font-weight: 400;
+    line-height: 1.05;
+    color: #FFFFFF;
+    letter-spacing: -0.02em;
+}
+
+.landing-title em {
+    font-style: italic;
+}
+
+.landing-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 2rem 3rem 3rem;
+    position: relative;
+    z-index: 10;
+}
+
+.landing-status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.status-label {
+    font-size: 0.75rem;
+    color: #FFD700;
+    letter-spacing: 0.02em;
+}
+
+.status-value {
+    font-size: 0.75rem;
+    color: #FFD700;
+}
+
+.landing-tagline {
+    max-width: 280px;
+    text-align: center;
+}
+
+.landing-tagline p {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
+}
+
+.landing-cta {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.cta-pill {
+    display: inline-block;
+    padding: 0.875rem 2rem;
+    background: #FFFFFF;
+    color: #000000;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.cta-pill:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: scale(1.02);
+}
+
+.blue-glow {
+    position: absolute;
+    bottom: -20%;
+    right: -10%;
+    width: 70%;
+    height: 80%;
+    background: radial-gradient(ellipse at center, #0066FF 0%, #0044CC 30%, transparent 70%);
+    filter: blur(60px);
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 1;
+}
+
 /* ==================== Hero Section ==================== */
 
 .hero-section {
@@ -782,5 +930,58 @@ p {
 
     .odds-table td:last-child {
         border-bottom: none;
+    }
+}
+
+/* Landing Page Responsive */
+@media (max-width: 768px) {
+    .landing-nav {
+        padding: 1.5rem;
+    }
+
+    .landing-hero {
+        padding: 0 1.5rem;
+    }
+
+    .landing-title {
+        font-size: 3rem;
+    }
+
+    .landing-bottom {
+        flex-direction: column;
+        gap: 2rem;
+        align-items: flex-start;
+        padding: 2rem 1.5rem;
+    }
+
+    .landing-tagline {
+        max-width: 100%;
+        text-align: left;
+    }
+
+    .landing-cta {
+        width: 100%;
+    }
+
+    .cta-pill {
+        width: 100%;
+        text-align: center;
+    }
+
+    .blue-glow {
+        width: 100%;
+        height: 60%;
+        bottom: -10%;
+        right: -20%;
+    }
+}
+
+@media (max-width: 480px) {
+    .landing-title {
+        font-size: 2.2rem;
+    }
+
+    .nav-label {
+        font-size: 0.55rem;
     }
 }
