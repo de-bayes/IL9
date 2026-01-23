@@ -98,15 +98,41 @@ p {
 .nav-links {
     list-style: none;
     display: flex;
-    gap: 2.5rem;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.nav-section-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-right: -0.5rem;
+}
+
+.live-badge-nav {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #FF4444;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(255, 68, 68, 0.9);
+    animation: pulse-live 2s ease-in-out infinite;
+}
+
+.nav-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    margin: 0 0.25rem;
 }
 
 .nav-link {
     font-size: 0.9rem;
     font-weight: 500;
     color: var(--text-secondary);
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
     position: relative;
+    text-decoration: none;
 }
 
 .nav-link:hover {
@@ -126,6 +152,20 @@ p {
 
 .nav-link:hover::after {
     width: 100%;
+}
+
+.nav-link-primary {
+    color: rgba(0, 220, 255, 0.9);
+    font-weight: 600;
+}
+
+.nav-link-primary::after {
+    background-color: rgba(0, 220, 255, 0.9);
+}
+
+.nav-link-primary:hover {
+    color: rgba(0, 240, 255, 1);
+    text-shadow: 0 0 10px rgba(0, 220, 255, 0.5);
 }
 
 .dark-mode-toggle {
@@ -411,52 +451,20 @@ p {
     font-family: 'Times New Roman', Times, Georgia, serif;
     font-size: 1rem;
     color: #FFFFFF;
-    background: linear-gradient(135deg,
-        rgba(0, 180, 230, 0.3) 0%,
-        rgba(0, 200, 245, 0.4) 50%,
-        rgba(0, 180, 230, 0.3) 100%
-    );
-    border: 2px solid rgba(0, 220, 255, 0.5);
+    background: rgba(0, 200, 240, 0.2);
+    border: 1.5px solid rgba(0, 220, 255, 0.4);
     padding: 0.75rem 1.5rem;
     border-radius: 50px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(8px);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-        0 2px 8px rgba(0, 0, 0, 0.2);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    position: relative;
-}
-
-.menu-toggle::before {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 10%;
-    right: 10%;
-    height: 35%;
-    background: linear-gradient(180deg,
-        rgba(255, 255, 255, 0.25) 0%,
-        transparent 100%
-    );
-    border-radius: 50px 50px 50% 50%;
-    pointer-events: none;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .menu-toggle:hover {
-    background: linear-gradient(135deg,
-        rgba(0, 200, 240, 0.5) 0%,
-        rgba(0, 220, 255, 0.6) 50%,
-        rgba(0, 200, 240, 0.5) 100%
-    );
-    border-color: rgba(0, 240, 255, 0.8);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.3),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-        0 4px 12px rgba(0, 0, 0, 0.3),
-        0 0 15px rgba(0, 220, 255, 0.4);
+    background: rgba(0, 220, 255, 0.25);
+    border-color: rgba(0, 240, 255, 0.6);
+    box-shadow: 0 4px 12px rgba(0, 220, 255, 0.2);
     transform: translateY(-1px);
 }
 
@@ -494,10 +502,34 @@ p {
     color: rgba(255, 255, 255, 0.4);
     margin-bottom: 0.25rem;
     margin-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .menu-group:first-child .menu-group-label {
     margin-top: 0;
+}
+
+.live-badge {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #FF4444;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255, 68, 68, 0.8);
+    animation: pulse-live 2s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+    0%, 100% {
+        opacity: 1;
+        box-shadow: 0 0 8px rgba(255, 68, 68, 0.8);
+    }
+    50% {
+        opacity: 0.6;
+        box-shadow: 0 0 12px rgba(255, 68, 68, 1);
+    }
 }
 
 .menu-bar {
@@ -506,61 +538,17 @@ p {
     justify-content: flex-end;
     width: 0;
     height: 45px;
-    background: linear-gradient(135deg,
-        rgba(0, 180, 230, 0.85) 0%,
-        rgba(0, 200, 245, 0.9) 25%,
-        rgba(0, 220, 255, 0.95) 50%,
-        rgba(0, 200, 245, 0.9) 75%,
-        rgba(0, 180, 230, 0.85) 100%
-    );
-    backdrop-filter: blur(8px);
+    background: rgba(0, 200, 240, 0.75);
+    backdrop-filter: blur(6px);
     text-decoration: none;
     overflow: hidden;
-    transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease, transform 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     transition-delay: calc(var(--delay) * 0.1s);
     border-radius: 6px;
     padding: 0 1.2rem;
     position: relative;
-    border: 2px solid rgba(0, 220, 255, 0.4);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.3),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-        0 2px 8px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(0, 0, 0, 0.1);
-}
-
-/* Stained glass inner glow effect */
-.menu-bar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(180deg,
-        rgba(255, 255, 255, 0.25) 0%,
-        transparent 50%,
-        rgba(0, 0, 0, 0.1) 100%
-    );
-    pointer-events: none;
-    border-radius: 4px;
-}
-
-/* Glass reflection highlight */
-.menu-bar::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 8px;
-    right: 8px;
-    height: 40%;
-    background: linear-gradient(180deg,
-        rgba(255, 255, 255, 0.4) 0%,
-        transparent 100%
-    );
-    border-radius: 4px 4px 50% 50%;
-    pointer-events: none;
-    opacity: 0.6;
+    border: 1px solid rgba(0, 220, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .menu-expanded.open .menu-bar {
@@ -588,20 +576,9 @@ p {
 }
 
 .menu-bar:hover {
-    background: linear-gradient(135deg,
-        rgba(0, 200, 245, 0.95) 0%,
-        rgba(0, 220, 255, 1) 25%,
-        rgba(0, 240, 255, 1) 50%,
-        rgba(0, 220, 255, 1) 75%,
-        rgba(0, 200, 245, 0.95) 100%
-    );
-    border-color: rgba(0, 240, 255, 0.7);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.4),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-        0 4px 12px rgba(0, 0, 0, 0.4),
-        0 0 20px rgba(0, 220, 255, 0.5),
-        0 0 0 1px rgba(0, 0, 0, 0.2);
+    background: rgba(0, 220, 255, 0.85);
+    border-color: rgba(0, 240, 255, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 220, 255, 0.3);
     transform: translateY(-1px);
 }
 

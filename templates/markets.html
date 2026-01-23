@@ -979,8 +979,11 @@ async function renderMarketTrendChart(candidates) {
     const aggregatedSnapshots = aggregateSnapshots(filteredSnapshots, period);
 
     // Build labels from aggregated snapshot timestamps
-    const labels = aggregatedSnapshots.map(s => {
-        const date = new Date(s.timestamp);
+    // Use current time for the most recent data point to ensure accuracy
+    const labels = aggregatedSnapshots.map((s, index) => {
+        const isLastDataPoint = index === aggregatedSnapshots.length - 1;
+        const date = isLastDataPoint ? new Date() : new Date(s.timestamp);
+
         if (period === '1h') {
             return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         } else {
