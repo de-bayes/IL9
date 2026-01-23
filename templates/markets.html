@@ -80,7 +80,10 @@
                     &nbsp;&nbsp;spread_factor = max(0.2, 1 - spread/10 × 0.8)<br>
                     &nbsp;&nbsp;spread = yes_ask - yes_bid<br>
                     <br>
-                    Normalization = (Raw_Aggregate / Sum_All_Aggregates) × 100
+                    Soft Normalization (30% strength):<br>
+                    &nbsp;&nbsp;Fully_Normalized = (Raw_Aggregate / Sum_All_Aggregates) × 100<br>
+                    &nbsp;&nbsp;Adjustment = Fully_Normalized - Raw_Aggregate<br>
+                    &nbsp;&nbsp;Final = Raw_Aggregate + (Adjustment × 0.30)
                 </div>
             </div>
         </section>
@@ -90,7 +93,7 @@
             <p class="breakdown-desc">Live formula application for each candidate</p>
             <div id="breakdownContent"></div>
             <p class="breakdown-desc" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                <strong>*</strong> = No Kalshi market available. Uses 100% of Manifold probability. Probabilities are normalized to sum to ~100%, which may cause slight discrepancies for candidates without Kalshi data.
+                <strong>*</strong> = No Kalshi market available. Uses 100% of Manifold probability. Probabilities are lightly normalized (30% strength) to prevent excessive drift while preserving raw market values for top candidates.
             </p>
         </section>
 
@@ -695,15 +698,20 @@ async function calculateAggregate() {
         }
     });
 
-    // Normalize probabilities to sum to 100%
+    // Soft normalization - only apply 30% of adjustment to keep top candidates higher
+    const NORMALIZATION_STRENGTH = 0.30; // 30% normalization, 70% raw values
     const total = aggregated.reduce((sum, c) => sum + c.probability, 0);
     if (total > 0) {
         aggregated.forEach(c => {
-            c.probability = (c.probability / total) * 100;
+            const fullyNormalized = (c.probability / total) * 100;
+            const adjustment = fullyNormalized - c.probability;
+            c.probability = c.probability + (adjustment * NORMALIZATION_STRENGTH);
         });
         breakdowns.forEach(b => {
             const oldAggregate = parseFloat(b.aggregate);
-            b.normalizedAggregate = ((oldAggregate / total) * 100).toFixed(1);
+            const fullyNormalized = (oldAggregate / total) * 100;
+            const adjustment = fullyNormalized - oldAggregate;
+            b.normalizedAggregate = (oldAggregate + (adjustment * NORMALIZATION_STRENGTH)).toFixed(1);
         });
     }
 
@@ -764,7 +772,7 @@ function renderBreakdown(breakdowns) {
                     = ${b.manifoldContribution} + ${b.kalshiLastContribution} + ${b.kalshiMidContribution} + ${b.kalshiLiqContribution}
                 </div>
                 <div class="breakdown-result">= ${b.aggregate}%</div>
-                ${b.normalizedAggregate ? `<div class="breakdown-line" style="margin-top: 0.5rem; color: var(--text-secondary);"><strong>Normalized:</strong> ${b.normalizedAggregate}%</div>` : ''}
+                ${b.normalizedAggregate ? `<div class="breakdown-line" style="margin-top: 0.5rem; color: var(--text-secondary);"><strong>Soft Normalized (30%):</strong> ${b.normalizedAggregate}%</div>` : ''}
             `;
         } else {
             calculationHTML = `
@@ -775,7 +783,7 @@ function renderBreakdown(breakdowns) {
                     Using 100% of Manifold probability (no Kalshi data)<br>
                     = ${b.manifoldProb}%
                 </div>
-                ${b.normalizedAggregate ? `<div class="breakdown-line" style="margin-top: 0.5rem; color: var(--text-secondary);"><strong>Normalized:</strong> ${b.normalizedAggregate}%<br><em style="font-size: 0.85em;">Note: Probabilities normalized to sum to ~100%. Since this candidate lacks Kalshi data, the aggregation methodology differs, which may cause slight discrepancies.</em></div>` : ''}
+                ${b.normalizedAggregate ? `<div class="breakdown-line" style="margin-top: 0.5rem; color: var(--text-secondary);"><strong>Soft Normalized (30%):</strong> ${b.normalizedAggregate}%<br><em style="font-size: 0.85em;">Light normalization applied to prevent drift while preserving market values.</em></div>` : ''}
             `;
         }
 
