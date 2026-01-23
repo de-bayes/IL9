@@ -4,16 +4,11 @@
 
 {% block content %}
 <div class="landing-wrapper">
-    <div class="vertical-columns">
-        <div class="v-col"></div>
-        <div class="v-col"></div>
-        <div class="v-col"></div>
-        <div class="v-col"></div>
-    </div>
+    <div class="vertical-columns" id="verticalColumns"></div>
 
     <div class="landing-nav">
         <div class="landing-nav-left">
-            <span class="nav-label">IL9CAST IS THE FORECAST MODEL FOR</span>
+            <span class="nav-label">IL9CAST IS A FORECAST MODEL FOR</span>
             <span class="nav-subtitle">Illinois 9th District Democratic Primary</span>
         </div>
         <div class="landing-nav-right">
@@ -22,29 +17,47 @@
     </div>
 
     <div class="landing-hero">
-        <h1 class="landing-title">
-            Forecast<br>
-            <em>for</em> democracy
-        </h1>
+        <div class="hero-content">
+            <h1 class="landing-title">
+                Forecast<br>
+                <em>Illinois's</em> 9th
+            </h1>
+            <p class="hero-credit">Model Created by: Ryan McComb</p>
+            <p class="hero-affiliation">Student at ETHS</p>
+        </div>
     </div>
 
-    <div class="landing-bottom">
-        <div class="landing-status">
-            <span class="status-label">Live forecast updates</span>
-            <span class="status-value">6 candidates tracked</span>
-        </div>
-
+    <div class="landing-right">
         <div class="landing-tagline">
-            <p>Your real-time forecasting model for the 2026 primary, updated daily.</p>
+            <p>Your real-time forecasting model for the IL-9 2026 primary, inspired by Nate Silver, 538, the Silver Bulletin, and Galen Druke.</p>
         </div>
-
-        <div class="landing-cta">
-            <a href="/odds" class="cta-pill">View the forecast</a>
+        <div class="landing-menu">
+            <button class="menu-toggle" id="menuToggle">Explore</button>
+            <div class="menu-expanded" id="menuExpanded">
+                <a href="/markets" class="menu-bar menu-bar-primary" style="--delay: 0">
+                    <span class="bar-text">Markets</span>
+                    <span class="menu-callout">Live Data</span>
+                </a>
+                <a href="/odds" class="menu-bar" style="--delay: 1">
+                    <span class="bar-text">The Model</span>
+                </a>
+                <a href="/fundraising" class="menu-bar" style="--delay: 2">
+                    <span class="bar-text">Fundraising</span>
+                </a>
+                <a href="/methodology" class="menu-bar" style="--delay: 3">
+                    <span class="bar-text">Methodology</span>
+                </a>
+                <a href="/about" class="menu-bar" style="--delay: 4">
+                    <span class="bar-text">About</span>
+                </a>
+            </div>
         </div>
     </div>
 
     <div class="blue-glow"></div>
     <div class="cyan-glow"></div>
+    <div class="red-glow"></div>
+    <div class="warm-glow"></div>
 </div>
 
 <script>
@@ -56,6 +69,44 @@ document.addEventListener('DOMContentLoaded', () => {
     if (navbar) navbar.style.display = 'none';
     if (footer) footer.style.display = 'none';
     if (main) main.style.padding = '0';
+
+    // Generate vertical columns with offset gradients
+    const container = document.getElementById('verticalColumns');
+    const numCols = 15;
+
+    for (let i = 0; i < numCols; i++) {
+        const col = document.createElement('div');
+        col.className = 'v-col';
+
+        // Blue light (bottom-right): fades as you go LEFT, vertical shift
+        const blueOpacity = 0.15 + (i / 14) * 0.85;
+        const blueOffset = (i - 7) * 3;
+
+        // Cyan light (top-left): fades as you go RIGHT, vertical shift
+        const cyanOpacity = 0.15 + ((14 - i) / 14) * 0.85;
+        const cyanOffset = (7 - i) * 3;
+
+        col.style.setProperty('--blue-offset', `${blueOffset}%`);
+        col.style.setProperty('--blue-opacity', blueOpacity);
+        col.style.setProperty('--cyan-offset', `${cyanOffset}%`);
+        col.style.setProperty('--cyan-opacity', cyanOpacity);
+        container.appendChild(col);
+    }
+
+    // Menu toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const menuExpanded = document.getElementById('menuExpanded');
+
+    menuToggle.addEventListener('click', () => {
+        menuExpanded.classList.toggle('open');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!menuToggle.contains(e.target) && !menuExpanded.contains(e.target)) {
+            menuExpanded.classList.remove('open');
+        }
+    });
 });
 </script>
 {% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}About - IL9Cast{% endblock %}
+
+{% block content %}
+<div class="inner-page about-page">
+    <nav class="inner-nav">
+        <a href="/" class="back-link">IL9Cast</a>
+        <div class="inner-nav-links">
+            <a href="/odds">The Model</a>
+            <a href="/markets">Markets</a>
+            <a href="/fundraising">Fundraising</a>
+            <a href="/methodology">Methodology</a>
+            <a href="/about" class="active">About</a>
+        </div>
+    </nav>
+
+    <div class="inner-content">
+        <h1 class="inner-title">About</h1>
+
+        <section class="about-section">
+            <h2>The Project</h2>
+            <p>IL9Cast is a forecasting model for the Illinois 9th Congressional District Democratic Primary, scheduled for March 17, 2026. This project aims to provide real-time probability estimates for each candidate based on polling data, fundraising reports, and historical trends.</p>
+        </section>
+
+        <section class="about-section">
+            <h2>Inspiration</h2>
+            <p>This model is inspired by the pioneering work of election forecasters including:</p>
+            <ul>
+                <li><strong>Nate Silver</strong> - Creator of FiveThirtyEight and modern election forecasting</li>
+                <li><strong>538</strong> - The original data-driven election forecast site</li>
+                <li><strong>The Silver Bulletin</strong> - Nate Silver's current forecasting publication</li>
+                <li><strong>Galen Druke</strong> - Podcast host and election analyst</li>
+            </ul>
+        </section>
+
+        <section class="about-section">
+            <h2>About the Creator</h2>
+            <p><strong>Ryan McComb</strong> is a student at ETHS with an interest in data science, political analysis, and civic engagement. This project was created as an educational exercise in statistical modeling and web development.</p>
+        </section>
+
+        <section class="about-section">
+            <h2>Disclaimer</h2>
+            <p>This is a demonstration project using simulated data. The probabilities shown are for educational purposes and should not be considered actual election predictions. Always consult official sources and multiple forecasters when evaluating electoral outcomes.</p>
+        </section>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const navbar = document.querySelector('.navbar');
+    const footer = document.querySelector('.footer');
+    if (navbar) navbar.style.display = 'none';
+    if (footer) footer.style.display = 'none';
+});
+</script>
+{% endblock %}

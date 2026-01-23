@@ -1,248 +1,139 @@
 {% extends "base.html" %}
 
-{% block title %}Odds - IL9Cast{% endblock %}
+{% block title %}The Model - IL9Cast{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Current Odds</h1>
-    <p class="page-subtitle">Live forecast for all candidates</p>
+<div class="model-page-wrapper">
+    <div class="horizontal-rows" id="horizontalRows"></div>
+
+    <nav class="inner-nav">
+        <a href="/" class="back-link">IL9Cast</a>
+        <div class="inner-nav-links">
+            <a href="/odds" class="active">The Model</a>
+            <a href="/markets">Markets</a>
+            <a href="/fundraising">Fundraising</a>
+            <a href="/methodology">Methodology</a>
+            <a href="/about">About</a>
+        </div>
+    </nav>
+
+    <div class="inner-content model-content">
+        <h1 class="inner-title">The Model</h1>
+        <p class="model-statement">Because this district is like...super...super uncompetitive and boring, it's really hard to find data to build a model, but i'm working on it.</p>
+    </div>
 </div>
 
-<section class="odds-controls">
-    <div class="sort-controls">
-        <label for="sortBy">Sort by:</label>
-        <select id="sortBy" class="sort-select">
-            <option value="odds-desc">Odds (High to Low)</option>
-            <option value="odds-asc">Odds (Low to High)</option>
-            <option value="name">Name (A-Z)</option>
-            <option value="change">Recent Change</option>
-        </select>
-    </div>
-    <div class="update-time">
-        Last updated: <span id="updateTimestamp">Loading...</span>
-    </div>
-</section>
+<style scoped>
+.model-page-wrapper {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
-<section class="odds-table-container">
-    <table class="odds-table" id="oddsTable">
-        <thead>
-            <tr>
-                <th>Rank</th>
-                <th>Candidate</th>
-                <th>Role</th>
-                <th>Current Odds</th>
-                <th>Change</th>
-                <th>Trend</th>
-            </tr>
-        </thead>
-        <tbody id="oddsTbody">
-            <tr>
-                <td colspan="6" class="table-loading">Loading candidates...</td>
-            </tr>
-        </tbody>
-    </table>
-</section>
+.horizontal-rows {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+    pointer-events: none;
+}
 
-<section class="visualizations">
-    <div class="viz-container">
-        <h2>Probability Distribution</h2>
-        <div class="chart-wrapper">
-            <canvas id="distributionChart"></canvas>
-        </div>
-    </div>
+.h-row {
+    --blue-offset: 0%;
+    --cyan-offset: 0%;
+    --blue-opacity: 1;
+    --cyan-opacity: 1;
+    flex: 1;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
 
-    <div class="viz-container">
-        <h2>Historical Trend (90 Days)</h2>
-        <div class="chart-wrapper">
-            <canvas id="trendChart"></canvas>
-        </div>
-    </div>
-</section>
+/* Blue light source - bottom right, fades toward top */
+.h-row::before {
+    content: '';
+    position: absolute;
+    bottom: calc(-25% + var(--blue-offset));
+    right: calc(-30% + var(--blue-offset));
+    width: 120%;
+    height: 450%;
+    background: radial-gradient(ellipse at center, rgba(0, 90, 255, 0.6) 0%, rgba(0, 60, 200, 0.35) 20%, rgba(0, 40, 150, 0.15) 40%, transparent 60%);
+    filter: blur(45px);
+    opacity: var(--blue-opacity);
+    pointer-events: none;
+}
+
+/* Cyan light source - top left, fades toward bottom */
+.h-row::after {
+    content: '';
+    position: absolute;
+    top: calc(-20% + var(--cyan-offset));
+    left: calc(-30% + var(--cyan-offset));
+    width: 120%;
+    height: 450%;
+    background: radial-gradient(ellipse at center, rgba(0, 220, 255, 0.5) 0%, rgba(0, 180, 220, 0.3) 18%, rgba(0, 140, 180, 0.15) 35%, transparent 55%);
+    filter: blur(40px);
+    opacity: var(--cyan-opacity);
+    pointer-events: none;
+}
+
+.inner-nav {
+    position: relative;
+    z-index: 10;
+}
+
+.model-content {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 6rem 2rem;
+}
+
+.model-statement {
+    font-size: 1.3rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-top: 2rem;
+}
+</style>
 
 <script>
-let distributionChart = null;
-let trendChart = null;
+document.addEventListener('DOMContentLoaded', () => {
+    const navbar = document.querySelector('.navbar');
+    const footer = document.querySelector('.footer');
+    if (navbar) navbar.style.display = 'none';
+    if (footer) footer.style.display = 'none';
 
-async function loadOdds() {
-    try {
-        const response = await fetch('/api/forecast');
-        const data = await response.json();
+    // Generate horizontal rows with offset gradients
+    const container = document.getElementById('horizontalRows');
+    const numRows = 12;
 
-        // Update timestamp
-        const updated = new Date(data.last_updated);
-        document.getElementById('updateTimestamp').textContent = updated.toLocaleString();
+    for (let i = 0; i < numRows; i++) {
+        const row = document.createElement('div');
+        row.className = 'h-row';
 
-        // Store data for sorting
-        window.candidatesData = data.candidates;
+        // Blue light (bottom-right): fades as you go UP, horizontal shift
+        const blueOpacity = 0.15 + (i / (numRows - 1)) * 0.85;
+        const blueOffsetH = (i - (numRows / 2)) * 4;
 
-        // Initial render
-        renderTable(data.candidates);
+        // Cyan light (top-left): fades as you go DOWN, horizontal shift
+        const cyanOpacity = 0.15 + (((numRows - 1) - i) / (numRows - 1)) * 0.85;
+        const cyanOffsetH = ((numRows / 2) - i) * 4;
 
-        // Load trend data
-        await loadTrendData();
-    } catch (error) {
-        console.error('Error loading odds:', error);
-        document.getElementById('oddsTbody').innerHTML = '<tr><td colspan="6" class="table-error">Error loading data</td></tr>';
+        row.style.setProperty('--blue-offset', `${blueOffsetH}%`);
+        row.style.setProperty('--blue-opacity', blueOpacity);
+        row.style.setProperty('--cyan-offset', `${cyanOffsetH}%`);
+        row.style.setProperty('--cyan-opacity', cyanOpacity);
+        container.appendChild(row);
     }
-}
-
-function renderTable(candidates) {
-    const tbody = document.getElementById('oddsTbody');
-    tbody.innerHTML = '';
-
-    // Sort candidates
-    const sortBy = document.getElementById('sortBy').value;
-    const sorted = sortCandidates(candidates, sortBy);
-
-    sorted.forEach((candidate, index) => {
-        const row = document.createElement('tr');
-        const changeNum = candidate.change || 0;
-        const changeClass = changeNum > 0 ? 'positive' : changeNum < 0 ? 'negative' : 'neutral';
-        const changePlus = changeNum > 0 ? '+' : '';
-
-        const trendEmoji = {
-            'up': '📈',
-            'down': '📉',
-            'stable': '→'
-        }[candidate.trend] || '→';
-
-        row.innerHTML = `
-            <td class="rank">#${index + 1}</td>
-            <td class="candidate-name">${candidate.name}</td>
-            <td class="candidate-role">${candidate.party_role}</td>
-            <td class="probability">
-                <div class="prob-bar">
-                    <div class="prob-fill" style="width: ${candidate.probability}%"></div>
-                </div>
-                <span class="prob-text">${candidate.probability}%</span>
-            </td>
-            <td class="change ${changeClass}">${changePlus}${changeNum}%</td>
-            <td class="trend">${trendEmoji}</td>
-        `;
-        tbody.appendChild(row);
-    });
-}
-
-function sortCandidates(candidates, sortBy) {
-    const copy = [...candidates];
-    switch (sortBy) {
-        case 'odds-asc':
-            return copy.sort((a, b) => a.probability - b.probability);
-        case 'name':
-            return copy.sort((a, b) => a.name.localeCompare(b.name));
-        case 'change':
-            return copy.sort((a, b) => (b.change || 0) - (a.change || 0));
-        default: // odds-desc
-            return copy.sort((a, b) => b.probability - a.probability);
-    }
-}
-
-async function loadTrendData() {
-    try {
-        const response = await fetch('/api/timeline');
-        const timeline = await response.json();
-
-        renderDistributionChart(window.candidatesData);
-        renderTrendChart(timeline);
-    } catch (error) {
-        console.error('Error loading trend data:', error);
-    }
-}
-
-function renderDistributionChart(candidates) {
-    const sorted = [...candidates].sort((a, b) => b.probability - a.probability);
-    const labels = sorted.map(c => c.name.split(' ')[0]);
-    const data = sorted.map(c => c.probability);
-    const colors = sorted.map(c => c.color);
-
-    const ctx = document.getElementById('distributionChart').getContext('2d');
-    if (distributionChart) distributionChart.destroy();
-
-    distributionChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Win Probability (%)',
-                data: data,
-                backgroundColor: colors,
-                borderColor: colors,
-                borderWidth: 1,
-                borderRadius: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            indexAxis: 'x',
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 35,
-                    ticks: {
-                        callback: (value) => value + '%'
-                    }
-                }
-            }
-        }
-    });
-}
-
-function renderTrendChart(timeline) {
-    const labels = timeline.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-    const candidateNames = Object.keys(timeline[0].candidates);
-    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F'];
-
-    const datasets = candidateNames.map((name, idx) => {
-        const data = timeline.map(d => d.candidates[name]);
-        return {
-            label: name.split(' ')[0],
-            data: data,
-            borderColor: colors[idx],
-            backgroundColor: colors[idx] + '20',
-            tension: 0.3,
-            fill: false,
-            pointRadius: 3,
-            pointBackgroundColor: colors[idx]
-        };
-    });
-
-    const ctx = document.getElementById('trendChart').getContext('2d');
-    if (trendChart) trendChart.destroy();
-
-    trendChart = new Chart(ctx, {
-        type: 'line',
-        data: { labels, datasets },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { usePointStyle: true, padding: 15 }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 35,
-                    ticks: { callback: (value) => value + '%' }
-                }
-            }
-        }
-    });
-}
-
-// Sort handler
-document.getElementById('sortBy').addEventListener('change', () => {
-    renderTable(window.candidatesData);
 });
-
-document.addEventListener('DOMContentLoaded', loadOdds);
 </script>
 {% endblock %}

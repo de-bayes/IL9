@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Fundraising - IL9Cast{% endblock %}
+
+{% block content %}
+<div class="inner-page fundraising-page">
+    <nav class="inner-nav">
+        <a href="/" class="back-link">IL9Cast</a>
+        <div class="inner-nav-links">
+            <a href="/odds">The Model</a>
+            <a href="/markets">Markets</a>
+            <a href="/fundraising" class="active">Fundraising</a>
+            <a href="/methodology">Methodology</a>
+            <a href="/about">About</a>
+        </div>
+    </nav>
+
+    <div class="inner-content">
+        <h1 class="inner-title">Fundraising</h1>
+        <p class="page-subtitle">Campaign finance data from FEC filings</p>
+
+        <section class="fundraising-overview">
+            <div class="stat-card">
+                <span class="stat-label">Total Raised (All Candidates)</span>
+                <span class="stat-value">$4.2M</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Latest Filing Period</span>
+                <span class="stat-value">Q4 2025</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Days Until Primary</span>
+                <span class="stat-value">58</span>
+            </div>
+        </section>
+
+        <section class="fundraising-table-section">
+            <h2>Candidate Fundraising</h2>
+            <div class="fundraising-table">
+                <div class="fundraising-row header">
+                    <span>Candidate</span>
+                    <span>Total Raised</span>
+                    <span>Cash on Hand</span>
+                    <span>Burn Rate</span>
+                </div>
+                <div class="fundraising-row">
+                    <span class="candidate-name">Maria Garcia</span>
+                    <span>$1,245,000</span>
+                    <span>$892,000</span>
+                    <span class="burn-rate low">$58K/mo</span>
+                </div>
+                <div class="fundraising-row">
+                    <span class="candidate-name">James Wilson</span>
+                    <span>$987,000</span>
+                    <span>$654,000</span>
+                    <span class="burn-rate medium">$72K/mo</span>
+                </div>
+                <div class="fundraising-row">
+                    <span class="candidate-name">Dr. Sarah Ahmed</span>
+                    <span>$756,000</span>
+                    <span>$523,000</span>
+                    <span class="burn-rate low">$45K/mo</span>
+                </div>
+                <div class="fundraising-row">
+                    <span class="candidate-name">Tom Mueller</span>
+                    <span>$612,000</span>
+                    <span>$298,000</span>
+                    <span class="burn-rate high">$89K/mo</span>
+                </div>
+                <div class="fundraising-row">
+                    <span class="candidate-name">Angela Chen</span>
+                    <span>$423,000</span>
+                    <span>$312,000</span>
+                    <span class="burn-rate low">$32K/mo</span>
+                </div>
+                <div class="fundraising-row">
+                    <span class="candidate-name">Robert Jackson</span>
+                    <span>$189,000</span>
+                    <span>$87,000</span>
+                    <span class="burn-rate medium">$28K/mo</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="donor-section">
+            <h2>Donor Statistics</h2>
+            <div class="donor-grid">
+                <div class="donor-card">
+                    <h3>Maria Garcia</h3>
+                    <div class="donor-stats">
+                        <div class="donor-stat">
+                            <span class="label">Unique Donors</span>
+                            <span class="value">3,421</span>
+                        </div>
+                        <div class="donor-stat">
+                            <span class="label">Avg. Donation</span>
+                            <span class="value">$364</span>
+                        </div>
+                        <div class="donor-stat">
+                            <span class="label">Small Dollar %</span>
+                            <span class="value">67%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="donor-card">
+                    <h3>James Wilson</h3>
+                    <div class="donor-stats">
+                        <div class="donor-stat">
+                            <span class="label">Unique Donors</span>
+                            <span class="value">2,156</span>
+                        </div>
+                        <div class="donor-stat">
+                            <span class="label">Avg. Donation</span>
+                            <span class="value">$458</span>
+                        </div>
+                        <div class="donor-stat">
+                            <span class="label">Small Dollar %</span>
+                            <span class="value">52%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="donor-card">
+                    <h3>Dr. Sarah Ahmed</h3>
+                    <div class="donor-stats">
+                        <div class="donor-stat">
+                            <span class="label">Unique Donors</span>
+                            <span class="value">1,892</span>
+                        </div>
+                        <div class="donor-stat">
+                            <span class="label">Avg. Donation</span>
+                            <span class="value">$400</span>
+                        </div>
+                        <div class="donor-stat">
+                            <span class="label">Small Dollar %</span>
+                            <span class="value">61%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const navbar = document.querySelector('.navbar');
+    const footer = document.querySelector('.footer');
+    if (navbar) navbar.style.display = 'none';
+    if (footer) footer.style.display = 'none';
+});
+</script>
+{% endblock %}

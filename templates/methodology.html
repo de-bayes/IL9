@@ -3,16 +3,166 @@
 {% block title %}Methodology - IL9Cast{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Methodology</h1>
-    <p class="page-subtitle">How we build the forecast model</p>
-</div>
+<div class="inner-page methodology-page">
+    <nav class="inner-nav">
+        <a href="/" class="back-link">IL9Cast</a>
+        <div class="inner-nav-links">
+            <a href="/odds">The Model</a>
+            <a href="/markets">Markets</a>
+            <a href="/fundraising">Fundraising</a>
+            <a href="/methodology" class="active">Methodology</a>
+            <a href="/about">About</a>
+        </div>
+    </nav>
+
+    <div class="inner-content">
+        <h1 class="inner-title">Methodology</h1>
+        <p class="method-subtitle">How we build the forecast model</p>
 
 <section class="methodology-content">
+    <div id="productOverviews" style="margin-bottom: 3rem;">
+        <h2 style="margin-bottom: 1rem;">Product Overview</h2>
+
+        <div class="candidate-breakdown" id="product-model">
+            <button class="breakdown-toggle" onclick="toggleProduct('product-model')">
+                <span class="breakdown-header">The Model</span>
+                <span class="breakdown-icon">+</span>
+            </button>
+            <div class="breakdown-details">
+                <div class="breakdown-line"><strong>Status:</strong> Under development</div>
+                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>What it is:</strong> A Bayesian ensemble model combining polling data, fundraising trends, historical performance, and voter demographics to produce probability estimates for each candidate.</div>
+                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Challenge:</strong> The IL-9 district is extremely uncompetitive and boring, making it difficult to find sufficient polling and historical data to build a robust predictive model.</div>
+                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Approach:</strong></div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">• Weighted average of recent polls (more recent = higher weight)</div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">• Fundamentals model using fundraising, incumbency, and demographic fit</div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">• Historical regression calibrated on past primary elections</div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">• Ensemble weighting based on historical accuracy</div>
+                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Output:</strong> Probability distributions (not point estimates) to quantify uncertainty and show race competitiveness.</div>
+            </div>
+        </div>
+
+        <div class="candidate-breakdown" id="product-markets">
+            <button class="breakdown-toggle" onclick="toggleProduct('product-markets')">
+                <span class="breakdown-header">Markets</span>
+                <span class="breakdown-icon">+</span>
+            </button>
+            <div class="breakdown-details">
+                <div class="breakdown-line"><strong>Status:</strong> Live and fully operational</div>
+                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>What it is:</strong> Real-time aggregation of prediction market probabilities from Manifold Markets (play-money AMM) and Kalshi (real-money order book exchange).</div>
+                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Weighting:</strong> 40% Manifold + 60% Kalshi</div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">Within Kalshi: 70% Last Price + 20% Midpoint + 10% Liquidity-Weighted</div>
+                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Why this works:</strong> Prediction markets aggregate distributed knowledge from diverse participants. Real money (Kalshi) reflects conviction; play money (Manifold) captures broader sentiment.</div>
+                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Update frequency:</strong></div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">• Default: Every 30 minutes</div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">• Final 3 days: Every 5 minutes</div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">• Election day: Every 1 minute</div>
+                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Unique feature:</strong> Liquidity-weighted pricing analyzes Kalshi's order book to detect buying vs selling pressure based on where the last trade occurred within the bid-ask spread.</div>
+            </div>
+        </div>
+
+        <div class="candidate-breakdown" id="product-fundraising">
+            <button class="breakdown-toggle" onclick="toggleProduct('product-fundraising')">
+                <span class="breakdown-header">Fundraising</span>
+                <span class="breakdown-icon">+</span>
+            </button>
+            <div class="breakdown-details">
+                <div class="breakdown-line"><strong>Status:</strong> Display only (simulated data)</div>
+                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>What it is:</strong> Campaign finance tracking from FEC filings, showing total raised, cash on hand, burn rate, and donor statistics for each candidate.</div>
+                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Data sources:</strong></div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">• FEC quarterly and monthly reports</div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">• Individual contribution records</div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">• Expenditure reports</div>
+                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Key metrics:</strong></div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">• Total raised (cumulative fundraising)</div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">• Cash on hand (available resources)</div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">• Burn rate (monthly spending pace)</div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">• Small dollar % (grassroots support indicator)</div>
+                <div class="breakdown-line" style="padding-left: 1.5rem;">• Average donation size</div>
+                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Why it matters:</strong> Fundraising is a strong predictor of campaign viability and correlates with name recognition, organizational strength, and voter outreach capacity.</div>
+            </div>
+        </div>
+    </div>
+
     <article class="method-section">
         <h2>How We Forecast</h2>
         <p>IL9Cast combines multiple data streams to estimate each candidate's probability of winning the Illinois 9th Democratic primary. Our model weighs polling data, fundraising trends, historical performance, and voter demographics to produce real-time odds.</p>
         <p>Unlike static predictions, our forecast updates as new information becomes available, allowing you to see how the race evolves in real time.</p>
+    </article>
+
+    <article class="method-section">
+        <h2>Prediction Markets Aggregation</h2>
+        <p>The <a href="/markets">Markets page</a> aggregates real-time probabilities from two major prediction markets: <strong>Manifold Markets</strong> (community-driven) and <strong>Kalshi</strong> (real-money exchange). This provides a live, crowd-sourced forecast updated automatically as new trades occur.</p>
+
+        <h3 style="margin-top: 1.5rem; font-size: 1.1rem;">Overall Weighting: 40% Manifold + 60% Kalshi</h3>
+
+        <p><strong>Manifold Markets (40% weight):</strong></p>
+        <ul class="method-list">
+            <li>Community prediction market using play money</li>
+            <li>Lower barrier to entry, broader participation</li>
+            <li>Captures general consensus and casual forecasters</li>
+            <li>Uses an Automated Market Maker (AMM) for price discovery</li>
+            <li>Good for long-term sentiment, less susceptible to short-term noise</li>
+        </ul>
+
+        <p><strong>Kalshi (60% weight):</strong></p>
+        <ul class="method-list">
+            <li>Real-money exchange with cash-settled contracts</li>
+            <li>Higher barrier to entry, attracts serious forecasters with skin in the game</li>
+            <li>Reflects genuine conviction (money is at risk)</li>
+            <li>Traditional order book exchange (bid/ask spread pricing)</li>
+        </ul>
+
+        <h3 style="margin-top: 1.5rem; font-size: 1.1rem;">Kalshi Component Breakdown (60% total weight)</h3>
+
+        <p>Within Kalshi's 60% weight, we use three price signals:</p>
+
+        <p><strong>1. Last Price (42% overall = 70% of Kalshi's 60%)</strong></p>
+        <ul class="method-list">
+            <li>The most recent completed trade price</li>
+            <li>Reflects real money execution and recent market sentiment</li>
+            <li>Given highest weight because it shows actual conviction backed by capital</li>
+            <li>Most responsive to new information and recent trades</li>
+        </ul>
+
+        <p><strong>2. Midpoint (12% overall = 20% of Kalshi's 60%)</strong></p>
+        <ul class="method-list">
+            <li>Average of the current best bid and best ask prices: (bid + ask) / 2</li>
+            <li>Represents the fair value between buyers and sellers right now</li>
+            <li>Includes current order book state but not yet executed</li>
+            <li>Smooths out last trade anomalies or outliers</li>
+        </ul>
+
+        <p><strong>3. Liquidity-Weighted Price (6% overall = 10% of Kalshi's 60%)</strong></p>
+        <ul class="method-list">
+            <li><strong>Purpose:</strong> Captures buying vs selling pressure by analyzing where the last trade occurred within the bid-ask spread</li>
+            <li><strong>Why only Kalshi?</strong> Kalshi uses a traditional order book exchange where buyers and sellers post bids and asks. Manifold uses an Automated Market Maker (AMM) that algorithmically sets prices, so order book analysis doesn't apply</li>
+            <li><strong>How it works:</strong> Calculate position in spread = (Last Price - Bid) / (Ask - Bid). Position of 0.0 = traded at bid (sellers aggressive), 0.5 = at midpoint (balanced), 1.0 = at ask (buyers aggressive)</li>
+            <li><strong>Spread dampening:</strong> Wider spreads reduce the adjustment because they indicate less confidence. At 0pp spread: factor = 1.0 (full shift potential). At 10pp spread: factor = 0.2 (heavily dampened)</li>
+            <li><strong>Example:</strong> Bid=60, Ask=68, Last=66, Mid=64, Spread=8. Position = (66-60)/8 = 0.75 (near ask). Offset = 0.75 - 0.5 = +0.25. Dampening = 1 - (8/10)×0.8 = 0.36. Shift = 0.25 × 6 × 0.36 = +0.54pp. Result = 64 + 0.54 = 64.5% (buyers showed aggression)</li>
+            <li>Caps shift at ±3 percentage points to avoid overreaction</li>
+        </ul>
+
+        <h3 style="margin-top: 1.5rem; font-size: 1.1rem;">The Complete Formula</h3>
+        <p style="font-family: monospace; background: rgba(0, 170, 220, 0.1); padding: 1rem; border-radius: 4px; margin: 1rem 0;">
+            Aggregate Probability = (0.40 × Manifold) + (0.42 × Kalshi Last Price) + (0.12 × Kalshi Midpoint) + (0.06 × Kalshi Liquidity-Weighted)
+        </p>
+
+        <h3 style="margin-top: 1.5rem; font-size: 1.1rem;">Normalization</h3>
+        <p>All final probabilities are normalized to sum to ~100%. This accounts for:</p>
+        <ul class="method-list">
+            <li>Candidates with no Kalshi market (marked with *) use 100% of their Manifold probability</li>
+            <li>All candidate probabilities are rescaled so the total equals 100%</li>
+            <li>This may cause small discrepancies, which is noted in the calculation breakdown</li>
+        </ul>
+
+        <h3 style="margin-top: 1.5rem; font-size: 1.1rem;">Update Frequency</h3>
+        <ul class="method-list">
+            <li><strong>Default (pre-campaign):</strong> Every 30 minutes</li>
+            <li><strong>Final 3 days before election:</strong> Every 5 minutes</li>
+            <li><strong>Election day:</strong> Every 1 minute</li>
+        </ul>
+
+        <p>This allows the markets page to reflect real-time sentiment while not overwhelming with noise early on.</p>
     </article>
 
     <article class="method-section">
@@ -132,5 +282,99 @@
 .method-section a:hover {
     opacity: 0.8;
 }
+
+/* Product overview foldout styles */
+.candidate-breakdown {
+    margin-bottom: 0.75rem;
+    background: rgba(0, 0, 0, 0.15);
+    border-left: 3px solid var(--accent-primary);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.breakdown-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-family: inherit;
+    text-align: left;
+    gap: 1rem;
+}
+
+.breakdown-toggle:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.breakdown-header {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+}
+
+.breakdown-icon {
+    font-size: 1.5rem;
+    color: var(--accent-primary);
+    transition: transform 0.3s ease;
+}
+
+.candidate-breakdown.open .breakdown-icon {
+    transform: rotate(45deg);
+}
+
+.breakdown-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 1.5rem;
+}
+
+.candidate-breakdown.open .breakdown-details {
+    max-height: 800px;
+    padding: 0 1.5rem 1.5rem;
+}
+
+.breakdown-line {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 0.4rem;
+}
+
+.breakdown-line strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.breakdown-result {
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid rgba(0, 170, 220, 0.2);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+}
 </style>
+    </div>
+</div>
+
+<script>
+function toggleProduct(id) {
+    const product = document.getElementById(id);
+    product.classList.toggle('open');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const navbar = document.querySelector('.navbar');
+    const footer = document.querySelector('.footer');
+    if (navbar) navbar.style.display = 'none';
+    if (footer) footer.style.display = 'none';
+});
+</script>
 {% endblock %}
