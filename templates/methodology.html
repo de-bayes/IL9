@@ -17,77 +17,9 @@
 
     <div class="inner-content">
         <h1 class="inner-title">Methodology</h1>
-        <p class="method-subtitle">How we build the forecast model</p>
+        <p class="method-subtitle">How we aggregate prediction markets</p>
 
 <section class="methodology-content">
-    <div id="productOverviews" style="margin-bottom: 3rem;">
-        <h2 style="margin-bottom: 1rem;">Product Overview</h2>
-
-        <div class="candidate-breakdown" id="product-model">
-            <button class="breakdown-toggle" onclick="toggleProduct('product-model')">
-                <span class="breakdown-header">The Model</span>
-                <span class="breakdown-icon">+</span>
-            </button>
-            <div class="breakdown-details">
-                <div class="breakdown-line"><strong>Status:</strong> Under development</div>
-                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>What it is:</strong> A Bayesian ensemble model combining polling data, fundraising trends, historical performance, and voter demographics to produce probability estimates for each candidate.</div>
-                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Challenge:</strong> The IL-9 district is extremely uncompetitive and boring, making it difficult to find sufficient polling and historical data to build a robust predictive model.</div>
-                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Approach:</strong></div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">• Weighted average of recent polls (more recent = higher weight)</div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">• Fundamentals model using fundraising, incumbency, and demographic fit</div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">• Historical regression calibrated on past primary elections</div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">• Ensemble weighting based on historical accuracy</div>
-                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Output:</strong> Probability distributions (not point estimates) to quantify uncertainty and show race competitiveness.</div>
-            </div>
-        </div>
-
-        <div class="candidate-breakdown" id="product-markets">
-            <button class="breakdown-toggle" onclick="toggleProduct('product-markets')">
-                <span class="breakdown-header">Markets</span>
-                <span class="breakdown-icon">+</span>
-            </button>
-            <div class="breakdown-details">
-                <div class="breakdown-line"><strong>Status:</strong> Live and fully operational</div>
-                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>What it is:</strong> Real-time aggregation of prediction market probabilities from Manifold Markets (play-money AMM) and Kalshi (real-money order book exchange).</div>
-                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Weighting:</strong> 40% Manifold + 60% Kalshi</div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">Within Kalshi: 70% Last Price + 20% Midpoint + 10% Liquidity-Weighted</div>
-                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Why this works:</strong> Prediction markets aggregate distributed knowledge from diverse participants. Real money (Kalshi) reflects conviction; play money (Manifold) captures broader sentiment.</div>
-                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Update frequency:</strong></div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">• Default: Every 30 minutes</div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">• Final 3 days: Every 5 minutes</div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">• Election day: Every 1 minute</div>
-                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Unique feature:</strong> Liquidity-weighted pricing analyzes Kalshi's order book to detect buying vs selling pressure based on where the last trade occurred within the bid-ask spread.</div>
-            </div>
-        </div>
-
-        <div class="candidate-breakdown" id="product-fundraising">
-            <button class="breakdown-toggle" onclick="toggleProduct('product-fundraising')">
-                <span class="breakdown-header">Fundraising</span>
-                <span class="breakdown-icon">+</span>
-            </button>
-            <div class="breakdown-details">
-                <div class="breakdown-line"><strong>Status:</strong> Display only (simulated data)</div>
-                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>What it is:</strong> Campaign finance tracking from FEC filings, showing total raised, cash on hand, burn rate, and donor statistics for each candidate.</div>
-                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Data sources:</strong></div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">• FEC quarterly and monthly reports</div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">• Individual contribution records</div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">• Expenditure reports</div>
-                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Key metrics:</strong></div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">• Total raised (cumulative fundraising)</div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">• Cash on hand (available resources)</div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">• Burn rate (monthly spending pace)</div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">• Small dollar % (grassroots support indicator)</div>
-                <div class="breakdown-line" style="padding-left: 1.5rem;">• Average donation size</div>
-                <div class="breakdown-line" style="margin-top: 0.8rem;"><strong>Why it matters:</strong> Fundraising is a strong predictor of campaign viability and correlates with name recognition, organizational strength, and voter outreach capacity.</div>
-            </div>
-        </div>
-    </div>
-
-    <article class="method-section">
-        <h2>How We Forecast</h2>
-        <p>IL9Cast combines multiple data streams to estimate each candidate's probability of winning the Illinois 9th Democratic primary. Our model weighs polling data, fundraising trends, historical performance, and voter demographics to produce real-time odds.</p>
-        <p>Unlike static predictions, our forecast updates as new information becomes available, allowing you to see how the race evolves in real time.</p>
-    </article>
 
     <article class="method-section">
         <h2>Prediction Markets Aggregation</h2>
@@ -147,72 +79,29 @@
             Aggregate Probability = (0.40 × Manifold) + (0.42 × Kalshi Last Price) + (0.12 × Kalshi Midpoint) + (0.06 × Kalshi Liquidity-Weighted)
         </p>
 
-        <h3 style="margin-top: 1.5rem; font-size: 1.1rem;">Normalization</h3>
-        <p>All final probabilities are normalized to sum to ~100%. This accounts for:</p>
+        <h3 style="margin-top: 1.5rem; font-size: 1.1rem;">Soft Normalization (30% Strength)</h3>
+        <p>Final probabilities are lightly normalized to prevent excessive drift while preserving raw market values:</p>
         <ul class="method-list">
             <li>Candidates with no Kalshi market (marked with *) use 100% of their Manifold probability</li>
-            <li>All candidate probabilities are rescaled so the total equals 100%</li>
-            <li>This may cause small discrepancies, which is noted in the calculation breakdown</li>
+            <li>Only 30% of the normalization adjustment is applied to each candidate</li>
+            <li>70% of the raw aggregated value is preserved</li>
+            <li>This keeps top candidates higher while preventing probabilities from summing to unrealistic totals</li>
         </ul>
 
         <h3 style="margin-top: 1.5rem; font-size: 1.1rem;">Update Frequency</h3>
         <ul class="method-list">
-            <li><strong>Default (pre-campaign):</strong> Every 30 minutes</li>
-            <li><strong>Final 3 days before election:</strong> Every 5 minutes</li>
+            <li><strong>Default:</strong> Every 3 minutes</li>
+            <li><strong>Final 3 days before election:</strong> Every 1 minute</li>
             <li><strong>Election day:</strong> Every 1 minute</li>
         </ul>
 
-        <p>This allows the markets page to reflect real-time sentiment while not overwhelming with noise early on.</p>
-    </article>
-
-    <article class="method-section">
-        <h2>Data Sources</h2>
-        <p>Our model integrates data from multiple sources:</p>
-        <ul class="method-list">
-            <li><strong>Public Polling:</strong> We aggregate publicly available polls from major pollsters tracking the IL-9 race.</li>
-            <li><strong>Fundraising Data:</strong> FEC filings and campaign finance reports inform candidate momentum and resources.</li>
-            <li><strong>Demographic Analysis:</strong> Census data and voter registration statistics by precinct.</li>
-            <li><strong>Historical Results:</strong> Previous primary and general election outcomes in the district.</li>
-            <li><strong>Endorsements & News:</strong> Major endorsements and media coverage weighted by source credibility.</li>
-            <li><strong>Social & Digital Signals:</strong> Campaign engagement metrics and digital presence strength.</li>
-        </ul>
-    </article>
-
-    <article class="method-section">
-        <h2>Model Details</h2>
-        <p>We employ a Bayesian ensemble approach that combines multiple forecasting techniques:</p>
-        <ul class="method-list">
-            <li><strong>Polling Average:</strong> A weighted average of recent polls, with more recent polls weighted more heavily.</li>
-            <li><strong>Fundamentals Model:</strong> Fundraising, incumbency, experience, and demographic fit are modeled separately.</li>
-            <li><strong>Historical Regression:</strong> Past election data helps calibrate expectations for new candidates.</li>
-            <li><strong>Ensemble Weighting:</strong> Individual model outputs are combined based on historical accuracy.</li>
-        </ul>
-        <p>Our model produces a probability distribution for each candidate, not just a point estimate. This allows us to quantify uncertainty and show how competitive or decisive the race is.</p>
-    </article>
-
-    <article class="method-section">
-        <h2>Update Frequency</h2>
-        <p>IL9Cast updates in real time as new data becomes available. When new polls are released, fundraising reports are filed, or significant campaign events occur, we incorporate that information into the model within hours.</p>
-        <p>You can see the exact time of the last update at the top of the <a href="/odds">Odds page</a>.</p>
-    </article>
-
-    <article class="method-section">
-        <h2>Confidence & Limitations</h2>
-        <p>While we aim for accuracy, forecasts always carry uncertainty. Here are some important caveats:</p>
-        <ul class="method-list">
-            <li><strong>Polling Error:</strong> Polls can miss, especially in low-turnout primaries. Historically, primary polls have a ~4-5% average error.</li>
-            <li><strong>Late Movements:</strong> Campaigns can shift dramatically in the final weeks. Early forecasts are less reliable.</li>
-            <li><strong>Turnout Uncertainty:</strong> Primary turnout is harder to predict than general election turnout, introducing additional variance.</li>
-            <li><strong>New Entrants:</strong> If new candidates enter the race late, our model may need recalibration.</li>
-            <li><strong>Data Quality:</strong> Our results are only as good as the underlying data. Some data sources may be incomplete or biased.</li>
-        </ul>
-        <p><strong>Bottom line:</strong> Use this forecast as one input among many, not as definitive prediction. The race will ultimately be decided by voters on March 17, 2026.</p>
+        <p>Historical snapshots are saved with every update and aggregated hourly for clean trend visualization.</p>
     </article>
 
     <article class="method-section contact-section">
         <h2>Questions?</h2>
-        <p>IL9Cast is maintained by <strong>Ryan</strong> as an educational project to help voters understand the race dynamics in Illinois's 9th Congressional District.</p>
-        <p>For questions about the methodology or to report issues, please reach out directly.</p>
+        <p>IL9Cast's prediction market aggregation is maintained by <strong>Ryan McComb</strong>, a student at ETHS, as an educational project to help voters understand real-time sentiment in the Illinois 9th Democratic Primary race.</p>
+        <p>For questions about the market aggregation methodology or to report data issues, please reach out directly.</p>
     </article>
 </section>
 
@@ -282,94 +171,11 @@
 .method-section a:hover {
     opacity: 0.8;
 }
-
-/* Product overview foldout styles */
-.candidate-breakdown {
-    margin-bottom: 0.75rem;
-    background: rgba(0, 0, 0, 0.15);
-    border-left: 3px solid var(--accent-primary);
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-.breakdown-toggle {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1.5rem;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--text-primary);
-    font-family: inherit;
-    text-align: left;
-    gap: 1rem;
-}
-
-.breakdown-toggle:hover {
-    background: rgba(255, 255, 255, 0.03);
-}
-
-.breakdown-header {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    flex: 1;
-}
-
-.breakdown-icon {
-    font-size: 1.5rem;
-    color: var(--accent-primary);
-    transition: transform 0.3s ease;
-}
-
-.candidate-breakdown.open .breakdown-icon {
-    transform: rotate(45deg);
-}
-
-.breakdown-details {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease, padding 0.3s ease;
-    padding: 0 1.5rem;
-}
-
-.candidate-breakdown.open .breakdown-details {
-    max-height: 800px;
-    padding: 0 1.5rem 1.5rem;
-}
-
-.breakdown-line {
-    font-size: 0.85rem;
-    line-height: 1.6;
-    color: var(--text-secondary);
-    margin-bottom: 0.4rem;
-}
-
-.breakdown-line strong {
-    color: var(--text-primary);
-    font-weight: 600;
-}
-
-.breakdown-result {
-    margin-top: 0.8rem;
-    padding-top: 0.8rem;
-    border-top: 1px solid rgba(0, 170, 220, 0.2);
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--accent-primary);
-}
 </style>
     </div>
 </div>
 
 <script>
-function toggleProduct(id) {
-    const product = document.getElementById(id);
-    product.classList.toggle('open');
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     const navbar = document.querySelector('.navbar');
     const footer = document.querySelector('.footer');
