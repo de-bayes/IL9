@@ -987,15 +987,19 @@ async function renderMarketTrendChart(candidates) {
     const aggregatedSnapshots = aggregateSnapshots(filteredSnapshots, period);
 
     // Build labels from aggregated snapshot timestamps
-    // Use current time for the most recent data point to ensure accuracy
     const labels = aggregatedSnapshots.map((s, index) => {
-        const isLastDataPoint = index === aggregatedSnapshots.length - 1;
-        const date = isLastDataPoint ? new Date() : new Date(s.timestamp);
+        const date = new Date(s.timestamp);
 
         if (period === '1h') {
             return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         } else {
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit' });
+            // For 30-day view, show date and hour
+            return date.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                hour12: true
+            });
         }
     });
 
