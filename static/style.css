@@ -289,10 +289,24 @@ p {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: #000000;
+    background: #000000 url('/static/images/capitol-bg.jpg') center center no-repeat;
+    background-size: cover;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+}
+
+/* Dark overlay for text readability */
+.landing-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    z-index: 2;
 }
 
 /* Add subtle noise texture to eliminate color banding */
@@ -340,9 +354,9 @@ p {
     right: -250%;
     width: 450%;
     height: 110%;
-    background: radial-gradient(ellipse at center, rgba(20, 60, 180, 0.7) 0%, rgba(30, 70, 160, 0.45) 20%, rgba(40, 80, 140, 0.25) 40%, transparent 60%);
+    background: radial-gradient(ellipse at center, rgba(20, 60, 180, 0.3) 0%, rgba(30, 70, 160, 0.2) 20%, rgba(40, 80, 140, 0.1) 40%, transparent 60%);
     filter: blur(45px);
-    opacity: var(--blue-opacity);
+    opacity: calc(var(--blue-opacity) * 0.4);
     pointer-events: none;
 }
 
@@ -354,9 +368,9 @@ p {
     left: -250%;
     width: 450%;
     height: 100%;
-    background: radial-gradient(ellipse at center, rgba(200, 40, 50, 0.6) 0%, rgba(160, 30, 40, 0.4) 18%, rgba(120, 20, 30, 0.2) 35%, transparent 55%);
+    background: radial-gradient(ellipse at center, rgba(200, 40, 50, 0.3) 0%, rgba(160, 30, 40, 0.2) 18%, rgba(120, 20, 30, 0.1) 35%, transparent 55%);
     filter: blur(40px);
-    opacity: var(--cyan-opacity);
+    opacity: calc(var(--cyan-opacity) * 0.4);
     pointer-events: none;
 }
 
@@ -780,7 +794,7 @@ p {
     height: 100%;
     z-index: 5;
     pointer-events: none;
-    opacity: 0.8;
+    opacity: 0.5;
 }
 
 .landing-bottom-new {
