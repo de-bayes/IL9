@@ -721,8 +721,9 @@ async function calculateAggregate() {
     // Store aggregated data for chart updates
     candidatesData = aggregated;
 
-    // Note: Snapshots are now saved automatically by the backend scheduler
-    // No need to save from frontend to avoid duplicates
+    // Save snapshot as backup (backend also saves every 3 min)
+    // Frontend saves only when page is viewed, backend ensures continuous collection
+    await saveSnapshot(aggregated);
 
     renderBigOdds(aggregated);
 

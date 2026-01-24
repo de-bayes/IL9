@@ -352,16 +352,42 @@ def clean_candidate_name(name):
     """Clean up candidate name for display"""
     return name.replace('wil ', '').replace('will ', '').replace(' be the democratic nominee', '').replace('?', '').strip()
 
-# Set up background scheduler
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=collect_market_data, trigger="interval", minutes=3)
-scheduler.start()
+# Set up background scheduler only if not running under gunicorn workers
+# This prevents duplicate schedulers when gunicorn spawns multiple workers
+import sys
+if 'gunicorn' not in sys.argv[0]:
+    # Running locally or in single-process mode
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(func=collect_market_data, trigger="interval", minutes=3)
+    scheduler.start()
 
-# Run initial data collection on startup
-collect_market_data()
+    # Run initial data collection on startup
+    collect_market_data()
 
-# Shut down the scheduler when exiting the app
-atexit.register(lambda: scheduler.shutdown())
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
+else:
+    # Running under gunicorn - only start scheduler in the main process
+    # Use gunicorn's preload mode with a single background thread
+    from threading import Thread
+    import time
+
+    def scheduler_thread():
+        """Background thread for data collection when running under gunicorn"""
+        # Wait a bit for app to fully start
+        time.sleep(5)
+        collect_market_data()  # Initial collection
+
+        while True:
+            time.sleep(3 * 60)  # 3 minutes
+            try:
+                collect_market_data()
+            except Exception as e:
+                print(f"Error in scheduler thread: {e}")
+
+    # Start scheduler thread
+    thread = Thread(target=scheduler_thread, daemon=True)
+    thread.start()
 
 if __name__ == '__main__':
     # Use debug mode only for local development
