@@ -6,10 +6,29 @@
 <div class="landing-wrapper">
     <div class="vertical-columns" id="verticalColumns"></div>
 
+    <!-- SVG Trend Lines -->
+    <svg class="trend-lines" viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice">
+        <defs>
+            <linearGradient id="redGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:rgba(255,80,80,0.8);stop-opacity:1" />
+                <stop offset="100%" style="stop-color:rgba(255,80,80,0.3);stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="cyanGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:rgba(0,200,255,0.3);stop-opacity:1" />
+                <stop offset="100%" style="stop-color:rgba(0,200,255,0.8);stop-opacity:1" />
+            </linearGradient>
+        </defs>
+        <!-- Red trend line -->
+        <path d="M 0 450 Q 200 380, 400 420 T 800 400 T 1200 480 L 1400 500"
+              stroke="url(#redGradient)" stroke-width="4" fill="none" opacity="0.7"/>
+        <!-- Cyan trend line -->
+        <path d="M 0 380 Q 200 420, 400 360 T 800 420 T 1200 350 L 1400 380"
+              stroke="url(#cyanGradient)" stroke-width="4" fill="none" opacity="0.7"/>
+    </svg>
+
     <div class="landing-nav">
         <div class="landing-nav-left">
-            <span class="nav-label">IL9CAST IS A FORECAST MODEL FOR</span>
-            <span class="nav-subtitle">Illinois 9th District Democratic Primary</span>
+            <span class="silver-bulletin-tag">IL9CAST</span>
         </div>
         <div class="landing-nav-right">
             <span class="brand-text">IL9Cast</span>
@@ -18,28 +37,17 @@
 
     <div class="landing-hero">
         <div class="hero-content">
-            <h1 class="landing-title">
-                Forecast<br>
-                <em>Illinois's</em> 9th
+            <h1 class="landing-title-new">
+                2026 ILLINOIS 9TH<br>
+                CONGRESSIONAL<br>
+                PRIMARY
             </h1>
-            <p class="hero-credit">Model Created by: Ryan McComb</p>
-            <p class="hero-affiliation">Student at ETHS</p>
         </div>
     </div>
 
-    <div class="landing-right">
-        <div class="landing-tagline">
-            <p>Your real-time forecasting model for the IL-9 2026 primary, inspired by Nate Silver, 538, the Silver Bulletin, and Galen Druke.</p>
-        </div>
-        <div class="landing-menu">
-            <a href="/markets" class="menu-toggle-link">Explore Markets</a>
-        </div>
+    <div class="landing-bottom-new">
+        <div class="landing-logo">IL9CAST</div>
     </div>
-
-    <div class="blue-glow"></div>
-    <div class="cyan-glow"></div>
-    <div class="red-glow"></div>
-    <div class="warm-glow"></div>
 </div>
 
 <script>
