@@ -24,6 +24,17 @@ def initialize_data():
     data_dir = os.path.dirname(HISTORICAL_DATA_PATH)
     os.makedirs(data_dir, exist_ok=True)
 
+    # ONE-TIME RESET: Delete old data with wrong timezone format
+    # Remove this block after Railway redeploys successfully
+    reset_marker = os.path.join(data_dir, '.timezone_reset_done')
+    if not os.path.exists(reset_marker):
+        if os.path.exists(HISTORICAL_DATA_PATH):
+            os.remove(HISTORICAL_DATA_PATH)
+            print(f"[{datetime.now().isoformat()}] One-time reset: deleted old data for timezone fix")
+        # Create marker so we don't reset again
+        with open(reset_marker, 'w') as f:
+            f.write('done')
+
     # Only seed data if historical file doesn't exist at all
     # Once Railway starts collecting, never overwrite its data
     if not os.path.exists(HISTORICAL_DATA_PATH) and os.path.exists(SEED_DATA_PATH):
