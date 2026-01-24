@@ -1,0 +1,72 @@
+[
+  {
+    "candidates": [
+      {
+        "name": "Daniel Biss",
+        "probability": 62.8,
+        "hasKalshi": true
+      },
+      {
+        "name": "Kat Abugazaleh",
+        "probability": 25.5,
+        "hasKalshi": true
+      },
+      {
+        "name": "Laura Fine",
+        "probability": 16.5,
+        "hasKalshi": true
+      },
+      {
+        "name": "Bushra Amiwala",
+        "probability": 1.0,
+        "hasKalshi": false
+      },
+      {
+        "name": "Phil Andrew",
+        "probability": 0.6,
+        "hasKalshi": false
+      },
+      {
+        "name": "Mike Simmons",
+        "probability": 0.5,
+        "hasKalshi": false
+      }
+    ],
+    "timestamp": "2026-01-23T22:08:19.004767"
+  },
+  {
+    "candidates": [
+      {
+        "name": "Daniel Biss",
+        "probability": 62.8,
+        "hasKalshi": true
+      },
+      {
+        "name": "Kat Abugazaleh",
+        "probability": 25.5,
+        "hasKalshi": true
+      },
+      {
+        "name": "Laura Fine",
+        "probability": 16.5,
+        "hasKalshi": true
+      },
+      {
+        "name": "Bushra Amiwala",
+        "probability": 1.0,
+        "hasKalshi": false
+      },
+      {
+        "name": "Phil Andrew",
+        "probability": 0.6,
+        "hasKalshi": false
+      },
+      {
+        "name": "Mike Simmons",
+        "probability": 0.5,
+        "hasKalshi": false
+      }
+    ],
+    "timestamp": "2026-01-23T22:08:19.323591"
+  }
+]
