@@ -721,8 +721,8 @@ async function calculateAggregate() {
     // Store aggregated data for chart updates
     candidatesData = aggregated;
 
-    // Save snapshot to persistent storage
-    await saveSnapshot(aggregated);
+    // Note: Snapshots are now saved automatically by the backend scheduler
+    // No need to save from frontend to avoid duplicates
 
     renderBigOdds(aggregated);
 
@@ -896,8 +896,9 @@ function aggregateSnapshots(snapshots, period) {
 
     snapshots.forEach(snapshot => {
         const date = new Date(snapshot.timestamp);
-        // Round down to the hour
-        const hourKey = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours()).toISOString();
+        // Round down to the hour - keep in original timezone
+        date.setMinutes(0, 0, 0);
+        const hourKey = date.toISOString();
 
         if (!hourlyBuckets[hourKey]) {
             hourlyBuckets[hourKey] = [];
