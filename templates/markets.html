@@ -896,11 +896,14 @@ function aggregateSnapshots(snapshots, period) {
     const hourlyBuckets = {};
 
     snapshots.forEach(snapshot => {
-        const date = new Date(snapshot.timestamp);
-        // Round down to the hour - keep in local timezone (don't convert to UTC)
-        date.setMinutes(0, 0, 0);
-        // Use local time string as key to avoid UTC conversion
-        const hourKey = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}T${String(date.getHours()).padStart(2,'0')}:00:00`;
+        // Parse timestamp as local time (not UTC) by extracting components
+        const ts = snapshot.timestamp;
+        const [datePart, timePart] = ts.split('T');
+        const [year, month, day] = datePart.split('-').map(Number);
+        const hour = parseInt((timePart || '00:00:00').split(':')[0]);
+
+        // Create hourKey directly from parsed local time components
+        const hourKey = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}T${String(hour).padStart(2,'0')}:00:00`;
 
         if (!hourlyBuckets[hourKey]) {
             hourlyBuckets[hourKey] = [];
@@ -975,7 +978,15 @@ async function renderMarketTrendChart(candidates) {
 
     if (period === '1h') {
         const oneHourAgo = new Date(now - 60 * 60 * 1000);
-        filteredSnapshots = snapshots.filter(s => new Date(s.timestamp) > oneHourAgo);
+        filteredSnapshots = snapshots.filter(s => {
+            // Parse timestamp as local time
+            const ts = s.timestamp;
+            const [datePart, timePart] = ts.split('T');
+            const [year, month, day] = datePart.split('-').map(Number);
+            const [hour, min, sec] = (timePart || '00:00:00').split(':').map(n => parseInt(n));
+            const snapshotDate = new Date(year, month - 1, day, hour, min, sec || 0);
+            return snapshotDate > oneHourAgo;
+        });
 
         // If we don't have enough data in the last hour (due to deployment gaps),
         // show the most recent data points to ensure the chart displays something
