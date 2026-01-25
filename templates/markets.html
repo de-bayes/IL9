@@ -67,6 +67,7 @@
                 <div class="chart-toggle" id="chartToggle">
                     <button class="toggle-btn" data-period="1d">1 Day</button>
                     <button class="toggle-btn active" data-period="7d">7 Days</button>
+                    <button class="toggle-btn" data-period="all">All Time</button>
                 </div>
             </div>
             <div class="chart-wrapper">
@@ -1134,6 +1135,9 @@ function aggregateSnapshots(snapshots, period) {
             // For 1 day view, aggregate to 15-minute intervals
             const minutes = Math.floor(date.getMinutes() / 15) * 15;
             bucketKey = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}T${String(date.getHours()).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:00`;
+        } else if (period === 'all') {
+            // For all time view, aggregate to daily averages
+            bucketKey = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}T12:00:00`;
         } else {
             // For 7 days view, aggregate to hourly averages
             bucketKey = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}T${String(date.getHours()).padStart(2,'0')}:00:00`;
@@ -1210,32 +1214,34 @@ async function renderMarketTrendChart(candidates) {
     const period = currentChartPeriod || '7d';
     let filteredSnapshots = snapshots;
 
-    let cutoffTime;
-    if (period === '1d') {
-        cutoffTime = new Date(now - 24 * 60 * 60 * 1000); // 1 day ago
-    } else {
-        cutoffTime = new Date(now - 7 * 24 * 60 * 60 * 1000); // 7 days ago
-    }
-
-    filteredSnapshots = snapshots.filter(s => {
-        // Parse timestamp - handle both UTC (with Z) and local (without Z)
-        const ts = s.timestamp;
-        let snapshotDate;
-        if (ts.endsWith('Z')) {
-            snapshotDate = new Date(ts); // UTC - auto converts to local
+    if (period !== 'all') {
+        let cutoffTime;
+        if (period === '1d') {
+            cutoffTime = new Date(now - 24 * 60 * 60 * 1000); // 1 day ago
         } else {
-            const [datePart, timePart] = ts.split('T');
-            const [year, month, day] = datePart.split('-').map(Number);
-            const [hour, min, sec] = (timePart || '00:00:00').split(':').map(n => parseInt(n));
-            snapshotDate = new Date(year, month - 1, day, hour, min, sec || 0);
+            cutoffTime = new Date(now - 7 * 24 * 60 * 60 * 1000); // 7 days ago
         }
-        return snapshotDate > cutoffTime;
-    });
 
-    // If we don't have enough data, show the most recent data points
-    const MIN_DATA_POINTS = 10;
-    if (filteredSnapshots.length < MIN_DATA_POINTS && snapshots.length >= MIN_DATA_POINTS) {
-        filteredSnapshots = snapshots.slice(-MIN_DATA_POINTS);
+        filteredSnapshots = snapshots.filter(s => {
+            // Parse timestamp - handle both UTC (with Z) and local (without Z)
+            const ts = s.timestamp;
+            let snapshotDate;
+            if (ts.endsWith('Z')) {
+                snapshotDate = new Date(ts); // UTC - auto converts to local
+            } else {
+                const [datePart, timePart] = ts.split('T');
+                const [year, month, day] = datePart.split('-').map(Number);
+                const [hour, min, sec] = (timePart || '00:00:00').split(':').map(n => parseInt(n));
+                snapshotDate = new Date(year, month - 1, day, hour, min, sec || 0);
+            }
+            return snapshotDate > cutoffTime;
+        });
+
+        // If we don't have enough data, show the most recent data points
+        const MIN_DATA_POINTS = 10;
+        if (filteredSnapshots.length < MIN_DATA_POINTS && snapshots.length >= MIN_DATA_POINTS) {
+            filteredSnapshots = snapshots.slice(-MIN_DATA_POINTS);
+        }
     }
 
     // Aggregate to reduce data points (hourly for 30d, raw for 1h)
@@ -1260,6 +1266,12 @@ async function renderMarketTrendChart(candidates) {
         if (period === '1d') {
             // For 1-day view, show time only
             return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        } else if (period === 'all') {
+            // For all-time view, show date only
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
+            });
         } else {
             // For 7-day view, show date and hour
             return date.toLocaleString('en-US', {
