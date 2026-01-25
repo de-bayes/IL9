@@ -27,26 +27,27 @@
                 <div class="leader-info">
                     <span class="leader-label">LEADING CANDIDATE</span>
                     <span class="leader-name" id="leaderName">Loading...</span>
-                    <div class="leader-stats">
-                        <div class="leader-stat">
-                            <span class="leader-stat-label">Aggregate</span>
-                            <span class="leader-stat-value aggregate" id="leaderAggregate">--%</span>
+                    <div class="leader-main-stat">
+                        <span class="leader-main-label">Aggregate Probability</span>
+                        <span class="leader-main-value" id="leaderAggregate">--%</span>
+                    </div>
+                    <div class="leader-divider"></div>
+                    <div class="leader-sub-stats">
+                        <div class="leader-sub-stat">
+                            <span class="leader-sub-label">Manifold</span>
+                            <span class="leader-sub-value" id="leaderManifold">--%</span>
                         </div>
-                        <div class="leader-stat">
-                            <span class="leader-stat-label">Manifold</span>
-                            <span class="leader-stat-value" id="leaderManifold">--%</span>
+                        <div class="leader-sub-stat">
+                            <span class="leader-sub-label">Kalshi Last</span>
+                            <span class="leader-sub-value" id="leaderKalshiLast">--%</span>
                         </div>
-                        <div class="leader-stat">
-                            <span class="leader-stat-label">Kalshi Last</span>
-                            <span class="leader-stat-value" id="leaderKalshiLast">--%</span>
+                        <div class="leader-sub-stat">
+                            <span class="leader-sub-label">Kalshi Mid</span>
+                            <span class="leader-sub-value" id="leaderKalshiMid">--%</span>
                         </div>
-                        <div class="leader-stat">
-                            <span class="leader-stat-label">Kalshi Midpoint</span>
-                            <span class="leader-stat-value" id="leaderKalshiMid">--%</span>
-                        </div>
-                        <div class="leader-stat">
-                            <span class="leader-stat-label">Kalshi Liq-Weighted</span>
-                            <span class="leader-stat-value" id="leaderKalshiLiq">--%</span>
+                        <div class="leader-sub-stat">
+                            <span class="leader-sub-label">Kalshi Liq</span>
+                            <span class="leader-sub-value" id="leaderKalshiLiq">--%</span>
                         </div>
                     </div>
                 </div>
@@ -343,19 +344,12 @@
     margin-bottom: 1rem;
 }
 
-.leader-stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem 2.5rem;
+.leader-main-stat {
     margin-top: 0.5rem;
 }
 
-.leader-stat {
-    display: flex;
-    flex-direction: column;
-}
-
-.leader-stat-label {
+.leader-main-label {
+    display: block;
     font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.1em;
@@ -364,17 +358,48 @@
     margin-bottom: 0.25rem;
 }
 
-.leader-stat-value {
-    font-size: 2.25rem;
+.leader-main-value {
+    font-size: 3.5rem;
     font-weight: 700;
     color: var(--text-primary);
     font-family: 'Times New Roman', Times, serif;
     line-height: 1;
 }
 
-.leader-stat-value.aggregate {
-    font-size: 3rem;
-    color: var(--text-primary);
+.leader-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 1rem 0;
+}
+
+.leader-sub-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem 2rem;
+}
+
+.leader-sub-stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.leader-sub-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+    opacity: 0.7;
+}
+
+.leader-sub-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-family: 'Times New Roman', Times, serif;
+    line-height: 1;
 }
 
 @media (max-width: 600px) {
@@ -385,22 +410,21 @@
         padding: 1.5rem;
     }
     .leader-photo {
-        width: 120px;
-        height: 120px;
+        width: 100px;
+        height: 100px;
     }
     .leader-name {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
     }
-    .leader-stats {
-        flex-wrap: wrap;
+    .leader-main-value {
+        font-size: 2.5rem;
+    }
+    .leader-sub-stats {
         justify-content: center;
-        gap: 1.5rem;
+        gap: 1rem 1.5rem;
     }
-    .leader-stat-value {
-        font-size: 1.75rem;
-    }
-    .leader-stat-value.aggregate {
-        font-size: 2.25rem;
+    .leader-sub-value {
+        font-size: 1.1rem;
     }
 }
 
