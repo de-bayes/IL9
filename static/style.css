@@ -762,28 +762,74 @@ p {
 
 .silver-bulletin-tag {
     display: inline-block;
-    background: var(--accent-green-bright);
+    background: #2ECC40;
     color: #000000;
     font-family: 'Arial Black', 'Arial Bold', Arial, sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     font-weight: 900;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    padding: 0.5rem 1.2rem;
+    padding: 0.4rem 1rem;
     border-radius: 4px;
-    box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+    box-shadow: 0 0 12px rgba(46, 204, 64, 0.3);
 }
 
 .landing-title-new {
     font-family: 'Arial Black', 'Arial Bold', Arial, sans-serif;
-    font-size: 6rem;
+    font-size: 4.5rem;
     font-weight: 900;
     line-height: 1.1;
-    color: var(--accent-green-bright);
+    color: #2ECC40;
     letter-spacing: -0.02em;
     text-transform: uppercase;
-    text-shadow: 0 0 30px rgba(57, 255, 20, 0.6);
+    text-shadow: 0 0 15px rgba(46, 204, 64, 0.35);
     margin: 0;
+}
+
+.hero-subtitle-label {
+    font-family: 'Arial', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.hero-inspiration {
+    font-family: 'Times New Roman', Times, Georgia, serif;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-style: italic;
+}
+
+.hero-credit-line {
+    font-family: 'Times New Roman', Times, Georgia, serif;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 2rem;
+}
+
+.hero-cta-button {
+    display: inline-block;
+    background: rgba(46, 204, 64, 0.9);
+    color: #000000;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    padding: 0.875rem 2rem;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(46, 204, 64, 0.3);
+}
+
+.hero-cta-button:hover {
+    background: rgba(46, 204, 64, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(46, 204, 64, 0.4);
 }
 
 .trend-lines {
@@ -2228,7 +2274,23 @@ p {
     }
 
     .landing-title-new {
-        font-size: 3rem;
+        font-size: 2.5rem;
+        text-align: center;
+    }
+
+    .hero-subtitle-label {
+        font-size: 0.7rem;
+        text-align: center;
+    }
+
+    .hero-inspiration,
+    .hero-credit-line {
+        text-align: center;
+        font-size: 0.8rem;
+    }
+
+    .hero-cta-button {
+        width: 100%;
         text-align: center;
     }
 
@@ -2305,12 +2367,21 @@ p {
     }
 
     .landing-title-new {
-        font-size: 2.2rem;
+        font-size: 1.8rem;
     }
 
     .silver-bulletin-tag {
-        font-size: 0.65rem;
-        padding: 0.3rem 0.8rem;
+        font-size: 0.6rem;
+        padding: 0.3rem 0.7rem;
+    }
+
+    .hero-subtitle-label {
+        font-size: 0.6rem;
+    }
+
+    .hero-inspiration,
+    .hero-credit-line {
+        font-size: 0.75rem;
     }
 
     .landing-logo {
