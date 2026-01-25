@@ -404,7 +404,7 @@ p {
 .landing-nav-right {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
 }
 
 .brand-text {
@@ -415,17 +415,22 @@ p {
     letter-spacing: 0.02em;
 }
 
-.nav-link-landing {
+.nav-btn-landing {
     font-family: 'Arial', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
     text-decoration: none;
-    transition: color 0.3s ease;
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
 }
 
-.nav-link-landing:hover {
-    color: rgba(255, 255, 255, 1);
+.nav-btn-landing:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.5);
 }
 
 .landing-hero {
@@ -868,11 +873,7 @@ p {
     position: absolute;
     bottom: 3rem;
     left: 3rem;
-    right: 3rem;
     z-index: 10;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
 }
 
 .landing-logo {
