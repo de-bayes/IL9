@@ -1725,35 +1725,33 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Parallax light effect on scroll (localhost only)
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        const parallaxLights = document.querySelectorAll('.parallax-light');
+    // Parallax light effect on scroll
+    const parallaxLights = document.querySelectorAll('.parallax-light');
 
-        window.addEventListener('scroll', () => {
-            const scrollY = window.pageYOffset;
+    window.addEventListener('scroll', () => {
+        const scrollY = window.pageYOffset;
 
-            parallaxLights.forEach(light => {
-                const speed = parseFloat(light.dataset.speed) || 0.3;
-                const direction = parseInt(light.dataset.direction) || 1;
-                const appearAt = parseInt(light.dataset.appear) || 0;
+        parallaxLights.forEach(light => {
+            const speed = parseFloat(light.dataset.speed) || 0.3;
+            const direction = parseInt(light.dataset.direction) || 1;
+            const appearAt = parseInt(light.dataset.appear) || 0;
 
-                // Handle appearing lights
-                if (appearAt > 0) {
-                    if (scrollY > appearAt) {
-                        light.style.opacity = Math.min(1, (scrollY - appearAt) / 200);
-                    } else {
-                        light.style.opacity = 0;
-                    }
+            // Handle appearing lights
+            if (appearAt > 0) {
+                if (scrollY > appearAt) {
+                    light.style.opacity = Math.min(1, (scrollY - appearAt) / 200);
+                } else {
+                    light.style.opacity = 0;
                 }
+            }
 
-                // Move horizontally and vertically based on scroll (subtle)
-                const moveX = scrollY * speed * direction * 0.5;
-                const moveY = scrollY * speed * direction * -0.2;
+            // Move horizontally and vertically based on scroll (subtle)
+            const moveX = scrollY * speed * direction * 0.5;
+            const moveY = scrollY * speed * direction * -0.2;
 
-                light.style.transform = `translate(${moveX}px, ${moveY}px)`;
-            });
+            light.style.transform = `translate(${moveX}px, ${moveY}px)`;
         });
-    }
+    });
 
     setupPolling();
 });
