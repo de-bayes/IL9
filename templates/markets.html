@@ -189,10 +189,11 @@
     border-radius: 50%;
     pointer-events: none;
     z-index: 0;
-    filter: blur(120px);
+    filter: blur(150px) contrast(1.05);
     transition: transform 0.2s ease-out, opacity 0.3s ease-out;
-    /* Fix banding with larger blur and mix-blend-mode */
     mix-blend-mode: screen;
+    /* Dithering trick */
+    background-blend-mode: overlay;
 }
 
 .parallax-light.warm-1 {
@@ -200,14 +201,18 @@
     right: -10%;
     width: 70%;
     height: 70%;
-    background: radial-gradient(ellipse at center,
-        rgba(255, 130, 50, 0.35) 0%,
-        rgba(255, 110, 40, 0.28) 15%,
-        rgba(255, 90, 35, 0.2) 30%,
-        rgba(255, 70, 25, 0.12) 45%,
-        rgba(255, 50, 15, 0.06) 60%,
-        rgba(255, 40, 10, 0.02) 75%,
-        transparent 90%);
+    background:
+        radial-gradient(ellipse at center,
+            hsla(25, 100%, 60%, 0.35) 0%,
+            hsla(25, 100%, 55%, 0.30) 8%,
+            hsla(24, 100%, 52%, 0.25) 16%,
+            hsla(23, 100%, 48%, 0.20) 24%,
+            hsla(22, 100%, 45%, 0.16) 32%,
+            hsla(21, 100%, 42%, 0.12) 40%,
+            hsla(20, 100%, 38%, 0.08) 50%,
+            hsla(19, 100%, 35%, 0.05) 60%,
+            hsla(18, 100%, 32%, 0.02) 72%,
+            transparent 85%);
 }
 
 .parallax-light.warm-2 {
@@ -215,13 +220,16 @@
     left: -15%;
     width: 65%;
     height: 65%;
-    background: radial-gradient(ellipse at center,
-        rgba(255, 110, 40, 0.3) 0%,
-        rgba(255, 95, 35, 0.22) 15%,
-        rgba(255, 80, 30, 0.15) 30%,
-        rgba(255, 65, 25, 0.1) 45%,
-        rgba(255, 50, 20, 0.05) 60%,
-        transparent 80%);
+    background:
+        radial-gradient(ellipse at center,
+            hsla(22, 100%, 58%, 0.32) 0%,
+            hsla(21, 100%, 54%, 0.26) 10%,
+            hsla(20, 100%, 50%, 0.20) 20%,
+            hsla(19, 100%, 46%, 0.15) 32%,
+            hsla(18, 100%, 42%, 0.10) 45%,
+            hsla(17, 100%, 38%, 0.06) 58%,
+            hsla(16, 100%, 34%, 0.02) 72%,
+            transparent 88%);
 }
 
 .parallax-light.warm-3 {
@@ -229,12 +237,14 @@
     left: 40%;
     width: 50%;
     height: 50%;
-    background: radial-gradient(ellipse at center,
-        rgba(255, 150, 70, 0.28) 0%,
-        rgba(255, 120, 55, 0.18) 20%,
-        rgba(255, 100, 45, 0.1) 40%,
-        rgba(255, 80, 35, 0.04) 60%,
-        transparent 80%);
+    background:
+        radial-gradient(ellipse at center,
+            hsla(28, 100%, 65%, 0.28) 0%,
+            hsla(26, 100%, 58%, 0.20) 15%,
+            hsla(24, 100%, 52%, 0.13) 30%,
+            hsla(22, 100%, 46%, 0.07) 48%,
+            hsla(20, 100%, 40%, 0.03) 65%,
+            transparent 85%);
 }
 
 .parallax-light.warm-4 {
@@ -243,11 +253,13 @@
     width: 45%;
     height: 45%;
     opacity: 0;
-    background: radial-gradient(ellipse at center,
-        rgba(255, 140, 60, 0.32) 0%,
-        rgba(255, 110, 45, 0.2) 25%,
-        rgba(255, 90, 35, 0.1) 50%,
-        transparent 75%);
+    background:
+        radial-gradient(ellipse at center,
+            hsla(24, 100%, 62%, 0.32) 0%,
+            hsla(22, 100%, 55%, 0.22) 18%,
+            hsla(20, 100%, 48%, 0.12) 38%,
+            hsla(18, 100%, 42%, 0.05) 58%,
+            transparent 80%);
 }
 
 .parallax-light.warm-5 {
@@ -256,11 +268,13 @@
     width: 40%;
     height: 40%;
     opacity: 0;
-    background: radial-gradient(ellipse at center,
-        rgba(255, 160, 80, 0.25) 0%,
-        rgba(255, 130, 60, 0.15) 30%,
-        rgba(255, 100, 45, 0.06) 55%,
-        transparent 75%);
+    background:
+        radial-gradient(ellipse at center,
+            hsla(30, 100%, 68%, 0.26) 0%,
+            hsla(27, 100%, 58%, 0.16) 22%,
+            hsla(24, 100%, 50%, 0.08) 45%,
+            hsla(21, 100%, 42%, 0.02) 68%,
+            transparent 88%);
 }
 
 .warm-glow {
