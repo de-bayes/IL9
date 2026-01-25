@@ -45,3 +45,16 @@ data/historical_snapshots.json
 
 # Logs
 *.log
+
+# Claude Code
+.claude/
+
+# Screenshots (local debugging only)
+SCREENHSHOTS/
+Screenshot*.png
+
+# Timezone reset markers (deployment-specific)
+data/.timezone_reset*
+
+# Empty folders
+static/images/
