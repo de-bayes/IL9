@@ -25,9 +25,22 @@
             <div class="leader-card">
                 <img src="" alt="" class="leader-photo" id="leaderPhoto">
                 <div class="leader-info">
-                    <span class="leader-label">LEADING</span>
+                    <span class="leader-label">LEADING CANDIDATE</span>
                     <span class="leader-name" id="leaderName">Loading...</span>
-                    <span class="leader-percent" id="leaderPercent">--%</span>
+                    <div class="leader-stats">
+                        <div class="leader-stat">
+                            <span class="leader-stat-label">Aggregate</span>
+                            <span class="leader-stat-value aggregate" id="leaderAggregate">--%</span>
+                        </div>
+                        <div class="leader-stat">
+                            <span class="leader-stat-label">Manifold</span>
+                            <span class="leader-stat-value" id="leaderManifold">--%</span>
+                        </div>
+                        <div class="leader-stat">
+                            <span class="leader-stat-label">Kalshi</span>
+                            <span class="leader-stat-value" id="leaderKalshi">--%</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -277,72 +290,107 @@
 }
 
 .leader-featured {
-    margin: 2rem 0;
+    margin: 2rem 0 2.5rem 0;
 }
 
 .leader-card {
     display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 1.5rem 2rem;
-    background: linear-gradient(135deg, rgba(46, 204, 64, 0.1) 0%, rgba(46, 204, 64, 0.05) 100%);
-    border: 2px solid var(--accent-green, #2ECC40);
+    gap: 2rem;
+    padding: 2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
-    box-shadow: 0 0 20px rgba(46, 204, 64, 0.15);
 }
 
 .leader-photo {
-    width: 100px;
-    height: 100px;
-    border-radius: 10px;
+    width: 160px;
+    height: 160px;
+    border-radius: 8px;
     object-fit: cover;
-    border: 3px solid var(--accent-green, #2ECC40);
+    flex-shrink: 0;
 }
 
 .leader-info {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    justify-content: center;
+    flex: 1;
 }
 
 .leader-label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    color: var(--accent-green, #2ECC40);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--text-secondary);
     text-transform: uppercase;
+    margin-bottom: 0.5rem;
 }
 
 .leader-name {
-    font-size: 1.75rem;
+    font-size: 2.5rem;
     font-weight: 700;
     color: var(--text-primary);
     font-family: 'Times New Roman', Times, serif;
+    margin-bottom: 1rem;
 }
 
-.leader-percent {
-    font-size: 3rem;
+.leader-stats {
+    display: flex;
+    gap: 2.5rem;
+    margin-top: 0.5rem;
+}
+
+.leader-stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.leader-stat-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.leader-stat-value {
+    font-size: 2.25rem;
     font-weight: 700;
-    color: var(--accent-green, #2ECC40);
+    color: var(--text-primary);
     font-family: 'Times New Roman', Times, serif;
     line-height: 1;
 }
 
-@media (max-width: 500px) {
+.leader-stat-value.aggregate {
+    font-size: 3rem;
+    color: var(--accent-primary, #00D9FF);
+}
+
+@media (max-width: 600px) {
     .leader-card {
         flex-direction: column;
+        align-items: center;
         text-align: center;
-        padding: 1.25rem;
+        padding: 1.5rem;
     }
     .leader-photo {
-        width: 80px;
-        height: 80px;
+        width: 120px;
+        height: 120px;
     }
     .leader-name {
-        font-size: 1.4rem;
+        font-size: 1.8rem;
     }
-    .leader-percent {
-        font-size: 2.5rem;
+    .leader-stats {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.5rem;
+    }
+    .leader-stat-value {
+        font-size: 1.75rem;
+    }
+    .leader-stat-value.aggregate {
+        font-size: 2.25rem;
     }
 }
 
@@ -971,7 +1019,9 @@ function renderBigOdds(candidates) {
         const leaderImage = getCandidateImage(leader.name);
         const photoEl = document.getElementById('leaderPhoto');
         const nameEl = document.getElementById('leaderName');
-        const percentEl = document.getElementById('leaderPercent');
+        const aggregateEl = document.getElementById('leaderAggregate');
+        const manifoldEl = document.getElementById('leaderManifold');
+        const kalshiEl = document.getElementById('leaderKalshi');
 
         if (leaderImage) {
             photoEl.src = leaderImage;
@@ -981,7 +1031,15 @@ function renderBigOdds(candidates) {
             photoEl.style.display = 'none';
         }
         nameEl.textContent = leader.name;
-        percentEl.textContent = Math.round(leader.probability) + '%';
+        aggregateEl.textContent = Math.round(leader.probability) + '%';
+
+        // Get Manifold and Kalshi data for leader
+        const leaderKey = normalizeCandidate(leader.name);
+        const manifoldProb = manifoldData[leaderKey]?.probability || 0;
+        const kalshiProb = kalshiData[leaderKey]?.last_price || 0;
+
+        manifoldEl.textContent = manifoldProb > 0 ? Math.round(manifoldProb) + '%' : '--';
+        kalshiEl.textContent = kalshiProb > 0 ? Math.round(kalshiProb) + '%' : '--';
     }
 
     // Update other candidates grid (skip leader)
