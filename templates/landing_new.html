@@ -33,6 +33,7 @@
 
         <section class="features-section">
             <div class="features-callout">
+                <h2 class="features-title">Why IL9Cast?</h2>
                 <div class="features-grid">
                     <div class="feature-item">
                         <h3>Real-Time Aggregation</h3>
@@ -44,7 +45,7 @@
                     </div>
                     <div class="feature-item">
                         <h3>Historical Tracking</h3>
-                        <p>5,565+ snapshots spanning from Jan 24 to present</p>
+                        <p><span id="snapshotCount">Loading...</span> snapshots spanning from Jan 24 to present</p>
                     </div>
                     <div class="feature-item">
                         <h3>Downloadable Data</h3>
@@ -189,6 +190,26 @@
         }
 
         drawGrid();
+
+        // LIVE SNAPSHOT COUNTER
+        async function updateSnapshotCount() {
+            try {
+                const response = await fetch('/api/snapshots');
+                const snapshots = await response.json();
+                const count = snapshots.length;
+                const formattedCount = count.toLocaleString();
+                document.getElementById('snapshotCount').textContent = `${formattedCount}+`;
+            } catch (error) {
+                console.error('Error fetching snapshot count:', error);
+                document.getElementById('snapshotCount').textContent = '5,565+';
+            }
+        }
+
+        // Update snapshot count on page load
+        updateSnapshotCount();
+
+        // Refresh snapshot count every 60 seconds
+        setInterval(updateSnapshotCount, 60000);
     </script>
 </body>
 </html>
