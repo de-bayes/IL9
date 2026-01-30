@@ -4,6 +4,13 @@
 
 {% block content %}
 <div class="inner-page markets-page">
+    <div class="parallax-light warm-1" data-speed="0.12" data-direction="1"></div>
+    <div class="parallax-light warm-2" data-speed="0.08" data-direction="-1"></div>
+    <div class="parallax-light warm-3" data-speed="0.1" data-direction="-1"></div>
+    <div class="parallax-light warm-4" data-speed="0.09" data-direction="1" data-appear="400"></div>
+    <div class="parallax-light warm-5" data-speed="0.11" data-direction="-1" data-appear="600"></div>
+    <div class="warm-glow"></div>
+
     <nav class="inner-nav">
         <a href="/" class="back-link">IL9Cast</a>
         <div class="inner-nav-links">
@@ -17,22 +24,48 @@
 
     <div class="inner-content">
         <h1 class="inner-title">Prediction Markets</h1>
-        <p class="page-subtitle">Aggregated odds from Manifold Markets and Kalshi</p>
+        <p class="page-subtitle">Aggregated odds from multiple prediction markets</p>
 
-        <!-- Big Blue Bars Display -->
-        <section class="big-bars-display" id="bigBarsDisplay">
-            <div class="bar-candidate">
-                <div class="bar-header">
-                    <span class="bar-name">Loading...</span>
-                    <span class="bar-percent">--</span>
-                </div>
-                <div class="bar-container">
-                    <div class="bar-fill" style="width: 0%;"></div>
+        <section class="leader-featured" id="leaderFeatured">
+            <div class="leader-card">
+                <img src="" alt="" class="leader-photo" id="leaderPhoto">
+                <div class="leader-info">
+                    <span class="leader-label">LEADING CANDIDATE</span>
+                    <span class="leader-name" id="leaderName">Loading...</span>
+                    <div class="leader-main-stat">
+                        <span class="leader-main-label">Aggregate Probability</span>
+                        <span class="leader-main-value" id="leaderAggregate">--%</span>
+                    </div>
+                    <div class="leader-divider"></div>
+                    <div class="leader-sub-stats">
+                        <div class="leader-sub-stat">
+                            <span class="leader-sub-label">Manifold</span>
+                            <span class="leader-sub-value" id="leaderManifold">--%</span>
+                        </div>
+                        <div class="leader-sub-stat">
+                            <span class="leader-sub-label">Kalshi Last</span>
+                            <span class="leader-sub-value" id="leaderKalshiLast">--%</span>
+                        </div>
+                        <div class="leader-sub-stat">
+                            <span class="leader-sub-label">Kalshi Mid</span>
+                            <span class="leader-sub-value" id="leaderKalshiMid">--%</span>
+                        </div>
+                        <div class="leader-sub-stat">
+                            <span class="leader-sub-label">Kalshi Liq</span>
+                            <span class="leader-sub-value" id="leaderKalshiLiq">--%</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Market Trends Chart -->
+        <section class="big-odds-display" id="bigOddsDisplay">
+            <div class="big-odds-candidate">
+                <span class="big-percent">--</span>
+                <span class="big-name">Loading...</span>
+            </div>
+        </section>
+
         <section class="market-chart-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                 <h2 style="margin: 0;">Market Trends</h2>
@@ -47,7 +80,6 @@
             </div>
         </section>
 
-        <!-- Aggregation Methodology -->
         <section class="weights-explainer">
             <h2>Aggregation Methodology</h2>
             <div class="weights-list">
@@ -68,15 +100,42 @@
                     <span class="weight-percentage">6%</span>
                 </div>
             </div>
+            <div class="methodology-note">
+                <p><strong>Why this approach?</strong> Kalshi's 60% weight emphasizes recent trade execution (70% of Kalshi weight → 42% overall) while incorporating midpoint (20% of Kalshi weight → 12%) and liquidity-weighted pricing (10% of Kalshi weight → 6%). This reflects that last trades show real money flow.</p>
+                <p style="margin-top: 0.8rem;"><strong>Why these weights?</strong> Manifold uses an AMM with liquidity banding that concentrates market-making capital around the current probability, making prices more responsive to trades near equilibrium but requiring larger trades to move prices significantly. Kalshi's real-money order book shows actual conviction through limit orders. Last price dominates because it reflects the most recent trades where people put capital at risk.</p>
+                <p style="margin-top: 0.8rem;"><strong>Why not rely solely on Kalshi's last price?</strong> Kalshi often has immensely wide bid-ask spreads (sometimes 10-20 percentage points), meaning the last completed trade may have occurred at an unrepresentative price. A market with a 45% bid / 55% ask and a last trade at 45% only demonstrates that someone was willing to sell at the bid—not that 45% is the accurate price. The true fair value likely sits somewhere in the middle of that spread, but Kalshi's order book structure means you only observe trades at the extremes when someone crosses the spread. Manifold has none of this problem: its AMM with liquidity banding provides instant, algorithmic two-way pricing with minimal spread, always reflecting current probability estimates without the friction of waiting for counterparties.</p>
+                <p style="margin-top: 0.8rem;"><strong>Liquidity-weighted pricing:</strong> Analyzes where the last trade occurred within Kalshi's bid-ask spread to capture buying vs selling pressure. Position near the ask (buyers aggressive) shifts the price up slightly; position near the bid (sellers aggressive) shifts down. Wider spreads dampen the adjustment. This only applies to Kalshi because it uses an order book exchange—Manifold's AMM algorithmically sets prices with liquidity banding that concentrates depth around current probabilities, so order book analysis doesn't apply. Manifold's continuous pricing eliminates the information gaps that plague order book exchanges with sparse liquidity.</p>
+            </div>
             <div class="formula">
                 <strong>Formula:</strong> Aggregate = (0.40 × Manifold) + (0.42 × Last) + (0.12 × Midpoint) + (0.06 × Liquidity)
-                <div style="margin-top: 0.8rem; font-size: 0.85rem; opacity: 0.8;">
-                    Soft Normalization (30% strength) applied to prevent drift while preserving market values.
+
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                    <strong>Sub-calculations:</strong><br>
+                    Midpoint = (yes_bid + yes_ask) / 2<br>
+                    <br>
+                    Liquidity = Midpoint + Shift<br>
+                    &nbsp;&nbsp;where Shift = offset × 6 × spread_factor<br>
+                    &nbsp;&nbsp;offset = (Last - yes_bid) / (yes_ask - yes_bid) - 0.5<br>
+                    &nbsp;&nbsp;spread_factor = max(0.2, 1 - spread/10 × 0.8)<br>
+                    &nbsp;&nbsp;spread = yes_ask - yes_bid<br>
+                    <br>
+                    Soft Normalization (30% strength):<br>
+                    &nbsp;&nbsp;Fully_Normalized = (Raw_Aggregate / Sum_All_Aggregates) × 100<br>
+                    &nbsp;&nbsp;Adjustment = Fully_Normalized - Raw_Aggregate<br>
+                    &nbsp;&nbsp;Final = Raw_Aggregate + (Adjustment × 0.30)
                 </div>
             </div>
         </section>
 
-        <!-- Market Sources -->
+        <section class="calculation-breakdown" id="calculationBreakdown">
+            <h2>Calculation Breakdown</h2>
+            <p class="breakdown-desc">Live formula application for each candidate</p>
+            <div id="breakdownContent"></div>
+            <p class="breakdown-desc" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                <strong>*</strong> = No Kalshi market available. Uses 100% of Manifold probability. Probabilities are lightly normalized (30% strength) to prevent excessive drift while preserving raw market values for top candidates.
+            </p>
+        </section>
+
         <section class="additional-markets">
             <h2>Market Sources</h2>
 
@@ -131,57 +190,127 @@
             </a>
         </section>
 
-        <!-- Data Gap Disclaimer -->
-        <div class="data-disclaimer">
-            *Data gaps present on Jan 28-29 due to cloud provider (Railway) maintenance.
-        </div>
-
     </div>
 </div>
 
-<style>
-.big-bars-display {
-    margin: 2.5rem 0;
+<style scoped>
+.parallax-light {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(150px) contrast(1.05);
+    transition: transform 0.2s ease-out, opacity 0.3s ease-out;
+    mix-blend-mode: screen;
+    /* Dithering trick */
+    background-blend-mode: overlay;
 }
 
-.bar-candidate {
-    margin-bottom: 1.5rem;
+.parallax-light.warm-1 {
+    bottom: -15%;
+    right: -10%;
+    width: 70%;
+    height: 70%;
+    background:
+        radial-gradient(ellipse at center,
+            hsla(25, 100%, 60%, 0.35) 0%,
+            hsla(25, 100%, 55%, 0.30) 8%,
+            hsla(24, 100%, 52%, 0.25) 16%,
+            hsla(23, 100%, 48%, 0.20) 24%,
+            hsla(22, 100%, 45%, 0.16) 32%,
+            hsla(21, 100%, 42%, 0.12) 40%,
+            hsla(20, 100%, 38%, 0.08) 50%,
+            hsla(19, 100%, 35%, 0.05) 60%,
+            hsla(18, 100%, 32%, 0.02) 72%,
+            transparent 85%);
 }
 
-.bar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 0.5rem;
+.parallax-light.warm-2 {
+    top: 5%;
+    left: -15%;
+    width: 65%;
+    height: 65%;
+    background:
+        radial-gradient(ellipse at center,
+            hsla(22, 100%, 58%, 0.32) 0%,
+            hsla(21, 100%, 54%, 0.26) 10%,
+            hsla(20, 100%, 50%, 0.20) 20%,
+            hsla(19, 100%, 46%, 0.15) 32%,
+            hsla(18, 100%, 42%, 0.10) 45%,
+            hsla(17, 100%, 38%, 0.06) 58%,
+            hsla(16, 100%, 34%, 0.02) 72%,
+            transparent 88%);
 }
 
-.bar-name {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-primary);
+.parallax-light.warm-3 {
+    bottom: 20%;
+    left: 40%;
+    width: 50%;
+    height: 50%;
+    background:
+        radial-gradient(ellipse at center,
+            hsla(28, 100%, 65%, 0.28) 0%,
+            hsla(26, 100%, 58%, 0.20) 15%,
+            hsla(24, 100%, 52%, 0.13) 30%,
+            hsla(22, 100%, 46%, 0.07) 48%,
+            hsla(20, 100%, 40%, 0.03) 65%,
+            transparent 85%);
 }
 
-.bar-percent {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--accent-primary);
-    font-family: 'Times New Roman', Times, serif;
+.parallax-light.warm-4 {
+    top: 40%;
+    right: 10%;
+    width: 45%;
+    height: 45%;
+    opacity: 0;
+    background:
+        radial-gradient(ellipse at center,
+            hsla(24, 100%, 62%, 0.32) 0%,
+            hsla(22, 100%, 55%, 0.22) 18%,
+            hsla(20, 100%, 48%, 0.12) 38%,
+            hsla(18, 100%, 42%, 0.05) 58%,
+            transparent 80%);
 }
 
-.bar-container {
-    width: 100%;
-    height: 48px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 4px;
-    overflow: hidden;
-    border: 1px solid var(--border-color);
+.parallax-light.warm-5 {
+    bottom: 60%;
+    left: 20%;
+    width: 40%;
+    height: 40%;
+    opacity: 0;
+    background:
+        radial-gradient(ellipse at center,
+            hsla(30, 100%, 68%, 0.26) 0%,
+            hsla(27, 100%, 58%, 0.16) 22%,
+            hsla(24, 100%, 50%, 0.08) 45%,
+            hsla(21, 100%, 42%, 0.02) 68%,
+            transparent 88%);
 }
 
-.bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #0066CC 0%, #0088FF 100%);
-    transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    border-radius: 3px;
+.warm-glow {
+    position: fixed;
+    bottom: -30%;
+    right: -15%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(ellipse at center,
+        rgba(255, 140, 60, 0.15) 0%,
+        rgba(255, 100, 40, 0.1) 20%,
+        rgba(255, 80, 30, 0.06) 40%,
+        rgba(255, 60, 20, 0.03) 60%,
+        transparent 80%);
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.inner-page {
+    position: relative;
+}
+
+.inner-nav, .inner-content {
+    position: relative;
+    z-index: 1;
 }
 
 .weights-explainer {
@@ -205,8 +334,8 @@
     gap: 0.75rem;
     margin-bottom: 1.5rem;
     padding: 1rem;
-    background: rgba(0, 102, 204, 0.08);
-    border: 1px solid rgba(0, 102, 204, 0.2);
+    background: rgba(0, 170, 220, 0.05);
+    border: 1px solid rgba(0, 170, 220, 0.15);
     border-radius: 6px;
 }
 
@@ -232,6 +361,22 @@
     text-align: right;
 }
 
+.methodology-note {
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: rgba(0, 170, 220, 0.08);
+    border-left: 3px solid rgba(0, 170, 220, 0.4);
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.methodology-note p {
+    margin: 0;
+    color: var(--text-secondary);
+}
+
 .formula {
     font-family: 'Courier New', monospace;
     font-size: 0.9rem;
@@ -241,26 +386,324 @@
     border-left: 3px solid var(--accent-primary);
     border-radius: 4px;
     margin: 0;
+    overflow-x: auto;
+}
+
+.big-odds-display {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    margin: 2.5rem 0;
+    text-align: center;
+}
+
+.big-odds-candidate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 0.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.leader-featured {
+    margin: 2rem 0 2.5rem 0;
+}
+
+.leader-card {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+}
+
+.leader-photo {
+    width: 140px;
+    height: 140px;
+    border-radius: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
+    opacity: 0.95;
+}
+
+.leader-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+}
+
+.leader-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.leader-name {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-family: 'Times New Roman', Times, serif;
+    margin-bottom: 1rem;
+}
+
+.leader-main-stat {
+    margin-top: 0.5rem;
+}
+
+.leader-main-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.leader-main-value {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-family: 'Times New Roman', Times, serif;
+    line-height: 1;
+}
+
+.leader-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 1rem 0;
+}
+
+.leader-sub-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem 2rem;
+}
+
+.leader-sub-stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.leader-sub-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+    opacity: 0.7;
+}
+
+.leader-sub-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-family: 'Times New Roman', Times, serif;
+    line-height: 1;
+}
+
+@media (max-width: 600px) {
+    .leader-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1.5rem;
+    }
+    .leader-photo {
+        width: 100px;
+        height: 100px;
+    }
+    .leader-name {
+        font-size: 1.6rem;
+    }
+    .leader-main-value {
+        font-size: 2.5rem;
+    }
+    .leader-sub-stats {
+        justify-content: center;
+        gap: 1rem 1.5rem;
+    }
+    .leader-sub-value {
+        font-size: 1.1rem;
+    }
+}
+
+.big-percent {
+    font-size: 3.5rem;
+    font-weight: 700;
+    font-family: 'Times New Roman', Times, serif;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.big-name {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+@media (max-width: 900px) {
+    .big-odds-display {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .big-odds-display {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .big-percent {
+        font-size: 2.5rem;
+    }
 }
 
 .market-chart-section {
     margin-top: 2.5rem;
     padding: 2rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    background: linear-gradient(180deg, rgba(0, 20, 40, 0.6) 0%, rgba(0, 10, 25, 0.8) 100%);
+    border: 1px solid rgba(0, 220, 255, 0.12);
     border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .market-chart-section h2 {
     margin-bottom: 1.5rem;
     font-size: 1.3rem;
     color: var(--text-primary);
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: 400;
 }
 
 .market-chart-section .chart-wrapper {
     height: 320px;
     position: relative;
     padding: 0.5rem 0;
+}
+
+.calculation-breakdown {
+    margin-top: 2.5rem;
+    padding: 2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.calculation-breakdown h2 {
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    color: var(--text-primary);
+}
+
+.breakdown-desc {
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.breakdown-desc:last-of-type {
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(0, 170, 220, 0.08);
+    border-left: 3px solid rgba(0, 170, 220, 0.4);
+    border-radius: 4px;
+    margin-left: 0;
+    font-size: 0.85rem;
+}
+
+.candidate-breakdown {
+    margin-bottom: 0.75rem;
+    background: rgba(0, 0, 0, 0.15);
+    border-left: 3px solid var(--accent-primary);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.breakdown-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-family: inherit;
+    text-align: left;
+    gap: 1rem;
+}
+
+.breakdown-toggle:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.breakdown-header {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+}
+
+.breakdown-preview {
+    font-size: 0.95rem;
+    color: var(--accent-primary);
+    font-weight: 700;
+    min-width: 60px;
+    text-align: right;
+}
+
+.breakdown-icon {
+    font-size: 1.5rem;
+    color: var(--accent-primary);
+    transition: transform 0.3s ease;
+}
+
+.candidate-breakdown.open .breakdown-icon {
+    transform: rotate(45deg);
+}
+
+.breakdown-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 1.5rem;
+}
+
+.candidate-breakdown.open .breakdown-details {
+    max-height: 400px;
+    padding: 0 1.5rem 1.5rem;
+}
+
+.breakdown-line {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 0.4rem;
+}
+
+.breakdown-line strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.breakdown-result {
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid rgba(0, 170, 220, 0.2);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--accent-primary);
 }
 
 .additional-markets {
@@ -389,6 +832,7 @@
     cursor: pointer;
     font-size: 0.85rem;
     font-weight: 500;
+    font-family: 'Times New Roman', Times, serif;
     transition: all 0.25s ease;
 }
 
@@ -398,9 +842,9 @@
 }
 
 .toggle-btn.active {
-    background: rgba(0, 102, 204, 0.3);
-    color: #0088FF;
-    box-shadow: 0 0 12px rgba(0, 102, 204, 0.3);
+    background: rgba(0, 220, 255, 0.15);
+    color: #00DCFF;
+    box-shadow: 0 0 12px rgba(0, 220, 255, 0.2);
 }
 
 .download-data-section {
@@ -449,16 +893,6 @@
 .download-icon {
     font-size: 1.2rem;
 }
-
-.data-disclaimer {
-    margin-top: 2rem;
-    padding: 1rem;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    text-align: right;
-    font-style: italic;
-    border-top: 1px solid var(--border-color);
-}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -469,24 +903,52 @@ let manifoldData = {};
 let kalshiData = {};
 let currentChartPeriod = '7d';
 
+// Candidate headshot mapping
+const candidateImages = {
+    'daniel biss': '/static/images/candidates/biss.jpg',
+    'biss': '/static/images/candidates/biss.jpg',
+    'erin bushra': '/static/images/candidates/bushra.png',
+    'bushra': '/static/images/candidates/bushra.png',
+    'robert fine': '/static/images/candidates/fine.png',
+    'fine': '/static/images/candidates/fine.png',
+    'kat abugazaleh': '/static/images/candidates/katabu.png',
+    'abugazaleh': '/static/images/candidates/katabu.png',
+    'mike simmons': '/static/images/candidates/simmons.jpg',
+    'simmons': '/static/images/candidates/simmons.jpg',
+    'phil andrew': '/static/images/candidates/philandrew.png',
+    'andrew': '/static/images/candidates/philandrew.png'
+};
+
+function getCandidateImage(name) {
+    const normalized = name.toLowerCase().trim();
+    // Try full name first
+    if (candidateImages[normalized]) return candidateImages[normalized];
+    // Try last name
+    const lastName = normalized.split(' ').pop();
+    if (candidateImages[lastName]) return candidateImages[lastName];
+    // Default placeholder
+    return null;
+}
+
 function toggleMarket(id) {
     const market = document.getElementById(id);
     market.classList.toggle('open');
 }
 
 function normalizeCandidate(name) {
+    // Extract just the candidate name for matching
     let cleaned = name.toLowerCase()
-        .replace(/^wil\s+/i, '')
-        .replace(/^will\s+/i, '')
-        .replace(/\sbe\sthe\sdemocratic\snominee.*$/i, '')
-        .replace(/\sfor\sil-9.*$/i, '')
-        .replace(/\swin.*$/i, '')
+        .replace(/^wil\s+/i, '') // Remove "Wil " prefix from Kalshi
+        .replace(/^will\s+/i, '') // Remove "Will " prefix
+        .replace(/\sbe\sthe\sdemocratic\snominee.*$/i, '') // Remove suffix
+        .replace(/\swin.*$/i, '') // Remove "win..." suffix
         .replace(/dr\.\s+/i, '')
-        .replace(/\?/g, '')
         .trim();
 
+    // Handle name variations/misspellings
     const nameVariations = {
         'kat abughazaleh': 'kat abugazaleh',
+        // Add more variations as needed
     };
 
     if (nameVariations[cleaned]) {
@@ -497,22 +959,27 @@ function normalizeCandidate(name) {
 }
 
 function cleanCandidateName(name) {
+    // Clean up display name for better readability
     return name
-        .replace(/^wil\s+/i, '')
-        .replace(/^will\s+/i, '')
-        .replace(/\sbe\sthe\sdemocratic\snominee.*$/i, '')
-        .replace(/\sfor\sil-9.*$/i, '')
-        .replace(/\?/g, '')
+        .replace(/^wil\s+/i, '') // Remove "Wil " prefix
+        .replace(/^will\s+/i, '') // Remove "Will " prefix
+        .replace(/\sbe\sthe\sdemocratic\snominee.*$/i, '') // Remove question suffix
+        .replace(/\?/g, '') // Remove question marks
         .trim();
 }
 
 async function calculateAggregate() {
+    // Match candidates across platforms and calculate aggregated probabilities
     const aggregated = [];
+    const breakdowns = [];
+
+    // Get all unique candidates
     const allCandidates = new Set();
     Object.keys(manifoldData).forEach(name => allCandidates.add(name));
     Object.keys(kalshiData).forEach(name => allCandidates.add(name));
 
     allCandidates.forEach(candidateKey => {
+        // Filter out Jan Schakowsky
         if (candidateKey.toLowerCase().includes('schakowsky')) {
             return;
         }
@@ -521,18 +988,31 @@ async function calculateAggregate() {
         const kalshiInfo = kalshiData[candidateKey] || {};
         const kalshiLast = kalshiInfo.last_price || 0;
         const kalshiMid = kalshiInfo.midpoint || 0;
-        const kalshiLiq = kalshiInfo.kalshiLiquidity || kalshiMid;
 
+        // Check if this candidate has Kalshi market
         const hasKalshi = kalshiLast > 0 || kalshiMid > 0;
 
+        // Calculate liquidity-weighted price
+        // Use pre-calculated liquidity-weighted probability from fetchKalshiData
+        const kalshiLiquidity = kalshiInfo.kalshiLiquidity || kalshiMid;
+
         let aggregate;
+
         if (hasKalshi) {
-            aggregate = (0.40 * manifoldProb) + (0.42 * kalshiLast) + (0.12 * kalshiMid) + (0.06 * kalshiLiq);
+            // Full weighted formula for candidates with Kalshi
+            // 40% Manifold + 60% Kalshi (70% last, 20% mid, 10% liquidity)
+            const manifoldContribution = 0.40 * manifoldProb;
+            const kalshiLastContribution = 0.42 * kalshiLast;
+            const kalshiMidContribution = 0.12 * kalshiMid;
+            const kalshiLiqContribution = 0.06 * kalshiLiquidity;
+            aggregate = manifoldContribution + kalshiLastContribution + kalshiMidContribution + kalshiLiqContribution;
         } else {
+            // Use 100% of Manifold probability for candidates without Kalshi
             aggregate = manifoldProb;
         }
 
         if (aggregate > 0 || manifoldProb > 0) {
+            // Use cleaned display name
             const displayName = manifoldData[candidateKey]?.displayName || kalshiInfo.displayName || candidateKey;
             const cleanName = cleanCandidateName(displayName);
 
@@ -541,25 +1021,62 @@ async function calculateAggregate() {
                 probability: aggregate,
                 hasKalshi: hasKalshi
             });
+
+            // Store breakdown for display
+            const manifoldContribution = hasKalshi ? (0.40 * manifoldProb) : manifoldProb;
+            const kalshiLastContribution = 0.27 * kalshiLast;
+            const kalshiMidContribution = 0.27 * kalshiMid;
+            const kalshiLiqContribution = 0.06 * kalshiLiquidity;
+
+            breakdowns.push({
+                name: cleanName,
+                manifoldProb: manifoldProb.toFixed(1),
+                kalshiLast: kalshiLast.toFixed(1),
+                kalshiMid: kalshiMid.toFixed(1),
+                kalshiLiq: kalshiLiquidity.toFixed(1),
+                manifoldContribution: manifoldContribution.toFixed(2),
+                kalshiLastContribution: kalshiLastContribution.toFixed(2),
+                kalshiMidContribution: kalshiMidContribution.toFixed(2),
+                kalshiLiqContribution: kalshiLiqContribution.toFixed(2),
+                aggregate: aggregate.toFixed(1),
+                hasKalshi: hasKalshi
+            });
         }
     });
 
-    // Soft normalization (30% strength)
+    // Soft normalization - only apply 30% of adjustment to keep top candidates higher
+    const NORMALIZATION_STRENGTH = 0.30; // 30% normalization, 70% raw values
     const total = aggregated.reduce((sum, c) => sum + c.probability, 0);
     if (total > 0) {
         aggregated.forEach(c => {
             const fullyNormalized = (c.probability / total) * 100;
             const adjustment = fullyNormalized - c.probability;
-            c.probability = c.probability + (adjustment * 0.30);
+            c.probability = c.probability + (adjustment * NORMALIZATION_STRENGTH);
+        });
+        breakdowns.forEach(b => {
+            const oldAggregate = parseFloat(b.aggregate);
+            const fullyNormalized = (oldAggregate / total) * 100;
+            const adjustment = fullyNormalized - oldAggregate;
+            b.normalizedAggregate = (oldAggregate + (adjustment * NORMALIZATION_STRENGTH)).toFixed(1);
         });
     }
 
     aggregated.sort((a, b) => b.probability - a.probability);
+    breakdowns.sort((a, b) => parseFloat(b.normalizedAggregate || b.aggregate) - parseFloat(a.normalizedAggregate || a.aggregate));
+
+    // Store aggregated data for chart updates
     candidatesData = aggregated;
 
+    // Save snapshot as backup (backend also saves every 3 min)
+    // Frontend saves only when page is viewed, backend ensures continuous collection
     await saveSnapshot(aggregated);
-    renderBigBars(aggregated);
+
+    renderBigOdds(aggregated);
+
+    // Render chart with aggregated data (handles both 30d and 1h views)
     await renderMarketTrendChart(aggregated);
+
+    renderBreakdown(breakdowns);
 }
 
 async function saveSnapshot(candidates) {
@@ -582,24 +1099,59 @@ async function saveSnapshot(candidates) {
     }
 }
 
-function renderBigBars(candidates) {
-    const container = document.getElementById('bigBarsDisplay');
-    container.innerHTML = candidates.map((c, idx) => {
-        const asterisk = !c.hasKalshi ? '*' : '';
-        const barColor = `hsl(${210 - idx * 15}, 100%, ${50 - idx * 3}%)`;
+function renderBreakdown(breakdowns) {
+    const container = document.getElementById('breakdownContent');
+
+    container.innerHTML = breakdowns.map((b, idx) => {
+        const asterisk = !b.hasKalshi ? '*' : '';
+        const finalProb = b.normalizedAggregate || b.aggregate;
+
+        let calculationHTML;
+        if (b.hasKalshi) {
+            calculationHTML = `
+                <div class="breakdown-line"><strong>Manifold:</strong> ${b.manifoldProb}%</div>
+                <div class="breakdown-line"><strong>Kalshi Last Price:</strong> ${b.kalshiLast}%</div>
+                <div class="breakdown-line"><strong>Kalshi Midpoint:</strong> ${b.kalshiMid}%</div>
+                <div class="breakdown-line"><strong>Kalshi Liquidity-Weighted:</strong> ${b.kalshiLiq}%</div>
+                <div class="breakdown-line" style="margin-top: 0.8rem;">
+                    <strong>Calculation:</strong><br>
+                    (0.40 × ${b.manifoldProb}) + (0.27 × ${b.kalshiLast}) + (0.27 × ${b.kalshiMid}) + (0.06 × ${b.kalshiLiq})<br>
+                    = ${b.manifoldContribution} + ${b.kalshiLastContribution} + ${b.kalshiMidContribution} + ${b.kalshiLiqContribution}
+                </div>
+                <div class="breakdown-result">= ${b.aggregate}%</div>
+                ${b.normalizedAggregate ? `<div class="breakdown-line" style="margin-top: 0.5rem; color: var(--text-secondary);"><strong>Soft Normalized (30%):</strong> ${b.normalizedAggregate}%</div>` : ''}
+            `;
+        } else {
+            calculationHTML = `
+                <div class="breakdown-line"><strong>Manifold:</strong> ${b.manifoldProb}%</div>
+                <div class="breakdown-line" style="color: var(--text-secondary);"><strong>Kalshi:</strong> No market available</div>
+                <div class="breakdown-line" style="margin-top: 0.8rem;">
+                    <strong>Calculation:</strong><br>
+                    Using 100% of Manifold probability (no Kalshi data)<br>
+                    = ${b.manifoldProb}%
+                </div>
+                ${b.normalizedAggregate ? `<div class="breakdown-line" style="margin-top: 0.5rem; color: var(--text-secondary);"><strong>Soft Normalized (30%):</strong> ${b.normalizedAggregate}%<br><em style="font-size: 0.85em;">Light normalization applied to prevent drift while preserving market values.</em></div>` : ''}
+            `;
+        }
 
         return `
-        <div class="bar-candidate">
-            <div class="bar-header">
-                <span class="bar-name">${c.name}${asterisk}</span>
-                <span class="bar-percent">${Math.round(c.probability)}%</span>
-            </div>
-            <div class="bar-container">
-                <div class="bar-fill" style="width: ${c.probability}%; background: ${barColor};"></div>
+        <div class="candidate-breakdown" id="breakdown-${idx}">
+            <button class="breakdown-toggle" onclick="toggleBreakdown(${idx})">
+                <span class="breakdown-header">${b.name}${asterisk}</span>
+                <span class="breakdown-preview">${finalProb}%</span>
+                <span class="breakdown-icon">+</span>
+            </button>
+            <div class="breakdown-details">
+                ${calculationHTML}
             </div>
         </div>
         `;
     }).join('');
+}
+
+function toggleBreakdown(idx) {
+    const breakdown = document.getElementById(`breakdown-${idx}`);
+    breakdown.classList.toggle('open');
 }
 
 async function fetchManifoldData() {
@@ -607,8 +1159,11 @@ async function fetchManifoldData() {
         const response = await fetch('/api/manifold');
         const data = await response.json();
 
-        if (data.error) throw new Error(data.error);
+        if (data.error) {
+            throw new Error(data.error);
+        }
 
+        // Extract answers with probabilities
         const answers = data.answers || [];
         const manifoldList = answers
             .map(a => ({
@@ -618,6 +1173,7 @@ async function fetchManifoldData() {
             .filter(a => a.name !== 'Other' && !a.name.toLowerCase().includes('schakowsky'))
             .sort((a, b) => b.probability - a.probability);
 
+        // Store in lookup object
         manifoldList.forEach(c => {
             const key = normalizeCandidate(c.name);
             manifoldData[key] = {
@@ -628,22 +1184,80 @@ async function fetchManifoldData() {
 
         renderManifoldExpanded(manifoldList);
 
+        // Update timestamp
         const updated = new Date(data.lastBetTime || data.lastUpdatedTime);
         document.getElementById('manifoldUpdated').textContent = `Updated ${updated.toLocaleString()}`;
 
+        // Calculate aggregate if both data sources are ready
         if (Object.keys(kalshiData).length > 0 && Object.keys(manifoldData).length > 0) {
+            console.log('Recalculating aggregate with updated Manifold data');
             await calculateAggregate();
+        } else {
+            console.log('Waiting for both data sources. Manifold:', Object.keys(manifoldData).length, 'Kalshi:', Object.keys(kalshiData).length);
         }
+
     } catch (error) {
         console.error('Error fetching Manifold data:', error);
-        document.getElementById('bigBarsDisplay').innerHTML = '<p style="color: var(--text-secondary);">Error loading market data</p>';
+        document.getElementById('bigOddsDisplay').innerHTML = '<p style="color: var(--text-secondary);">Error loading market data</p>';
     }
 }
 
-function renderManifoldExpanded(candidates) {
-    const top = candidates[0];
-    document.getElementById('manifoldPreview').textContent = `Top: ${top.name.split(' ').pop()} ${Math.round(top.probability)}%`;
+function renderBigOdds(candidates) {
+    // Update leader featured card
+    if (candidates.length > 0) {
+        const leader = candidates[0];
+        const leaderImage = getCandidateImage(leader.name);
+        const photoEl = document.getElementById('leaderPhoto');
+        const nameEl = document.getElementById('leaderName');
+        const aggregateEl = document.getElementById('leaderAggregate');
+        const manifoldEl = document.getElementById('leaderManifold');
+        const kalshiLastEl = document.getElementById('leaderKalshiLast');
+        const kalshiMidEl = document.getElementById('leaderKalshiMid');
+        const kalshiLiqEl = document.getElementById('leaderKalshiLiq');
 
+        if (leaderImage) {
+            photoEl.src = leaderImage;
+            photoEl.alt = leader.name;
+            photoEl.style.display = 'block';
+        } else {
+            photoEl.style.display = 'none';
+        }
+        nameEl.textContent = leader.name;
+        aggregateEl.textContent = Math.round(leader.probability) + '%';
+
+        // Get Manifold and Kalshi data for leader
+        const leaderKey = normalizeCandidate(leader.name);
+        const manifoldProb = manifoldData[leaderKey]?.probability || 0;
+        const kalshiInfo = kalshiData[leaderKey] || {};
+        const kalshiLast = kalshiInfo.last_price || 0;
+        const kalshiMid = kalshiInfo.midpoint || 0;
+        const kalshiLiq = kalshiInfo.kalshiLiquidity || 0;
+
+        manifoldEl.textContent = manifoldProb > 0 ? manifoldProb.toFixed(1) + '%' : '--';
+        kalshiLastEl.textContent = kalshiLast > 0 ? kalshiLast.toFixed(1) + '%' : '--';
+        kalshiMidEl.textContent = kalshiMid > 0 ? kalshiMid.toFixed(1) + '%' : '--';
+        kalshiLiqEl.textContent = kalshiLiq > 0 ? kalshiLiq.toFixed(1) + '%' : '--';
+    }
+
+    // Update other candidates grid (skip leader)
+    const container = document.getElementById('bigOddsDisplay');
+    container.innerHTML = candidates.slice(1, 6).map((c) => {
+        const asterisk = !c.hasKalshi ? '*' : '';
+        return `
+        <div class="big-odds-candidate">
+            <span class="big-percent">${Math.round(c.probability)}%</span>
+            <span class="big-name">${c.name}${asterisk}</span>
+        </div>
+        `;
+    }).join('');
+}
+
+function renderManifoldExpanded(candidates) {
+    // Update preview
+    const top = candidates[0];
+    document.getElementById('manifoldPreview').textContent = `Top: ${top.name.split(' ')[1]} ${Math.round(top.probability)}%`;
+
+    // Update expanded list
     const container = document.getElementById('manifoldCandidates');
     container.innerHTML = candidates.map(c => `
         <div class="market-candidate">
@@ -653,95 +1267,17 @@ function renderManifoldExpanded(candidates) {
     `).join('');
 }
 
-async function fetchKalshiData() {
-    try {
-        const response = await fetch('/api/kalshi');
-        const data = await response.json();
 
-        if (data.error) throw new Error(data.error);
-
-        const markets = data.markets || [];
-        const kalshiList = [];
-
-        markets.forEach(m => {
-            let displayName = m.subtitle || m.title;
-            if (displayName.toLowerCase().includes('schakowsky')) return;
-
-            const last_price = m.last_price || 0;
-            const yes_bid = m.yes_bid || 0;
-            const yes_ask = m.yes_ask || 0;
-            const midpoint = (yes_bid + yes_ask) / 2;
-
-            if (last_price > 0 || midpoint > 0) {
-                const key = normalizeCandidate(displayName);
-                const spread = yes_ask - yes_bid;
-                let kalshiLiquidity = midpoint;
-
-                if (spread > 0 && last_price > 0) {
-                    const positionInSpread = Math.max(0, Math.min(1, (last_price - yes_bid) / spread));
-                    const offsetFromMid = positionInSpread - 0.5;
-                    const spreadFactor = Math.max(0.2, 1 - (spread / 10) * 0.8);
-                    const priceShift = Math.max(-3, Math.min(3, offsetFromMid * 6 * spreadFactor));
-                    kalshiLiquidity = Math.max(0, Math.min(100, midpoint + priceShift));
-                }
-
-                kalshiData[key] = {
-                    displayName: displayName,
-                    last_price: last_price,
-                    yes_bid: yes_bid,
-                    yes_ask: yes_ask,
-                    midpoint: midpoint,
-                    kalshiLiquidity: kalshiLiquidity
-                };
-
-                kalshiList.push({
-                    name: cleanCandidateName(displayName),
-                    probability: Math.round(last_price * 10) / 10
-                });
-            }
-        });
-
-        kalshiList.sort((a, b) => b.probability - a.probability);
-        renderKalshiExpanded(kalshiList);
-
-        document.getElementById('kalshiUpdated').textContent = `Live data - ${new Date().toLocaleTimeString()}`;
-
-        if (Object.keys(manifoldData).length > 0 && Object.keys(kalshiData).length > 0) {
-            await calculateAggregate();
-        }
-    } catch (error) {
-        console.error('Error fetching Kalshi data:', error);
-        document.getElementById('kalshiPreview').textContent = 'Error loading';
-    }
-}
-
-function renderKalshiExpanded(candidates) {
-    if (candidates.length === 0) {
-        document.getElementById('kalshiPreview').textContent = 'No data';
-        return;
-    }
-
-    const top = candidates[0];
-    const topName = top.name.split(' ').pop();
-    document.getElementById('kalshiPreview').textContent = `Top: ${topName} ${Math.round(top.probability)}%`;
-
-    const container = document.getElementById('kalshiCandidates');
-    container.innerHTML = candidates.map(c => `
-        <div class="market-candidate">
-            <span class="candidate-name">${c.name}</span>
-            <span class="candidate-odds">${c.probability}%</span>
-        </div>
-    `).join('');
-}
-
+// Aggregate snapshots to reduce data points for cleaner chart lines
 function aggregateSnapshots(snapshots, period) {
     const buckets = {};
 
     snapshots.forEach(snapshot => {
+        // Parse timestamp - handle both UTC (with Z) and local (without Z)
         const ts = snapshot.timestamp;
         let date;
         if (ts.endsWith('Z')) {
-            date = new Date(ts);
+            date = new Date(ts); // UTC - auto converts to local
         } else {
             const [datePart, timePart] = ts.split('T');
             const [year, month, day] = datePart.split('-').map(Number);
@@ -751,23 +1287,34 @@ function aggregateSnapshots(snapshots, period) {
 
         let bucketKey;
         if (period === '1d') {
+            // For 1 day view, aggregate to 15-minute intervals
             const minutes = Math.floor(date.getMinutes() / 15) * 15;
             bucketKey = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}T${String(date.getHours()).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:00`;
         } else if (period === 'all') {
+            // For all time view, aggregate to daily averages
             bucketKey = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}T12:00:00`;
         } else {
+            // For 7 days view, aggregate to hourly averages
             bucketKey = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}T${String(date.getHours()).padStart(2,'0')}:00:00`;
         }
 
-        if (!buckets[bucketKey]) buckets[bucketKey] = [];
+        if (!buckets[bucketKey]) {
+            buckets[bucketKey] = [];
+        }
         buckets[bucketKey].push(snapshot);
     });
 
+    // Average the snapshots in each bucket
     const aggregated = Object.keys(buckets).sort().map(bucketKey => {
         const snapshotsInBucket = buckets[bucketKey];
-        const allCandidates = new Set();
-        snapshotsInBucket.forEach(s => s.candidates.forEach(c => allCandidates.add(c.name)));
 
+        // Get all unique candidate names
+        const allCandidates = new Set();
+        snapshotsInBucket.forEach(s => {
+            s.candidates.forEach(c => allCandidates.add(c.name));
+        });
+
+        // Average probability for each candidate
         const candidateAverages = Array.from(allCandidates).map(name => {
             const probs = snapshotsInBucket
                 .map(s => s.candidates.find(c => c.name === name)?.probability)
@@ -778,10 +1325,17 @@ function aggregateSnapshots(snapshots, period) {
                 s.candidates.find(c => c.name === name)?.hasKalshi
             );
 
-            return { name, probability: avgProb, hasKalshi };
+            return {
+                name: name,
+                probability: avgProb,
+                hasKalshi: hasKalshi
+            };
         });
 
-        return { timestamp: bucketKey, candidates: candidateAverages };
+        return {
+            timestamp: bucketKey,
+            candidates: candidateAverages
+        };
     });
 
     return aggregated;
@@ -790,6 +1344,7 @@ function aggregateSnapshots(snapshots, period) {
 async function renderMarketTrendChart(candidates) {
     const ctx = document.getElementById('marketTrendChart').getContext('2d');
 
+    // Fetch REAL historical snapshots - NO FAKE DATA
     let snapshots = [];
     try {
         const response = await fetch('/api/snapshots');
@@ -798,8 +1353,10 @@ async function renderMarketTrendChart(candidates) {
         console.error('Error fetching historical snapshots:', error);
     }
 
+    // If we don't have enough historical data, show a message
     if (snapshots.length < 2) {
         if (marketChart) marketChart.destroy();
+
         ctx.font = '14px Arial';
         ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
         ctx.textAlign = 'center';
@@ -807,6 +1364,7 @@ async function renderMarketTrendChart(candidates) {
         return;
     }
 
+    // Filter snapshots by time period and aggregate for cleaner lines
     const now = new Date();
     const period = currentChartPeriod || '7d';
     let filteredSnapshots = snapshots;
@@ -814,16 +1372,17 @@ async function renderMarketTrendChart(candidates) {
     if (period !== 'all') {
         let cutoffTime;
         if (period === '1d') {
-            cutoffTime = new Date(now - 24 * 60 * 60 * 1000);
+            cutoffTime = new Date(now - 24 * 60 * 60 * 1000); // 1 day ago
         } else {
-            cutoffTime = new Date(now - 7 * 24 * 60 * 60 * 1000);
+            cutoffTime = new Date(now - 7 * 24 * 60 * 60 * 1000); // 7 days ago
         }
 
         filteredSnapshots = snapshots.filter(s => {
+            // Parse timestamp - handle both UTC (with Z) and local (without Z)
             const ts = s.timestamp;
             let snapshotDate;
             if (ts.endsWith('Z')) {
-                snapshotDate = new Date(ts);
+                snapshotDate = new Date(ts); // UTC - auto converts to local
             } else {
                 const [datePart, timePart] = ts.split('T');
                 const [year, month, day] = datePart.split('-').map(Number);
@@ -833,20 +1392,26 @@ async function renderMarketTrendChart(candidates) {
             return snapshotDate > cutoffTime;
         });
 
+        // If we don't have enough data, show the most recent data points
         const MIN_DATA_POINTS = 10;
         if (filteredSnapshots.length < MIN_DATA_POINTS && snapshots.length >= MIN_DATA_POINTS) {
             filteredSnapshots = snapshots.slice(-MIN_DATA_POINTS);
         }
     }
 
+    // Aggregate to reduce data points (hourly for 30d, raw for 1h)
     const aggregatedSnapshots = aggregateSnapshots(filteredSnapshots, period);
 
-    const labels = aggregatedSnapshots.map((s) => {
+    // Build labels from aggregated snapshot timestamps
+    const labels = aggregatedSnapshots.map((s, index) => {
+        // Parse timestamp - if ends with Z, it's UTC; otherwise treat as local
         const ts = s.timestamp;
         let date;
         if (ts.endsWith('Z')) {
+            // UTC timestamp - new Date() will convert to local automatically
             date = new Date(ts);
         } else {
+            // Old format without Z - parse as local time components
             const [datePart, timePart] = ts.split('T');
             const [year, month, day] = datePart.split('-').map(Number);
             const [hour, min, sec] = (timePart || '00:00:00').split(':').map(n => parseInt(n));
@@ -854,17 +1419,37 @@ async function renderMarketTrendChart(candidates) {
         }
 
         if (period === '1d') {
+            // For 1-day view, show time only
             return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         } else if (period === 'all') {
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            // For all-time view, show date only
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
+            });
         } else {
-            return date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', hour12: true });
+            // For 7-day view, show date and hour
+            return date.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                hour12: true
+            });
         }
     });
 
-    const colors = ['#0066CC', '#FF6B35', '#6D904F', '#8B8B8B', '#E5AE38', '#810F7C'];
+    // FiveThirtyEight-inspired color palette: muted, professional
+    const colors = [
+        '#008FD5',  // Blue
+        '#FC4F30',  // Red/Orange
+        '#6D904F',  // Green
+        '#8B8B8B',  // Gray
+        '#E5AE38',  // Gold
+        '#810F7C'   // Purple
+    ];
 
-    const topCandidates = candidates.slice(0, 6);
+    // Build datasets from REAL historical data only (aggregated for clean lines)
+    const topCandidates = candidates.slice(0, 4);
     const datasets = topCandidates.map((c, idx) => {
         const data = aggregatedSnapshots.map(snapshot => {
             const candidateData = snapshot.candidates.find(sc => sc.name === c.name);
@@ -872,12 +1457,12 @@ async function renderMarketTrendChart(candidates) {
         });
 
         return {
-            label: c.name,
+            label: c.name.split(' ').pop() || c.name,
             data: data,
             borderColor: colors[idx],
             backgroundColor: 'transparent',
-            borderWidth: 2.5,
-            tension: 0,
+            borderWidth: 2,
+            tension: 0,  // FiveThirtyEight uses straight lines between points
             fill: false,
             pointRadius: 2,
             pointHoverRadius: 4,
@@ -896,16 +1481,24 @@ async function renderMarketTrendChart(candidates) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
             plugins: {
                 legend: {
                     position: 'bottom',
                     labels: {
+                        usePointStyle: false,
                         boxWidth: 12,
                         boxHeight: 12,
                         padding: 15,
                         color: 'rgba(255, 255, 255, 0.8)',
-                        font: { size: 12 }
+                        font: {
+                            family: 'Arial, sans-serif',
+                            size: 12,
+                            weight: 'normal'
+                        }
                     }
                 },
                 tooltip: {
@@ -915,8 +1508,20 @@ async function renderMarketTrendChart(candidates) {
                     borderColor: 'rgba(255, 255, 255, 0.1)',
                     borderWidth: 1,
                     padding: 10,
+                    cornerRadius: 3,
+                    titleFont: {
+                        family: 'Arial, sans-serif',
+                        size: 12,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        family: 'Arial, sans-serif',
+                        size: 11
+                    },
                     callbacks: {
-                        label: (context) => `${context.dataset.label}: ${context.parsed.y?.toFixed(1) || '--'}%`
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.parsed.y?.toFixed(1) || '--'}%`;
+                        }
                     }
                 }
             },
@@ -928,35 +1533,233 @@ async function renderMarketTrendChart(candidates) {
                         stepSize: 10,
                         callback: (value) => value + '%',
                         color: 'rgba(255, 255, 255, 0.6)',
-                        font: { size: 11 }
+                        font: {
+                            family: 'Arial, sans-serif',
+                            size: 11
+                        },
+                        padding: 8
                     },
-                    grid: { color: 'rgba(255, 255, 255, 0.08)', drawBorder: false },
-                    border: { display: false }
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.08)',
+                        drawBorder: false,
+                        lineWidth: 1
+                    },
+                    border: {
+                        display: false
+                    }
                 },
                 x: {
                     ticks: {
                         color: 'rgba(255, 255, 255, 0.6)',
                         maxTicksLimit: 10,
-                        font: { size: 10 },
+                        font: {
+                            family: 'Arial, sans-serif',
+                            size: 10
+                        },
                         maxRotation: 45,
                         minRotation: 0
                     },
-                    grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
-                    border: { display: false }
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)',
+                        drawBorder: false
+                    },
+                    border: {
+                        display: false
+                    }
                 }
             }
         }
     });
 }
 
+async function fetchKalshiData() {
+    try {
+        console.log('Fetching Kalshi data...');
+        const response = await fetch('/api/kalshi');
+        const data = await response.json();
+
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
+        // Extract markets - each market is a candidate
+        const markets = data.markets || [];
+
+        console.log('Kalshi response received. Markets count:', markets.length);
+        console.log('Kalshi markets:', markets); // Debug log
+        console.log('Kalshi data full response:', data);
+
+        const kalshiList = [];
+
+        markets.forEach(m => {
+            // Extract candidate name from subtitle or title
+            let displayName = m.subtitle || m.title;
+
+            // Filter out Jan Schakowsky
+            if (displayName.toLowerCase().includes('schakowsky')) {
+                return;
+            }
+
+            const last_price = m.last_price || 0;
+            const yes_bid = m.yes_bid || 0;
+            const yes_ask = m.yes_ask || 0;
+            const midpoint = (yes_bid + yes_ask) / 2;
+
+            // Extract order book volume data
+            const yes_bid_volume = m.yes_bid_size || 0;
+            const no_bid_volume = m.no_bid_size || 0;
+
+            if (last_price > 0 || midpoint > 0) {
+                const key = normalizeCandidate(displayName);
+                const localMid = midpoint;
+
+                // Liquidity-weighted price based on last trade position within spread
+                const spread = yes_ask - yes_bid;
+                let kalshiLiquidity = localMid;
+
+                console.log(`${displayName} RAW DATA: yes_bid=${yes_bid}, yes_ask=${yes_ask}, last=${last_price}, spread=${spread.toFixed(2)}, mid=${localMid.toFixed(1)}`);
+
+                if (spread > 0 && last_price > 0) {
+                    // Liquidity weighting: where did the last trade occur within the spread?
+                    // - Last price near ask (1.0) → buyers aggressive → shift up
+                    // - Last price near bid (0.0) → sellers aggressive → shift down
+                    // - Last price at mid (0.5) → balanced → no shift
+
+                    // Position in spread: 0 = at bid, 0.5 = at mid, 1 = at ask
+                    const positionInSpread = Math.max(0, Math.min(1, (last_price - yes_bid) / spread));
+
+                    // Offset from midpoint: -0.5 to +0.5
+                    const offsetFromMid = positionInSpread - 0.5;
+
+                    // Spread dampening: wider spreads = less confidence in the signal
+                    // At 0pp spread: factor = 1.0 (full shift potential)
+                    // At 10pp spread: factor = 0.2 (heavily dampened)
+                    const spreadFactor = Math.max(0.2, 1 - (spread / 10) * 0.8);
+
+                    // Calculate shift: scale by 6 (so ±0.5 offset → ±3pp max), apply dampening
+                    const rawShift = offsetFromMid * 6 * spreadFactor;
+
+                    // Cap at ±3 percentage points
+                    const priceShift = Math.max(-3, Math.min(3, rawShift));
+
+                    kalshiLiquidity = Math.max(0, Math.min(100, localMid + priceShift));
+
+                    console.log(`${displayName} liquidity: pos_in_spread=${positionInSpread.toFixed(2)}, offset=${offsetFromMid.toFixed(2)}, spread_factor=${spreadFactor.toFixed(2)}, shift=${priceShift.toFixed(2)}, result=${kalshiLiquidity.toFixed(1)}`);
+                } else {
+                    console.log(`${displayName} NO spread/last data - using midpoint ${localMid}`);
+                }
+
+                kalshiData[key] = {
+                    displayName: displayName,
+                    last_price: last_price,
+                    yes_bid: yes_bid,
+                    yes_ask: yes_ask,
+                    midpoint: midpoint,
+                    yes_bid_volume: yes_bid_volume,
+                    no_bid_volume: no_bid_volume,
+                    kalshiLiquidity: kalshiLiquidity
+                };
+
+                kalshiList.push({
+                    name: cleanCandidateName(displayName),
+                    probability: Math.round(last_price * 10) / 10
+                });
+            }
+        });
+
+        kalshiList.sort((a, b) => b.probability - a.probability);
+        renderKalshiExpanded(kalshiList);
+
+        console.log('Kalshi candidates processed:', kalshiList);
+        console.log('Kalshi data object:', kalshiData);
+
+        // Update timestamp
+        document.getElementById('kalshiUpdated').textContent = `Live data - ${new Date().toLocaleTimeString()}`;
+
+        // Calculate aggregate if both Manifold and Kalshi data are ready
+        if (Object.keys(manifoldData).length > 0 && Object.keys(kalshiData).length > 0) {
+            console.log('Recalculating aggregate with updated Kalshi data');
+            console.log('Manifold keys:', Object.keys(manifoldData));
+            console.log('Kalshi keys:', Object.keys(kalshiData));
+            await calculateAggregate();
+        } else {
+            console.log('Waiting for both data sources. Manifold:', Object.keys(manifoldData).length, 'Kalshi:', Object.keys(kalshiData).length);
+        }
+
+    } catch (error) {
+        console.error('Error fetching Kalshi data:', error);
+        document.getElementById('kalshiPreview').textContent = 'Error loading';
+        document.getElementById('kalshiCandidates').innerHTML = '<p style="color: var(--text-secondary);">Error loading Kalshi data</p>';
+    }
+}
+
+function renderKalshiExpanded(candidates) {
+    if (candidates.length === 0) {
+        document.getElementById('kalshiPreview').textContent = 'No data';
+        return;
+    }
+
+    // Update preview - use last name only
+    const top = candidates[0];
+    const nameParts = top.name.split(' ');
+    const topName = nameParts[nameParts.length - 1]; // Get last name
+    document.getElementById('kalshiPreview').textContent = `Top: ${topName} ${Math.round(top.probability)}%`;
+
+    // Update expanded list
+    const container = document.getElementById('kalshiCandidates');
+    container.innerHTML = candidates.map(c => `
+        <div class="market-candidate">
+            <span class="candidate-name">${c.name}</span>
+            <span class="candidate-odds">${c.probability}%</span>
+        </div>
+    `).join('');
+}
+
+function getPollingInterval() {
+    const electionDay = new Date('2026-03-17');
+    const today = new Date();
+    const millisecondsUntilElection = electionDay - today;
+    const daysUntilElection = millisecondsUntilElection / (1000 * 60 * 60 * 24);
+
+    // Election day: poll every 1 minute
+    if (daysUntilElection <= 0 && daysUntilElection > -1) {
+        return 1 * 60 * 1000; // 1 minute
+    }
+    // Last 3 days before election: poll every 1 minute
+    else if (daysUntilElection <= 3) {
+        return 1 * 60 * 1000; // 1 minute
+    }
+    // Default: poll every 3 minutes
+    else {
+        return 3 * 60 * 1000; // 3 minutes
+    }
+}
+
 function setupPolling() {
+    // Initial fetch
     fetchManifoldData();
     fetchKalshiData();
 
-    setInterval(() => {
-        fetchManifoldData();
-        fetchKalshiData();
-    }, 3 * 60 * 1000);
+    // Set up interval polling with dynamic intervals
+    let currentInterval = null;
+
+    function setupNextPoll() {
+        const interval = getPollingInterval();
+
+        if (currentInterval) {
+            clearInterval(currentInterval);
+        }
+
+        currentInterval = setInterval(() => {
+            fetchManifoldData();
+            fetchKalshiData();
+            setupNextPoll(); // Re-check interval after each poll in case it changed
+        }, interval);
+
+        console.log(`Polling set to every ${interval / 1000 / 60} minute(s)`);
+    }
+
+    setupNextPoll();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -965,12 +1768,45 @@ document.addEventListener('DOMContentLoaded', () => {
     if (navbar) navbar.style.display = 'none';
     if (footer) footer.style.display = 'none';
 
+    // Set up chart toggle buttons
     document.querySelectorAll('.toggle-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
+            // Update button states
             document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
+
             currentChartPeriod = e.target.dataset.period;
+
+            // Render chart with the selected period (handles both 30d and 1h)
             await renderMarketTrendChart(candidatesData);
+        });
+    });
+
+    // Parallax light effect on scroll
+    const parallaxLights = document.querySelectorAll('.parallax-light');
+
+    window.addEventListener('scroll', () => {
+        const scrollY = window.pageYOffset;
+
+        parallaxLights.forEach(light => {
+            const speed = parseFloat(light.dataset.speed) || 0.3;
+            const direction = parseInt(light.dataset.direction) || 1;
+            const appearAt = parseInt(light.dataset.appear) || 0;
+
+            // Handle appearing lights
+            if (appearAt > 0) {
+                if (scrollY > appearAt) {
+                    light.style.opacity = Math.min(1, (scrollY - appearAt) / 200);
+                } else {
+                    light.style.opacity = 0;
+                }
+            }
+
+            // Move horizontally and vertically based on scroll (subtle)
+            const moveX = scrollY * speed * direction * 0.5;
+            const moveY = scrollY * speed * direction * -0.2;
+
+            light.style.transform = `translate(${moveX}px, ${moveY}px)`;
         });
     });
 
