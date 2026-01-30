@@ -1,186 +1,307 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="IL9Cast - Methodology">
+    <title>Methodology - IL9Cast</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+</head>
+<body class="dark-mode">
+    <canvas id="grid-canvas"></canvas>
 
-{% block title %}Methodology - IL9Cast{% endblock %}
+    <div class="site-content">
+        <header>
+            <a href="/" class="logo">IL9<span>Cast</span></a>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/markets">Markets</a>
+                <a href="/odds">Model</a>
+                <a href="/methodology" class="active">Methodology</a>
+                <a href="/about">About</a>
+            </nav>
+        </header>
 
-{% block content %}
-<div class="inner-page methodology-page">
-    <nav class="inner-nav">
-        <a href="/" class="back-link">IL9Cast</a>
-        <div class="inner-nav-links">
-            <a href="/odds">The Model</a>
-            <a href="/markets">Markets</a>
-            <a href="/fundraising">Fundraising</a>
-            <a href="/methodology" class="active">Methodology</a>
-            <a href="/about">About</a>
-        </div>
-    </nav>
+        <section class="hero">
+            <h1>Methodology</h1>
+            <p class="subtitle">How we aggregate prediction markets</p>
+        </section>
 
-    <div class="inner-content">
-        <h1 class="inner-title">Methodology</h1>
-        <p class="method-subtitle">How we aggregate prediction markets</p>
+        <section class="methodology-content-page">
+            <article class="method-section">
+                <h2>Prediction Markets Aggregation</h2>
+                <p>The <a href="/markets">Markets page</a> aggregates real-time probabilities from two major prediction markets: <strong>Manifold Markets</strong> (community-driven) and <strong>Kalshi</strong> (real-money exchange). This provides a live, crowd-sourced forecast updated automatically as new trades occur.</p>
 
-<section class="methodology-content">
+                <h3>Overall Weighting: 40% Manifold + 60% Kalshi</h3>
 
-    <article class="method-section">
-        <h2>Prediction Markets Aggregation</h2>
-        <p>The <a href="/markets">Markets page</a> aggregates real-time probabilities from two major prediction markets: <strong>Manifold Markets</strong> (community-driven) and <strong>Kalshi</strong> (real-money exchange). This provides a live, crowd-sourced forecast updated automatically as new trades occur.</p>
+                <p><strong>Manifold Markets (40% weight):</strong></p>
+                <ul class="method-list">
+                    <li>Community prediction market using play money</li>
+                    <li>Lower barrier to entry, broader participation</li>
+                    <li>Captures general consensus and casual forecasters</li>
+                    <li>Uses an Automated Market Maker (AMM) for price discovery</li>
+                    <li>Good for long-term sentiment, less susceptible to short-term noise</li>
+                </ul>
 
-        <h3 style="margin-top: 1.5rem; font-size: 1.1rem;">Overall Weighting: 40% Manifold + 60% Kalshi</h3>
+                <p><strong>Kalshi (60% weight):</strong></p>
+                <ul class="method-list">
+                    <li>Real-money exchange with cash-settled contracts</li>
+                    <li>Higher barrier to entry, attracts serious forecasters with skin in the game</li>
+                    <li>Reflects genuine conviction (money is at risk)</li>
+                    <li>Traditional order book exchange (bid/ask spread pricing)</li>
+                </ul>
 
-        <p><strong>Manifold Markets (40% weight):</strong></p>
-        <ul class="method-list">
-            <li>Community prediction market using play money</li>
-            <li>Lower barrier to entry, broader participation</li>
-            <li>Captures general consensus and casual forecasters</li>
-            <li>Uses an Automated Market Maker (AMM) for price discovery</li>
-            <li>Good for long-term sentiment, less susceptible to short-term noise</li>
-        </ul>
+                <h3>Kalshi Component Breakdown (60% total weight)</h3>
 
-        <p><strong>Kalshi (60% weight):</strong></p>
-        <ul class="method-list">
-            <li>Real-money exchange with cash-settled contracts</li>
-            <li>Higher barrier to entry, attracts serious forecasters with skin in the game</li>
-            <li>Reflects genuine conviction (money is at risk)</li>
-            <li>Traditional order book exchange (bid/ask spread pricing)</li>
-        </ul>
+                <p>Within Kalshi's 60% weight, we use three price signals:</p>
 
-        <h3 style="margin-top: 1.5rem; font-size: 1.1rem;">Kalshi Component Breakdown (60% total weight)</h3>
+                <p><strong>1. Last Price (42% overall = 70% of Kalshi's 60%)</strong></p>
+                <ul class="method-list">
+                    <li>The most recent completed trade price</li>
+                    <li>Reflects real money execution and recent market sentiment</li>
+                    <li>Given highest weight because it shows actual conviction backed by capital</li>
+                    <li>Most responsive to new information and recent trades</li>
+                </ul>
 
-        <p>Within Kalshi's 60% weight, we use three price signals:</p>
+                <p><strong>2. Midpoint (12% overall = 20% of Kalshi's 60%)</strong></p>
+                <ul class="method-list">
+                    <li>Average of the current best bid and best ask prices: (bid + ask) / 2</li>
+                    <li>Represents the fair value between buyers and sellers right now</li>
+                    <li>Includes current order book state but not yet executed</li>
+                    <li>Smooths out last trade anomalies or outliers</li>
+                </ul>
 
-        <p><strong>1. Last Price (42% overall = 70% of Kalshi's 60%)</strong></p>
-        <ul class="method-list">
-            <li>The most recent completed trade price</li>
-            <li>Reflects real money execution and recent market sentiment</li>
-            <li>Given highest weight because it shows actual conviction backed by capital</li>
-            <li>Most responsive to new information and recent trades</li>
-        </ul>
+                <p><strong>3. Liquidity-Weighted Price (6% overall = 10% of Kalshi's 60%)</strong></p>
+                <ul class="method-list">
+                    <li><strong>Purpose:</strong> Captures buying vs selling pressure by analyzing where the last trade occurred within the bid-ask spread</li>
+                    <li><strong>Why only Kalshi?</strong> Kalshi uses a traditional order book exchange where buyers and sellers post bids and asks. Manifold uses an Automated Market Maker (AMM) that algorithmically sets prices, so order book analysis doesn't apply</li>
+                    <li><strong>How it works:</strong> Calculate position in spread = (Last Price - Bid) / (Ask - Bid). Position of 0.0 = traded at bid (sellers aggressive), 0.5 = at midpoint (balanced), 1.0 = at ask (buyers aggressive)</li>
+                    <li><strong>Spread dampening:</strong> Wider spreads reduce the adjustment because they indicate less confidence. At 0pp spread: factor = 1.0 (full shift potential). At 10pp spread: factor = 0.2 (heavily dampened)</li>
+                    <li><strong>Example:</strong> Bid=60, Ask=68, Last=66, Mid=64, Spread=8. Position = (66-60)/8 = 0.75 (near ask). Offset = 0.75 - 0.5 = +0.25. Dampening = 1 - (8/10)×0.8 = 0.36. Shift = 0.25 × 6 × 0.36 = +0.54pp. Result = 64 + 0.54 = 64.5% (buyers showed aggression)</li>
+                    <li>Caps shift at ±3 percentage points to avoid overreaction</li>
+                </ul>
 
-        <p><strong>2. Midpoint (12% overall = 20% of Kalshi's 60%)</strong></p>
-        <ul class="method-list">
-            <li>Average of the current best bid and best ask prices: (bid + ask) / 2</li>
-            <li>Represents the fair value between buyers and sellers right now</li>
-            <li>Includes current order book state but not yet executed</li>
-            <li>Smooths out last trade anomalies or outliers</li>
-        </ul>
+                <h3>The Complete Formula</h3>
+                <div class="formula-box">
+                    Aggregate Probability = (0.40 × Manifold) + (0.42 × Kalshi Last Price) + (0.12 × Kalshi Midpoint) + (0.06 × Kalshi Liquidity-Weighted)
+                </div>
 
-        <p><strong>3. Liquidity-Weighted Price (6% overall = 10% of Kalshi's 60%)</strong></p>
-        <ul class="method-list">
-            <li><strong>Purpose:</strong> Captures buying vs selling pressure by analyzing where the last trade occurred within the bid-ask spread</li>
-            <li><strong>Why only Kalshi?</strong> Kalshi uses a traditional order book exchange where buyers and sellers post bids and asks. Manifold uses an Automated Market Maker (AMM) that algorithmically sets prices, so order book analysis doesn't apply</li>
-            <li><strong>How it works:</strong> Calculate position in spread = (Last Price - Bid) / (Ask - Bid). Position of 0.0 = traded at bid (sellers aggressive), 0.5 = at midpoint (balanced), 1.0 = at ask (buyers aggressive)</li>
-            <li><strong>Spread dampening:</strong> Wider spreads reduce the adjustment because they indicate less confidence. At 0pp spread: factor = 1.0 (full shift potential). At 10pp spread: factor = 0.2 (heavily dampened)</li>
-            <li><strong>Example:</strong> Bid=60, Ask=68, Last=66, Mid=64, Spread=8. Position = (66-60)/8 = 0.75 (near ask). Offset = 0.75 - 0.5 = +0.25. Dampening = 1 - (8/10)×0.8 = 0.36. Shift = 0.25 × 6 × 0.36 = +0.54pp. Result = 64 + 0.54 = 64.5% (buyers showed aggression)</li>
-            <li>Caps shift at ±3 percentage points to avoid overreaction</li>
-        </ul>
+                <h3>Soft Normalization (30% Strength)</h3>
+                <p>Final probabilities are lightly normalized to prevent excessive drift while preserving raw market values:</p>
+                <ul class="method-list">
+                    <li>Candidates with no Kalshi market (marked with *) use 100% of their Manifold probability</li>
+                    <li>Only 30% of the normalization adjustment is applied to each candidate</li>
+                    <li>70% of the raw aggregated value is preserved</li>
+                    <li>This keeps top candidates higher while preventing probabilities from summing to unrealistic totals</li>
+                </ul>
 
-        <h3 style="margin-top: 1.5rem; font-size: 1.1rem;">The Complete Formula</h3>
-        <p style="font-family: monospace; background: rgba(0, 170, 220, 0.1); padding: 1rem; border-radius: 4px; margin: 1rem 0;">
-            Aggregate Probability = (0.40 × Manifold) + (0.42 × Kalshi Last Price) + (0.12 × Kalshi Midpoint) + (0.06 × Kalshi Liquidity-Weighted)
-        </p>
+                <h3>Update Frequency</h3>
+                <ul class="method-list">
+                    <li><strong>Default:</strong> Every 3 minutes</li>
+                    <li><strong>Final 3 days before election:</strong> Every 1 minute</li>
+                    <li><strong>Election day:</strong> Every 1 minute</li>
+                </ul>
 
-        <h3 style="margin-top: 1.5rem; font-size: 1.1rem;">Soft Normalization (30% Strength)</h3>
-        <p>Final probabilities are lightly normalized to prevent excessive drift while preserving raw market values:</p>
-        <ul class="method-list">
-            <li>Candidates with no Kalshi market (marked with *) use 100% of their Manifold probability</li>
-            <li>Only 30% of the normalization adjustment is applied to each candidate</li>
-            <li>70% of the raw aggregated value is preserved</li>
-            <li>This keeps top candidates higher while preventing probabilities from summing to unrealistic totals</li>
-        </ul>
+                <p>Historical snapshots are saved with every update and aggregated hourly for clean trend visualization.</p>
+            </article>
 
-        <h3 style="margin-top: 1.5rem; font-size: 1.1rem;">Update Frequency</h3>
-        <ul class="method-list">
-            <li><strong>Default:</strong> Every 3 minutes</li>
-            <li><strong>Final 3 days before election:</strong> Every 1 minute</li>
-            <li><strong>Election day:</strong> Every 1 minute</li>
-        </ul>
-
-        <p>Historical snapshots are saved with every update and aggregated hourly for clean trend visualization.</p>
-    </article>
-
-    <article class="method-section contact-section">
-        <h2>Questions?</h2>
-        <p>IL9Cast's prediction market aggregation is maintained by <strong>Ryan McComb</strong>, a student at ETHS, as an educational project to help voters understand real-time sentiment in the Illinois 9th Democratic Primary race.</p>
-        <p>For questions about the market aggregation methodology or to report data issues, please reach out directly.</p>
-    </article>
-</section>
-
-<style scoped>
-.methodology-content {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.method-section {
-    margin-bottom: 3rem;
-    padding: 1.5rem 0;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.method-section:last-child {
-    border-bottom: none;
-}
-
-.method-section h2 {
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-.method-section p {
-    margin-bottom: 1rem;
-    line-height: 1.8;
-    color: var(--text-secondary);
-}
-
-.method-list {
-    list-style: none;
-    padding-left: 0;
-    margin: 1rem 0;
-}
-
-.method-list li {
-    margin-bottom: 0.8rem;
-    padding-left: 1.5rem;
-    position: relative;
-    line-height: 1.6;
-    color: var(--text-secondary);
-}
-
-.method-list li:before {
-    content: "→";
-    position: absolute;
-    left: 0;
-    color: var(--accent-primary);
-}
-
-.contact-section {
-    background: var(--bg-card);
-    padding: 2rem;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
-}
-
-.method-section a {
-    color: var(--accent-primary);
-    text-decoration: none;
-    border-bottom: 1px solid var(--accent-primary);
-}
-
-.method-section a:hover {
-    opacity: 0.8;
-}
-</style>
+            <article class="method-section contact-section">
+                <h2>Questions?</h2>
+                <p>IL9Cast's prediction market aggregation is maintained by <strong>Ryan McComb</strong>, a student at ETHS, as an educational project to help voters understand real-time sentiment in the Illinois 9th Democratic Primary race.</p>
+                <p>For questions about the market aggregation methodology or to report data issues, please reach out directly.</p>
+            </article>
+        </section>
     </div>
-</div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const navbar = document.querySelector('.navbar');
-    const footer = document.querySelector('.footer');
-    if (navbar) navbar.style.display = 'none';
-    if (footer) footer.style.display = 'none';
-});
-</script>
-{% endblock %}
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        .methodology-content-page {
+            max-width: 900px;
+            margin: 0 auto 4rem;
+            padding: 0 2rem;
+        }
+
+        .method-section {
+            background: rgba(26, 26, 26, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(230, 126, 34, 0.3);
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .method-section h2 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #e67e22;
+        }
+
+        .method-section h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #e67e22;
+        }
+
+        .method-section p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+            color: #c0c0c0;
+        }
+
+        .method-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 1rem 0;
+        }
+
+        .method-list li {
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+            line-height: 1.6;
+            color: #c0c0c0;
+        }
+
+        .method-list li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #e67e22;
+        }
+
+        .method-section a {
+            color: #e67e22;
+            text-decoration: underline;
+        }
+
+        .method-section a:hover {
+            opacity: 0.8;
+        }
+
+        .formula-box {
+            font-family: 'VT323', monospace;
+            background: rgba(230, 126, 34, 0.1);
+            border-left: 4px solid #e67e22;
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin: 1.5rem 0;
+            font-size: 1.1rem;
+            color: #e0e0e0;
+        }
+
+        .contact-section {
+            border-color: rgba(230, 126, 34, 0.5);
+        }
+    </style>
+
+    <script>
+        // GRID BACKGROUND
+        const canvas = document.getElementById('grid-canvas');
+        const ctx = canvas.getContext('2d');
+        let mouseX = -1000, mouseY = -1000;
+        let targetMouseX = -1000, targetMouseY = -1000;
+        const gridSize = 40, influence = 280, maxDisplacement = 15, smoothing = 0.06;
+        let pointsState = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            pointsState = null;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        document.addEventListener('mousemove', (e) => {
+            targetMouseX = e.clientX;
+            targetMouseY = e.clientY;
+        });
+
+        document.addEventListener('mouseleave', () => {
+            targetMouseX = targetMouseY = -1000;
+        });
+
+        function drawGrid() {
+            mouseX += (targetMouseX - mouseX) * smoothing;
+            mouseY += (targetMouseY - mouseY) * smoothing;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.lineWidth = 1;
+            const cols = Math.ceil(canvas.width / gridSize) + 1;
+            const rows = Math.ceil(canvas.height / gridSize) + 1;
+
+            if (!pointsState || pointsState.length !== rows + 1) {
+                pointsState = [];
+                for (let row = 0; row <= rows; row++) {
+                    pointsState[row] = [];
+                    for (let col = 0; col <= cols; col++) {
+                        pointsState[row][col] = { x: col * gridSize, y: row * gridSize };
+                    }
+                }
+            }
+
+            for (let row = 0; row <= rows; row++) {
+                for (let col = 0; col <= cols; col++) {
+                    const baseX = col * gridSize, baseY = row * gridSize;
+                    let targetX = baseX, targetY = baseY;
+                    const dx = baseX - mouseX, dy = baseY - mouseY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < influence && dist > 0) {
+                        const falloff = 1 - dist / influence;
+                        const force = falloff * falloff * falloff * maxDisplacement;
+                        const angle = Math.atan2(dy, dx);
+                        targetX = baseX + Math.cos(angle) * force;
+                        targetY = baseY + Math.sin(angle) * force;
+                    }
+
+                    pointsState[row][col].x += (targetX - pointsState[row][col].x) * 0.06;
+                    pointsState[row][col].y += (targetY - pointsState[row][col].y) * 0.06;
+                }
+            }
+
+            for (let row = 0; row <= rows; row++) {
+                ctx.beginPath();
+                ctx.moveTo(pointsState[row][0].x, pointsState[row][0].y);
+                for (let col = 1; col <= cols; col++) {
+                    const prev = pointsState[row][col - 1], curr = pointsState[row][col];
+                    ctx.quadraticCurveTo(prev.x, prev.y, (prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
+                }
+                ctx.stroke();
+            }
+
+            for (let col = 0; col <= cols; col++) {
+                ctx.beginPath();
+                ctx.moveTo(pointsState[0][col].x, pointsState[0][col].y);
+                for (let row = 1; row <= rows; row++) {
+                    const prev = pointsState[row - 1][col], curr = pointsState[row][col];
+                    ctx.quadraticCurveTo(prev.x, prev.y, (prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
+                }
+                ctx.stroke();
+            }
+
+            requestAnimationFrame(drawGrid);
+        }
+
+        drawGrid();
+    </script>
+</body>
+</html>

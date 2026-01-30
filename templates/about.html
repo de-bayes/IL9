@@ -1,81 +1,268 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="IL9Cast - About">
+    <title>About - IL9Cast</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+</head>
+<body class="dark-mode">
+    <canvas id="grid-canvas"></canvas>
 
-{% block title %}About - IL9Cast{% endblock %}
+    <div class="site-content">
+        <header>
+            <a href="/" class="logo">IL9<span>Cast</span></a>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/markets">Markets</a>
+                <a href="/odds">Model</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/about" class="active">About</a>
+            </nav>
+        </header>
 
-{% block content %}
-<div class="inner-page about-page">
-    <nav class="inner-nav">
-        <a href="/" class="back-link">IL9Cast</a>
-        <div class="inner-nav-links">
-            <a href="/odds">The Model</a>
-            <a href="/markets">Markets</a>
-            <a href="/fundraising">Fundraising</a>
-            <a href="/methodology">Methodology</a>
-            <a href="/about" class="active">About</a>
-        </div>
-    </nav>
-
-    <div class="inner-content">
-        <h1 class="inner-title">About IL9Cast</h1>
-
-        <section class="about-section">
-            <h2>The Project</h2>
-            <p>IL9Cast is a real-time forecasting platform for the Illinois 9th Congressional District Democratic Primary, scheduled for March 17, 2026. The site aggregates live prediction market data from Manifold Markets and Kalshi to provide up-to-the-minute probability estimates for each candidate.</p>
-            <p>This project combines sophisticated market aggregation methodology with clean data visualization to help voters and political observers understand the race dynamics in real time.</p>
+        <section class="hero">
+            <h1>About IL9Cast</h1>
         </section>
 
-        <section class="about-section">
-            <h2>Created by Ryan McComb</h2>
-            <p>I'm a student at Evanston Township High School with a passion for politics, data science, and prediction markets. I built IL9Cast because I wanted to see real-time market sentiment for the IL-9 primary race—and figured others might find it useful too.</p>
+        <section class="about-content-page">
+            <article class="about-section">
+                <h2>The Project</h2>
+                <p>IL9Cast is a real-time forecasting platform for the Illinois 9th Congressional District Democratic Primary, scheduled for March 17, 2026. The site aggregates live prediction market data from Manifold Markets and Kalshi to provide up-to-the-minute probability estimates for each candidate.</p>
+                <p>This project combines sophisticated market aggregation methodology with clean data visualization to help voters and political observers understand the race dynamics in real time.</p>
+            </article>
 
-            <p style="margin-top: 1rem;">I spend way too much time trading on prediction markets (Manifold and Metaculus), hosting my podcast Project 2028 (which somehow reaches listeners in 50+ countries), and volunteering as finance lead for Daniel Biss's campaign in the 9th district.</p>
+            <article class="about-section">
+                <h2>Created by Ryan McComb</h2>
+                <p>I'm a student at Evanston Township High School with a passion for politics, data science, and prediction markets. I built IL9Cast because I wanted to see real-time market sentiment for the IL-9 primary race—and figured others might find it useful too.</p>
 
-            <p style="margin-top: 1rem;">When I'm not obsessing over probability distributions or Bayesian reasoning, I'm either swimming competitively or shooting photos with my Canon R8. I've done photography work for the Chicago Union professional ultimate frisbee team, which is pretty cool.</p>
+                <p>I spend way too much time trading on prediction markets (Manifold and Metaculus), hosting my podcast Project 2028 (which somehow reaches listeners in 50+ countries), and volunteering as finance lead for Daniel Biss's campaign in the 9th district.</p>
 
-            <p style="margin-top: 1rem;">If you want to talk markets, forecasting, or have feedback on IL9Cast, feel free to reach out.</p>
-        </section>
+                <p>When I'm not obsessing over probability distributions or Bayesian reasoning, I'm either swimming competitively or shooting photos with my Canon R8. I've done photography work for the Chicago Union professional ultimate frisbee team, which is pretty cool.</p>
 
-        <section class="about-section" style="background: rgba(0, 170, 220, 0.05); padding: 2rem; border-radius: 8px; border: 1px solid rgba(0, 170, 220, 0.2);">
-            <h2>Contact Information</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
-                <div>
-                    <p style="margin: 0.5rem 0;"><strong>Email:</strong><br>
-                    <a href="mailto:rymccomb1@icloud.com" style="color: var(--accent-primary); text-decoration: none; border-bottom: 1px solid var(--accent-primary);">rymccomb1@icloud.com</a></p>
+                <p>If you want to talk markets, forecasting, or have feedback on IL9Cast, feel free to reach out.</p>
+            </article>
+
+            <article class="about-section contact-section">
+                <h2>Contact Information</h2>
+                <div class="contact-grid">
+                    <div>
+                        <p><strong>Email:</strong><br>
+                        <a href="mailto:rymccomb1@icloud.com">rymccomb1@icloud.com</a></p>
+                    </div>
+                    <div>
+                        <p><strong>Phone:</strong><br>
+                        <a href="tel:872-243-3800">872-243-3800</a></p>
+                    </div>
+                    <div>
+                        <p><strong>Manifold Markets:</strong><br>
+                        <a href="https://manifold.markets/JeromeHPowell" target="_blank" rel="noopener noreferrer">@JeromeHPowell</a></p>
+                    </div>
+                    <div>
+                        <p><strong>Metaculus:</strong><br>
+                        <a href="https://www.metaculus.com/accounts/profile/238376/" target="_blank" rel="noopener noreferrer">Profile #238376</a></p>
+                    </div>
                 </div>
-                <div>
-                    <p style="margin: 0.5rem 0;"><strong>Phone:</strong><br>
-                    <a href="tel:872-243-3800" style="color: var(--accent-primary); text-decoration: none; border-bottom: 1px solid var(--accent-primary);">872-243-3800</a></p>
-                </div>
-                <div>
-                    <p style="margin: 0.5rem 0;"><strong>Manifold Markets:</strong><br>
-                    <a href="https://manifold.markets/JeromeHPowell" target="_blank" rel="noopener noreferrer" style="color: var(--accent-primary); text-decoration: none; border-bottom: 1px solid var(--accent-primary);">@JeromeHPowell</a></p>
-                </div>
-                <div>
-                    <p style="margin: 0.5rem 0;"><strong>Metaculus:</strong><br>
-                    <a href="https://www.metaculus.com/accounts/profile/238376/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-primary); text-decoration: none; border-bottom: 1px solid var(--accent-primary);">Profile #238376</a></p>
-                </div>
-            </div>
-        </section>
+            </article>
 
-        <section class="about-section">
-            <h2>Inspiration</h2>
-            <p>This forecasting platform is inspired by the pioneering work of data-driven election forecasters including:</p>
-            <ul style="margin: 0.75rem 0; padding-left: 1.5rem; line-height: 1.8;">
-                <li><strong>Nate Silver</strong> - Creator of FiveThirtyEight and modern election forecasting</li>
-                <li><strong>538</strong> - The original data-driven election forecast site</li>
-                <li><strong>The Silver Bulletin</strong> - Nate Silver's current forecasting publication</li>
-                <li><strong>Galen Druke</strong> - Podcast host and election analyst at 538</li>
-            </ul>
+            <article class="about-section">
+                <h2>Inspiration</h2>
+                <p>This forecasting platform is inspired by the pioneering work of data-driven election forecasters including:</p>
+                <ul class="inspiration-list">
+                    <li><strong>Nate Silver</strong> - Creator of FiveThirtyEight and modern election forecasting</li>
+                    <li><strong>538</strong> - The original data-driven election forecast site</li>
+                    <li><strong>The Silver Bulletin</strong> - Nate Silver's current forecasting publication</li>
+                    <li><strong>Galen Druke</strong> - Podcast host and election analyst at 538</li>
+                </ul>
+            </article>
         </section>
     </div>
-</div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const navbar = document.querySelector('.navbar');
-    const footer = document.querySelector('.footer');
-    if (navbar) navbar.style.display = 'none';
-    if (footer) footer.style.display = 'none';
-});
-</script>
-{% endblock %}
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        .about-content-page {
+            max-width: 900px;
+            margin: 0 auto 4rem;
+            padding: 0 2rem;
+        }
+
+        .about-section {
+            background: rgba(26, 26, 26, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(230, 126, 34, 0.3);
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .about-section h2 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #e67e22;
+        }
+
+        .about-section p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+            color: #c0c0c0;
+        }
+
+        .about-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-section {
+            border-color: rgba(230, 126, 34, 0.5);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .contact-grid p {
+            margin: 0;
+        }
+
+        .contact-grid a {
+            color: #e67e22;
+            text-decoration: underline;
+        }
+
+        .contact-grid a:hover {
+            opacity: 0.8;
+        }
+
+        .inspiration-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 1rem 0 0;
+        }
+
+        .inspiration-list li {
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+            line-height: 1.6;
+            color: #c0c0c0;
+        }
+
+        .inspiration-list li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #e67e22;
+        }
+    </style>
+
+    <script>
+        // GRID BACKGROUND
+        const canvas = document.getElementById('grid-canvas');
+        const ctx = canvas.getContext('2d');
+        let mouseX = -1000, mouseY = -1000;
+        let targetMouseX = -1000, targetMouseY = -1000;
+        const gridSize = 40, influence = 280, maxDisplacement = 15, smoothing = 0.06;
+        let pointsState = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            pointsState = null;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        document.addEventListener('mousemove', (e) => {
+            targetMouseX = e.clientX;
+            targetMouseY = e.clientY;
+        });
+
+        document.addEventListener('mouseleave', () => {
+            targetMouseX = targetMouseY = -1000;
+        });
+
+        function drawGrid() {
+            mouseX += (targetMouseX - mouseX) * smoothing;
+            mouseY += (targetMouseY - mouseY) * smoothing;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.lineWidth = 1;
+            const cols = Math.ceil(canvas.width / gridSize) + 1;
+            const rows = Math.ceil(canvas.height / gridSize) + 1;
+
+            if (!pointsState || pointsState.length !== rows + 1) {
+                pointsState = [];
+                for (let row = 0; row <= rows; row++) {
+                    pointsState[row] = [];
+                    for (let col = 0; col <= cols; col++) {
+                        pointsState[row][col] = { x: col * gridSize, y: row * gridSize };
+                    }
+                }
+            }
+
+            for (let row = 0; row <= rows; row++) {
+                for (let col = 0; col <= cols; col++) {
+                    const baseX = col * gridSize, baseY = row * gridSize;
+                    let targetX = baseX, targetY = baseY;
+                    const dx = baseX - mouseX, dy = baseY - mouseY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < influence && dist > 0) {
+                        const falloff = 1 - dist / influence;
+                        const force = falloff * falloff * falloff * maxDisplacement;
+                        const angle = Math.atan2(dy, dx);
+                        targetX = baseX + Math.cos(angle) * force;
+                        targetY = baseY + Math.sin(angle) * force;
+                    }
+
+                    pointsState[row][col].x += (targetX - pointsState[row][col].x) * 0.06;
+                    pointsState[row][col].y += (targetY - pointsState[row][col].y) * 0.06;
+                }
+            }
+
+            for (let row = 0; row <= rows; row++) {
+                ctx.beginPath();
+                ctx.moveTo(pointsState[row][0].x, pointsState[row][0].y);
+                for (let col = 1; col <= cols; col++) {
+                    const prev = pointsState[row][col - 1], curr = pointsState[row][col];
+                    ctx.quadraticCurveTo(prev.x, prev.y, (prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
+                }
+                ctx.stroke();
+            }
+
+            for (let col = 0; col <= cols; col++) {
+                ctx.beginPath();
+                ctx.moveTo(pointsState[0][col].x, pointsState[0][col].y);
+                for (let row = 1; row <= rows; row++) {
+                    const prev = pointsState[row - 1][col], curr = pointsState[row][col];
+                    ctx.quadraticCurveTo(prev.x, prev.y, (prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
+                }
+                ctx.stroke();
+            }
+
+            requestAnimationFrame(drawGrid);
+        }
+
+        drawGrid();
+    </script>
+</body>
+</html>
