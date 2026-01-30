@@ -493,12 +493,28 @@ def get_snapshots_chart():
                 for ri in rdp_indices:
                     kept_indices.add(index_map[ri])
 
+        # Detect real gaps (>1 hour) in the RAW data before RDP
+        GAP_THRESHOLD_SECS = 3600  # 1 hour
+        gaps = []
+        for i in range(1, len(parsed)):
+            gap_secs = (parsed[i][0] - parsed[i - 1][0]).total_seconds()
+            if gap_secs > GAP_THRESHOLD_SECS:
+                gaps.append({
+                    'start': parsed[i - 1][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+                    'end': parsed[i][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+                })
+
         # Build result from kept indices
         kept_sorted = sorted(kept_indices)
-        result = []
+        result_snapshots = []
         for idx in kept_sorted:
             dt, snap = parsed[idx]
-            result.append(snap)
+            result_snapshots.append(snap)
+
+        result = {
+            'snapshots': result_snapshots,
+            'gaps': gaps
+        }
 
         # Cache and return
         _chart_cache = {'data': result, 'time': now, 'key': cache_key}
