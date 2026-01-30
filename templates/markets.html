@@ -1402,6 +1402,16 @@ async function renderMarketTrendChart(candidates) {
     // Aggregate to reduce data points (hourly for 30d, raw for 1h)
     const aggregatedSnapshots = aggregateSnapshots(filteredSnapshots, period);
 
+    // Debug logging
+    console.log(`[Chart Debug] Period: ${period}`);
+    console.log(`[Chart Debug] Total snapshots: ${snapshots.length}`);
+    console.log(`[Chart Debug] Filtered snapshots: ${filteredSnapshots.length}`);
+    console.log(`[Chart Debug] Aggregated data points: ${aggregatedSnapshots.length}`);
+    if (aggregatedSnapshots.length > 0) {
+        console.log(`[Chart Debug] First: ${aggregatedSnapshots[0].timestamp}`);
+        console.log(`[Chart Debug] Last: ${aggregatedSnapshots[aggregatedSnapshots.length - 1].timestamp}`);
+    }
+
     // Build labels from aggregated snapshot timestamps
     const labels = aggregatedSnapshots.map((s, index) => {
         // Parse timestamp - if ends with Z, it's UTC; otherwise treat as local
@@ -1422,19 +1432,23 @@ async function renderMarketTrendChart(candidates) {
             // For 1-day view, show time only
             return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         } else if (period === 'all') {
-            // For all-time view, show date only
+            // For all-time view, show date only (one per day)
             return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: '2-digit'
+            });
+        } else {
+            // For 7-day view, show date and time
+            const dateStr = date.toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric'
             });
-        } else {
-            // For 7-day view, show date and hour
-            return date.toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
+            const timeStr = date.toLocaleTimeString('en-US', {
                 hour: 'numeric',
                 hour12: true
             });
+            return `${dateStr} ${timeStr}`;
         }
     });
 
@@ -1474,6 +1488,16 @@ async function renderMarketTrendChart(candidates) {
     });
 
     if (marketChart) marketChart.destroy();
+
+    // Determine max ticks based on period for better label visibility
+    let maxTicks;
+    if (period === '1d') {
+        maxTicks = 24; // Show every hour for 1 day
+    } else if (period === '7d') {
+        maxTicks = 28; // Show every 6 hours for 7 days
+    } else {
+        maxTicks = aggregatedSnapshots.length; // Show every day for all time
+    }
 
     marketChart = new Chart(ctx, {
         type: 'line',
@@ -1551,13 +1575,15 @@ async function renderMarketTrendChart(candidates) {
                 x: {
                     ticks: {
                         color: 'rgba(255, 255, 255, 0.6)',
-                        maxTicksLimit: 10,
+                        maxTicksLimit: maxTicks,
+                        autoSkip: true,
+                        autoSkipPadding: 10,
                         font: {
                             family: 'Arial, sans-serif',
                             size: 10
                         },
                         maxRotation: 45,
-                        minRotation: 0
+                        minRotation: period === 'all' ? 45 : 0
                     },
                     grid: {
                         color: 'rgba(255, 255, 255, 0.05)',
