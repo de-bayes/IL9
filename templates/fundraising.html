@@ -50,10 +50,164 @@
                 IL9Cast will update this page with comprehensive fundraising analysis once the January 31st FEC filing data becomes available.
             </p>
         </section>
+
+        <!-- Methodology Section -->
+        <section class="methodology-section" style="max-width: 900px; margin: 3rem auto 2rem;">
+            <div class="methodology-header" onclick="toggleFundraisingMethodology()">
+                <h2 style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 2rem;">Methodology</h2>
+                <span class="toggle-icon" id="fundraisingMethodologyToggle">▼</span>
+            </div>
+            <div class="methodology-content hidden" id="fundraisingMethodologyContent">
+                <div class="methodology-explanation">
+                    <h3>FEC Data Analysis Framework</h3>
+                    <p>
+                        Once FEC filings become available on January 31st, 2026, IL9Cast will provide comprehensive fundraising analysis using standardized metrics to compare candidates' financial positions and donor bases.
+                    </p>
+
+                    <h3>Key Metrics Tracked</h3>
+                    <ul>
+                        <li><strong>Total Raised:</strong> Cumulative funds raised during the reporting period</li>
+                        <li><strong>Cash on Hand:</strong> Available campaign funds for future expenditures</li>
+                        <li><strong>Burn Rate:</strong> Monthly spending rate calculated from expenditures</li>
+                        <li><strong>Donor Count:</strong> Number of individual contributors to assess grassroots support</li>
+                        <li><strong>Average Contribution:</strong> Mean donation size (total raised ÷ donor count)</li>
+                        <li><strong>Small Dollar Percentage:</strong> Proportion of funds from donations under $200</li>
+                    </ul>
+
+                    <h3>Data Sources</h3>
+                    <p>
+                        All fundraising data is sourced directly from FEC filings submitted by candidate committees. IL9Cast uses the FEC's bulk data API to retrieve and parse filing reports.
+                    </p>
+
+                    <div class="formula-box" style="background: rgba(0, 0, 0, 0.2); border: 2px solid rgba(0, 170, 220, 0.3); padding: 1.5rem; margin: 1.5rem 0; font-family: 'Courier New', monospace;">
+                        <strong>Example Calculations:</strong><br><br>
+                        Burn Rate = Total Expenditures ÷ Days in Reporting Period × 30<br>
+                        Small Dollar % = (Contributions &lt; $200) ÷ Total Raised × 100<br>
+                        Cash Runway = Cash on Hand ÷ (Monthly Burn Rate)
+                    </div>
+
+                    <h3>Comparative Analysis</h3>
+                    <p>
+                        Fundraising totals will be visualized with candidate-by-candidate comparisons, including:
+                    </p>
+                    <ul>
+                        <li>Bar charts showing total raised and cash on hand</li>
+                        <li>Donor count histograms to assess grassroots strength</li>
+                        <li>Small dollar percentage rankings</li>
+                        <li>Burn rate trends over multiple filing periods</li>
+                    </ul>
+
+                    <h3>Why Fundraising Matters in Primaries</h3>
+                    <p>
+                        In Democratic primaries, fundraising metrics serve as important signals of campaign viability and grassroots support:
+                    </p>
+                    <ul>
+                        <li><strong>Resource Availability:</strong> Cash on hand determines a campaign's ability to reach voters through mail, digital ads, and field operations</li>
+                        <li><strong>Donor Base:</strong> High donor counts suggest broad grassroots support and volunteer potential</li>
+                        <li><strong>Small Dollar Ratio:</strong> Higher small-dollar percentages indicate genuine grassroots enthusiasm vs. reliance on large donors</li>
+                        <li><strong>Sustainability:</strong> Low burn rates relative to cash on hand suggest efficient, sustainable campaigns</li>
+                    </ul>
+
+                    <div class="methodology-note" style="background: rgba(0, 170, 220, 0.08); border-left: 3px solid rgba(0, 170, 220, 0.4); padding: 1rem 1.25rem; margin-top: 2rem;">
+                        <strong>Next Filing Deadline:</strong> January 31st, 2026. IL9Cast will update this page within 24 hours of FEC data availability with full analysis and visualizations.
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 </div>
 
+<style scoped>
+.methodology-section {
+    background: rgba(26, 26, 26, 0.5);
+    border: 2px solid rgba(58, 58, 58, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.methodology-header {
+    padding: 2rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.3s ease;
+}
+
+.methodology-header:hover {
+    background: rgba(0, 170, 220, 0.1);
+}
+
+.toggle-icon {
+    font-size: 1.5rem;
+    color: #00aadc;
+    transition: transform 0.3s ease;
+}
+
+.methodology-content {
+    padding: 0 2rem 2rem;
+    max-height: 2000px;
+    overflow: hidden;
+    transition: max-height 0.5s ease, padding 0.3s ease;
+}
+
+.methodology-content.hidden {
+    max-height: 0;
+    padding: 0 2rem;
+}
+
+.methodology-explanation {
+    line-height: 1.8;
+}
+
+.methodology-explanation h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.5rem;
+    margin: 2rem 0 1rem;
+    color: #00aadc;
+}
+
+.methodology-explanation h3:first-child {
+    margin-top: 0;
+}
+
+.methodology-explanation p {
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+}
+
+.methodology-explanation ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 1rem 0;
+}
+
+.methodology-explanation li {
+    padding: 0.5rem 0 0.5rem 1.5rem;
+    position: relative;
+    color: var(--text-secondary);
+}
+
+.methodology-explanation li:before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: #00aadc;
+}
+
+.formula-box strong {
+    color: #00aadc;
+}
+</style>
+
 <script>
+function toggleFundraisingMethodology() {
+    const content = document.getElementById('fundraisingMethodologyContent');
+    const icon = document.getElementById('fundraisingMethodologyToggle');
+    content.classList.toggle('hidden');
+    icon.textContent = content.classList.contains('hidden') ? '▼' : '▲';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const navbar = document.querySelector('.navbar');
     const footer = document.querySelector('.footer');

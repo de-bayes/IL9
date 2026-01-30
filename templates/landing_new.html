@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="IL9Cast - Illinois 9th District Democratic Primary Forecast">
+    <title>IL9Cast - Illinois 9th District Forecast</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+</head>
+<body class="dark-mode">
+    <canvas id="grid-canvas"></canvas>
+
+    <div class="site-content">
+        <header>
+            <a href="/" class="logo">IL9<span>Cast</span></a>
+            <nav>
+                <a href="/" class="active">Home</a>
+                <a href="/markets">Markets</a>
+                <a href="/odds">Model</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/about">About</a>
+            </nav>
+        </header>
+
+        <section class="hero" id="home">
+            <h1>Illinois 9th District Democratic Primary</h1>
+            <p class="subtitle">Live prediction market aggregation for the March 17, 2026 primary election</p>
+        </section>
+
+        <section class="features-section">
+            <div class="features-callout">
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <h3>Real-Time Aggregation</h3>
+                        <p>Combines data from Manifold Markets and Kalshi every 60 seconds</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Weighted Formula</h3>
+                        <p>40% Manifold + 60% Kalshi (last/mid/liquidity) for balanced odds</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Historical Tracking</h3>
+                        <p>5,565+ snapshots spanning from Jan 24 to present</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Downloadable Data</h3>
+                        <p>Export complete historical dataset in JSONL format</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="featured-forecasts">
+            <h2 class="section-title">Current Race Status</h2>
+
+            <div class="forecast-grid">
+                <a href="/markets" class="forecast-card">
+                    <div class="forecast-header">
+                        <h3>Live Prediction Markets</h3>
+                        <span class="forecast-type">Aggregated Odds</span>
+                    </div>
+                    <div class="forecast-meta">
+                        <span>Real-time data from Manifold & Kalshi</span>
+                        <span>Updates every 60 seconds</span>
+                    </div>
+                </a>
+
+                <a href="/odds" class="forecast-card">
+                    <div class="forecast-header">
+                        <h3>Forecasting Model</h3>
+                        <span class="forecast-type">Statistical Analysis</span>
+                    </div>
+                    <div class="forecast-meta">
+                        <span>Polling data unavailable</span>
+                        <span>In development</span>
+                    </div>
+                </a>
+
+                <a href="/methodology" class="forecast-card">
+                    <div class="forecast-header">
+                        <h3>Methodology</h3>
+                        <span class="forecast-type">Transparency</span>
+                    </div>
+                    <div class="forecast-meta">
+                        <span>Complete documentation</span>
+                        <span>Open source approach</span>
+                    </div>
+                </a>
+            </div>
+
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <a href="/markets" class="btn">View Live Markets</a>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // GRID BACKGROUND
+        const canvas = document.getElementById('grid-canvas');
+        const ctx = canvas.getContext('2d');
+        let mouseX = -1000, mouseY = -1000;
+        let targetMouseX = -1000, targetMouseY = -1000;
+        const gridSize = 40, influence = 280, maxDisplacement = 15, smoothing = 0.06;
+        let pointsState = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            pointsState = null;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        document.addEventListener('mousemove', (e) => {
+            targetMouseX = e.clientX;
+            targetMouseY = e.clientY;
+        });
+
+        document.addEventListener('mouseleave', () => {
+            targetMouseX = targetMouseY = -1000;
+        });
+
+        function drawGrid() {
+            mouseX += (targetMouseX - mouseX) * smoothing;
+            mouseY += (targetMouseY - mouseY) * smoothing;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.055)';
+            ctx.lineWidth = 1;
+            const cols = Math.ceil(canvas.width / gridSize) + 1;
+            const rows = Math.ceil(canvas.height / gridSize) + 1;
+
+            if (!pointsState || pointsState.length !== rows + 1) {
+                pointsState = [];
+                for (let row = 0; row <= rows; row++) {
+                    pointsState[row] = [];
+                    for (let col = 0; col <= cols; col++) {
+                        pointsState[row][col] = { x: col * gridSize, y: row * gridSize };
+                    }
+                }
+            }
+
+            for (let row = 0; row <= rows; row++) {
+                for (let col = 0; col <= cols; col++) {
+                    const baseX = col * gridSize, baseY = row * gridSize;
+                    let targetX = baseX, targetY = baseY;
+                    const dx = baseX - mouseX, dy = baseY - mouseY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < influence && dist > 0) {
+                        const falloff = 1 - dist / influence;
+                        const force = falloff * falloff * falloff * maxDisplacement;
+                        const angle = Math.atan2(dy, dx);
+                        targetX = baseX + Math.cos(angle) * force;
+                        targetY = baseY + Math.sin(angle) * force;
+                    }
+
+                    pointsState[row][col].x += (targetX - pointsState[row][col].x) * 0.06;
+                    pointsState[row][col].y += (targetY - pointsState[row][col].y) * 0.06;
+                }
+            }
+
+            for (let row = 0; row <= rows; row++) {
+                ctx.beginPath();
+                ctx.moveTo(pointsState[row][0].x, pointsState[row][0].y);
+                for (let col = 1; col <= cols; col++) {
+                    const prev = pointsState[row][col - 1], curr = pointsState[row][col];
+                    ctx.quadraticCurveTo(prev.x, prev.y, (prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
+                }
+                ctx.stroke();
+            }
+
+            for (let col = 0; col <= cols; col++) {
+                ctx.beginPath();
+                ctx.moveTo(pointsState[0][col].x, pointsState[0][col].y);
+                for (let row = 1; row <= rows; row++) {
+                    const prev = pointsState[row - 1][col], curr = pointsState[row][col];
+                    ctx.quadraticCurveTo(prev.x, prev.y, (prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
+                }
+                ctx.stroke();
+            }
+
+            requestAnimationFrame(drawGrid);
+        }
+
+        drawGrid();
+    </script>
+</body>
+</html>

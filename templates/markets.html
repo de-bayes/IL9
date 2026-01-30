@@ -80,9 +80,13 @@
             </div>
         </section>
 
-        <section class="weights-explainer">
-            <h2>Aggregation Methodology</h2>
-            <div class="weights-list">
+        <section class="weights-explainer methodology-section">
+            <div class="methodology-header" onclick="toggleMarketsMethodology()">
+                <h2 style="margin: 0;">Aggregation Methodology</h2>
+                <span class="toggle-icon" id="marketsMethodologyToggle">▼</span>
+            </div>
+            <div class="methodology-content hidden" id="marketsMethodologyContent">
+                <div class="weights-list">
                 <div class="weight-row">
                     <span class="weight-title">Manifold Markets</span>
                     <span class="weight-percentage">40%</span>
@@ -124,6 +128,7 @@
                     &nbsp;&nbsp;Adjustment = Fully_Normalized - Raw_Aggregate<br>
                     &nbsp;&nbsp;Final = Raw_Aggregate + (Adjustment × 0.30)
                 </div>
+            </div>
             </div>
         </section>
 
@@ -317,9 +322,47 @@
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 2rem;
+    padding: 0;
     margin-bottom: 2.5rem;
     margin-top: 2.5rem;
+}
+
+.methodology-section {
+    background: rgba(26, 26, 26, 0.5);
+    border: 2px solid rgba(58, 58, 58, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.methodology-header {
+    padding: 2rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.3s ease;
+}
+
+.methodology-header:hover {
+    background: rgba(0, 170, 220, 0.1);
+}
+
+.toggle-icon {
+    font-size: 1.5rem;
+    color: #00aadc;
+    transition: transform 0.3s ease;
+}
+
+.methodology-content {
+    padding: 0 2rem 2rem;
+    max-height: 3000px;
+    overflow: hidden;
+    transition: max-height 0.5s ease, padding 0.3s ease;
+}
+
+.methodology-content.hidden {
+    max-height: 0;
+    padding: 0 2rem;
 }
 
 .weights-explainer h2 {
@@ -897,6 +940,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+function toggleMarketsMethodology() {
+    const content = document.getElementById('marketsMethodologyContent');
+    const icon = document.getElementById('marketsMethodologyToggle');
+    content.classList.toggle('hidden');
+    icon.textContent = content.classList.contains('hidden') ? '▼' : '▲';
+}
+
 let marketChart = null;
 let candidatesData = [];
 let manifoldData = {};

@@ -166,7 +166,7 @@ CANDIDATES = [
 # Routes
 @app.route('/')
 def landing():
-    return render_template('landing.html')
+    return render_template('landing_new.html')
 
 @app.route('/odds')
 def odds():
