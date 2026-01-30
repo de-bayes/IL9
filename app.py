@@ -1,17 +1,34 @@
 from flask import Flask, jsonify, render_template, request, send_file
 import random
-from datetime import datetime, timedelta
+import math
+from datetime import datetime, timedelta, timezone
 import requests
 import json
 import os
+import time as _time
 import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 
+
+# ===== PATH RESOLUTION =====
+
+def resolve_data_path(filename='historical_snapshots.jsonl'):
+    """
+    Resolve the correct data directory, checking Railway persistent volume first.
+    Priority: /data/ -> /app/data/ -> local data/
+    """
+    for candidate_dir in ['/data', '/app/data']:
+        candidate_path = os.path.join(candidate_dir, filename)
+        if os.path.exists(candidate_dir):
+            return candidate_path
+    # Fallback to local data/ directory
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', filename)
+
+
 # Path to historical data storage (JSONL format - JSON Lines)
-# On Railway, this will be in the persistent volume at /app/data
-HISTORICAL_DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'historical_snapshots.jsonl')
+HISTORICAL_DATA_PATH = resolve_data_path('historical_snapshots.jsonl')
 
 # Seed data path - git-tracked backup that Railway will use to initialize the volume
 SEED_DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'seed_snapshots.json')
@@ -100,6 +117,74 @@ def count_snapshots_jsonl(filepath):
             if line.strip():
                 count += 1
     return count
+
+# ===== TIMESTAMP PARSING =====
+
+def parse_snapshot_timestamp(ts_str):
+    """
+    Parse ISO timestamp string to UTC datetime.
+    Handles both Z-suffix and no-suffix (all are UTC).
+    Returns None if unparseable.
+    """
+    if not ts_str:
+        return None
+    ts_clean = ts_str.rstrip('Z')
+    for fmt in ('%Y-%m-%dT%H:%M:%S.%f', '%Y-%m-%dT%H:%M:%S'):
+        try:
+            dt = datetime.strptime(ts_clean, fmt)
+            return dt.replace(tzinfo=timezone.utc)
+        except ValueError:
+            continue
+    return None
+
+
+# ===== RAMER-DOUGLAS-PEUCKER SIMPLIFICATION =====
+
+def _perpendicular_distance(point, line_start, line_end):
+    """Calculate perpendicular distance from a point to a line segment."""
+    dx = line_end[0] - line_start[0]
+    dy = line_end[1] - line_start[1]
+    if dx == 0 and dy == 0:
+        return math.sqrt((point[0] - line_start[0]) ** 2 + (point[1] - line_start[1]) ** 2)
+    t = ((point[0] - line_start[0]) * dx + (point[1] - line_start[1]) * dy) / (dx * dx + dy * dy)
+    t = max(0, min(1, t))
+    proj_x = line_start[0] + t * dx
+    proj_y = line_start[1] + t * dy
+    return math.sqrt((point[0] - proj_x) ** 2 + (point[1] - proj_y) ** 2)
+
+
+def rdp_simplify(points, epsilon):
+    """
+    Ramer-Douglas-Peucker polyline simplification.
+    points: list of (x, y) tuples where x is normalized time (0-100), y is probability (0-100).
+    Returns list of indices to keep.
+    """
+    if len(points) <= 2:
+        return list(range(len(points)))
+
+    # Find the point with the maximum distance from the line between first and last
+    max_dist = 0
+    max_idx = 0
+    for i in range(1, len(points) - 1):
+        d = _perpendicular_distance(points[i], points[0], points[-1])
+        if d > max_dist:
+            max_dist = d
+            max_idx = i
+
+    if max_dist > epsilon:
+        # Recurse on both halves
+        left = rdp_simplify(points[:max_idx + 1], epsilon)
+        right = rdp_simplify(points[max_idx:], epsilon)
+        # Combine, avoiding duplicate at split point
+        right_shifted = [max_idx + idx for idx in right]
+        return left[:-1] + right_shifted
+    else:
+        return [0, len(points) - 1]
+
+
+# ===== CHART DATA CACHE =====
+_chart_cache = {'data': None, 'time': 0, 'key': None}
+
 
 # ===== INITIALIZATION =====
 
@@ -304,7 +389,6 @@ def save_snapshot():
         # Get new snapshot from request
         new_snapshot = request.json
         # Use UTC with Z suffix for consistent timezone handling
-        from datetime import timezone
         new_snapshot['timestamp'] = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
 
         # Append to JSONL file
@@ -325,6 +409,107 @@ def get_snapshots():
         return jsonify(snapshots)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/api/snapshots/chart')
+def get_snapshots_chart():
+    """
+    Return RDP-simplified snapshots for chart rendering.
+    Params:
+      period: '1d', '7d', 'all' (default 'all')
+      epsilon: RDP tolerance (default 0.3)
+    Returns ~200-400 points instead of 5000+ raw.
+    """
+    global _chart_cache
+    try:
+        period = request.args.get('period', 'all')
+        epsilon = float(request.args.get('epsilon', '0.3'))
+        cache_key = f'{period}:{epsilon}'
+
+        # 60-second cache
+        now = _time.time()
+        if _chart_cache['key'] == cache_key and _chart_cache['data'] and (now - _chart_cache['time']) < 60:
+            return jsonify(_chart_cache['data'])
+
+        # Read all snapshots
+        all_snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
+        if not all_snapshots:
+            return jsonify([])
+
+        # Parse timestamps and filter bad ones
+        parsed = []
+        for snap in all_snapshots:
+            dt = parse_snapshot_timestamp(snap.get('timestamp', ''))
+            if dt:
+                parsed.append((dt, snap))
+        parsed.sort(key=lambda x: x[0])
+
+        if not parsed:
+            return jsonify([])
+
+        # Filter by period
+        now_utc = datetime.now(timezone.utc)
+        if period == '1d':
+            cutoff = now_utc - timedelta(days=1)
+            parsed = [(dt, s) for dt, s in parsed if dt >= cutoff]
+        elif period == '7d':
+            cutoff = now_utc - timedelta(days=7)
+            parsed = [(dt, s) for dt, s in parsed if dt >= cutoff]
+        # 'all' keeps everything
+
+        if not parsed:
+            return jsonify([])
+
+        # Normalize time axis to 0-100 for RDP (same scale as probability 0-100)
+        t_first = parsed[0][0].timestamp()
+        t_last = parsed[-1][0].timestamp()
+        t_range = t_last - t_first if t_last != t_first else 1.0
+
+        # Collect all candidate names across all snapshots
+        all_candidates = set()
+        for _, snap in parsed:
+            for c in snap.get('candidates', []):
+                all_candidates.add(c['name'])
+
+        # Run RDP per candidate, collect union of kept indices
+        kept_indices = set()
+        kept_indices.add(0)
+        kept_indices.add(len(parsed) - 1)
+
+        for cand_name in all_candidates:
+            # Build polyline for this candidate
+            points = []
+            index_map = []  # maps polyline index -> parsed index
+            for i, (dt, snap) in enumerate(parsed):
+                for c in snap.get('candidates', []):
+                    if c['name'] == cand_name:
+                        x = ((dt.timestamp() - t_first) / t_range) * 100.0
+                        y = c.get('probability', 0)
+                        points.append((x, y))
+                        index_map.append(i)
+                        break
+
+            if len(points) > 2:
+                rdp_indices = rdp_simplify(points, epsilon)
+                for ri in rdp_indices:
+                    kept_indices.add(index_map[ri])
+
+        # Build result from kept indices
+        kept_sorted = sorted(kept_indices)
+        result = []
+        for idx in kept_sorted:
+            dt, snap = parsed[idx]
+            result.append(snap)
+
+        # Cache and return
+        _chart_cache = {'data': result, 'time': now, 'key': cache_key}
+
+        resp = jsonify(result)
+        resp.headers['Cache-Control'] = 'public, max-age=30'
+        return resp
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/api/download/snapshots')
 def download_snapshots():
@@ -442,7 +627,6 @@ def collect_market_data():
             aggregated.sort(key=lambda x: x['probability'], reverse=True)
 
             # Save snapshot with UTC timestamp (Z suffix marks it as UTC)
-            from datetime import timezone
             snapshot = {
                 'candidates': [{
                     'name': c['name'],
