@@ -494,7 +494,7 @@ def get_snapshots_chart():
                     kept_indices.add(index_map[ri])
 
         # Detect real gaps (>1 hour) in the RAW data before RDP
-        GAP_THRESHOLD_SECS = 3600  # 1 hour
+        GAP_THRESHOLD_SECS = 7200  # 2 hours
         gaps = []
         for i in range(1, len(parsed)):
             gap_secs = (parsed[i][0] - parsed[i - 1][0]).total_seconds()
@@ -543,7 +543,8 @@ def download_snapshots():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Background task to automatically collect and save data
+# Background task to collect data every 3 minutes
+# Reduces over-sampling and ensures clean 3-minute intervals
 def collect_market_data():
     """Fetch market data and save snapshot automatically"""
     try:
@@ -708,7 +709,7 @@ import sys
 if 'gunicorn' not in sys.argv[0]:
     # Running locally or in single-process mode
     scheduler = BackgroundScheduler()
-    scheduler.add_job(func=collect_market_data, trigger="interval", minutes=1)
+    scheduler.add_job(func=collect_market_data, trigger="interval", minutes=3)
     scheduler.start()
 
     # Run initial data collection on startup
@@ -729,7 +730,7 @@ else:
         collect_market_data()  # Initial collection
 
         while True:
-            time.sleep(1 * 60)  # 1 minute
+            time.sleep(3 * 60)  # 3 minutes
             try:
                 collect_market_data()
             except Exception as e:

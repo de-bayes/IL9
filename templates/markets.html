@@ -84,7 +84,10 @@
                 <div class="chart-wrapper">
                     <canvas id="marketTrendChart"></canvas>
                 </div>
-                <p class="chart-subtitle">Dashed lines indicate periods of data loss due to provider outages.</p>
+                <p class="chart-subtitle">
+                    Dashed lines indicate periods of data loss due to Railway or AWS outages.
+                    All times displayed in Central Time (CT).
+                </p>
             </section>
 
             <section class="weights-explainer methodology-section">
@@ -885,6 +888,16 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script>
+// Central Time formatter utility
+function formatCentralTime(date, options = {}) {
+    const defaults = {
+        timeZone: 'America/Chicago',
+        hour12: true
+    };
+    const formatter = new Intl.DateTimeFormat('en-US', { ...defaults, ...options });
+    return formatter.format(date) + ' CT';
+}
+
 function toggleMarketsMethodology() {
     const content = document.getElementById('marketsMethodologyContent');
     const icon = document.getElementById('marketsMethodologyToggle');
@@ -1181,7 +1194,10 @@ async function fetchManifoldData() {
 
         // Update timestamp
         const updated = new Date(data.lastBetTime || data.lastUpdatedTime);
-        document.getElementById('manifoldUpdated').textContent = `Updated ${updated.toLocaleString()}`;
+        document.getElementById('manifoldUpdated').textContent = `Updated ${formatCentralTime(updated, {
+            month: 'short', day: 'numeric', year: 'numeric',
+            hour: 'numeric', minute: '2-digit'
+        })}`;
 
         // Calculate aggregate if both data sources are ready
         if (Object.keys(kalshiData).length > 0 && Object.keys(manifoldData).length > 0) {
@@ -1450,7 +1466,8 @@ async function renderMarketTrendChart(candidates) {
                     callbacks: {
                         title: function(items) {
                             if (items.length > 0) {
-                                return new Date(items[0].parsed.x).toLocaleString('en-US', {
+                                const date = new Date(items[0].parsed.x);
+                                return formatCentralTime(date, {
                                     month: 'short', day: 'numeric', year: 'numeric',
                                     hour: 'numeric', minute: '2-digit'
                                 });
@@ -1506,7 +1523,18 @@ async function renderMarketTrendChart(candidates) {
                             family: 'Arial, sans-serif',
                             size: 10
                         },
-                        maxRotation: 0
+                        maxRotation: 0,
+                        callback: function(value, index, ticks) {
+                            const utcDate = new Date(value);
+                            const formatter = new Intl.DateTimeFormat('en-US', {
+                                timeZone: 'America/Chicago',
+                                hour: timeUnit === 'hour' ? 'numeric' : undefined,
+                                day: timeUnit === 'day' ? 'numeric' : undefined,
+                                month: timeUnit === 'day' ? 'short' : undefined,
+                                hour12: true
+                            });
+                            return formatter.format(utcDate);
+                        }
                     },
                     grid: {
                         color: 'rgba(255, 255, 255, 0.05)',
@@ -1623,7 +1651,9 @@ async function fetchKalshiData() {
         console.log('Kalshi data object:', kalshiData);
 
         // Update timestamp
-        document.getElementById('kalshiUpdated').textContent = `Live data - ${new Date().toLocaleTimeString()}`;
+        document.getElementById('kalshiUpdated').textContent = `Live data - ${formatCentralTime(new Date(), {
+            hour: 'numeric', minute: '2-digit', second: '2-digit'
+        })}`;
 
         // Calculate aggregate if both Manifold and Kalshi data are ready
         if (Object.keys(manifoldData).length > 0 && Object.keys(kalshiData).length > 0) {
