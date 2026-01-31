@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, render_template, request, send_file
 import random
 import math
+import hashlib
 from datetime import datetime, timedelta, timezone
 import requests
 import json
@@ -35,6 +36,15 @@ SEED_DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'seed_snapshots
 
 # Legacy JSON path for migration
 LEGACY_JSON_PATH = os.path.join(os.path.dirname(__file__), 'data', 'historical_snapshots.json')
+
+# ===== EMAIL ALERT CONFIGURATION =====
+SUBSCRIBERS_PATH = resolve_data_path('email_subscribers.jsonl')
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
+RESEND_FROM = os.environ.get('RESEND_FROM_EMAIL', 'onboarding@resend.dev')
+EMAIL_SECRET_SALT = os.environ.get('EMAIL_SECRET_SALT', 'il9cast-change-me')
+SWING_THRESHOLD = 5.0  # percentage points to trigger alert
+_swing_debounce = {}  # candidate_name -> last_alert_time (UTC timestamp)
+_daily_summary_sent = None  # date string of last sent daily summary
 
 # ===== JSONL HELPER FUNCTIONS =====
 
@@ -184,6 +194,413 @@ def rdp_simplify(points, epsilon):
 
 # ===== CHART DATA CACHE =====
 _chart_cache = {'data': None, 'time': 0, 'key': None}
+
+
+# ===== EMAIL ALERT FUNCTIONS =====
+
+def read_subscribers():
+    """Read subscriber list from JSONL file. Returns list of {email, subscribed_at}."""
+    subscribers = []
+    if not os.path.exists(SUBSCRIBERS_PATH):
+        return subscribers
+    try:
+        with open(SUBSCRIBERS_PATH, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    subscribers.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
+    except (IOError, OSError):
+        pass
+    return subscribers
+
+def add_subscriber(email):
+    """Add a subscriber. Returns unsub token. Raises ValueError if duplicate."""
+    email = email.lower().strip()
+    existing = read_subscribers()
+    for sub in existing:
+        if sub.get('email') == email:
+            raise ValueError('Already subscribed')
+
+    record = {
+        'email': email,
+        'subscribed_at': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
+    }
+
+    os.makedirs(os.path.dirname(SUBSCRIBERS_PATH), exist_ok=True)
+    with open(SUBSCRIBERS_PATH, 'a') as f:
+        f.write(json.dumps(record) + '\n')
+
+    return make_unsub_token(email)
+
+def remove_subscriber(email):
+    """Remove a subscriber by rewriting JSONL without that email."""
+    email = email.lower().strip()
+    if not os.path.exists(SUBSCRIBERS_PATH):
+        return False
+
+    kept = []
+    found = False
+    with open(SUBSCRIBERS_PATH, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                record = json.loads(line)
+                if record.get('email') == email:
+                    found = True
+                    continue
+                kept.append(line)
+            except json.JSONDecodeError:
+                kept.append(line)
+
+    if found:
+        with open(SUBSCRIBERS_PATH, 'w') as f:
+            for line in kept:
+                f.write(line + '\n')
+    return found
+
+def make_unsub_token(email):
+    """Generate unsubscribe token: sha256(email:salt)[:16]"""
+    return hashlib.sha256(f"{email.lower().strip()}:{EMAIL_SECRET_SALT}".encode()).hexdigest()[:16]
+
+def verify_unsub_token(email, token):
+    """Verify an unsubscribe token matches."""
+    return make_unsub_token(email) == token
+
+def send_email(to, subject, html):
+    """Send email via Resend API. Returns True on success."""
+    if not RESEND_API_KEY:
+        print(f"[{datetime.now().isoformat()}] Email skipped (no RESEND_API_KEY): {subject} -> {to}")
+        return False
+    try:
+        resp = requests.post(
+            'https://api.resend.com/emails',
+            headers={
+                'Authorization': f'Bearer {RESEND_API_KEY}',
+                'Content-Type': 'application/json'
+            },
+            json={
+                'from': RESEND_FROM,
+                'to': [to],
+                'subject': subject,
+                'html': html
+            },
+            timeout=10
+        )
+        if resp.status_code in (200, 201):
+            print(f"[{datetime.now().isoformat()}] Email sent: {subject} -> {to}")
+            return True
+        else:
+            print(f"[{datetime.now().isoformat()}] Email failed ({resp.status_code}): {resp.text}")
+            return False
+    except Exception as e:
+        print(f"[{datetime.now().isoformat()}] Email error: {e}")
+        return False
+
+def send_welcome_email(email):
+    """Send welcome email to new subscriber."""
+    token = make_unsub_token(email)
+    unsub_url = f"{request.host_url}unsubscribe?email={email}&token={token}"
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="margin: 0; padding: 20px; background: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; position: relative;">
+            <!-- Grid background -->
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: linear-gradient(rgba(230, 126, 34, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(230, 126, 34, 0.1) 1px, transparent 1px); background-size: 40px 40px; border-radius: 16px; pointer-events: none;"></div>
+
+            <!-- Main card with frosted glass -->
+            <div style="position: relative; background: rgba(26, 26, 26, 0.85); backdrop-filter: blur(20px); border: 2px solid rgba(230, 126, 34, 0.3); border-radius: 16px; padding: 40px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);">
+                <!-- Header -->
+                <div style="text-align: center; margin-bottom: 32px;">
+                    <h1 style="margin: 0; color: #e67e22; font-size: 32px; font-weight: 600; letter-spacing: -0.5px;">Welcome to IL9Cast</h1>
+                    <p style="margin: 8px 0 0 0; color: #a0a0a0; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase;">Alert System Activated</p>
+                </div>
+
+                <!-- Feature cards -->
+                <div style="margin: 24px 0;">
+                    <div style="background: rgba(230, 126, 34, 0.1); border: 1px solid rgba(230, 126, 34, 0.2); border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+                        <div style="color: #e67e22; font-size: 24px; margin-bottom: 8px;">⚡</div>
+                        <h3 style="margin: 0 0 8px 0; color: #e0e0e0; font-size: 18px; font-weight: 600;">Big Swing Alerts</h3>
+                        <p style="margin: 0; color: #a0a0a0; font-size: 14px; line-height: 1.6;">Get notified immediately when any candidate moves 5%+ in the prediction markets</p>
+                    </div>
+
+                    <div style="background: rgba(230, 126, 34, 0.1); border: 1px solid rgba(230, 126, 34, 0.2); border-radius: 12px; padding: 20px;">
+                        <div style="color: #e67e22; font-size: 24px; margin-bottom: 8px;">📊</div>
+                        <h3 style="margin: 0 0 8px 0; color: #e0e0e0; font-size: 18px; font-weight: 600;">Daily Summary</h3>
+                        <p style="margin: 0; color: #a0a0a0; font-size: 14px; line-height: 1.6;">Every morning at 8 AM CT: current standings and 24-hour changes</p>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <div style="text-align: center; margin: 32px 0 24px 0;">
+                    <a href="{request.host_url}markets" style="display: inline-block; background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);">View Live Markets →</a>
+                </div>
+
+                <!-- Footer -->
+                <div style="border-top: 1px solid rgba(230, 126, 34, 0.2); padding-top: 20px; margin-top: 20px; text-align: center;">
+                    <p style="margin: 0; color: #666; font-size: 12px;">
+                        <a href="{unsub_url}" style="color: #666; text-decoration: none;">Unsubscribe</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    send_email(email, '⚡ Welcome to IL9Cast Alerts', html)
+
+def check_swings_and_alert(new_snapshot, prev_snapshot):
+    """Compare snapshots and send alerts if any candidate moved 5%+. 60-min debounce per candidate."""
+    if not prev_snapshot:
+        return
+
+    prev_by_name = {c['name']: c['probability'] for c in prev_snapshot.get('candidates', [])}
+    now_ts = _time.time()
+    swings = []
+
+    for c in new_snapshot.get('candidates', []):
+        name = c['name']
+        new_prob = c['probability']
+        old_prob = prev_by_name.get(name)
+        if old_prob is None:
+            continue
+        delta = new_prob - old_prob
+        if abs(delta) >= SWING_THRESHOLD:
+            # Check 60-minute debounce
+            last_alert = _swing_debounce.get(name, 0)
+            if now_ts - last_alert < 3600:
+                print(f"[{datetime.now().isoformat()}] Swing alert debounced for {name} ({delta:+.1f}%)")
+                continue
+            _swing_debounce[name] = now_ts
+            swings.append({
+                'name': name,
+                'old': old_prob,
+                'new': new_prob,
+                'delta': delta
+            })
+
+    if swings:
+        send_swing_alerts(swings)
+
+def send_swing_alerts(swings):
+    """Build and send swing alert emails to all subscribers."""
+    subscribers = read_subscribers()
+    if not subscribers:
+        return
+
+    rows = ''
+    for s in swings:
+        arrow = '▲' if s['delta'] > 0 else '▼'
+        color = '#27ae60' if s['delta'] > 0 else '#e74c3c'
+        bg_color = 'rgba(39, 174, 96, 0.1)' if s['delta'] > 0 else 'rgba(231, 76, 60, 0.1)'
+        rows += f"""
+        <tr style="background: {bg_color};">
+            <td style="padding: 16px; border-bottom: 1px solid rgba(230, 126, 34, 0.2); color: #e0e0e0; font-weight: 500;">{s['name']}</td>
+            <td style="padding: 16px; border-bottom: 1px solid rgba(230, 126, 34, 0.2); color: #a0a0a0;">{s['old']:.1f}%</td>
+            <td style="padding: 16px; border-bottom: 1px solid rgba(230, 126, 34, 0.2); color: #e0e0e0; font-weight: 600;">{s['new']:.1f}%</td>
+            <td style="padding: 16px; border-bottom: 1px solid rgba(230, 126, 34, 0.2); color: {color}; font-weight: 700; font-size: 18px;">
+                {arrow} {abs(s['delta']):.1f}%
+            </td>
+        </tr>"""
+
+    subject = f"⚡ IL9Cast Alert: {swings[0]['name']} {'+' if swings[0]['delta'] > 0 else ''}{swings[0]['delta']:.1f}%"
+    if len(swings) > 1:
+        subject = f"⚡ IL9Cast Alert: {len(swings)} candidates moved 5%+"
+
+    for sub in subscribers:
+        email = sub['email']
+        token = make_unsub_token(email)
+        unsub_url = f"{request.host_url}unsubscribe?email={email}&token={token}"
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 20px; background: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; position: relative;">
+                <!-- Grid background -->
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: linear-gradient(rgba(230, 126, 34, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(230, 126, 34, 0.1) 1px, transparent 1px); background-size: 40px 40px; border-radius: 16px; pointer-events: none;"></div>
+
+                <!-- Main card -->
+                <div style="position: relative; background: rgba(26, 26, 26, 0.85); backdrop-filter: blur(20px); border: 2px solid rgba(230, 126, 34, 0.4); border-radius: 16px; padding: 40px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);">
+                    <!-- Alert badge -->
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <div style="display: inline-block; background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; padding: 8px 20px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 4px 12px rgba(230, 126, 34, 0.4);">
+                            ⚡ Big Swing Detected
+                        </div>
+                    </div>
+
+                    <!-- Header -->
+                    <h1 style="margin: 0 0 24px 0; color: #e67e22; font-size: 28px; font-weight: 700; text-align: center; letter-spacing: -0.5px;">Market Movement Alert</h1>
+
+                    <!-- Table -->
+                    <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(230, 126, 34, 0.2); border-radius: 12px; overflow: hidden; margin: 24px 0;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: rgba(230, 126, 34, 0.15);">
+                                    <th style="text-align: left; padding: 14px 16px; color: #a0a0a0; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid rgba(230, 126, 34, 0.3);">Candidate</th>
+                                    <th style="text-align: left; padding: 14px 16px; color: #a0a0a0; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid rgba(230, 126, 34, 0.3);">Before</th>
+                                    <th style="text-align: left; padding: 14px 16px; color: #a0a0a0; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid rgba(230, 126, 34, 0.3);">After</th>
+                                    <th style="text-align: left; padding: 14px 16px; color: #a0a0a0; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid rgba(230, 126, 34, 0.3);">Change</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {rows}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- CTA -->
+                    <div style="text-align: center; margin: 32px 0 24px 0;">
+                        <a href="{request.host_url}markets" style="display: inline-block; background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);">View Live Markets →</a>
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="border-top: 1px solid rgba(230, 126, 34, 0.2); padding-top: 20px; margin-top: 20px; text-align: center;">
+                        <p style="margin: 0; color: #666; font-size: 12px;">
+                            <a href="{unsub_url}" style="color: #666; text-decoration: none;">Unsubscribe</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        send_email(email, subject, html)
+
+def send_daily_summary():
+    """Send daily summary email with current standings and 24h changes."""
+    global _daily_summary_sent
+    today_str = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    if _daily_summary_sent == today_str:
+        return
+    _daily_summary_sent = today_str
+
+    subscribers = read_subscribers()
+    if not subscribers:
+        return
+
+    snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
+    if not snapshots:
+        return
+
+    current = snapshots[-1]
+    now_utc = datetime.now(timezone.utc)
+    cutoff_24h = now_utc - timedelta(hours=24)
+
+    # Find snapshot closest to 24h ago
+    old_snapshot = None
+    for snap in snapshots:
+        dt = parse_snapshot_timestamp(snap.get('timestamp', ''))
+        if dt and dt <= cutoff_24h:
+            old_snapshot = snap
+
+    old_by_name = {}
+    if old_snapshot:
+        old_by_name = {c['name']: c['probability'] for c in old_snapshot.get('candidates', [])}
+
+    rows = ''
+    for c in sorted(current.get('candidates', []), key=lambda x: x['probability'], reverse=True):
+        name = c['name']
+        prob = c['probability']
+        old_prob = old_by_name.get(name)
+        if old_prob is not None:
+            delta = prob - old_prob
+            arrow = '▲' if delta > 0 else ('▼' if delta < 0 else '—')
+            color = '#27ae60' if delta > 0 else ('#e74c3c' if delta < 0 else '#a0a0a0')
+            if delta != 0:
+                change_str = f'<span style="color: {color}; font-weight: 600;">{arrow} {abs(delta):.1f}%</span>'
+            else:
+                change_str = '<span style="color: #a0a0a0;">—</span>'
+        else:
+            change_str = '<span style="color: #a0a0a0;">New</span>'
+
+        rows += f"""
+                                <tr>
+                                    <td style="padding: 16px; border-bottom: 1px solid rgba(230, 126, 34, 0.2); color: #e0e0e0; font-weight: 500;">{name}</td>
+                                    <td style="padding: 16px; border-bottom: 1px solid rgba(230, 126, 34, 0.2); color: #e67e22; font-weight: 700; font-size: 18px;">{prob:.1f}%</td>
+                                    <td style="padding: 16px; border-bottom: 1px solid rgba(230, 126, 34, 0.2);">{change_str}</td>
+                                </tr>"""
+
+    ct_time = datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=-6)))
+    date_str = ct_time.strftime('%B %d, %Y')
+
+    for sub in subscribers:
+        email = sub['email']
+        token = make_unsub_token(email)
+        unsub_url = f"{request.host_url}unsubscribe?email={email}&token={token}"
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 20px; background: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; position: relative;">
+                <!-- Grid background -->
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: linear-gradient(rgba(230, 126, 34, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(230, 126, 34, 0.1) 1px, transparent 1px); background-size: 40px 40px; border-radius: 16px; pointer-events: none;"></div>
+
+                <!-- Main card -->
+                <div style="position: relative; background: rgba(26, 26, 26, 0.85); backdrop-filter: blur(20px); border: 2px solid rgba(230, 126, 34, 0.4); border-radius: 16px; padding: 40px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);">
+                    <!-- Badge -->
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <div style="display: inline-block; background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; padding: 8px 20px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 4px 12px rgba(230, 126, 34, 0.4);">
+                            📊 Daily Summary
+                        </div>
+                    </div>
+
+                    <!-- Header -->
+                    <h1 style="margin: 0 0 8px 0; color: #e67e22; font-size: 28px; font-weight: 700; text-align: center; letter-spacing: -0.5px;">IL9 Democratic Primary</h1>
+                    <p style="margin: 0 0 24px 0; text-align: center; color: #a0a0a0; font-size: 14px;">{date_str}</p>
+
+                    <!-- Table -->
+                    <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(230, 126, 34, 0.2); border-radius: 12px; overflow: hidden; margin: 24px 0;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: rgba(230, 126, 34, 0.15);">
+                                    <th style="text-align: left; padding: 14px 16px; color: #a0a0a0; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid rgba(230, 126, 34, 0.3);">Candidate</th>
+                                    <th style="text-align: left; padding: 14px 16px; color: #a0a0a0; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid rgba(230, 126, 34, 0.3);">Current</th>
+                                    <th style="text-align: left; padding: 14px 16px; color: #a0a0a0; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid rgba(230, 126, 34, 0.3);">24h Change</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {rows}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- CTA -->
+                    <div style="text-align: center; margin: 32px 0 24px 0;">
+                        <a href="{request.host_url}markets" style="display: inline-block; background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);">View Live Markets →</a>
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="border-top: 1px solid rgba(230, 126, 34, 0.2); padding-top: 20px; margin-top: 20px; text-align: center;">
+                        <p style="margin: 0; color: #666; font-size: 12px;">
+                            <a href="{unsub_url}" style="color: #666; text-decoration: none;">Unsubscribe</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        send_email(email, f'📊 IL9Cast Daily Summary - {date_str}', html)
+
+    print(f"[{datetime.now().isoformat()}] Daily summary sent to {len(subscribers)} subscriber(s)")
 
 
 # ===== INITIALIZATION =====
@@ -668,6 +1085,57 @@ def download_snapshots():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/subscribe', methods=['POST'])
+def subscribe():
+    """Subscribe an email to alerts."""
+    import re
+    data = request.get_json()
+    if not data or not data.get('email'):
+        return jsonify({'error': 'Email required'}), 400
+
+    email = data['email'].lower().strip()
+    if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
+        return jsonify({'error': 'Invalid email address'}), 400
+
+    try:
+        token = add_subscriber(email)
+        try:
+            send_welcome_email(email)
+        except Exception as e:
+            print(f"[{datetime.now().isoformat()}] Welcome email failed: {e}")
+        return jsonify({'success': True, 'message': 'Subscribed! Check your email.'})
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 409
+
+@app.route('/unsubscribe')
+def unsubscribe():
+    """Unsubscribe via signed token link."""
+    email = request.args.get('email', '').lower().strip()
+    token = request.args.get('token', '')
+
+    if not email or not token:
+        return render_template('unsubscribe.html', success=False, message='Invalid unsubscribe link.')
+
+    if not verify_unsub_token(email, token):
+        return render_template('unsubscribe.html', success=False, message='Invalid unsubscribe link.')
+
+    removed = remove_subscriber(email)
+    if removed:
+        return render_template('unsubscribe.html', success=True, message=f'{email} has been unsubscribed.')
+    else:
+        return render_template('unsubscribe.html', success=True, message='You are already unsubscribed.')
+
+@app.route('/api/test-swing-alert')
+def test_swing_alert():
+    """Test endpoint: send a fake swing alert to all subscribers"""
+    fake_swings = [
+        {'name': 'Daniel Biss', 'old': 58.2, 'new': 64.7, 'delta': 6.5},
+        {'name': 'Jan Schakowsky', 'old': 24.1, 'new': 18.3, 'delta': -5.8}
+    ]
+    send_swing_alerts(fake_swings)
+    return jsonify({'success': True, 'message': 'Test swing alert sent to all subscribers'})
+
+
 # Background task to collect data every 3 minutes
 # Reduces over-sampling and ensures clean 3-minute intervals
 # Includes spike dampening to prevent chart artifacts
@@ -851,10 +1319,17 @@ def collect_market_data():
 
             # Append to JSONL file (atomic operation)
             try:
+                prev_snapshot = _last_snapshot
                 append_snapshot_jsonl(HISTORICAL_DATA_PATH, snapshot)
                 _last_snapshot = snapshot  # Update in-memory cache
                 total_count = count_snapshots_jsonl(HISTORICAL_DATA_PATH)
                 print(f"[{datetime.now().isoformat()}] Snapshot saved successfully. Total snapshots: {total_count}")
+
+                # Check for big swings and send alerts
+                try:
+                    check_swings_and_alert(snapshot, prev_snapshot)
+                except Exception as e:
+                    print(f"[{datetime.now().isoformat()}] Error checking swings: {e}")
             except Exception as e:
                 print(f"[{datetime.now().isoformat()}] Error saving snapshot: {e}")
                 raise
@@ -905,8 +1380,10 @@ def clean_candidate_name(name):
 import sys
 if 'gunicorn' not in sys.argv[0]:
     # Running locally or in single-process mode
+    from apscheduler.triggers.cron import CronTrigger
     scheduler = BackgroundScheduler()
     scheduler.add_job(func=collect_market_data, trigger="interval", minutes=3)
+    scheduler.add_job(func=send_daily_summary, trigger=CronTrigger(hour=8, minute=0, timezone='America/Chicago'))
     scheduler.start()
 
     # Run initial data collection on startup
@@ -932,6 +1409,14 @@ else:
                 collect_market_data()
             except Exception as e:
                 print(f"Error in scheduler thread: {e}")
+
+            # Check if it's time for daily summary (8 AM CT = 14:00 UTC)
+            try:
+                ct_now = datetime.now(timezone.utc) + timedelta(hours=-6)
+                if ct_now.hour == 8 and ct_now.minute < 3:
+                    send_daily_summary()
+            except Exception as e:
+                print(f"Error sending daily summary: {e}")
 
     # Start scheduler thread
     thread = Thread(target=scheduler_thread, daemon=True)

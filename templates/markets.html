@@ -228,6 +228,17 @@
                 </div>
             </section>
 
+            <!-- Email Alerts Section -->
+            <section class="email-alerts-section">
+                <h2>Get Email Alerts</h2>
+                <p class="alerts-description">Receive big swing alerts and a daily summary at 8 AM CT</p>
+                <form class="subscribe-form" id="subscribeForm" onsubmit="return handleSubscribe(event)">
+                    <input type="email" id="subscribeEmail" placeholder="your@email.com" required class="subscribe-input" />
+                    <button type="submit" class="subscribe-button">Subscribe</button>
+                </form>
+                <div id="subscribeMessage" class="subscribe-message"></div>
+            </section>
+
             <!-- Infrastructure Status -->
             <div class="status-section">
                 <h3>System Status</h3>
@@ -242,17 +253,21 @@
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Download Data Section -->
-            <section class="download-data-section">
+        <!-- Download Data Popup Modal -->
+        <div id="downloadModal" class="download-modal">
+            <div class="download-modal-overlay" onclick="closeDownloadModal()"></div>
+            <div class="download-modal-content">
+                <button class="download-modal-close" onclick="closeDownloadModal()">&times;</button>
                 <h2>Download Historical Data</h2>
-                <p class="download-description">Download the complete historical snapshot data (JSONL format)</p>
-                <a href="/api/download/snapshots" class="download-button" download>
+                <p class="download-modal-description">Get the complete historical snapshot data in JSONL format</p>
+                <a href="/api/download/snapshots" class="download-button" download onclick="closeDownloadModal()">
                     <span class="download-icon">⬇</span>
                     Download Data (JSONL)
                 </a>
-            </section>
-        </section>
+            </div>
+        </div>
 
         <footer class="site-footer">
             <div class="footer-content">
@@ -1333,6 +1348,192 @@
 
         .download-icon {
             font-size: 1.2rem;
+        }
+
+        /* Email Alerts Section */
+        .email-alerts-section {
+            padding: 2.5rem;
+            background: rgba(26, 26, 26, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(230, 126, 34, 0.3);
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .email-alerts-section h2 {
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-weight: 600;
+            color: #e67e22;
+        }
+
+        .alerts-description {
+            margin-bottom: 1.5rem;
+            color: #a0a0a0;
+            font-size: 0.95rem;
+        }
+
+        .subscribe-form {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .subscribe-input {
+            padding: 0.75rem 1rem;
+            border: 1px solid #444;
+            border-radius: 6px;
+            background: #2a2a2a;
+            color: #e0e0e0;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            width: 280px;
+            max-width: 100%;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .subscribe-input:focus {
+            border-color: #e67e22;
+        }
+
+        .subscribe-input::placeholder {
+            color: #666;
+        }
+
+        .subscribe-button {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .subscribe-button:hover {
+            background: linear-gradient(135deg, #d35400 0%, #c0392b 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+        }
+
+        .subscribe-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .subscribe-message {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            min-height: 1.4em;
+        }
+
+        .subscribe-message.success {
+            color: #27ae60;
+        }
+
+        .subscribe-message.error {
+            color: #e74c3c;
+        }
+
+        /* Download Modal Popup */
+        .download-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .download-modal.show {
+            display: block;
+        }
+
+        .download-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .download-modal-content {
+            position: relative;
+            max-width: 500px;
+            margin: 15% auto;
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(230, 126, 34, 0.4);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.4s ease-out;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .download-modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: transparent;
+            border: none;
+            color: #a0a0a0;
+            font-size: 32px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            transition: color 0.2s ease;
+        }
+
+        .download-modal-close:hover {
+            color: #e67e22;
+        }
+
+        .download-modal-content h2 {
+            margin: 0 0 12px 0;
+            font-size: 2rem;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-weight: 600;
+            color: #e67e22;
+        }
+
+        .download-modal-description {
+            margin: 0 0 24px 0;
+            color: #a0a0a0;
+            font-size: 0.95rem;
         }
 
         .last-updated {
@@ -2417,6 +2618,69 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         drawGrid();
+    </script>
+    <script>
+    function handleSubscribe(e) {
+        e.preventDefault();
+        var email = document.getElementById('subscribeEmail').value;
+        var btn = document.querySelector('.subscribe-button');
+        var msg = document.getElementById('subscribeMessage');
+        btn.disabled = true;
+        btn.textContent = 'Subscribing...';
+        msg.textContent = '';
+        msg.className = 'subscribe-message';
+
+        fetch('/api/subscribe', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email: email})
+        })
+        .then(function(r) { return r.json().then(function(d) { return {ok: r.ok, data: d}; }); })
+        .then(function(result) {
+            if (result.ok) {
+                msg.textContent = result.data.message || 'Subscribed!';
+                msg.className = 'subscribe-message success';
+                document.getElementById('subscribeEmail').value = '';
+            } else {
+                msg.textContent = result.data.error || 'Something went wrong.';
+                msg.className = 'subscribe-message error';
+            }
+        })
+        .catch(function() {
+            msg.textContent = 'Network error. Please try again.';
+            msg.className = 'subscribe-message error';
+        })
+        .finally(function() {
+            btn.disabled = false;
+            btn.textContent = 'Subscribe';
+        });
+
+        return false;
+    }
+
+    // Download Modal Logic
+    function closeDownloadModal() {
+        var modal = document.getElementById('downloadModal');
+        modal.classList.remove('show');
+        localStorage.setItem('downloadModalDismissed', 'true');
+    }
+
+    // Show download modal after 3 seconds if not previously dismissed
+    window.addEventListener('load', function() {
+        var dismissed = localStorage.getItem('downloadModalDismissed');
+        if (!dismissed) {
+            setTimeout(function() {
+                document.getElementById('downloadModal').classList.add('show');
+            }, 3000);
+        }
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeDownloadModal();
+        }
+    });
     </script>
 </body>
 </html>
