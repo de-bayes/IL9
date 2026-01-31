@@ -104,30 +104,14 @@ nav a:hover, nav a.active {
 
 /* GitHub Link */
 nav a.github-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    padding: 0;
     color: #555555;
-    transition: color 0.2s ease, opacity 0.2s ease;
-    margin-left: 0.5rem;
-}
-
-nav a.github-link svg {
-    width: 24px;
-    height: 24px;
-    opacity: 0.7;
-    transition: opacity 0.2s ease;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
 }
 
 nav a.github-link:hover {
     color: #e67e22;
-}
-
-nav a.github-link:hover svg {
-    opacity: 1;
 }
 
 body.dark-mode nav a.github-link {
