@@ -162,11 +162,18 @@
         });
 
         // Counter animation for snapshot count
-        function animateCounter() {
+        async function animateCounter() {
             const element = document.getElementById('snapshotCount');
             if (!element) return;
 
-            const finalValue = 4000;
+            let liveCount = 0;
+            try {
+                const resp = await fetch('/api/snapshots/count');
+                const data = await resp.json();
+                liveCount = data.count || 0;
+            } catch (e) {}
+
+            const finalValue = 4000 + liveCount;
             const duration = 1500;
             const startTime = Date.now();
 
@@ -179,7 +186,7 @@
                 if (progress < 1) {
                     requestAnimationFrame(update);
                 } else {
-                    element.textContent = '4,000+';
+                    element.textContent = finalValue.toLocaleString() + '+';
                 }
             }
 
@@ -228,8 +235,7 @@
 
         drawGrid();
 
-        // Snapshot counter displays static 4,000+ as a round number
-        // Will update as data grows
+        // Snapshot counter: 4,000 (pre-reset data) + live JSONL count
     </script>
 </body>
 </html>

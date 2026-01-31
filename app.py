@@ -474,6 +474,15 @@ def save_snapshot():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/snapshots/count')
+def get_snapshot_count():
+    """Return total snapshot count without loading all data"""
+    try:
+        count = count_snapshots_jsonl(HISTORICAL_DATA_PATH)
+        return jsonify({"count": count})
+    except Exception as e:
+        return jsonify({"count": 0})
+
 @app.route('/api/snapshots')
 def get_snapshots():
     """Retrieve historical snapshots for charting (reads JSONL format)"""
