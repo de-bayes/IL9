@@ -272,24 +272,28 @@ def verify_unsub_token(email, token):
     """Verify an unsubscribe token matches."""
     return make_unsub_token(email) == token
 
-def send_email(to, subject, html):
+def send_email(to, subject, html, text=None):
     """Send email via Resend API. Returns True on success."""
     if not RESEND_API_KEY:
         print(f"[{datetime.now().isoformat()}] Email skipped (no RESEND_API_KEY): {subject} -> {to}")
         return False
     try:
+        payload = {
+            'from': RESEND_FROM,
+            'to': [to],
+            'subject': subject,
+            'html': html
+        }
+        if text:
+            payload['text'] = text
+
         resp = requests.post(
             'https://api.resend.com/emails',
             headers={
                 'Authorization': f'Bearer {RESEND_API_KEY}',
                 'Content-Type': 'application/json'
             },
-            json={
-                'from': RESEND_FROM,
-                'to': [to],
-                'subject': subject,
-                'html': html
-            },
+            json=payload,
             timeout=10
         )
         if resp.status_code in (200, 201):
@@ -306,6 +310,26 @@ def send_welcome_email(email):
     """Send welcome email to new subscriber."""
     token = make_unsub_token(email)
     unsub_url = f"{request.host_url}unsubscribe?email={email}&token={token}"
+
+    # Plain text version
+    text = f"""
+Welcome to IL9Cast Alerts!
+
+You'll now receive:
+
+⚡ Big Swing Alerts
+Get notified immediately when any candidate moves 5%+ in the prediction markets
+
+📊 Daily Summary
+Every morning at 8 AM CT: current standings and 24-hour changes
+
+View Live Markets: {request.host_url}markets
+
+---
+Unsubscribe: {unsub_url}
+    """
+
+    # HTML version - email-safe (no backdrop-filter, no position absolute)
     html = f"""
     <!DOCTYPE html>
     <html>
@@ -313,51 +337,72 @@ def send_welcome_email(email):
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-    <body style="margin: 0; padding: 20px; background: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
-        <div style="max-width: 600px; margin: 0 auto; position: relative;">
-            <!-- Grid background -->
-            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: linear-gradient(rgba(230, 126, 34, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(230, 126, 34, 0.1) 1px, transparent 1px); background-size: 40px 40px; border-radius: 16px; pointer-events: none;"></div>
+    <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0a0a0a;">
+            <tr>
+                <td align="center" style="padding: 40px 20px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #1a1a1a; border: 2px solid #e67e22; border-radius: 12px;">
+                        <!-- Header -->
+                        <tr>
+                            <td style="padding: 40px 40px 0 40px; text-align: center;">
+                                <h1 style="margin: 0; color: #e67e22; font-size: 32px; font-weight: 600;">Welcome to IL9Cast</h1>
+                                <p style="margin: 8px 0 0 0; color: #a0a0a0; font-size: 12px; letter-spacing: 1px; text-transform: uppercase;">Alert System Activated</p>
+                            </td>
+                        </tr>
 
-            <!-- Main card with frosted glass -->
-            <div style="position: relative; background: rgba(26, 26, 26, 0.85); backdrop-filter: blur(20px); border: 2px solid rgba(230, 126, 34, 0.3); border-radius: 16px; padding: 40px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);">
-                <!-- Header -->
-                <div style="text-align: center; margin-bottom: 32px;">
-                    <h1 style="margin: 0; color: #e67e22; font-size: 32px; font-weight: 600; letter-spacing: -0.5px;">Welcome to IL9Cast</h1>
-                    <p style="margin: 8px 0 0 0; color: #a0a0a0; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase;">Alert System Activated</p>
-                </div>
+                        <!-- Feature 1 -->
+                        <tr>
+                            <td style="padding: 32px 40px 0 40px;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                    <tr>
+                                        <td style="padding: 20px;">
+                                            <div style="color: #e67e22; font-size: 24px; margin-bottom: 8px;">⚡</div>
+                                            <h3 style="margin: 0 0 8px 0; color: #e0e0e0; font-size: 18px; font-weight: 600;">Big Swing Alerts</h3>
+                                            <p style="margin: 0; color: #a0a0a0; font-size: 14px; line-height: 1.6;">Get notified immediately when any candidate moves 5%+ in the prediction markets</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
 
-                <!-- Feature cards -->
-                <div style="margin: 24px 0;">
-                    <div style="background: rgba(230, 126, 34, 0.1); border: 1px solid rgba(230, 126, 34, 0.2); border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-                        <div style="color: #e67e22; font-size: 24px; margin-bottom: 8px;">⚡</div>
-                        <h3 style="margin: 0 0 8px 0; color: #e0e0e0; font-size: 18px; font-weight: 600;">Big Swing Alerts</h3>
-                        <p style="margin: 0; color: #a0a0a0; font-size: 14px; line-height: 1.6;">Get notified immediately when any candidate moves 5%+ in the prediction markets</p>
-                    </div>
+                        <!-- Feature 2 -->
+                        <tr>
+                            <td style="padding: 16px 40px 0 40px;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                    <tr>
+                                        <td style="padding: 20px;">
+                                            <div style="color: #e67e22; font-size: 24px; margin-bottom: 8px;">📊</div>
+                                            <h3 style="margin: 0 0 8px 0; color: #e0e0e0; font-size: 18px; font-weight: 600;">Daily Summary</h3>
+                                            <p style="margin: 0; color: #a0a0a0; font-size: 14px; line-height: 1.6;">Every morning at 8 AM CT: current standings and 24-hour changes</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
 
-                    <div style="background: rgba(230, 126, 34, 0.1); border: 1px solid rgba(230, 126, 34, 0.2); border-radius: 12px; padding: 20px;">
-                        <div style="color: #e67e22; font-size: 24px; margin-bottom: 8px;">📊</div>
-                        <h3 style="margin: 0 0 8px 0; color: #e0e0e0; font-size: 18px; font-weight: 600;">Daily Summary</h3>
-                        <p style="margin: 0; color: #a0a0a0; font-size: 14px; line-height: 1.6;">Every morning at 8 AM CT: current standings and 24-hour changes</p>
-                    </div>
-                </div>
+                        <!-- CTA Button -->
+                        <tr>
+                            <td style="padding: 32px 40px; text-align: center;">
+                                <a href="{request.host_url}markets" style="display: inline-block; background-color: #e67e22; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">View Live Markets →</a>
+                            </td>
+                        </tr>
 
-                <!-- CTA -->
-                <div style="text-align: center; margin: 32px 0 24px 0;">
-                    <a href="{request.host_url}markets" style="display: inline-block; background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);">View Live Markets →</a>
-                </div>
-
-                <!-- Footer -->
-                <div style="border-top: 1px solid rgba(230, 126, 34, 0.2); padding-top: 20px; margin-top: 20px; text-align: center;">
-                    <p style="margin: 0; color: #666; font-size: 12px;">
-                        <a href="{unsub_url}" style="color: #666; text-decoration: none;">Unsubscribe</a>
-                    </p>
-                </div>
-            </div>
-        </div>
+                        <!-- Footer -->
+                        <tr>
+                            <td style="padding: 0 40px 40px 40px; text-align: center; border-top: 1px solid #3a3a3a;">
+                                <p style="margin: 20px 0 0 0; color: #666; font-size: 12px;">
+                                    <a href="{unsub_url}" style="color: #666; text-decoration: underline;">Unsubscribe</a>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
     </body>
     </html>
     """
-    send_email(email, '⚡ Welcome to IL9Cast Alerts', html)
+    send_email(email, '⚡ Welcome to IL9Cast Alerts', html, text)
 
 def check_swings_and_alert(new_snapshot, prev_snapshot):
     """Compare snapshots and send alerts if any candidate moved 5%+. 60-min debounce per candidate."""
@@ -398,20 +443,35 @@ def send_swing_alerts(swings):
     if not subscribers:
         return
 
+    # Build plain text version
+    text_rows = []
+    for s in swings:
+        arrow = '▲' if s['delta'] > 0 else '▼'
+        text_rows.append(f"{s['name']}: {s['old']:.1f}% → {s['new']:.1f}% ({arrow} {abs(s['delta']):.1f}%)")
+
+    text = f"""
+IL9Cast Big Swing Alert!
+
+{chr(10).join(text_rows)}
+
+View Live Markets: {request.host_url}markets
+    """
+
+    # Build HTML rows
     rows = ''
     for s in swings:
         arrow = '▲' if s['delta'] > 0 else '▼'
         color = '#27ae60' if s['delta'] > 0 else '#e74c3c'
-        bg_color = 'rgba(39, 174, 96, 0.1)' if s['delta'] > 0 else 'rgba(231, 76, 60, 0.1)'
+        bg_color = '#1a2e1a' if s['delta'] > 0 else '#2e1a1a'  # Solid colors instead of rgba
         rows += f"""
-        <tr style="background: {bg_color};">
-            <td style="padding: 16px; border-bottom: 1px solid rgba(230, 126, 34, 0.2); color: #e0e0e0; font-weight: 500;">{s['name']}</td>
-            <td style="padding: 16px; border-bottom: 1px solid rgba(230, 126, 34, 0.2); color: #a0a0a0;">{s['old']:.1f}%</td>
-            <td style="padding: 16px; border-bottom: 1px solid rgba(230, 126, 34, 0.2); color: #e0e0e0; font-weight: 600;">{s['new']:.1f}%</td>
-            <td style="padding: 16px; border-bottom: 1px solid rgba(230, 126, 34, 0.2); color: {color}; font-weight: 700; font-size: 18px;">
-                {arrow} {abs(s['delta']):.1f}%
-            </td>
-        </tr>"""
+                                <tr style="background-color: {bg_color};">
+                                    <td style="padding: 14px; border-bottom: 1px solid #3a3a3a; color: #e0e0e0; font-weight: 500;">{s['name']}</td>
+                                    <td style="padding: 14px; border-bottom: 1px solid #3a3a3a; color: #a0a0a0;">{s['old']:.1f}%</td>
+                                    <td style="padding: 14px; border-bottom: 1px solid #3a3a3a; color: #e0e0e0; font-weight: 600;">{s['new']:.1f}%</td>
+                                    <td style="padding: 14px; border-bottom: 1px solid #3a3a3a; color: {color}; font-weight: 700; font-size: 16px;">
+                                        {arrow} {abs(s['delta']):.1f}%
+                                    </td>
+                                </tr>"""
 
     subject = f"⚡ IL9Cast Alert: {swings[0]['name']} {'+' if swings[0]['delta'] > 0 else ''}{swings[0]['delta']:.1f}%"
     if len(swings) > 1:
@@ -421,6 +481,7 @@ def send_swing_alerts(swings):
         email = sub['email']
         token = make_unsub_token(email)
         unsub_url = f"{request.host_url}unsubscribe?email={email}&token={token}"
+
         html = f"""
         <!DOCTYPE html>
         <html>
@@ -428,57 +489,69 @@ def send_swing_alerts(swings):
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
         </head>
-        <body style="margin: 0; padding: 20px; background: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
-            <div style="max-width: 600px; margin: 0 auto; position: relative;">
-                <!-- Grid background -->
-                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: linear-gradient(rgba(230, 126, 34, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(230, 126, 34, 0.1) 1px, transparent 1px); background-size: 40px 40px; border-radius: 16px; pointer-events: none;"></div>
+        <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0a0a0a;">
+                <tr>
+                    <td align="center" style="padding: 40px 20px;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #1a1a1a; border: 2px solid #e67e22; border-radius: 12px;">
+                            <!-- Badge -->
+                            <tr>
+                                <td style="padding: 32px 40px 0 40px; text-align: center;">
+                                    <div style="display: inline-block; background-color: #e67e22; color: #ffffff; padding: 8px 20px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
+                                        ⚡ BIG SWING DETECTED
+                                    </div>
+                                </td>
+                            </tr>
 
-                <!-- Main card -->
-                <div style="position: relative; background: rgba(26, 26, 26, 0.85); backdrop-filter: blur(20px); border: 2px solid rgba(230, 126, 34, 0.4); border-radius: 16px; padding: 40px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);">
-                    <!-- Alert badge -->
-                    <div style="text-align: center; margin-bottom: 24px;">
-                        <div style="display: inline-block; background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; padding: 8px 20px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 4px 12px rgba(230, 126, 34, 0.4);">
-                            ⚡ Big Swing Detected
-                        </div>
-                    </div>
+                            <!-- Header -->
+                            <tr>
+                                <td style="padding: 24px 40px 32px 40px; text-align: center;">
+                                    <h1 style="margin: 0; color: #e67e22; font-size: 26px; font-weight: 700;">Market Movement Alert</h1>
+                                </td>
+                            </tr>
 
-                    <!-- Header -->
-                    <h1 style="margin: 0 0 24px 0; color: #e67e22; font-size: 28px; font-weight: 700; text-align: center; letter-spacing: -0.5px;">Market Movement Alert</h1>
+                            <!-- Data Table -->
+                            <tr>
+                                <td style="padding: 0 40px 32px 40px;">
+                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0a0a0a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                        <thead>
+                                            <tr style="background-color: #2a2a2a;">
+                                                <th style="text-align: left; padding: 12px 14px; color: #a0a0a0; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #3a3a3a;">Candidate</th>
+                                                <th style="text-align: left; padding: 12px 14px; color: #a0a0a0; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #3a3a3a;">Before</th>
+                                                <th style="text-align: left; padding: 12px 14px; color: #a0a0a0; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #3a3a3a;">After</th>
+                                                <th style="text-align: left; padding: 12px 14px; color: #a0a0a0; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #3a3a3a;">Change</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {rows}
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
 
-                    <!-- Table -->
-                    <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(230, 126, 34, 0.2); border-radius: 12px; overflow: hidden; margin: 24px 0;">
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="background: rgba(230, 126, 34, 0.15);">
-                                    <th style="text-align: left; padding: 14px 16px; color: #a0a0a0; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid rgba(230, 126, 34, 0.3);">Candidate</th>
-                                    <th style="text-align: left; padding: 14px 16px; color: #a0a0a0; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid rgba(230, 126, 34, 0.3);">Before</th>
-                                    <th style="text-align: left; padding: 14px 16px; color: #a0a0a0; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid rgba(230, 126, 34, 0.3);">After</th>
-                                    <th style="text-align: left; padding: 14px 16px; color: #a0a0a0; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid rgba(230, 126, 34, 0.3);">Change</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {rows}
-                            </tbody>
+                            <!-- CTA Button -->
+                            <tr>
+                                <td style="padding: 0 40px 32px 40px; text-align: center;">
+                                    <a href="{request.host_url}markets" style="display: inline-block; background-color: #e67e22; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">View Live Markets →</a>
+                                </td>
+                            </tr>
+
+                            <!-- Footer -->
+                            <tr>
+                                <td style="padding: 0 40px 32px 40px; text-align: center; border-top: 1px solid #3a3a3a;">
+                                    <p style="margin: 20px 0 0 0; color: #666; font-size: 12px;">
+                                        <a href="{unsub_url}" style="color: #666; text-decoration: underline;">Unsubscribe</a>
+                                    </p>
+                                </td>
+                            </tr>
                         </table>
-                    </div>
-
-                    <!-- CTA -->
-                    <div style="text-align: center; margin: 32px 0 24px 0;">
-                        <a href="{request.host_url}markets" style="display: inline-block; background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);">View Live Markets →</a>
-                    </div>
-
-                    <!-- Footer -->
-                    <div style="border-top: 1px solid rgba(230, 126, 34, 0.2); padding-top: 20px; margin-top: 20px; text-align: center;">
-                        <p style="margin: 0; color: #666; font-size: 12px;">
-                            <a href="{unsub_url}" style="color: #666; text-decoration: none;">Unsubscribe</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
+                    </td>
+                </tr>
+            </table>
         </body>
         </html>
         """
-        send_email(email, subject, html)
+        send_email(email, subject, html, text)
 
 def send_daily_summary():
     """Send daily summary email with current standings and 24h changes."""
@@ -521,26 +594,49 @@ def send_daily_summary():
             arrow = '▲' if delta > 0 else ('▼' if delta < 0 else '—')
             color = '#27ae60' if delta > 0 else ('#e74c3c' if delta < 0 else '#a0a0a0')
             if delta != 0:
-                change_str = f'<span style="color: {color}; font-weight: 600;">{arrow} {abs(delta):.1f}%</span>'
+                change_str = f'{arrow} {abs(delta):.1f}%'
             else:
-                change_str = '<span style="color: #a0a0a0;">—</span>'
+                change_str = '—'
         else:
-            change_str = '<span style="color: #a0a0a0;">New</span>'
+            color = '#a0a0a0'
+            change_str = 'New'
 
         rows += f"""
-                                <tr>
-                                    <td style="padding: 16px; border-bottom: 1px solid rgba(230, 126, 34, 0.2); color: #e0e0e0; font-weight: 500;">{name}</td>
-                                    <td style="padding: 16px; border-bottom: 1px solid rgba(230, 126, 34, 0.2); color: #e67e22; font-weight: 700; font-size: 18px;">{prob:.1f}%</td>
-                                    <td style="padding: 16px; border-bottom: 1px solid rgba(230, 126, 34, 0.2);">{change_str}</td>
-                                </tr>"""
+                                            <tr>
+                                                <td style="padding: 14px; border-bottom: 1px solid #3a3a3a; color: #e0e0e0; font-weight: 500;">{name}</td>
+                                                <td style="padding: 14px; border-bottom: 1px solid #3a3a3a; color: #e67e22; font-weight: 700; font-size: 16px;">{prob:.1f}%</td>
+                                                <td style="padding: 14px; border-bottom: 1px solid #3a3a3a; color: {color}; font-weight: 600;">{change_str}</td>
+                                            </tr>"""
 
     ct_time = datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=-6)))
     date_str = ct_time.strftime('%B %d, %Y')
+
+    # Plain text version
+    text_rows = []
+    for c in sorted(current.get('candidates', []), key=lambda x: x['probability'], reverse=True):
+        name = c['name']
+        prob = c['probability']
+        old_prob = old_by_name.get(name)
+        if old_prob is not None:
+            delta = prob - old_prob
+            arrow = '▲' if delta > 0 else ('▼' if delta < 0 else '—')
+            text_rows.append(f"{name}: {prob:.1f}% ({arrow} {abs(delta):.1f}% 24h)")
+        else:
+            text_rows.append(f"{name}: {prob:.1f}% (New)")
+
+    text = f"""
+IL9Cast Daily Summary - {date_str}
+
+{chr(10).join(text_rows)}
+
+View Live Markets: {request.host_url}markets
+    """
 
     for sub in subscribers:
         email = sub['email']
         token = make_unsub_token(email)
         unsub_url = f"{request.host_url}unsubscribe?email={email}&token={token}"
+
         html = f"""
         <!DOCTYPE html>
         <html>
@@ -548,57 +644,69 @@ def send_daily_summary():
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
         </head>
-        <body style="margin: 0; padding: 20px; background: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
-            <div style="max-width: 600px; margin: 0 auto; position: relative;">
-                <!-- Grid background -->
-                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: linear-gradient(rgba(230, 126, 34, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(230, 126, 34, 0.1) 1px, transparent 1px); background-size: 40px 40px; border-radius: 16px; pointer-events: none;"></div>
+        <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0a0a0a;">
+                <tr>
+                    <td align="center" style="padding: 40px 20px;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #1a1a1a; border: 2px solid #e67e22; border-radius: 12px;">
+                            <!-- Badge -->
+                            <tr>
+                                <td style="padding: 32px 40px 0 40px; text-align: center;">
+                                    <div style="display: inline-block; background-color: #e67e22; color: #ffffff; padding: 8px 20px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
+                                        📊 DAILY SUMMARY
+                                    </div>
+                                </td>
+                            </tr>
 
-                <!-- Main card -->
-                <div style="position: relative; background: rgba(26, 26, 26, 0.85); backdrop-filter: blur(20px); border: 2px solid rgba(230, 126, 34, 0.4); border-radius: 16px; padding: 40px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);">
-                    <!-- Badge -->
-                    <div style="text-align: center; margin-bottom: 24px;">
-                        <div style="display: inline-block; background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; padding: 8px 20px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 4px 12px rgba(230, 126, 34, 0.4);">
-                            📊 Daily Summary
-                        </div>
-                    </div>
+                            <!-- Header -->
+                            <tr>
+                                <td style="padding: 24px 40px 0 40px; text-align: center;">
+                                    <h1 style="margin: 0 0 8px 0; color: #e67e22; font-size: 26px; font-weight: 700;">IL9 Democratic Primary</h1>
+                                    <p style="margin: 0; color: #a0a0a0; font-size: 13px;">{date_str}</p>
+                                </td>
+                            </tr>
 
-                    <!-- Header -->
-                    <h1 style="margin: 0 0 8px 0; color: #e67e22; font-size: 28px; font-weight: 700; text-align: center; letter-spacing: -0.5px;">IL9 Democratic Primary</h1>
-                    <p style="margin: 0 0 24px 0; text-align: center; color: #a0a0a0; font-size: 14px;">{date_str}</p>
+                            <!-- Data Table -->
+                            <tr>
+                                <td style="padding: 32px 40px;">
+                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0a0a0a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                        <thead>
+                                            <tr style="background-color: #2a2a2a;">
+                                                <th style="text-align: left; padding: 12px 14px; color: #a0a0a0; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #3a3a3a;">Candidate</th>
+                                                <th style="text-align: left; padding: 12px 14px; color: #a0a0a0; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #3a3a3a;">Current</th>
+                                                <th style="text-align: left; padding: 12px 14px; color: #a0a0a0; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #3a3a3a;">24h Change</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {rows}
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
 
-                    <!-- Table -->
-                    <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(230, 126, 34, 0.2); border-radius: 12px; overflow: hidden; margin: 24px 0;">
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="background: rgba(230, 126, 34, 0.15);">
-                                    <th style="text-align: left; padding: 14px 16px; color: #a0a0a0; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid rgba(230, 126, 34, 0.3);">Candidate</th>
-                                    <th style="text-align: left; padding: 14px 16px; color: #a0a0a0; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid rgba(230, 126, 34, 0.3);">Current</th>
-                                    <th style="text-align: left; padding: 14px 16px; color: #a0a0a0; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid rgba(230, 126, 34, 0.3);">24h Change</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {rows}
-                            </tbody>
+                            <!-- CTA Button -->
+                            <tr>
+                                <td style="padding: 0 40px 32px 40px; text-align: center;">
+                                    <a href="{request.host_url}markets" style="display: inline-block; background-color: #e67e22; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">View Live Markets →</a>
+                                </td>
+                            </tr>
+
+                            <!-- Footer -->
+                            <tr>
+                                <td style="padding: 0 40px 32px 40px; text-align: center; border-top: 1px solid #3a3a3a;">
+                                    <p style="margin: 20px 0 0 0; color: #666; font-size: 12px;">
+                                        <a href="{unsub_url}" style="color: #666; text-decoration: underline;">Unsubscribe</a>
+                                    </p>
+                                </td>
+                            </tr>
                         </table>
-                    </div>
-
-                    <!-- CTA -->
-                    <div style="text-align: center; margin: 32px 0 24px 0;">
-                        <a href="{request.host_url}markets" style="display: inline-block; background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);">View Live Markets →</a>
-                    </div>
-
-                    <!-- Footer -->
-                    <div style="border-top: 1px solid rgba(230, 126, 34, 0.2); padding-top: 20px; margin-top: 20px; text-align: center;">
-                        <p style="margin: 0; color: #666; font-size: 12px;">
-                            <a href="{unsub_url}" style="color: #666; text-decoration: none;">Unsubscribe</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
+                    </td>
+                </tr>
+            </table>
         </body>
         </html>
         """
-        send_email(email, f'📊 IL9Cast Daily Summary - {date_str}', html)
+        send_email(email, f'📊 IL9Cast Daily Summary - {date_str}', html, text)
 
     print(f"[{datetime.now().isoformat()}] Daily summary sent to {len(subscribers)} subscriber(s)")
 
