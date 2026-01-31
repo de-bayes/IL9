@@ -40,7 +40,8 @@ LEGACY_JSON_PATH = os.path.join(os.path.dirname(__file__), 'data', 'historical_s
 # ===== EMAIL ALERT CONFIGURATION =====
 SUBSCRIBERS_PATH = resolve_data_path('email_subscribers.jsonl')
 RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
-RESEND_FROM = os.environ.get('RESEND_FROM_EMAIL', 'onboarding@resend.dev')
+RESEND_FROM_EMAIL = os.environ.get('RESEND_FROM_EMAIL', 'alerts@il9.org')
+RESEND_FROM = f"IL9Cast <{RESEND_FROM_EMAIL}>"  # Display name + email
 EMAIL_SECRET_SALT = os.environ.get('EMAIL_SECRET_SALT', 'il9cast-change-me')
 SWING_THRESHOLD = 5.0  # percentage points to trigger alert
 _swing_debounce = {}  # candidate_name -> last_alert_time (UTC timestamp)
