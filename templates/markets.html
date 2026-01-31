@@ -2257,6 +2257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const canvas = document.getElementById('grid-canvas');
         const ctx = canvas.getContext('2d');
         const gridSize = 40;
+        const topPadding = 100; // Padding at top of grid
         let pointsState = null;
         let scrollOffset = 0;
 
@@ -2294,9 +2295,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             for (let row = 0; row <= rows; row++) {
                 for (let col = 0; col <= cols; col++) {
-                    // Base grid position offset by scroll amount (slower: 0.15 instead of 0.3)
-                    const baseX = (col * gridSize) - (scrollOffset * 0.15);
-                    const baseY = (row * gridSize) + (scrollOffset * 0.15);
+                    // Base grid position offset by scroll amount (slower: 0.08 multiplier)
+                    const baseX = (col * gridSize) - (scrollOffset * 0.08);
+                    const baseY = (row * gridSize) + topPadding + (scrollOffset * 0.08);
 
                     pointsState[row][col].x = baseX;
                     pointsState[row][col].y = baseY;
