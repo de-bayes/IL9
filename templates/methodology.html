@@ -75,6 +75,10 @@
                     <li>Smooths out last trade anomalies or outliers</li>
                 </ul>
 
+                <p><strong>Thin-Market Fallback (Midpoint &amp; Liquidity)</strong></p>
+                <p>When a candidate has <strong>no yes-side bids</strong> (yes_bid = 0), the standard midpoint formula (yes_bid + yes_ask) / 2 produces a meaningless number — it averages zero against the ask, massively inflating the result. In these cases, both the Midpoint and Liquidity-Weighted components fall back to the candidate's <strong>last trade price</strong> instead.</p>
+                <p><strong>Example — Mike Simmons:</strong> Simmons has virtually no buy-side interest on Kalshi. His order book might show yes_bid = 0, yes_ask = 19, last_price = 1. Without the fallback, the midpoint formula would compute (0 + 19) / 2 = 9.5%, and the liquidity-weighted price would land around 9.0% — suggesting nearly 10% support for a candidate trading at 1 cent. With the fallback, both Midpoint and Liquidity correctly report 1%, matching his actual last trade. The spread-based liquidity adjustment is also skipped entirely because there is no real two-sided market to analyze.</p>
+
                 <p><strong>3. Liquidity-Weighted Price (6% overall = 10% of Kalshi's 60%)</strong></p>
                 <ul class="method-list">
                     <li><strong>Purpose:</strong> Captures buying vs selling pressure by analyzing where the last trade occurred within the bid-ask spread</li>

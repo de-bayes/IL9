@@ -126,13 +126,20 @@
 
                     <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
                         <strong>Sub-calculations:</strong><br>
-                        Midpoint = (yes_bid + yes_ask) / 2 &nbsp;(falls back to last_price if no yes bids)<br>
+                        Midpoint = (yes_bid + yes_ask) / 2<br>
                         <br>
                         Liquidity = Midpoint + Shift<br>
                         &nbsp;&nbsp;where Shift = offset × 6 × spread_factor<br>
                         &nbsp;&nbsp;offset = (Last - yes_bid) / (yes_ask - yes_bid) - 0.5<br>
                         &nbsp;&nbsp;spread_factor = max(0.2, 1 - spread/10 × 0.8)<br>
                         &nbsp;&nbsp;spread = yes_ask - yes_bid<br>
+                        <br>
+                        <strong>Thin-market fallback:</strong> When yes_bid = 0 (no buy-side orders),
+                        both Midpoint and Liquidity fall back to last_price instead.
+                        A midpoint between zero and the ask is not a real price signal — it
+                        would massively inflate candidates with no buyer interest.
+                        For example, Mike Simmons at yes_bid=0, yes_ask=19, last_price=1
+                        would incorrectly show Midpoint=9.5% instead of the correct 1%.<br>
                         <br>
                         Soft Normalization (30% strength):<br>
                         &nbsp;&nbsp;Fully_Normalized = (Raw_Aggregate / Sum_All_Aggregates) × 100<br>
