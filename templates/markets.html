@@ -365,12 +365,228 @@
             .leader-sub-value {
                 font-size: 1.1rem;
             }
+            .market-chart-section {
+                padding: 1.5rem;
+            }
+            .market-chart-section h2 {
+                font-size: 1.4rem;
+                margin-bottom: 1rem;
+            }
+            .market-chart-section .chart-wrapper {
+                height: 240px;
+            }
+            .chart-toggle {
+                gap: 0.2rem;
+            }
+            .toggle-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+            .chart-subtitle {
+                font-size: 0.75rem;
+                margin-top: 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .markets-content-page {
+                padding: 1rem;
+            }
+
+            .leader-card {
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .leader-photo {
+                width: 80px;
+                height: 80px;
+            }
+
+            .leader-label {
+                font-size: 0.65rem;
+                letter-spacing: 0.06em;
+            }
+
+            .leader-name {
+                font-size: 1.35rem;
+            }
+
+            .leader-main-label {
+                font-size: 0.6rem;
+            }
+
+            .leader-main-value {
+                font-size: 2rem;
+            }
+
+            .leader-sub-stats {
+                gap: 0.8rem 1rem;
+            }
+
+            .leader-sub-label {
+                font-size: 0.55rem;
+            }
+
+            .leader-sub-value {
+                font-size: 0.95rem;
+            }
+
+            .big-odds-display {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .big-odds-candidate {
+                padding: 1rem 0.4rem;
+                border-radius: 10px;
+            }
+
+            .big-percent {
+                font-size: 2rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .big-name {
+                font-size: 0.8rem;
+            }
+
+            .market-chart-section {
+                padding: 1.25rem;
+                margin-bottom: 1.5rem;
+                border-radius: 10px;
+            }
+
+            .market-chart-section h2 {
+                font-size: 1.2rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .market-chart-section .chart-wrapper {
+                height: 200px;
+            }
+
+            .chart-toggle {
+                gap: 0.15rem;
+            }
+
+            .toggle-btn {
+                padding: 0.35rem 0.65rem;
+                font-size: 0.75rem;
+            }
+
+            .chart-subtitle {
+                font-size: 0.7rem;
+                margin-top: 0.6rem;
+            }
+
+            .methodology-section {
+                padding: 1rem;
+            }
+
+            .methodology-header {
+                padding: 0.75rem;
+            }
+
+            .methodology-header h2 {
+                font-size: 1.1rem !important;
+            }
+
+            .market-chart-section > div {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+
+            .hero .subtitle {
+                font-size: 0.8rem;
+            }
+
+            .markets-content-page {
+                padding: 0.75rem;
+            }
+
+            .leader-featured {
+                margin-bottom: 1rem;
+            }
+
+            .leader-card {
+                padding: 0.75rem;
+            }
+
+            .leader-photo {
+                width: 70px;
+                height: 70px;
+            }
+
+            .leader-name {
+                font-size: 1.2rem;
+            }
+
+            .leader-main-value {
+                font-size: 1.75rem;
+            }
+
+            .leader-sub-value {
+                font-size: 0.85rem;
+            }
+
+            .big-odds-display {
+                gap: 0.6rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .big-odds-candidate {
+                padding: 0.75rem 0.35rem;
+            }
+
+            .big-percent {
+                font-size: 1.75rem;
+                margin-bottom: 0.3rem;
+            }
+
+            .big-name {
+                font-size: 0.75rem;
+            }
+
+            .market-chart-section {
+                padding: 1rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .market-chart-section h2 {
+                font-size: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .market-chart-section .chart-wrapper {
+                height: 180px;
+            }
+
+            .toggle-btn {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.7rem;
+            }
         }
 
         /* Odds Grid */
         .big-odds-display {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
             gap: 1rem;
             margin: 0 0 2rem 0;
             text-align: center;
@@ -450,6 +666,7 @@
             height: 320px;
             position: relative;
             padding: 0.5rem 0;
+            width: 100%;
         }
 
         .chart-toggle {
@@ -459,6 +676,9 @@
             padding: 4px;
             border-radius: 8px;
             border: 1px solid rgba(230, 126, 34, 0.15);
+            flex-wrap: wrap;
+            justify-content: center;
+            width: auto;
         }
 
         .toggle-btn {
@@ -467,6 +687,7 @@
             border: none;
             color: rgba(255, 255, 255, 0.5);
             border-radius: 6px;
+            white-space: nowrap;
             cursor: pointer;
             font-size: 0.85rem;
             font-weight: 500;
