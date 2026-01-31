@@ -228,6 +228,17 @@
                 </div>
             </section>
 
+            <!-- Email Alerts Section -->
+            <section class="email-alerts-section">
+                <h2>Get Email Alerts</h2>
+                <p class="alerts-description">Receive big swing alerts and a daily summary at 8 AM CT</p>
+                <form class="subscribe-form" id="subscribeForm" onsubmit="return handleSubscribe(event)">
+                    <input type="email" id="subscribeEmail" placeholder="your@email.com" required class="subscribe-input" />
+                    <button type="submit" class="subscribe-button">Subscribe</button>
+                </form>
+                <div id="subscribeMessage" class="subscribe-message"></div>
+            </section>
+
             <!-- Infrastructure Status -->
             <div class="status-section">
                 <h3>System Status</h3>
