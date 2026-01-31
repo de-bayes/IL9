@@ -190,6 +190,21 @@
         // Run counter animation when page loads
         window.addEventListener('load', animateCounter);
 
+        // Hide header overlay when scrolling down
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.scrollY;
+            const headerOverlay = document.getElementById('header-overlay');
+
+            if (currentScroll > 150) {
+                headerOverlay.classList.add('hidden');
+            } else {
+                headerOverlay.classList.remove('hidden');
+            }
+
+            lastScroll = currentScroll;
+        });
+
         // GRID BACKGROUND - Static, no mouse interaction
         const canvas = document.getElementById('grid-canvas');
         const ctx = canvas.getContext('2d');

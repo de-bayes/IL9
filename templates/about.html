@@ -176,7 +176,19 @@
         }
     </style>
 
-    <script>
+    <script>        // Hide header overlay when scrolling down
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.scrollY;
+            const headerOverlay = document.getElementById('header-overlay');
+
+            if (currentScroll > 150) {
+                headerOverlay.classList.add('hidden');
+            } else {
+                headerOverlay.classList.remove('hidden');
+            }
+        });
+
+
         // GRID BACKGROUND - Static, no mouse interaction
         const canvas = document.getElementById('grid-canvas');
         const ctx = canvas.getContext('2d');
