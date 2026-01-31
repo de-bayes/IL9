@@ -2256,10 +2256,9 @@ document.addEventListener('DOMContentLoaded', () => {
     <script>
         const canvas = document.getElementById('grid-canvas');
         const ctx = canvas.getContext('2d');
-        let mouseX = -1000, mouseY = -1000;
-        let targetMouseX = -1000, targetMouseY = -1000;
-        const gridSize = 40, influence = 280, maxDisplacement = 15, smoothing = 0.06;
+        const gridSize = 40;
         let pointsState = null;
+        let scrollOffset = 0;
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -2270,18 +2269,12 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        document.addEventListener('mousemove', (e) => {
-            targetMouseX = e.clientX;
-            targetMouseY = e.clientY;
-        });
-
-        document.addEventListener('mouseleave', () => {
-            targetMouseX = targetMouseY = -1000;
+        // Scroll effect - grid moves down and left as you scroll
+        window.addEventListener('scroll', () => {
+            scrollOffset = window.scrollY;
         });
 
         function drawGrid() {
-            mouseX += (targetMouseX - mouseX) * smoothing;
-            mouseY += (targetMouseY - mouseY) * smoothing;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
             ctx.lineWidth = 1;
@@ -2300,21 +2293,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             for (let row = 0; row <= rows; row++) {
                 for (let col = 0; col <= cols; col++) {
-                    const baseX = col * gridSize, baseY = row * gridSize;
-                    let targetX = baseX, targetY = baseY;
-                    const dx = baseX - mouseX, dy = baseY - mouseY;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    // Base grid position offset by scroll amount
+                    const baseX = (col * gridSize) - (scrollOffset * 0.3);
+                    const baseY = (row * gridSize) + (scrollOffset * 0.3);
 
-                    if (dist < influence && dist > 0) {
-                        const falloff = 1 - dist / influence;
-                        const force = falloff * falloff * falloff * maxDisplacement;
-                        const angle = Math.atan2(dy, dx);
-                        targetX = baseX + Math.cos(angle) * force;
-                        targetY = baseY + Math.sin(angle) * force;
-                    }
-
-                    pointsState[row][col].x += (targetX - pointsState[row][col].x) * 0.06;
-                    pointsState[row][col].y += (targetY - pointsState[row][col].y) * 0.06;
+                    pointsState[row][col].x = baseX;
+                    pointsState[row][col].y = baseY;
                 }
             }
 
