@@ -2259,13 +2259,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const gridSize = 40;
         let pointsState = null;
         let scrollOffset = 0;
-        let topPadding = window.innerHeight * 0.5; // 50% of viewport height
+        let initialOffset = -window.innerHeight * 3; // Start grid way above viewport
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             pointsState = null;
-            topPadding = window.innerHeight * 0.5; // Recalculate on resize
+            initialOffset = -window.innerHeight * 3; // Recalculate on resize
         }
 
         window.addEventListener('resize', resizeCanvas);
@@ -2298,7 +2298,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (let col = 0; col <= cols; col++) {
                     // Base grid position offset by scroll amount (slower: 0.08 multiplier)
                     const baseX = (col * gridSize) - (scrollOffset * 0.08);
-                    const baseY = (row * gridSize) + topPadding + (scrollOffset * 0.08);
+                    const baseY = (row * gridSize) + initialOffset + (scrollOffset * 0.08);
 
                     pointsState[row][col].x = baseX;
                     pointsState[row][col].y = baseY;
