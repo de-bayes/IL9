@@ -13,6 +13,7 @@
 </head>
 <body class="dark-mode">
     <canvas id="grid-canvas"></canvas>
+    <div id="header-overlay"></div>
 
     <div class="site-content">
         <header>
@@ -278,6 +279,29 @@
     </div>
 
     <style>
+        #header-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: #1a1a1a;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            #header-overlay {
+                height: 100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #header-overlay {
+                height: 90px;
+            }
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #1a1a1a;
