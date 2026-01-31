@@ -21,6 +21,7 @@
                 <a href="/">Home</a>
                 <a href="/markets">Markets</a>
                 <a href="/odds">Model</a>
+                <a href="/fundraising">Fundraising</a>
                 <a href="/methodology" class="active">Methodology</a>
                 <a href="/about">About</a>
             </nav>
@@ -28,90 +29,160 @@
 
         <section class="hero">
             <h1>Methodology</h1>
-            <p class="subtitle">How we aggregate prediction markets</p>
+            <p class="subtitle">How IL9Cast generates its forecasts</p>
         </section>
 
         <section class="methodology-content-page">
-            <article class="method-section">
-                <h2>Prediction Markets Aggregation</h2>
-                <p>The <a href="/markets">Markets page</a> aggregates real-time probabilities from two major prediction markets: <strong>Manifold Markets</strong> (community-driven) and <strong>Kalshi</strong> (real-money exchange). This provides a live, crowd-sourced forecast updated automatically as new trades occur.</p>
 
-                <h3>Overall Weighting: 40% Manifold + 60% Kalshi</h3>
+            <!-- FOLDOUT 1: Prediction Markets Aggregation -->
+            <div class="method-foldout" id="foldout-pm">
+                <button class="foldout-trigger" onclick="toggleFoldout('pm')">
+                    <div class="foldout-trigger-left">
+                        <span class="foldout-icon" id="foldout-icon-pm"></span>
+                        <div>
+                            <h2>Prediction Markets Aggregation</h2>
+                            <p class="foldout-desc">40% Manifold + 60% Kalshi weighted formula</p>
+                        </div>
+                    </div>
+                    <span class="foldout-arrow" id="foldout-arrow-pm">+</span>
+                </button>
+                <div class="foldout-body" id="foldout-body-pm">
+                    <div class="foldout-inner">
+                        <p>The <a href="/markets">Markets page</a> aggregates real-time probabilities from two major prediction markets: <strong>Manifold Markets</strong> (community-driven) and <strong>Kalshi</strong> (real-money exchange). This provides a live, crowd-sourced forecast updated automatically as new trades occur.</p>
 
-                <p><strong>Manifold Markets (40% weight):</strong></p>
-                <ul class="method-list">
-                    <li>Community prediction market using play money</li>
-                    <li>Lower barrier to entry, broader participation</li>
-                    <li>Captures general consensus and casual forecasters</li>
-                    <li>Uses an Automated Market Maker (AMM) for price discovery</li>
-                    <li>Good for long-term sentiment, less susceptible to short-term noise</li>
-                </ul>
+                        <h3>Overall Weighting: 40% Manifold + 60% Kalshi</h3>
 
-                <p><strong>Kalshi (60% weight):</strong></p>
-                <ul class="method-list">
-                    <li>Real-money exchange with cash-settled contracts</li>
-                    <li>Higher barrier to entry, attracts serious forecasters with skin in the game</li>
-                    <li>Reflects genuine conviction (money is at risk)</li>
-                    <li>Traditional order book exchange (bid/ask spread pricing)</li>
-                </ul>
+                        <p><strong>Manifold Markets (40% weight):</strong></p>
+                        <ul class="method-list">
+                            <li>Community prediction market using play money</li>
+                            <li>Lower barrier to entry, broader participation</li>
+                            <li>Captures general consensus and casual forecasters</li>
+                            <li>Uses an Automated Market Maker (AMM) for price discovery</li>
+                            <li>Good for long-term sentiment, less susceptible to short-term noise</li>
+                        </ul>
 
-                <h3>Kalshi Component Breakdown (60% total weight)</h3>
+                        <p><strong>Kalshi (60% weight):</strong></p>
+                        <ul class="method-list">
+                            <li>Real-money exchange with cash-settled contracts</li>
+                            <li>Higher barrier to entry, attracts serious forecasters with skin in the game</li>
+                            <li>Reflects genuine conviction (money is at risk)</li>
+                            <li>Traditional order book exchange (bid/ask spread pricing)</li>
+                        </ul>
 
-                <p>Within Kalshi's 60% weight, we use three price signals:</p>
+                        <h3>Kalshi Component Breakdown (60% total weight)</h3>
 
-                <p><strong>1. Last Price (42% overall = 70% of Kalshi's 60%)</strong></p>
-                <ul class="method-list">
-                    <li>The most recent completed trade price</li>
-                    <li>Reflects real money execution and recent market sentiment</li>
-                    <li>Given highest weight because it shows actual conviction backed by capital</li>
-                    <li>Most responsive to new information and recent trades</li>
-                </ul>
+                        <p>Within Kalshi's 60% weight, we use three price signals:</p>
 
-                <p><strong>2. Midpoint (12% overall = 20% of Kalshi's 60%)</strong></p>
-                <ul class="method-list">
-                    <li>Average of the current best bid and best ask prices: (bid + ask) / 2</li>
-                    <li>Represents the fair value between buyers and sellers right now</li>
-                    <li>Includes current order book state but not yet executed</li>
-                    <li>Smooths out last trade anomalies or outliers</li>
-                </ul>
+                        <p><strong>1. Last Price (42% overall = 70% of Kalshi's 60%)</strong></p>
+                        <ul class="method-list">
+                            <li>The most recent completed trade price</li>
+                            <li>Reflects real money execution and recent market sentiment</li>
+                            <li>Given highest weight because it shows actual conviction backed by capital</li>
+                            <li>Most responsive to new information and recent trades</li>
+                        </ul>
 
-                <p><strong>Thin-Market Fallback (Midpoint &amp; Liquidity)</strong></p>
-                <p>When a candidate has <strong>no yes-side bids</strong> (yes_bid = 0), the standard midpoint formula (yes_bid + yes_ask) / 2 produces a meaningless number — it averages zero against the ask, massively inflating the result. In these cases, both the Midpoint and Liquidity-Weighted components fall back to the candidate's <strong>last trade price</strong> instead.</p>
-                <p><strong>Example — Mike Simmons:</strong> Simmons has virtually no buy-side interest on Kalshi. His order book might show yes_bid = 0, yes_ask = 19, last_price = 1. Without the fallback, the midpoint formula would compute (0 + 19) / 2 = 9.5%, and the liquidity-weighted price would land around 9.0% — suggesting nearly 10% support for a candidate trading at 1 cent. With the fallback, both Midpoint and Liquidity correctly report 1%, matching his actual last trade. The spread-based liquidity adjustment is also skipped entirely because there is no real two-sided market to analyze.</p>
+                        <p><strong>2. Midpoint (12% overall = 20% of Kalshi's 60%)</strong></p>
+                        <ul class="method-list">
+                            <li>Average of the current best bid and best ask prices: (bid + ask) / 2</li>
+                            <li>Represents the fair value between buyers and sellers right now</li>
+                            <li>Includes current order book state but not yet executed</li>
+                            <li>Smooths out last trade anomalies or outliers</li>
+                        </ul>
 
-                <p><strong>3. Liquidity-Weighted Price (6% overall = 10% of Kalshi's 60%)</strong></p>
-                <ul class="method-list">
-                    <li><strong>Purpose:</strong> Captures buying vs selling pressure by analyzing where the last trade occurred within the bid-ask spread</li>
-                    <li><strong>Why only Kalshi?</strong> Kalshi uses a traditional order book exchange where buyers and sellers post bids and asks. Manifold uses an Automated Market Maker (AMM) that algorithmically sets prices, so order book analysis doesn't apply</li>
-                    <li><strong>How it works:</strong> Calculate position in spread = (Last Price - Bid) / (Ask - Bid). Position of 0.0 = traded at bid (sellers aggressive), 0.5 = at midpoint (balanced), 1.0 = at ask (buyers aggressive)</li>
-                    <li><strong>Spread dampening:</strong> Wider spreads reduce the adjustment because they indicate less confidence. At 0pp spread: factor = 1.0 (full shift potential). At 10pp spread: factor = 0.2 (heavily dampened)</li>
-                    <li><strong>Example:</strong> Bid=60, Ask=68, Last=66, Mid=64, Spread=8. Position = (66-60)/8 = 0.75 (near ask). Offset = 0.75 - 0.5 = +0.25. Dampening = 1 - (8/10)×0.8 = 0.36. Shift = 0.25 × 6 × 0.36 = +0.54pp. Result = 64 + 0.54 = 64.5% (buyers showed aggression)</li>
-                    <li>Caps shift at ±3 percentage points to avoid overreaction</li>
-                </ul>
+                        <p><strong>Thin-Market Fallback (Midpoint &amp; Liquidity)</strong></p>
+                        <p>When a candidate has <strong>no yes-side bids</strong> (yes_bid = 0), the standard midpoint formula (yes_bid + yes_ask) / 2 produces a meaningless number — it averages zero against the ask, massively inflating the result. In these cases, both the Midpoint and Liquidity-Weighted components fall back to the candidate's <strong>last trade price</strong> instead.</p>
+                        <p><strong>Example — Mike Simmons:</strong> Simmons has virtually no buy-side interest on Kalshi. His order book might show yes_bid = 0, yes_ask = 19, last_price = 1. Without the fallback, the midpoint formula would compute (0 + 19) / 2 = 9.5%, and the liquidity-weighted price would land around 9.0% — suggesting nearly 10% support for a candidate trading at 1 cent. With the fallback, both Midpoint and Liquidity correctly report 1%, matching his actual last trade. The spread-based liquidity adjustment is also skipped entirely because there is no real two-sided market to analyze.</p>
 
-                <h3>The Complete Formula</h3>
-                <div class="formula-box">
-                    Aggregate Probability = (0.40 × Manifold) + (0.42 × Kalshi Last Price) + (0.12 × Kalshi Midpoint) + (0.06 × Kalshi Liquidity-Weighted)
+                        <p><strong>3. Liquidity-Weighted Price (6% overall = 10% of Kalshi's 60%)</strong></p>
+                        <ul class="method-list">
+                            <li><strong>Purpose:</strong> Captures buying vs selling pressure by analyzing where the last trade occurred within the bid-ask spread</li>
+                            <li><strong>Why only Kalshi?</strong> Kalshi uses a traditional order book exchange where buyers and sellers post bids and asks. Manifold uses an Automated Market Maker (AMM) that algorithmically sets prices, so order book analysis doesn't apply</li>
+                            <li><strong>How it works:</strong> Calculate position in spread = (Last Price - Bid) / (Ask - Bid). Position of 0.0 = traded at bid (sellers aggressive), 0.5 = at midpoint (balanced), 1.0 = at ask (buyers aggressive)</li>
+                            <li><strong>Spread dampening:</strong> Wider spreads reduce the adjustment because they indicate less confidence. At 0pp spread: factor = 1.0 (full shift potential). At 10pp spread: factor = 0.2 (heavily dampened)</li>
+                            <li><strong>Example:</strong> Bid=60, Ask=68, Last=66, Mid=64, Spread=8. Position = (66-60)/8 = 0.75 (near ask). Offset = 0.75 - 0.5 = +0.25. Dampening = 1 - (8/10)×0.8 = 0.36. Shift = 0.25 × 6 × 0.36 = +0.54pp. Result = 64 + 0.54 = 64.5% (buyers showed aggression)</li>
+                            <li>Caps shift at ±3 percentage points to avoid overreaction</li>
+                        </ul>
+
+                        <h3>The Complete Formula</h3>
+                        <div class="formula-box">
+                            Aggregate Probability = (0.40 × Manifold) + (0.42 × Kalshi Last Price) + (0.12 × Kalshi Midpoint) + (0.06 × Kalshi Liquidity-Weighted)
+                        </div>
+
+                        <h3>Soft Normalization (30% Strength)</h3>
+                        <p>Final probabilities are lightly normalized to prevent excessive drift while preserving raw market values:</p>
+                        <ul class="method-list">
+                            <li>Candidates with no Kalshi market (marked with *) use 100% of their Manifold probability</li>
+                            <li>Only 30% of the normalization adjustment is applied to each candidate</li>
+                            <li>70% of the raw aggregated value is preserved</li>
+                            <li>This keeps top candidates higher while preventing probabilities from summing to unrealistic totals</li>
+                        </ul>
+
+                        <h3>Chart Smoothing</h3>
+                        <p>To produce clean, readable trend lines, the chart pipeline applies multiple smoothing layers:</p>
+                        <ul class="method-list">
+                            <li><strong>Spike dampening:</strong> Per-candidate probability changes are capped at ±3 percentage points per 3-minute collection interval, preventing sudden jumps from thin-market trades or API glitches</li>
+                            <li><strong>Exponential Moving Average (EMA):</strong> Chart data is smoothed server-side with an EMA (alpha = 0.15) — each displayed point is 15% new value + 85% previous smoothed value</li>
+                            <li><strong>RDP simplification:</strong> The Ramer-Douglas-Peucker algorithm reduces thousands of raw data points to ~200-400 visually significant points, removing redundant noise</li>
+                            <li><strong>Monotone cubic interpolation:</strong> The frontend renders curves using monotone splines that prevent overshoot between data points</li>
+                        </ul>
+
+                        <h3>Update Frequency</h3>
+                        <ul class="method-list">
+                            <li><strong>Default:</strong> Every 3 minutes</li>
+                            <li><strong>Final 3 days before election:</strong> Every 1 minute</li>
+                            <li><strong>Election day:</strong> Every 1 minute</li>
+                        </ul>
+
+                        <p>Historical snapshots are saved with every update and aggregated hourly for clean trend visualization.</p>
+                    </div>
                 </div>
+            </div>
 
-                <h3>Soft Normalization (30% Strength)</h3>
-                <p>Final probabilities are lightly normalized to prevent excessive drift while preserving raw market values:</p>
-                <ul class="method-list">
-                    <li>Candidates with no Kalshi market (marked with *) use 100% of their Manifold probability</li>
-                    <li>Only 30% of the normalization adjustment is applied to each candidate</li>
-                    <li>70% of the raw aggregated value is preserved</li>
-                    <li>This keeps top candidates higher while preventing probabilities from summing to unrealistic totals</li>
-                </ul>
+            <!-- FOLDOUT 2: Forecast Model -->
+            <div class="method-foldout" id="foldout-model">
+                <button class="foldout-trigger" onclick="toggleFoldout('model')">
+                    <div class="foldout-trigger-left">
+                        <span class="foldout-icon" id="foldout-icon-model"></span>
+                        <div>
+                            <h2>Forecast Model</h2>
+                            <p class="foldout-desc">Multi-factor probabilistic model</p>
+                        </div>
+                    </div>
+                    <span class="foldout-arrow" id="foldout-arrow-model">+</span>
+                </button>
+                <div class="foldout-body" id="foldout-body-model">
+                    <div class="foldout-inner">
+                        <div class="coming-soon-block">
+                            <span class="coming-soon-icon">&#9881;</span>
+                            <h3>Coming Soon</h3>
+                            <p>The forecast model methodology will be published here once the model is live on the <a href="/odds">Model page</a>. It will incorporate prediction market data, fundraising metrics, endorsement signals, and historical primary patterns to generate win probabilities for each candidate.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <h3>Update Frequency</h3>
-                <ul class="method-list">
-                    <li><strong>Default:</strong> Every 3 minutes</li>
-                    <li><strong>Final 3 days before election:</strong> Every 1 minute</li>
-                    <li><strong>Election day:</strong> Every 1 minute</li>
-                </ul>
-
-                <p>Historical snapshots are saved with every update and aggregated hourly for clean trend visualization.</p>
-            </article>
+            <!-- FOLDOUT 3: Fundraising Analysis -->
+            <div class="method-foldout" id="foldout-fundraising">
+                <button class="foldout-trigger" onclick="toggleFoldout('fundraising')">
+                    <div class="foldout-trigger-left">
+                        <span class="foldout-icon" id="foldout-icon-fundraising"></span>
+                        <div>
+                            <h2>Fundraising Analysis</h2>
+                            <p class="foldout-desc">FEC filing data and financial metrics</p>
+                        </div>
+                    </div>
+                    <span class="foldout-arrow" id="foldout-arrow-fundraising">+</span>
+                </button>
+                <div class="foldout-body" id="foldout-body-fundraising">
+                    <div class="foldout-inner">
+                        <div class="coming-soon-block">
+                            <span class="coming-soon-icon">&#9881;</span>
+                            <h3>Coming Soon</h3>
+                            <p>The fundraising methodology will be published here once FEC filing data is integrated on the <a href="/fundraising">Fundraising page</a>. It will detail how we source, normalize, and visualize campaign finance data including total raised, cash on hand, donor counts, and burn rates from Federal Election Commission filings.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <article class="method-section contact-section">
                 <h2>Questions?</h2>
@@ -137,6 +208,214 @@
             padding: 0 2rem;
         }
 
+        /* ===== FOLDOUT STYLES ===== */
+        .method-foldout {
+            background: rgba(26, 26, 26, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(230, 126, 34, 0.3);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .foldout-trigger {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.8rem 2.2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            color: inherit;
+            transition: background 0.3s ease;
+        }
+
+        .foldout-trigger:hover {
+            background: rgba(230, 126, 34, 0.06);
+        }
+
+        .foldout-trigger-left {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .foldout-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: rgba(230, 126, 34, 0.15);
+            border: 1px solid rgba(230, 126, 34, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .foldout-trigger h2 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #e67e22;
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .foldout-desc {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.45);
+            margin: 0.2rem 0 0 0;
+            line-height: 1.4;
+        }
+
+        .foldout-arrow {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 300;
+            color: rgba(230, 126, 34, 0.6);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            flex-shrink: 0;
+            width: 30px;
+            text-align: center;
+            line-height: 1;
+        }
+
+        .foldout-arrow.open {
+            transform: rotate(45deg);
+        }
+
+        .foldout-body {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.5s cubic-bezier(0.34, 1.12, 0.64, 1),
+                        opacity 0.4s ease;
+            opacity: 0;
+        }
+
+        .foldout-body.open {
+            grid-template-rows: 1fr;
+            opacity: 1;
+        }
+
+        .foldout-inner {
+            overflow: hidden;
+            padding: 0 2.2rem;
+        }
+
+        .foldout-body.open .foldout-inner {
+            padding-bottom: 2.2rem;
+        }
+
+        .foldout-body .foldout-inner {
+            border-top: 1px solid rgba(230, 126, 34, 0.15);
+            padding-top: 0;
+            transition: padding-top 0.4s ease;
+        }
+
+        .foldout-body.open .foldout-inner {
+            padding-top: 1.8rem;
+        }
+
+        /* Active/open foldout border glow */
+        .method-foldout.active {
+            border-color: rgba(230, 126, 34, 0.5);
+            box-shadow: 0 0 20px rgba(230, 126, 34, 0.08);
+        }
+
+        /* ===== COMING SOON BLOCK ===== */
+        .coming-soon-block {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        .coming-soon-icon {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 0.8rem;
+            opacity: 0.4;
+        }
+
+        .coming-soon-block h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: rgba(230, 126, 34, 0.7);
+            margin-bottom: 0.8rem;
+        }
+
+        .coming-soon-block p {
+            color: rgba(255, 255, 255, 0.45);
+            max-width: 550px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .coming-soon-block a {
+            color: #e67e22;
+            text-decoration: underline;
+        }
+
+        /* ===== INNER CONTENT STYLES ===== */
+        .foldout-inner h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #e67e22;
+        }
+
+        .foldout-inner p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+            color: #c0c0c0;
+        }
+
+        .foldout-inner a {
+            color: #e67e22;
+            text-decoration: underline;
+        }
+
+        .foldout-inner a:hover {
+            opacity: 0.8;
+        }
+
+        .method-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 1rem 0;
+        }
+
+        .method-list li {
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+            line-height: 1.6;
+            color: #c0c0c0;
+        }
+
+        .method-list li:before {
+            content: "\2192";
+            position: absolute;
+            left: 0;
+            color: #e67e22;
+        }
+
+        .formula-box {
+            font-family: 'VT323', monospace;
+            background: rgba(230, 126, 34, 0.1);
+            border-left: 4px solid #e67e22;
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin: 1.5rem 0;
+            font-size: 1.1rem;
+            color: #e0e0e0;
+        }
+
+        /* ===== CONTACT SECTION ===== */
         .method-section {
             background: rgba(26, 26, 26, 0.5);
             backdrop-filter: blur(12px);
@@ -155,68 +434,49 @@
             color: #e67e22;
         }
 
-        .method-section h3 {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            color: #e67e22;
-        }
-
         .method-section p {
             margin-bottom: 1rem;
             line-height: 1.8;
             color: #c0c0c0;
         }
 
-        .method-list {
-            list-style: none;
-            padding-left: 0;
-            margin: 1rem 0;
-        }
-
-        .method-list li {
-            margin-bottom: 0.8rem;
-            padding-left: 1.5rem;
-            position: relative;
-            line-height: 1.6;
-            color: #c0c0c0;
-        }
-
-        .method-list li:before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: #e67e22;
-        }
-
-        .method-section a {
-            color: #e67e22;
-            text-decoration: underline;
-        }
-
-        .method-section a:hover {
-            opacity: 0.8;
-        }
-
-        .formula-box {
-            font-family: 'VT323', monospace;
-            background: rgba(230, 126, 34, 0.1);
-            border-left: 4px solid #e67e22;
-            padding: 1.5rem;
-            border-radius: 4px;
-            margin: 1.5rem 0;
-            font-size: 1.1rem;
-            color: #e0e0e0;
-        }
-
         .contact-section {
             border-color: rgba(230, 126, 34, 0.5);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .foldout-trigger {
+                padding: 1.2rem 1.4rem;
+            }
+            .foldout-trigger h2 {
+                font-size: 1.25rem;
+            }
+            .foldout-inner {
+                padding: 0 1.4rem;
+            }
+            .foldout-body.open .foldout-inner {
+                padding-bottom: 1.4rem;
+            }
+            .foldout-icon {
+                width: 36px;
+                height: 36px;
+            }
         }
     </style>
 
     <script>
+        function toggleFoldout(id) {
+            const body = document.getElementById('foldout-body-' + id);
+            const arrow = document.getElementById('foldout-arrow-' + id);
+            const foldout = document.getElementById('foldout-' + id);
+            const isOpen = body.classList.contains('open');
+
+            body.classList.toggle('open');
+            arrow.classList.toggle('open');
+            foldout.classList.toggle('active');
+        }
+
         // GRID BACKGROUND
         const canvas = document.getElementById('grid-canvas');
         const ctx = canvas.getContext('2d');
