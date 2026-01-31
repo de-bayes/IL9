@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Candle 1 -->
+  <!-- Wick -->
+  <rect x="10" y="8" width="4" height="40" fill="#C2410C"/>
+  <!-- Body -->
+  <rect x="8" y="20" width="8" height="20" fill="#F97316"/>
+  <!-- Close/Open line -->
+  <rect x="8" y="28" width="8" height="4" fill="#FDBA74"/>
+
+  <!-- Candle 2 -->
+  <rect x="26" y="14" width="4" height="36" fill="#9A3412"/>
+  <rect x="24" y="24" width="8" height="16" fill="#FB923C"/>
+  <rect x="24" y="28" width="8" height="4" fill="#FED7AA"/>
+
+  <!-- Candle 3 -->
+  <rect x="42" y="6" width="4" height="44" fill="#7C2D12"/>
+  <rect x="40" y="16" width="8" height="28" fill="#F97316"/>
+  <rect x="40" y="28" width="8" height="4" fill="#FDBA74"/>
+</svg>
