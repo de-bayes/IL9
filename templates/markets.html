@@ -228,17 +228,6 @@
                 </div>
             </section>
 
-            <!-- Email Alerts Section -->
-            <section class="email-alerts-section">
-                <h2>Get Email Alerts</h2>
-                <p class="alerts-description">Receive big swing alerts and a daily summary at 8 AM CT</p>
-                <form class="subscribe-form" id="subscribeForm" onsubmit="return handleSubscribe(event)">
-                    <input type="email" id="subscribeEmail" placeholder="your@email.com" required class="subscribe-input" />
-                    <button type="submit" class="subscribe-button">Subscribe</button>
-                </form>
-                <div id="subscribeMessage" class="subscribe-message"></div>
-            </section>
-
             <!-- Infrastructure Status -->
             <div class="status-section">
                 <h3>System Status</h3>
@@ -253,19 +242,30 @@
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Download Data Popup Modal -->
-        <div id="downloadModal" class="download-modal">
-            <div class="download-modal-overlay" onclick="closeDownloadModal()"></div>
-            <div class="download-modal-content">
-                <button class="download-modal-close" onclick="closeDownloadModal()">&times;</button>
+            <!-- Download Data Section -->
+            <section class="download-data-section">
                 <h2>Download Historical Data</h2>
-                <p class="download-modal-description">Get the complete historical snapshot data in JSONL format</p>
-                <a href="/api/download/snapshots" class="download-button" download onclick="closeDownloadModal()">
+                <p class="download-description">Download the complete historical snapshot data (JSONL format)</p>
+                <a href="/api/download/snapshots" class="download-button" download>
                     <span class="download-icon">⬇</span>
                     Download Data (JSONL)
                 </a>
+            </section>
+        </section>
+
+        <!-- Email Subscribe Popup Modal -->
+        <div id="emailModal" class="email-modal">
+            <div class="email-modal-overlay" onclick="closeEmailModal()"></div>
+            <div class="email-modal-content">
+                <button class="email-modal-close" onclick="closeEmailModal()">&times;</button>
+                <h2>Get Email Alerts</h2>
+                <p class="email-modal-description">Receive big swing alerts and a daily summary at 8 AM CT</p>
+                <form class="subscribe-form" id="subscribeFormModal" onsubmit="return handleSubscribeModal(event)">
+                    <input type="email" id="subscribeEmailModal" placeholder="your@email.com" required class="subscribe-input" />
+                    <button type="submit" class="subscribe-button">Subscribe</button>
+                </form>
+                <div id="subscribeMessageModal" class="subscribe-message"></div>
             </div>
         </div>
 
@@ -1444,8 +1444,8 @@
             color: #e74c3c;
         }
 
-        /* Download Modal Popup */
-        .download-modal {
+        /* Email Subscribe Modal Popup */
+        .email-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -1456,11 +1456,11 @@
             animation: fadeIn 0.3s ease-out;
         }
 
-        .download-modal.show {
+        .email-modal.show {
             display: block;
         }
 
-        .download-modal-overlay {
+        .email-modal-overlay {
             position: absolute;
             top: 0;
             left: 0;
@@ -1471,7 +1471,7 @@
             -webkit-backdrop-filter: blur(8px);
         }
 
-        .download-modal-content {
+        .email-modal-content {
             position: relative;
             max-width: 500px;
             margin: 15% auto;
@@ -1502,7 +1502,7 @@
             }
         }
 
-        .download-modal-close {
+        .email-modal-close {
             position: absolute;
             top: 16px;
             right: 16px;
@@ -1518,11 +1518,11 @@
             transition: color 0.2s ease;
         }
 
-        .download-modal-close:hover {
+        .email-modal-close:hover {
             color: #e67e22;
         }
 
-        .download-modal-content h2 {
+        .email-modal-content h2 {
             margin: 0 0 12px 0;
             font-size: 2rem;
             font-family: 'Cormorant Garamond', Georgia, serif;
@@ -1530,7 +1530,7 @@
             color: #e67e22;
         }
 
-        .download-modal-description {
+        .email-modal-description {
             margin: 0 0 24px 0;
             color: #a0a0a0;
             font-size: 0.95rem;
@@ -2658,19 +2658,60 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
     }
 
-    // Download Modal Logic
-    function closeDownloadModal() {
-        var modal = document.getElementById('downloadModal');
+    // Email Modal Logic
+    function closeEmailModal() {
+        var modal = document.getElementById('emailModal');
         modal.classList.remove('show');
-        localStorage.setItem('downloadModalDismissed', 'true');
+        localStorage.setItem('emailModalDismissed', 'true');
     }
 
-    // Show download modal after 3 seconds if not previously dismissed
+    function handleSubscribeModal(e) {
+        e.preventDefault();
+        var email = document.getElementById('subscribeEmailModal').value;
+        var btn = e.target.querySelector('.subscribe-button');
+        var msg = document.getElementById('subscribeMessageModal');
+        btn.disabled = true;
+        btn.textContent = 'Subscribing...';
+        msg.textContent = '';
+        msg.className = 'subscribe-message';
+
+        fetch('/api/subscribe', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email: email})
+        })
+        .then(function(r) { return r.json().then(function(d) { return {ok: r.ok, data: d}; }); })
+        .then(function(result) {
+            if (result.ok) {
+                msg.textContent = result.data.message || 'Subscribed!';
+                msg.className = 'subscribe-message success';
+                document.getElementById('subscribeEmailModal').value = '';
+                setTimeout(function() {
+                    closeEmailModal();
+                }, 2000);
+            } else {
+                msg.textContent = result.data.error || 'Something went wrong.';
+                msg.className = 'subscribe-message error';
+            }
+        })
+        .catch(function() {
+            msg.textContent = 'Network error. Please try again.';
+            msg.className = 'subscribe-message error';
+        })
+        .finally(function() {
+            btn.disabled = false;
+            btn.textContent = 'Subscribe';
+        });
+
+        return false;
+    }
+
+    // Show email modal after 3 seconds if not previously dismissed
     window.addEventListener('load', function() {
-        var dismissed = localStorage.getItem('downloadModalDismissed');
+        var dismissed = localStorage.getItem('emailModalDismissed');
         if (!dismissed) {
             setTimeout(function() {
-                document.getElementById('downloadModal').classList.add('show');
+                document.getElementById('emailModal').classList.add('show');
             }, 3000);
         }
     });
@@ -2678,7 +2719,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Close modal on Escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            closeDownloadModal();
+            closeEmailModal();
         }
     });
     </script>
