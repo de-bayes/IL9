@@ -20,34 +20,6 @@ body.dark-mode {
     color: #e0e0e0;
 }
 
-/* Header Overlay - Solid background on top of grid canvas */
-#header-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 120px;
-    background: #1a1a1a;
-    z-index: 100;
-    pointer-events: none;
-}
-
-body:not(.dark-mode) #header-overlay {
-    background: #ffffff;
-}
-
-@media (max-width: 600px) {
-    #header-overlay {
-        height: 100px;
-    }
-}
-
-@media (max-width: 480px) {
-    #header-overlay {
-        height: 90px;
-    }
-}
-
 body.dark-mode .logo {
     color: #e0e0e0;
 }
