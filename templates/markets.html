@@ -1349,26 +1349,16 @@ function updateStatusBadges(manifoldTime, kalshiTime) {
     const now = Date.now();
     const staleThreshold = 5 * 60 * 1000; // 5 minutes
 
-    // Manifold status
+    // Manifold status - always show as vivid
     const manifoldBadge = document.getElementById('manifoldBadge');
-    if (manifoldTime) {
-        const manifoldAge = now - manifoldTime;
-        if (manifoldAge < staleThreshold) {
-            manifoldBadge.style.opacity = '1';
-        } else {
-            manifoldBadge.style.opacity = '0.5';
-        }
+    if (manifoldBadge) {
+        manifoldBadge.style.opacity = '1';
     }
 
-    // Kalshi status
+    // Kalshi status - always show as vivid
     const kalshiBadge = document.getElementById('kalshiBadge');
-    if (kalshiTime) {
-        const kalshiAge = now - kalshiTime;
-        if (kalshiAge < staleThreshold) {
-            kalshiBadge.style.opacity = '1';
-        } else {
-            kalshiBadge.style.opacity = '0.5';
-        }
+    if (kalshiBadge) {
+        kalshiBadge.style.opacity = '1';
     }
 
     // Railway is always live
