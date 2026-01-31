@@ -332,92 +332,42 @@
             icon.textContent = content.classList.contains('hidden') ? '▼' : '▲';
         }
 
-        // GRID BACKGROUND
+        // GRID BACKGROUND - Static, no mouse interaction
         const canvas = document.getElementById('grid-canvas');
         const ctx = canvas.getContext('2d');
-        let mouseX = -1000, mouseY = -1000;
-        let targetMouseX = -1000, targetMouseY = -1000;
-        const gridSize = 40, influence = 280, maxDisplacement = 15, smoothing = 0.06;
-        let pointsState = null;
+        const gridSize = 40;
+        const gridOffset = 120; // Shift grid down to clear header area
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            pointsState = null;
+            drawGrid();
         }
 
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        document.addEventListener('mousemove', (e) => {
-            targetMouseX = e.clientX;
-            targetMouseY = e.clientY;
-        });
-
-        document.addEventListener('mouseleave', () => {
-            targetMouseX = targetMouseY = -1000;
-        });
-
         function drawGrid() {
-            mouseX += (targetMouseX - mouseX) * smoothing;
-            mouseY += (targetMouseY - mouseY) * smoothing;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.055)';
             ctx.lineWidth = 1;
-            const cols = Math.ceil(canvas.width / gridSize) + 1;
-            const rows = Math.ceil(canvas.height / gridSize) + 1;
 
-            if (!pointsState || pointsState.length !== rows + 1) {
-                pointsState = [];
-                for (let row = 0; row <= rows; row++) {
-                    pointsState[row] = [];
-                    for (let col = 0; col <= cols; col++) {
-                        pointsState[row][col] = { x: col * gridSize, y: row * gridSize };
-                    }
-                }
-            }
-
-            for (let row = 0; row <= rows; row++) {
-                for (let col = 0; col <= cols; col++) {
-                    const baseX = col * gridSize, baseY = row * gridSize;
-                    let targetX = baseX, targetY = baseY;
-                    const dx = baseX - mouseX, dy = baseY - mouseY;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-
-                    if (dist < influence && dist > 0) {
-                        const falloff = 1 - dist / influence;
-                        const force = falloff * falloff * falloff * maxDisplacement;
-                        const angle = Math.atan2(dy, dx);
-                        targetX = baseX + Math.cos(angle) * force;
-                        targetY = baseY + Math.sin(angle) * force;
-                    }
-
-                    pointsState[row][col].x += (targetX - pointsState[row][col].x) * 0.06;
-                    pointsState[row][col].y += (targetY - pointsState[row][col].y) * 0.06;
-                }
-            }
-
-            for (let row = 0; row <= rows; row++) {
+            // Draw horizontal lines
+            for (let y = gridOffset; y < canvas.height; y += gridSize) {
                 ctx.beginPath();
-                ctx.moveTo(pointsState[row][0].x, pointsState[row][0].y);
-                for (let col = 1; col <= cols; col++) {
-                    const prev = pointsState[row][col - 1], curr = pointsState[row][col];
-                    ctx.quadraticCurveTo(prev.x, prev.y, (prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
-                }
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
                 ctx.stroke();
             }
 
-            for (let col = 0; col <= cols; col++) {
+            // Draw vertical lines
+            for (let x = 0; x < canvas.width; x += gridSize) {
                 ctx.beginPath();
-                ctx.moveTo(pointsState[0][col].x, pointsState[0][col].y);
-                for (let row = 1; row <= rows; row++) {
-                    const prev = pointsState[row - 1][col], curr = pointsState[row][col];
-                    ctx.quadraticCurveTo(prev.x, prev.y, (prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
-                }
+                ctx.moveTo(x, gridOffset);
+                ctx.lineTo(x, canvas.height);
                 ctx.stroke();
             }
-
-            requestAnimationFrame(drawGrid);
         }
 
         drawGrid();
