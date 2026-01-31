@@ -184,6 +184,116 @@
                 </div>
             </div>
 
+            <!-- FOLDOUT 4: Infrastructure & Technical Details -->
+            <div class="method-foldout" id="foldout-infra">
+                <button class="foldout-trigger" onclick="toggleFoldout('infra')">
+                    <div class="foldout-trigger-left">
+                        <span class="foldout-icon" id="foldout-icon-infra"></span>
+                        <div>
+                            <h2>Infrastructure &amp; Technical Stack</h2>
+                            <p class="foldout-desc">Railway, JSONL storage, and the data pipeline under the hood</p>
+                        </div>
+                    </div>
+                    <span class="foldout-arrow" id="foldout-arrow-infra">+</span>
+                </button>
+                <div class="foldout-body" id="foldout-body-infra">
+                    <div class="foldout-inner">
+
+                        <p>IL9Cast is a pretty lean operation — a single Python app running on Railway that does everything from fetching market data to serving the website. Here's how it all fits together.</p>
+
+                        <h3>The Cloud Setup</h3>
+                        <p>We run on <strong>Railway</strong>, which is a platform-as-a-service that deploys straight from GitHub. Every time we push code to the <code>main</code> branch, Railway automatically builds and deploys a new version using Nixpacks (their build system). The whole deploy cycle takes about 30 seconds.</p>
+                        <p>The app runs behind <strong>Gunicorn</strong>, a production-grade Python WSGI server. We use the <code>--preload</code> flag, which is important — it loads the app once in memory before forking workers, so our background data collector only starts a single thread instead of duplicating itself across workers. Without that flag, you'd get multiple scrapers all writing to the same file at the same time, which is a recipe for corrupted data.</p>
+                        <p>Here's the key configuration from <code>railway.toml</code>:</p>
+                        <div class="formula-box" style="font-size: 0.95rem;">
+                            startCommand = "gunicorn app:app --preload"<br>
+                            healthcheckPath = "/"<br>
+                            restartPolicyType = "ON_FAILURE"<br>
+                            restartPolicyMaxRetries = 10
+                        </div>
+                        <p>That restart policy is our safety net. If the app crashes — maybe a dependency breaks, maybe Railway has a hiccup — it'll automatically restart up to 10 times before giving up. In practice, it almost never needs more than one.</p>
+
+                        <h3>Persistent Storage (the tricky part)</h3>
+                        <p>Railway containers are ephemeral by default — when the app redeploys, everything on the filesystem gets wiped. That's fine for code, but our historical data needs to survive between deploys. So we use a <strong>Railway persistent volume</strong> mounted at <code>/app/data</code>.</p>
+                        <p>When the app boots up, it runs a path resolution function that checks, in order: <code>/data</code>, <code>/app/data</code>, then falls back to a local <code>data/</code> directory. This means the same code works on Railway (where the volume lives at <code>/app/data</code>) and on a developer's laptop (where it just uses the local folder). No environment variables, no conditional imports — just a directory check.</p>
+
+                        <h3>Why JSONL (and not a database)</h3>
+                        <p>You might wonder why we're storing data in a flat file instead of PostgreSQL or SQLite. Honestly? For our use case, JSONL is better.</p>
+                        <p><strong>JSONL</strong> (JSON Lines) means one JSON object per line. Every 3 minutes, the scraper appends a single line to the file — that's it. No connection pools, no schema migrations, no ORM overhead. The file is human-readable (you can literally <code>tail</code> it to see the latest data), and if a line gets corrupted, every other line is still perfectly valid. Try saying that about a SQLite database after a partial write.</p>
+                        <p>The append operation is actually a bit more careful than a simple file write:</p>
+                        <ul class="method-list">
+                            <li><strong>Write to a temp file first</strong> — the new snapshot goes to <code>historical_snapshots.jsonl.tmp</code></li>
+                            <li><strong>Copy existing content + new line</strong> — both old data and the new snapshot get written to the temp file</li>
+                            <li><strong>Atomic replace</strong> — <code>os.replace()</code> swaps the temp file into place in a single filesystem operation. If the app crashes mid-write, either the old file or the new file exists — never a half-written mess</li>
+                        </ul>
+                        <p>At 480 snapshots per day (~3 KB each), the file grows at roughly 1.4 MB/day. After a full election cycle, we're looking at maybe 70 MB total. That's nothing — your phone has thousands of times more storage. A database would be overkill here.</p>
+
+                        <h3>The Data Collection Loop</h3>
+                        <p>Every 3 minutes, a background thread wakes up and runs our <code>collect_market_data()</code> function. Here's what happens in those few hundred milliseconds:</p>
+                        <ul class="method-list">
+                            <li><strong>1. Fetch Manifold</strong> — HTTP GET to their public API. Returns JSON with each candidate's probability (0.0–1.0 scale, which we multiply by 100). Timeout: 10 seconds.</li>
+                            <li><strong>2. Fetch Kalshi</strong> — HTTP GET to their trade API. Returns an array of markets, each with <code>last_price</code>, <code>yes_bid</code>, and <code>yes_ask</code>. Same 10-second timeout.</li>
+                            <li><strong>3. Normalize names</strong> — Manifold calls her "Kat Abughazaleh" and Kalshi calls her "Katheryn Abughazaleh." We strip prefixes, suffixes, and known variations to get a canonical key for matching.</li>
+                            <li><strong>4. Aggregate</strong> — Apply the 40/42/12/6 weighted formula (see the Markets Aggregation section above).</li>
+                            <li><strong>5. Soft normalize</strong> — Nudge probabilities 30% toward summing to 100%, so the chart doesn't show the race at 130% or 80% total.</li>
+                            <li><strong>6. Spike dampen</strong> — Compare to the previous snapshot. If any candidate moved more than ±3 percentage points, clamp the change. This prevents chart artifacts from thin-market Kalshi trades.</li>
+                            <li><strong>7. Save</strong> — Atomically append to the JSONL file.</li>
+                        </ul>
+                        <p>If <em>both</em> APIs fail (say Manifold is down and Kalshi returns an error), we skip the snapshot entirely. Bad data is worse than missing data — the chart just won't have a point for that 3-minute window, and the gap detection handles it gracefully.</p>
+
+                        <h3>The Scheduler Problem</h3>
+                        <p>Running a background task alongside a web server sounds simple, but there's a subtle gotcha. When you run Flask locally, you get one process — easy. But Gunicorn can spawn multiple worker processes, and each one would try to run its own scheduler. That means two workers = two scrapers = double the data (and double the API calls).</p>
+                        <p>We solve this two ways depending on the environment:</p>
+                        <ul class="method-list">
+                            <li><strong>Local development:</strong> Uses APScheduler's <code>BackgroundScheduler</code>, which runs the job in a background thread within the single Flask process.</li>
+                            <li><strong>Production (Gunicorn):</strong> Detects Gunicorn via <code>sys.argv[0]</code> and instead spins up a plain <code>threading.Thread</code> in daemon mode. The <code>--preload</code> flag ensures this thread is created once in the master process before workers fork, so only one thread ever exists.</li>
+                        </ul>
+
+                        <h3>Chart Data Pipeline</h3>
+                        <p>When you load the Markets page, your browser hits <code>/api/snapshots/chart?period=1d</code> (or <code>7d</code> or <code>all</code>). Here's what the server does before sending data back:</p>
+                        <ul class="method-list">
+                            <li><strong>Cache check</strong> — We keep a 60-second in-memory cache. If the same period was requested within the last minute, we serve the cached version instantly.</li>
+                            <li><strong>Load &amp; filter</strong> — Read all snapshots from the JSONL file, parse timestamps, sort chronologically, and filter to the requested time window.</li>
+                            <li><strong>Gap detection</strong> — Scan consecutive timestamps for gaps &gt; 2 hours. These become the dashed-line segments on the chart — they represent real outages (Railway restarts, AWS issues), not normal 3-minute intervals.</li>
+                            <li><strong>EMA smoothing</strong> — Run an exponential moving average (alpha = 0.15) across each candidate's probability series. This is the biggest smoothing step — each data point becomes 15% raw value + 85% previous smoothed value, which kills jitter while preserving genuine trends.</li>
+                            <li><strong>RDP simplification</strong> — The Ramer-Douglas-Peucker algorithm finds which points you can remove without changing the visual shape of the line (within an epsilon tolerance of 0.5 percentage points). A week of data at 3-minute intervals = ~3,360 points per candidate. After RDP, that drops to maybe 200–400 points. Your browser thanks us.</li>
+                        </ul>
+                        <p>The RDP algorithm is actually kind of elegant. Imagine drawing a straight line from the first data point to the last. Now find whichever intermediate point is farthest from that line. If it's farther than epsilon, that point matters — keep it, and recursively check both halves. If it's closer than epsilon, the whole segment is "flat enough" to represent with just the endpoints. It's O(n log n) on average and perfectly preserves peaks, valleys, and inflection points while throwing away the boring flat stretches.</p>
+
+                        <h3>The Frontend Rendering</h3>
+                        <p>The chart itself is rendered with <strong>Chart.js</strong> using a time-scaled x-axis. The data comes in as <code>{x: timestamp, y: probability}</code> pairs, and Chart.js handles the rest. A few important settings:</p>
+                        <ul class="method-list">
+                            <li><strong>Monotone cubic interpolation</strong> — This is the <code>cubicInterpolationMode: 'monotone'</code> setting. Regular cubic splines can "overshoot" — if a candidate goes from 60% to 62%, a regular spline might draw a curve that briefly dips to 59% between the points. Monotone splines guarantee the curve never exceeds the actual data values. No fake dips, no fake peaks.</li>
+                            <li><strong>Tension 0.5</strong> — Controls how curvy the lines are. At 0 you get straight segments (ugly). At 1 you get maximally curvy (too smooth, hides real movement). 0.5 is the sweet spot.</li>
+                            <li><strong>Central Time display</strong> — All timestamps are stored in UTC but displayed in Central Time (America/Chicago) using <code>Intl.DateTimeFormat</code>. This handles daylight saving transitions automatically — no hardcoded offsets.</li>
+                            <li><strong>Segment styling for gaps</strong> — Chart.js lets you style individual line segments. For each segment, we check if the two endpoints span a known gap period. If they do, the segment gets dashed and faded. This is done per-frame via a callback, so it works even when you zoom or pan.</li>
+                        </ul>
+
+                        <h3>What Could Go Wrong (and what we do about it)</h3>
+                        <p>A few things have bitten us before, so we built defenses:</p>
+                        <ul class="method-list">
+                            <li><strong>API timeouts:</strong> Both Manifold and Kalshi calls have 10-second timeouts. If they're slow, we fail fast instead of blocking the scheduler thread.</li>
+                            <li><strong>Partial API failure:</strong> If only one API goes down, we still collect what we can, but spike dampening prevents the sudden weight shift from creating chart artifacts.</li>
+                            <li><strong>Railway restarts:</strong> The persistent volume survives container restarts. When the app boots, it checks for existing data and picks up where it left off.</li>
+                            <li><strong>Corrupt JSONL lines:</strong> The reader skips unparseable lines and logs a warning. One bad line doesn't take down the whole dataset — that's the beauty of line-delimited formats.</li>
+                            <li><strong>Duplicate schedulers:</strong> The Gunicorn <code>--preload</code> + <code>sys.argv</code> detection ensures exactly one scraper thread exists in production.</li>
+                        </ul>
+
+                        <h3>Dependencies</h3>
+                        <p>The whole app runs on five Python packages:</p>
+                        <div class="formula-box" style="font-size: 0.95rem;">
+                            Flask 2.3.2 &nbsp;&mdash;&nbsp; web framework<br>
+                            Werkzeug 2.3.6 &nbsp;&mdash;&nbsp; WSGI utilities (Flask dependency)<br>
+                            Requests 2.31.0 &nbsp;&mdash;&nbsp; HTTP client for API calls<br>
+                            Gunicorn 21.2.0 &nbsp;&mdash;&nbsp; production WSGI server<br>
+                            APScheduler 3.10.4 &nbsp;&mdash;&nbsp; background job scheduling (dev mode)
+                        </div>
+                        <p>No NumPy, no Pandas, no heavyweight data libraries. The EMA, RDP, and aggregation math are all hand-written in ~100 lines of plain Python. For a project that processes a few hundred data points, there's no reason to import a 30 MB library.</p>
+
+                    </div>
+                </div>
+            </div>
+
             <article class="method-section contact-section">
                 <h2>Questions?</h2>
                 <p>IL9Cast's prediction market aggregation is maintained by <strong>Ryan McComb</strong>, a student at ETHS, as an educational project to help voters understand real-time sentiment in the Illinois 9th Democratic Primary race.</p>
