@@ -206,6 +206,38 @@ p {
     display: none;
 }
 
+/* GitHub Link */
+.github-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    color: var(--text-secondary);
+    transition: color 0.3s ease, opacity 0.3s ease;
+    margin-left: 1rem;
+}
+
+.github-link svg {
+    width: 24px;
+    height: 24px;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.github-link:hover {
+    color: var(--accent);
+}
+
+.github-link:hover svg {
+    opacity: 1;
+}
+
+.github-link::after {
+    display: none;
+}
+
 .nav-dropdown {
     position: relative;
 }

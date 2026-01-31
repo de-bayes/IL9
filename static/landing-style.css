@@ -97,6 +97,42 @@ nav a:hover, nav a.active {
     color: #000000;
 }
 
+/* GitHub Link */
+nav a.github-link {
+    margin-left: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    color: #555555;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+nav a.github-link svg {
+    width: 24px;
+    height: 24px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+nav a.github-link:hover {
+    color: #e67e22;
+}
+
+nav a.github-link:hover svg {
+    opacity: 1;
+}
+
+body.dark-mode nav a.github-link {
+    color: #a0a0a0;
+}
+
+body.dark-mode nav a.github-link:hover {
+    color: #e67e22;
+}
+
 /* HERO */
 .hero {
     max-width: 900px;
