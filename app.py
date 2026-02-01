@@ -785,10 +785,13 @@ def fetch_fec_candidate_data(candidate_name):
         total_spent = result.get('disbursements', 0)
         cash_on_hand = result.get('last_cash_on_hand_end_period', 0)
 
-        # FEC doesn't provide donor count in totals - estimate from contribution amounts
-        # Average small donor ~$50, large donor ~$500
-        unitemized = result.get('individual_unitemized_contributions', 0)  # < $200
+        # Individual contributions breakdown (for small dollar %)
+        individual_total = result.get('individual_contributions', 0)
+        unitemized = result.get('individual_unitemized_contributions', 0)  # < $200 (small dollar)
         itemized = result.get('individual_itemized_contributions', 0)      # >= $200
+
+        # Estimate donor count (FEC doesn't provide exact count)
+        # Average small donor ~$50, large donor ~$500
         estimated_donors = int((unitemized / 50) + (itemized / 500)) if (unitemized + itemized) > 0 else 0
 
         return {
@@ -798,6 +801,7 @@ def fetch_fec_candidate_data(candidate_name):
             'cash_on_hand': cash_on_hand,
             'total_donors': estimated_donors,
             'small_dollar_amount': unitemized,
+            'individual_total': individual_total,  # Used for small dollar % calculation
             'coverage_end_date': result.get('coverage_end_date', '')
         }
     except Exception as e:
@@ -867,9 +871,12 @@ def fetch_all_fec_data():
                 data['spent_pct_of_raised'] = 0
                 data['avg_contribution'] = 0
 
-            if data.get('total_raised', 0) > 0:
+            # Small dollar % should be calculated against individual contributions, not total receipts
+            # (Total receipts includes PAC money, transfers, etc.)
+            individual_total = data.get('individual_total', 0)
+            if individual_total > 0:
                 small_dollar = data.get('small_dollar_amount', 0)
-                data['small_dollar_pct'] = (small_dollar / data['total_raised']) * 100
+                data['small_dollar_pct'] = (small_dollar / individual_total) * 100
             else:
                 data['small_dollar_pct'] = 0
 
