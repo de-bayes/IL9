@@ -233,6 +233,13 @@
                 <p class="alerts-description">Receive big swing alerts and a daily summary at 8 AM CT</p>
                 <form class="subscribe-form" id="subscribeForm" onsubmit="return handleSubscribe(event)">
                     <input type="email" id="subscribeEmail" placeholder="your@email.com" required class="subscribe-input" />
+                    <select id="subscribeThreshold" class="subscribe-threshold">
+                        <option value="2">Alert at 2%+ moves</option>
+                        <option value="3">Alert at 3%+ moves</option>
+                        <option value="5" selected>Alert at 5%+ moves</option>
+                        <option value="7">Alert at 7%+ moves</option>
+                        <option value="10">Alert at 10%+ moves</option>
+                    </select>
                     <button type="submit" class="subscribe-button">Subscribe</button>
                 </form>
                 <div id="subscribeMessage" class="subscribe-message"></div>
@@ -256,11 +263,17 @@
             <!-- Download Data Section -->
             <section class="download-data-section">
                 <h2>Download Historical Data</h2>
-                <p class="download-description">Download the complete historical snapshot data (JSONL format)</p>
-                <a href="/api/download/snapshots" class="download-button" download>
-                    <span class="download-icon">⬇</span>
-                    Download Data (JSONL)
-                </a>
+                <p class="download-description">Download the complete historical snapshot data in your preferred format</p>
+                <div class="download-buttons">
+                    <a href="/api/download/snapshots/csv" class="download-button" download>
+                        <span class="download-icon">⬇</span>
+                        Download CSV
+                    </a>
+                    <a href="/api/download/snapshots" class="download-button download-button-secondary" download>
+                        <span class="download-icon">⬇</span>
+                        Download JSONL
+                    </a>
+                </div>
             </section>
         </section>
 
@@ -273,6 +286,13 @@
                 <p class="email-modal-description">Receive big swing alerts and a daily summary at 8 AM CT</p>
                 <form class="subscribe-form" id="subscribeFormModal" onsubmit="return handleSubscribeModal(event)">
                     <input type="email" id="subscribeEmailModal" placeholder="your@email.com" required class="subscribe-input" />
+                    <select id="subscribeThresholdModal" class="subscribe-threshold">
+                        <option value="2">Alert at 2%+ moves</option>
+                        <option value="3">Alert at 3%+ moves</option>
+                        <option value="5" selected>Alert at 5%+ moves</option>
+                        <option value="7">Alert at 7%+ moves</option>
+                        <option value="10">Alert at 10%+ moves</option>
+                    </select>
                     <button type="submit" class="subscribe-button">Subscribe</button>
                 </form>
                 <div id="subscribeMessageModal" class="subscribe-message"></div>
@@ -1334,6 +1354,13 @@
             font-size: 0.95rem;
         }
 
+        .download-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
         .download-button {
             display: inline-flex;
             align-items: center;
@@ -1358,6 +1385,19 @@
 
         .download-icon {
             font-size: 1.2rem;
+        }
+
+        .download-button-secondary {
+            background: rgba(230, 126, 34, 0.1);
+            border: 2px solid #e67e22;
+            color: #e67e22;
+        }
+
+        .download-button-secondary:hover {
+            background: rgba(230, 126, 34, 0.2);
+            border-color: #d35400;
+            color: #d35400;
+            box-shadow: 0 4px 12px rgba(230, 126, 34, 0.2);
         }
 
         /* Email Alerts Section */
@@ -1413,6 +1453,25 @@
 
         .subscribe-input::placeholder {
             color: #666;
+        }
+
+        .subscribe-threshold {
+            padding: 0.75rem 1rem;
+            border: 1px solid #444;
+            border-radius: 6px;
+            background: #2a2a2a;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            width: 200px;
+            max-width: 100%;
+            outline: none;
+            transition: border-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .subscribe-threshold:focus {
+            border-color: #e67e22;
         }
 
         .subscribe-button {
@@ -2633,6 +2692,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleSubscribe(e) {
         e.preventDefault();
         var email = document.getElementById('subscribeEmail').value;
+        var threshold = parseFloat(document.getElementById('subscribeThreshold').value);
         var btn = document.querySelector('.subscribe-button');
         var msg = document.getElementById('subscribeMessage');
         btn.disabled = true;
@@ -2643,7 +2703,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch('/api/subscribe', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email: email})
+            body: JSON.stringify({email: email, threshold: threshold})
         })
         .then(function(r) { return r.json().then(function(d) { return {ok: r.ok, data: d}; }); })
         .then(function(result) {
@@ -2678,6 +2738,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleSubscribeModal(e) {
         e.preventDefault();
         var email = document.getElementById('subscribeEmailModal').value;
+        var threshold = parseFloat(document.getElementById('subscribeThresholdModal').value);
         var btn = e.target.querySelector('.subscribe-button');
         var msg = document.getElementById('subscribeMessageModal');
         btn.disabled = true;
@@ -2688,7 +2749,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch('/api/subscribe', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email: email})
+            body: JSON.stringify({email: email, threshold: threshold})
         })
         .then(function(r) { return r.json().then(function(d) { return {ok: r.ok, data: d}; }); })
         .then(function(result) {

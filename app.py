@@ -218,9 +218,15 @@ def read_subscribers():
         pass
     return subscribers
 
-def add_subscriber(email):
+def add_subscriber(email, threshold=5.0):
     """Add a subscriber. Returns unsub token. Raises ValueError if duplicate."""
     email = email.lower().strip()
+    threshold = float(threshold) if threshold else 5.0
+
+    # Validate threshold range
+    if threshold < 1.0 or threshold > 20.0:
+        raise ValueError('Threshold must be between 1% and 20%')
+
     existing = read_subscribers()
     for sub in existing:
         if sub.get('email') == email:
@@ -228,6 +234,7 @@ def add_subscriber(email):
 
     record = {
         'email': email,
+        'threshold': threshold,
         'subscribed_at': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
     }
 
@@ -307,7 +314,7 @@ def send_email(to, subject, html, text=None):
         print(f"[{datetime.now().isoformat()}] Email error: {e}")
         return False
 
-def send_welcome_email(email):
+def send_welcome_email(email, threshold=5.0):
     """Send welcome email to new subscriber."""
     token = make_unsub_token(email)
     unsub_url = f"{request.host_url}unsubscribe?email={email}&token={token}"
@@ -319,7 +326,7 @@ Welcome to IL9Cast Alerts!
 You'll now receive:
 
 ⚡ Big Swing Alerts
-Get notified immediately when any candidate moves 5%+ in the prediction markets
+Get notified immediately when any candidate moves {threshold:.1f}%+ in the prediction markets
 
 📊 Daily Summary
 Every morning at 8 AM CT: current standings and 24-hour changes
@@ -359,7 +366,7 @@ Unsubscribe: {unsub_url}
                                         <td style="padding: 20px;">
                                             <div style="color: #e67e22; font-size: 24px; margin-bottom: 8px;">⚡</div>
                                             <h3 style="margin: 0 0 8px 0; color: #e0e0e0; font-size: 18px; font-weight: 600;">Big Swing Alerts</h3>
-                                            <p style="margin: 0; color: #a0a0a0; font-size: 14px; line-height: 1.6;">Get notified immediately when any candidate moves 5%+ in the prediction markets</p>
+                                            <p style="margin: 0; color: #a0a0a0; font-size: 14px; line-height: 1.6;">Get notified immediately when any candidate moves {threshold:.1f}%+ in the prediction markets</p>
                                         </td>
                                     </tr>
                                 </table>
@@ -406,14 +413,15 @@ Unsubscribe: {unsub_url}
     send_email(email, '⚡ Welcome to IL9Cast Alerts', html, text)
 
 def check_swings_and_alert(new_snapshot, prev_snapshot):
-    """Compare snapshots and send alerts if any candidate moved 5%+. 60-min debounce per candidate."""
+    """Compare snapshots and send alerts based on each subscriber's threshold. 60-min debounce per candidate."""
     if not prev_snapshot:
         return
 
     prev_by_name = {c['name']: c['probability'] for c in prev_snapshot.get('candidates', [])}
     now_ts = _time.time()
-    swings = []
 
+    # Calculate all deltas
+    all_swings = []
     for c in new_snapshot.get('candidates', []):
         name = c['name']
         new_prob = c['probability']
@@ -421,27 +429,42 @@ def check_swings_and_alert(new_snapshot, prev_snapshot):
         if old_prob is None:
             continue
         delta = new_prob - old_prob
-        if abs(delta) >= SWING_THRESHOLD:
-            # Check 60-minute debounce
-            last_alert = _swing_debounce.get(name, 0)
-            if now_ts - last_alert < 3600:
-                print(f"[{datetime.now().isoformat()}] Swing alert debounced for {name} ({delta:+.1f}%)")
-                continue
-            _swing_debounce[name] = now_ts
-            swings.append({
+        if abs(delta) >= 1.0:  # Only track swings >= 1% (minimum threshold)
+            all_swings.append({
                 'name': name,
                 'old': old_prob,
                 'new': new_prob,
                 'delta': delta
             })
 
-    if swings:
-        send_swing_alerts(swings)
+    if not all_swings:
+        return
 
-def send_swing_alerts(swings):
-    """Build and send swing alert emails to all subscribers."""
+    # Send alerts to each subscriber based on their threshold
     subscribers = read_subscribers()
-    if not subscribers:
+    for sub in subscribers:
+        email = sub['email']
+        threshold = sub.get('threshold', 5.0)
+
+        # Filter swings that meet this subscriber's threshold
+        subscriber_swings = []
+        for swing in all_swings:
+            if abs(swing['delta']) >= threshold:
+                # Check 60-minute debounce (per candidate, globally)
+                last_alert = _swing_debounce.get(swing['name'], 0)
+                if now_ts - last_alert < 3600:
+                    continue
+                subscriber_swings.append(swing)
+
+        if subscriber_swings:
+            # Update debounce for all candidates we're alerting about
+            for swing in subscriber_swings:
+                _swing_debounce[swing['name']] = now_ts
+            send_swing_alert_to_subscriber(email, subscriber_swings)
+
+def send_swing_alert_to_subscriber(email, swings):
+    """Build and send swing alert email to a single subscriber."""
+    if not swings:
         return
 
     # Build plain text version
@@ -476,83 +499,81 @@ View Live Markets: {request.host_url}markets
 
     subject = f"⚡ IL9Cast Alert: {swings[0]['name']} {'+' if swings[0]['delta'] > 0 else ''}{swings[0]['delta']:.1f}%"
     if len(swings) > 1:
-        subject = f"⚡ IL9Cast Alert: {len(swings)} candidates moved 5%+"
+        subject = f"⚡ IL9Cast Alert: {len(swings)} candidates moved significantly"
 
-    for sub in subscribers:
-        email = sub['email']
-        token = make_unsub_token(email)
-        unsub_url = f"{request.host_url}unsubscribe?email={email}&token={token}"
+    token = make_unsub_token(email)
+    unsub_url = f"{request.host_url}unsubscribe?email={email}&token={token}"
 
-        html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        </head>
-        <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;">
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0a0a0a;">
-                <tr>
-                    <td align="center" style="padding: 40px 20px;">
-                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #1a1a1a; border: 2px solid #e67e22; border-radius: 12px;">
-                            <!-- Badge -->
-                            <tr>
-                                <td style="padding: 32px 40px 0 40px; text-align: center;">
-                                    <div style="display: inline-block; background-color: #e67e22; color: #ffffff; padding: 8px 20px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
-                                        ⚡ BIG SWING DETECTED
-                                    </div>
-                                </td>
-                            </tr>
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0a0a0a;">
+            <tr>
+                <td align="center" style="padding: 40px 20px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #1a1a1a; border: 2px solid #e67e22; border-radius: 12px;">
+                        <!-- Badge -->
+                        <tr>
+                            <td style="padding: 32px 40px 0 40px; text-align: center;">
+                                <div style="display: inline-block; background-color: #e67e22; color: #ffffff; padding: 8px 20px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
+                                    ⚡ BIG SWING DETECTED
+                                </div>
+                            </td>
+                        </tr>
 
-                            <!-- Header -->
-                            <tr>
-                                <td style="padding: 24px 40px 32px 40px; text-align: center;">
-                                    <h1 style="margin: 0; color: #e67e22; font-size: 26px; font-weight: 700;">Market Movement Alert</h1>
-                                </td>
-                            </tr>
+                        <!-- Header -->
+                        <tr>
+                            <td style="padding: 24px 40px 32px 40px; text-align: center;">
+                                <h1 style="margin: 0; color: #e67e22; font-size: 26px; font-weight: 700;">Market Movement Alert</h1>
+                            </td>
+                        </tr>
 
-                            <!-- Data Table -->
-                            <tr>
-                                <td style="padding: 0 40px 32px 40px;">
-                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0a0a0a; border: 1px solid #3a3a3a; border-radius: 8px;">
-                                        <thead>
-                                            <tr style="background-color: #2a2a2a;">
-                                                <th style="text-align: left; padding: 12px 14px; color: #a0a0a0; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #3a3a3a;">Candidate</th>
-                                                <th style="text-align: left; padding: 12px 14px; color: #a0a0a0; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #3a3a3a;">Before</th>
-                                                <th style="text-align: left; padding: 12px 14px; color: #a0a0a0; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #3a3a3a;">After</th>
-                                                <th style="text-align: left; padding: 12px 14px; color: #a0a0a0; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #3a3a3a;">Change</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {rows}
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
+                        <!-- Data Table -->
+                        <tr>
+                            <td style="padding: 0 40px 32px 40px;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0a0a0a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                    <thead>
+                                        <tr style="background-color: #2a2a2a;">
+                                            <th style="text-align: left; padding: 12px 14px; color: #a0a0a0; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #3a3a3a;">Candidate</th>
+                                            <th style="text-align: left; padding: 12px 14px; color: #a0a0a0; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #3a3a3a;">Before</th>
+                                            <th style="text-align: left; padding: 12px 14px; color: #a0a0a0; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #3a3a3a;">After</th>
+                                            <th style="text-align: left; padding: 12px 14px; color: #a0a0a0; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #3a3a3a;">Change</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {rows}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
 
-                            <!-- CTA Button -->
-                            <tr>
-                                <td style="padding: 0 40px 32px 40px; text-align: center;">
-                                    <a href="{request.host_url}markets" style="display: inline-block; background-color: #e67e22; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">View Live Markets →</a>
-                                </td>
-                            </tr>
+                        <!-- CTA Button -->
+                        <tr>
+                            <td style="padding: 0 40px 32px 40px; text-align: center;">
+                                <a href="{request.host_url}markets" style="display: inline-block; background-color: #e67e22; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">View Live Markets →</a>
+                            </td>
+                        </tr>
 
-                            <!-- Footer -->
-                            <tr>
-                                <td style="padding: 0 40px 32px 40px; text-align: center; border-top: 1px solid #3a3a3a;">
-                                    <p style="margin: 20px 0 0 0; color: #666; font-size: 12px;">
-                                        <a href="{unsub_url}" style="color: #666; text-decoration: underline;">Unsubscribe</a>
-                                    </p>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </body>
-        </html>
-        """
-        send_email(email, subject, html, text)
+                        <!-- Footer -->
+                        <tr>
+                            <td style="padding: 0 40px 32px 40px; text-align: center; border-top: 1px solid #3a3a3a;">
+                                <p style="margin: 20px 0 0 0; color: #666; font-size: 12px;">
+                                    <a href="{unsub_url}" style="color: #666; text-decoration: underline;">Unsubscribe</a>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    """
+    send_email(email, subject, html, text)
 
 def send_daily_summary():
     """Send daily summary email with current standings and 24h changes."""
@@ -1194,6 +1215,41 @@ def download_snapshots():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/download/snapshots/csv')
+def download_snapshots_csv():
+    """Download all historical snapshot data as CSV file"""
+    try:
+        snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
+        if not snapshots:
+            return jsonify({"error": "No data available"}), 404
+
+        # Build CSV content
+        import io
+        output = io.StringIO()
+        output.write('timestamp,candidate,probability,hasKalshi\n')
+
+        for snapshot in snapshots:
+            timestamp = snapshot.get('timestamp', '')
+            for candidate in snapshot.get('candidates', []):
+                name = candidate.get('name', '')
+                prob = candidate.get('probability', 0)
+                has_kalshi = 'true' if candidate.get('hasKalshi', False) else 'false'
+                # Escape candidate name if it contains commas or quotes
+                name_escaped = f'"{name}"' if ',' in name or '"' in name else name
+                output.write(f'{timestamp},{name_escaped},{prob:.1f},{has_kalshi}\n')
+
+        csv_content = output.getvalue()
+        output.close()
+
+        # Create response
+        from flask import Response
+        response = Response(csv_content, mimetype='text/csv')
+        response.headers['Content-Disposition'] = 'attachment; filename=il9cast_historical_data.csv'
+        return response
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/api/subscribe', methods=['POST'])
 def subscribe():
     """Subscribe an email to alerts."""
@@ -1206,10 +1262,12 @@ def subscribe():
     if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
         return jsonify({'error': 'Invalid email address'}), 400
 
+    threshold = data.get('threshold', 5.0)
+
     try:
-        token = add_subscriber(email)
+        token = add_subscriber(email, threshold)
         try:
-            send_welcome_email(email)
+            send_welcome_email(email, threshold)
         except Exception as e:
             print(f"[{datetime.now().isoformat()}] Welcome email failed: {e}")
         return jsonify({'success': True, 'message': 'Subscribed! Check your email.'})
@@ -1241,8 +1299,18 @@ def test_swing_alert():
         {'name': 'Daniel Biss', 'old': 58.2, 'new': 64.7, 'delta': 6.5},
         {'name': 'Jan Schakowsky', 'old': 24.1, 'new': 18.3, 'delta': -5.8}
     ]
-    send_swing_alerts(fake_swings)
-    return jsonify({'success': True, 'message': 'Test swing alert sent to all subscribers'})
+
+    subscribers = read_subscribers()
+    count = 0
+    for sub in subscribers:
+        threshold = sub.get('threshold', 5.0)
+        # Filter swings that meet this subscriber's threshold
+        subscriber_swings = [s for s in fake_swings if abs(s['delta']) >= threshold]
+        if subscriber_swings:
+            send_swing_alert_to_subscriber(sub['email'], subscriber_swings)
+            count += 1
+
+    return jsonify({'success': True, 'message': f'Test swing alert sent to {count} subscriber(s)'})
 
 
 # Background task to collect data every 3 minutes
