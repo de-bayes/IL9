@@ -748,15 +748,13 @@ def fetch_fec_candidate_data(candidate_name):
         # Map candidate names to FEC candidate IDs (not committee IDs)
         # Format: H6IL09XXX (H = House, 6 = 2026 cycle, IL09 = district)
         fec_candidate_map = {
-            'Daniel Biss': 'H6IL09228',       # Found in FEC database
-            'Mike Simmons': 'H6IL09293',      # Found in FEC database
-            'Kat Abughazaleh': 'H6IL09178',   # Found in FEC database (Katherine M. Abughazaleh)
-            'Ram Villivalam': None,           # Not yet filed with FEC
-            'Helly Shah': None,               # Not yet filed with FEC
-            'Katie Stuart': None,             # Not yet filed with FEC
-            'Benjy Dolich': None,             # Not yet filed with FEC
-            'Greg Hoff': None,                # Not yet filed with FEC
-            'Liz Fiedler': None               # Not yet filed with FEC
+            'Daniel Biss': 'H6IL09228',       # Found: has FEC data
+            'Kat Abughazaleh': 'H6IL09178',   # Found: Katherine M. Abughazaleh in FEC
+            'Kat Abugazaleh': 'H6IL09178',    # Alternate spelling (same person)
+            'Mike Simmons': 'H6IL09293',      # Found: has FEC data
+            'Laura Fine': None,               # In FEC (FINE, LAURA) - need candidate ID
+            'Phil Andrew': None,              # In FEC (ANDREW, PHILIP JEROME) - need candidate ID
+            'Bushra Amiwala': None,           # In FEC (AMIWALA, BUSHRA) - need candidate ID
         }
 
         candidate_id = fec_candidate_map.get(candidate_name)
@@ -839,19 +837,17 @@ def calculate_burn_rate(candidate_data):
 
 def fetch_all_fec_data():
     """
-    Fetch FEC data for all IL-09 2026 candidates.
+    Fetch FEC data for all IL-09 2026 candidates with profiles.
     Returns list of candidate financial data dicts.
     """
+    # Only fetch candidates who have profiles on the site
     candidates = [
         'Daniel Biss',
+        'Kat Abugazaleh',      # Note: spelled differently than FEC (Abughazaleh)
+        'Laura Fine',
         'Mike Simmons',
-        'Ram Villivalam',
-        'Helly Shah',
-        'Kat Abughazaleh',
-        'Katie Stuart',
-        'Benjy Dolich',
-        'Greg Hoff',
-        'Liz Fiedler'
+        'Phil Andrew',
+        'Bushra Amiwala'
     ]
 
     results = []
