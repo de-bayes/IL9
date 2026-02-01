@@ -745,26 +745,26 @@ def fetch_fec_candidate_data(candidate_name):
     Returns dict with financial metrics or None if not found.
     """
     try:
-        # Map candidate names to FEC committee IDs
-        # These will need to be looked up once candidates file with FEC
-        fec_committee_map = {
-            'Daniel Biss': None,  # To be filled when FEC ID is available
-            'Mike Simmons': None,
-            'Ram Villivalam': None,
-            'Helly Shah': None,
-            'Kat Abughazaleh': None,
-            'Katie Stuart': None,
-            'Benjy Dolich': None,
-            'Greg Hoff': None,
-            'Liz Fiedler': None
+        # Map candidate names to FEC candidate IDs (not committee IDs)
+        # Format: H6IL09XXX (H = House, 6 = 2026 cycle, IL09 = district)
+        fec_candidate_map = {
+            'Daniel Biss': 'H6IL09228',       # Found in FEC database
+            'Mike Simmons': 'H6IL09293',      # Found in FEC database
+            'Kat Abughazaleh': 'H6IL09178',   # Found in FEC database (Katherine M. Abughazaleh)
+            'Ram Villivalam': None,           # Not yet filed with FEC
+            'Helly Shah': None,               # Not yet filed with FEC
+            'Katie Stuart': None,             # Not yet filed with FEC
+            'Benjy Dolich': None,             # Not yet filed with FEC
+            'Greg Hoff': None,                # Not yet filed with FEC
+            'Liz Fiedler': None               # Not yet filed with FEC
         }
 
-        committee_id = fec_committee_map.get(candidate_name)
-        if not committee_id:
+        candidate_id = fec_candidate_map.get(candidate_name)
+        if not candidate_id:
             return None
 
         # Fetch candidate totals from FEC API
-        url = f'{FEC_API_BASE}/candidate/{committee_id}/totals/'
+        url = f'{FEC_API_BASE}/candidate/{candidate_id}/totals/'
         params = {
             'api_key': FEC_API_KEY,
             'cycle': 2026,
@@ -782,14 +782,24 @@ def fetch_fec_candidate_data(candidate_name):
 
         result = data['results'][0]
 
-        # Extract key metrics
+        # Extract key metrics from FEC totals
+        total_raised = result.get('receipts', 0)
+        total_spent = result.get('disbursements', 0)
+        cash_on_hand = result.get('last_cash_on_hand_end_period', 0)
+
+        # FEC doesn't provide donor count in totals - estimate from contribution amounts
+        # Average small donor ~$50, large donor ~$500
+        unitemized = result.get('individual_unitemized_contributions', 0)  # < $200
+        itemized = result.get('individual_itemized_contributions', 0)      # >= $200
+        estimated_donors = int((unitemized / 50) + (itemized / 500)) if (unitemized + itemized) > 0 else 0
+
         return {
             'name': candidate_name,
-            'total_raised': result.get('receipts', 0),
-            'total_spent': result.get('disbursements', 0),
-            'cash_on_hand': result.get('cash_on_hand_end_period', 0),
-            'total_donors': result.get('individual_contributions_count', 0),
-            'small_dollar_amount': result.get('individual_itemized_contributions', 0),
+            'total_raised': total_raised,
+            'total_spent': total_spent,
+            'cash_on_hand': cash_on_hand,
+            'total_donors': estimated_donors,
+            'small_dollar_amount': unitemized,
             'coverage_end_date': result.get('coverage_end_date', '')
         }
     except Exception as e:
