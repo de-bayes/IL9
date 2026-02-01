@@ -568,11 +568,11 @@
                             backgroundColor: 'rgba(230, 126, 34, 0.6)',
                             borderColor: 'rgba(230, 126, 34, 1)',
                             borderWidth: 2,
-                            barPercentage: 0.8,
-                            categoryPercentage: 0.8,
+                            barPercentage: 0.95,  // Wider bars
+                            categoryPercentage: 0.95,  // More space per candidate
                             yAxisID: 'y-left',
                             order: 2,
-                            stack: 'combined'  // Same stack = same X position
+                            stack: 'combined'
                         },
                         {
                             label: 'Spent % of Raised',
@@ -580,11 +580,11 @@
                             backgroundColor: 'rgba(52, 152, 219, 0.8)',
                             borderColor: 'rgba(52, 152, 219, 1)',
                             borderWidth: 2,
-                            barPercentage: 0.5,
-                            categoryPercentage: 0.8,
+                            barPercentage: 0.65,  // Wider nested bar
+                            categoryPercentage: 0.95,  // More space per candidate
                             yAxisID: 'y-right',
                             order: 1,
-                            stack: 'combined'  // Same stack = same X position
+                            stack: 'combined'
                         }
                     ]
                 },
@@ -681,10 +681,10 @@
                             display: true,
                             position: 'right',
                             stacked: false,
-                            min: 0,
-                            max: 120,  // Allow >100% to show candidates who spent more than raised
+                            beginAtZero: true,
+                            suggestedMax: 100,  // Suggest 100% but allow higher if needed
                             grid: {
-                                drawOnChartArea: false  // Don't draw gridlines over the chart
+                                drawOnChartArea: false
                             },
                             ticks: {
                                 color: '#3498db',
