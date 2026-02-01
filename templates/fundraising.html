@@ -568,10 +568,11 @@
                             backgroundColor: 'rgba(230, 126, 34, 0.6)',
                             borderColor: 'rgba(230, 126, 34, 1)',
                             borderWidth: 2,
-                            barPercentage: 1.0,  // Full width of category
-                            categoryPercentage: 0.7,  // Category width
+                            barPercentage: 0.8,
+                            categoryPercentage: 0.8,
                             yAxisID: 'y-left',
-                            order: 2  // Draw first (behind)
+                            order: 2,
+                            stack: 'combined'  // Same stack = same X position
                         },
                         {
                             label: 'Spent % of Raised',
@@ -579,10 +580,11 @@
                             backgroundColor: 'rgba(52, 152, 219, 0.8)',
                             borderColor: 'rgba(52, 152, 219, 1)',
                             borderWidth: 2,
-                            barPercentage: 0.6,  // 60% of orange bar width
-                            categoryPercentage: 0.7,  // Same category width
+                            barPercentage: 0.5,
+                            categoryPercentage: 0.8,
                             yAxisID: 'y-right',
-                            order: 1  // Draw second (on top)
+                            order: 1,
+                            stack: 'combined'  // Same stack = same X position
                         }
                     ]
                 },
@@ -650,6 +652,7 @@
                             type: 'linear',
                             display: true,
                             position: 'left',
+                            stacked: false,
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.05)',
                                 lineWidth: 1
@@ -677,6 +680,7 @@
                             type: 'linear',
                             display: true,
                             position: 'right',
+                            stacked: false,
                             min: 0,
                             max: 120,  // Allow >100% to show candidates who spent more than raised
                             grid: {
