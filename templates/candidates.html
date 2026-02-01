@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="IL9Cast - Candidate Profiles">
+    <title>Candidates - IL9Cast</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dark-mode">
+    <canvas id="grid-canvas"></canvas>
+
+    <div class="site-content">
+        <header>
+            <a href="/" class="logo">IL9<span>Cast</span></a>
+            <nav>
+                <a href="/markets">Markets</a>
+                <a href="/odds">Model</a>
+                <a href="/candidates" class="active">Candidates</a>
+                <a href="/fundraising">Fundraising</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/about">About</a>
+                <a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer" class="github-link" title="View on GitHub">GitHub</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <h1>Candidate Profiles</h1>
+            <p class="subtitle">Illinois 9th District Democratic Primary • March 17, 2026</p>
+        </section>
+
+        <section class="candidates-grid">
+            {% for candidate in candidates %}
+            <article class="candidate-card">
+                <div class="candidate-header">
+                    <div class="candidate-photo-container">
+                        <img src="{{ candidate.photo }}" alt="{{ candidate.name }}" class="candidate-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="candidate-photo-fallback" style="display: none;">
+                            <span>{{ candidate.name.split()[0][0] }}{{ candidate.name.split()[-1][0] }}</span>
+                        </div>
+                    </div>
+                    <div class="candidate-info">
+                        <h2>{{ candidate.name }}</h2>
+                        <p class="candidate-title">{{ candidate.title }}</p>
+                        <div class="candidate-odds">
+                            <span class="odds-value">{{ "%.1f"|format(candidate.current_odds) }}%</span>
+                            <span class="odds-label">Current Odds</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="candidate-bio">
+                    <p>{{ candidate.bio }}</p>
+                </div>
+
+                <div class="candidate-chart-container">
+                    <canvas id="chart-{{ candidate.slug }}"></canvas>
+                </div>
+
+                {% if candidate.endorsements %}
+                <div class="candidate-endorsements">
+                    <h3>Key Endorsements</h3>
+                    <ul>
+                        {% for endorsement in candidate.endorsements %}
+                        <li>{{ endorsement }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                {% if candidate.key_issues %}
+                <div class="candidate-issues">
+                    <h3>Key Issues</h3>
+                    <div class="issue-tags">
+                        {% for issue in candidate.key_issues %}
+                        <span class="issue-tag">{{ issue }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if candidate.campaign_url and candidate.campaign_url != '#' %}
+                <a href="{{ candidate.campaign_url }}" target="_blank" rel="noopener noreferrer" class="campaign-link">
+                    Visit Campaign Site →
+                </a>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </section>
+    </div>
+
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        .candidates-grid {
+            max-width: 1400px;
+            margin: 0 auto 4rem;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .candidates-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .candidate-card {
+            background: rgba(26, 26, 26, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(230, 126, 34, 0.3);
+            border-radius: 12px;
+            padding: 0;
+            overflow: hidden;
+            transition: border-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .candidate-card:hover {
+            border-color: rgba(230, 126, 34, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .candidate-header {
+            display: flex;
+            gap: 1.5rem;
+            padding: 2rem;
+            background: rgba(230, 126, 34, 0.05);
+            border-bottom: 1px solid rgba(230, 126, 34, 0.2);
+        }
+
+        .candidate-photo-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            flex-shrink: 0;
+        }
+
+        .candidate-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid rgba(230, 126, 34, 0.3);
+        }
+
+        .candidate-photo-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            border-radius: 8px;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #fff;
+            border: 2px solid rgba(230, 126, 34, 0.3);
+        }
+
+        .candidate-info {
+            flex: 1;
+        }
+
+        .candidate-info h2 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0 0 0.25rem 0;
+            color: #e67e22;
+        }
+
+        .candidate-title {
+            font-size: 0.95rem;
+            color: #a0a0a0;
+            margin: 0 0 1rem 0;
+        }
+
+        .candidate-odds {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+
+        .odds-value {
+            font-family: 'VT323', monospace;
+            font-size: 2rem;
+            color: #e67e22;
+            font-weight: 600;
+        }
+
+        .odds-label {
+            font-size: 0.85rem;
+            color: #a0a0a0;
+        }
+
+        .candidate-bio {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(230, 126, 34, 0.1);
+        }
+
+        .candidate-bio p {
+            margin: 0;
+            line-height: 1.7;
+            color: #c0c0c0;
+        }
+
+        .candidate-chart-container {
+            padding: 1.5rem 2rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(230, 126, 34, 0.1);
+        }
+
+        .candidate-chart-container canvas {
+            max-height: 200px;
+        }
+
+        .candidate-endorsements {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(230, 126, 34, 0.1);
+        }
+
+        .candidate-endorsements h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0 0 0.75rem 0;
+            color: #e67e22;
+        }
+
+        .candidate-endorsements ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .candidate-endorsements li {
+            padding: 0.4rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #c0c0c0;
+        }
+
+        .candidate-endorsements li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #e67e22;
+        }
+
+        .candidate-issues {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(230, 126, 34, 0.1);
+        }
+
+        .candidate-issues h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0 0 0.75rem 0;
+            color: #e67e22;
+        }
+
+        .issue-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .issue-tag {
+            background: rgba(230, 126, 34, 0.15);
+            border: 1px solid rgba(230, 126, 34, 0.3);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #e67e22;
+        }
+
+        .campaign-link {
+            display: block;
+            padding: 1.25rem 2rem;
+            text-align: center;
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .campaign-link:hover {
+            background: rgba(230, 126, 34, 0.1);
+        }
+    </style>
+
+    <script>
+        // GRID BACKGROUND - Static, no mouse interaction
+        const canvas = document.getElementById('grid-canvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 40;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawGrid();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.055)';
+            ctx.lineWidth = 1;
+
+            // Draw horizontal lines
+            for (let y = 0; y < canvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            // Draw vertical lines
+            for (let x = 0; x < canvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+        }
+
+        drawGrid();
+
+        // CANDIDATE CHARTS
+        (function() {
+            // Fetch historical data and render charts for each candidate
+            fetch('/api/snapshots/chart?period=all&epsilon=0.5')
+                .then(response => response.json())
+                .then(data => {
+                    const candidates = {{ candidates | tojson }};
+
+                    candidates.forEach(candidate => {
+                        const candidateName = candidate.name;
+                        const chartId = 'chart-' + candidate.slug;
+
+                        // Extract time series for this candidate from snapshots
+                        const chartData = [];
+                        data.snapshots.forEach(snapshot => {
+                            const timestamp = snapshot.timestamp;
+                            const candidateInSnapshot = snapshot.candidates.find(c => {
+                                const normalizedName = c.name.replace('Abughazaleh', 'Abugazaleh');
+                                return normalizedName === candidateName;
+                            });
+
+                            if (candidateInSnapshot) {
+                                chartData.push({
+                                    x: new Date(timestamp),
+                                    y: candidateInSnapshot.probability
+                                });
+                            }
+                        });
+
+                        if (chartData.length === 0) return;
+
+                        // Create chart
+                        const chartElement = document.getElementById(chartId);
+                        if (!chartElement) return;
+
+                        new Chart(chartElement, {
+                            type: 'line',
+                            data: {
+                                datasets: [{
+                                    label: candidateName,
+                                    data: chartData,
+                                    borderColor: '#e67e22',
+                                    backgroundColor: 'rgba(230, 126, 34, 0.1)',
+                                    borderWidth: 2,
+                                    pointRadius: 0,
+                                    pointHoverRadius: 4,
+                                    tension: 0.4,
+                                    fill: true
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: true,
+                                aspectRatio: 2.5,
+                                interaction: {
+                                    intersect: false,
+                                    mode: 'index'
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    tooltip: {
+                                        enabled: true,
+                                        backgroundColor: 'rgba(26, 26, 26, 0.95)',
+                                        titleColor: '#e67e22',
+                                        bodyColor: '#c0c0c0',
+                                        borderColor: 'rgba(230, 126, 34, 0.5)',
+                                        borderWidth: 1,
+                                        padding: 12,
+                                        displayColors: false,
+                                        callbacks: {
+                                            title: function(context) {
+                                                const date = new Date(context[0].parsed.x);
+                                                const formatter = new Intl.DateTimeFormat('en-US', {
+                                                    timeZone: 'America/Chicago',
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                    hour: 'numeric',
+                                                    minute: '2-digit',
+                                                    hour12: true
+                                                });
+                                                return formatter.format(date) + ' CT';
+                                            },
+                                            label: function(context) {
+                                                return context.parsed.y.toFixed(1) + '%';
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        type: 'time',
+                                        time: {
+                                            unit: 'day',
+                                            displayFormats: {
+                                                day: 'MMM d'
+                                            },
+                                            tooltipFormat: 'MMM d, h:mm a'
+                                        },
+                                        grid: {
+                                            color: 'rgba(255, 255, 255, 0.05)',
+                                            drawBorder: false
+                                        },
+                                        ticks: {
+                                            color: '#a0a0a0',
+                                            maxRotation: 0,
+                                            autoSkipPadding: 20
+                                        }
+                                    },
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: {
+                                            color: 'rgba(255, 255, 255, 0.05)',
+                                            drawBorder: false
+                                        },
+                                        ticks: {
+                                            color: '#a0a0a0',
+                                            callback: function(value) {
+                                                return value + '%';
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading candidate chart data:', error);
+                });
+        })();
+    </script>
+</body>
+</html>

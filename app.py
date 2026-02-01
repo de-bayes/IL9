@@ -868,6 +868,87 @@ CANDIDATES = [
     {"id": 6, "name": "Robert Jackson", "party_role": "Former Alderman", "color": "#F7DC6F"},
 ]
 
+# Real IL-9 Candidate Profiles
+CANDIDATE_PROFILES = [
+    {
+        "name": "Daniel Biss",
+        "slug": "daniel-biss",
+        "title": "State Senator",
+        "photo": "https://www.danielbiss.com/images/daniel-biss-headshot.jpg",
+        "campaign_url": "https://www.danielbiss.com",
+        "bio": "Illinois State Senator representing the 9th district since 2013. Former State Representative and mathematics professor at the University of Chicago.",
+        "endorsements": [
+            "Rep. Jan Schakowsky",
+            "Chicago Teachers Union",
+            "SEIU Healthcare Illinois",
+            "Sierra Club Illinois"
+        ],
+        "key_issues": ["Education funding", "Healthcare access", "Climate action"]
+    },
+    {
+        "name": "Kat Abugazaleh",
+        "slug": "kat-abugazaleh",
+        "title": "Nonprofit Executive",
+        "photo": "https://katabugazaleh.com/images/kat-headshot.jpg",
+        "campaign_url": "https://katabugazaleh.com",
+        "bio": "Executive Director of Arab American Action Network, community organizer, and advocate for immigrant rights and social justice.",
+        "endorsements": [
+            "National Nurses United",
+            "Chicago Federation of Labor",
+            "Progressive Democrats of America"
+        ],
+        "key_issues": ["Immigrant rights", "Workers' rights", "Progressive taxation"]
+    },
+    {
+        "name": "Laura Fine",
+        "slug": "laura-fine",
+        "title": "State Representative",
+        "photo": "https://www.laurafine.org/images/laura-fine-headshot.jpg",
+        "campaign_url": "https://www.laurafine.org",
+        "bio": "Illinois State Representative from Glenview since 2016. Former Glenview Village Trustee focused on reproductive rights and environmental issues.",
+        "endorsements": [
+            "EMILY's List",
+            "Planned Parenthood Illinois Action",
+            "League of Conservation Voters"
+        ],
+        "key_issues": ["Reproductive rights", "Environmental protection", "Gun safety"]
+    },
+    {
+        "name": "Phil Andrew",
+        "slug": "phil-andrew",
+        "title": "Community Activist",
+        "photo": "https://via.placeholder.com/400x400/e67e22/ffffff?text=PA",
+        "campaign_url": "#",
+        "bio": "Longtime Evanston resident and community activist focused on local issues and grassroots organizing.",
+        "endorsements": [],
+        "key_issues": ["Local governance", "Community engagement"]
+    },
+    {
+        "name": "Bushra Amiwala",
+        "slug": "bushra-amiwala",
+        "title": "College Board Member",
+        "photo": "https://via.placeholder.com/400x400/e67e22/ffffff?text=BA",
+        "campaign_url": "#",
+        "bio": "Youngest Muslim elected official in the United States. Oakton Community College Board Trustee and youth advocate.",
+        "endorsements": [
+            "Run for Something"
+        ],
+        "key_issues": ["Education access", "Youth engagement", "Diversity and inclusion"]
+    },
+    {
+        "name": "Mike Simmons",
+        "slug": "mike-simmons",
+        "title": "State Senator",
+        "photo": "https://via.placeholder.com/400x400/e67e22/ffffff?text=MS",
+        "campaign_url": "#",
+        "bio": "Illinois State Senator representing the 7th district. First openly gay Black state senator in Illinois history.",
+        "endorsements": [
+            "Equality Illinois"
+        ],
+        "key_issues": ["LGBTQ+ rights", "Affordable housing", "Criminal justice reform"]
+    }
+]
+
 # Routes
 @app.route('/')
 def landing():
@@ -892,6 +973,38 @@ def markets():
 @app.route('/fundraising')
 def fundraising():
     return render_template('fundraising.html')
+
+@app.route('/candidates')
+def candidates():
+    """Show candidate profiles with live odds and individual charts"""
+    # Get latest snapshot for current odds
+    snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
+    latest_snapshot = snapshots[-1] if snapshots else None
+
+    # Build candidate data with current odds
+    candidates_data = []
+    for profile in CANDIDATE_PROFILES:
+        candidate = profile.copy()
+        # Find current odds from latest snapshot
+        if latest_snapshot:
+            for c in latest_snapshot.get('candidates', []):
+                # Normalize names for matching
+                snapshot_name = c['name'].replace('Abughazaleh', 'Abugazaleh')
+                profile_name = profile['name']
+                if snapshot_name == profile_name:
+                    candidate['current_odds'] = c['probability']
+                    candidate['has_kalshi'] = c.get('hasKalshi', False)
+                    break
+        if 'current_odds' not in candidate:
+            candidate['current_odds'] = 0.0
+            candidate['has_kalshi'] = False
+
+        candidates_data.append(candidate)
+
+    # Sort by current odds descending
+    candidates_data.sort(key=lambda x: x['current_odds'], reverse=True)
+
+    return render_template('candidates.html', candidates=candidates_data)
 
 # API Endpoints
 @app.route('/api/forecast')
