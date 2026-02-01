@@ -58,7 +58,8 @@
                     <p>{{ candidate.bio }}</p>
                 </div>
 
-                <div class="candidate-chart-container">
+                <div class="candidate-chart-container" id="chart-container-{{ candidate.slug }}" style="display: none;">
+                    <h3 class="chart-title">Odds Over Time</h3>
                     <canvas id="chart-{{ candidate.slug }}"></canvas>
                 </div>
 
@@ -266,6 +267,15 @@
             border-bottom: 1px solid rgba(230, 126, 34, 0.1);
         }
 
+        .chart-title {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0 0 1.25rem 0;
+            color: #e67e22;
+            letter-spacing: 0.3px;
+        }
+
         .candidate-chart-container canvas {
             max-height: 180px;
         }
@@ -432,6 +442,12 @@
                         });
 
                         if (chartData.length === 0) return;
+
+                        // Show chart container only if we have data
+                        const chartContainer = document.getElementById('chart-container-' + candidate.slug);
+                        if (chartContainer) {
+                            chartContainer.style.display = 'block';
+                        }
 
                         // Create chart
                         const chartElement = document.getElementById(chartId);

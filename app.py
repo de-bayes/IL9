@@ -879,9 +879,11 @@ CANDIDATE_PROFILES = [
         "bio": "Mayor of Evanston and former Illinois State Senator. Proven progressive with a legislative track record protecting healthcare, defending immigrants, and advocating for economic justice.",
         "endorsements": [
             "Rep. Jan Schakowsky",
+            "Sen. Elizabeth Warren",
+            "Illinois AFL-CIO",
+            "SEIU Illinois State Council",
             "Chicago Teachers Union",
-            "SEIU Healthcare Illinois",
-            "Sierra Club Illinois"
+            "Congressional Progressive Caucus PAC"
         ],
         "key_issues": ["Medicare for All", "Wealth tax on billionaires", "Ban on mass deportations", "Cease-fire in Gaza"]
     },
@@ -893,9 +895,10 @@ CANDIDATE_PROFILES = [
         "campaign_url": "https://www.katforillinois.com/",
         "bio": "Media critic and researcher focused on combating right-wing disinformation. Running an anti-establishment campaign centered on breaking the status quo and transparent grassroots fundraising.",
         "endorsements": [
-            "National Nurses United",
-            "Chicago Federation of Labor",
-            "Progressive Democrats of America"
+            "Rep. Ro Khanna",
+            "Former Rep. Jamaal Bowman",
+            "Sunrise Movement",
+            "Peace Action"
         ],
         "key_issues": ["Rejecting corporate PAC money", "Media transparency", "Combating disinformation", "Breaking the status quo"]
     },
@@ -907,9 +910,8 @@ CANDIDATE_PROFILES = [
         "campaign_url": "https://www.laurafineforcongress.org/",
         "bio": "Illinois State Senator and champion for families. Recently passed laws banning prior authorization for mental health services and requiring insurance coverage for neonatal intensive care.",
         "endorsements": [
-            "EMILY's List",
-            "Planned Parenthood Illinois Action",
-            "League of Conservation Voters"
+            "Personal PAC",
+            "Planned Parenthood"
         ],
         "key_issues": ["Mental health access", "Insurance reform", "Family healthcare", "Toxic metal testing in baby food"]
     },
@@ -921,7 +923,8 @@ CANDIDATE_PROFILES = [
         "campaign_url": "https://www.mikesimmons.org/",
         "bio": "First openly LGBTQ+ and Ethiopian-American Illinois State Senator. Leader on bold systemic change, passing the Jett Hawkins Act banning hair discrimination and protecting gender-affirming care.",
         "endorsements": [
-            "Equality Illinois"
+            "Equality PAC",
+            "LGBTQ+ Victory Fund"
         ],
         "key_issues": ["Gender-affirming care", "Public transit expansion", "Affordable housing", "Permanent child tax credits"]
     },
@@ -932,7 +935,9 @@ CANDIDATE_PROFILES = [
         "photo": "images/candidates/philandrew.png",
         "campaign_url": "https://www.philandrewforcongress.com/",
         "bio": "Crisis-tested leader with background in law enforcement and hostage negotiation. Gun violence survivor advocating for evidence-based community safety strategies. Pledged to serve only 3-5 terms.",
-        "endorsements": [],
+        "endorsements": [
+            "Brady PAC"
+        ],
         "key_issues": ["Gun violence prevention", "Community safety", "Political independence", "Refusing PAC money"]
     },
     {
@@ -943,7 +948,9 @@ CANDIDATE_PROFILES = [
         "campaign_url": "https://www.bushraforcongress.com/",
         "bio": "Youngest Muslim elected official in the United States. School board member and education advocate focused on tuition-free public college and student debt cancellation.",
         "endorsements": [
-            "Run for Something"
+            "Former Rep. Marie Newman",
+            "Muslim Civic Coalition",
+            "Northside Democracy for America"
         ],
         "key_issues": ["Tuition-free college", "Student debt cancellation", "Medicare for All", "Domestic infrastructure over foreign aid"]
     }
