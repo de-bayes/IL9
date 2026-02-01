@@ -10,7 +10,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="dark-mode">
     <canvas id="grid-canvas"></canvas>
@@ -58,11 +57,6 @@
                     <p>{{ candidate.bio }}</p>
                 </div>
 
-                <div class="candidate-chart-container" id="chart-container-{{ candidate.slug }}" style="display: none;">
-                    <h3 class="chart-title">Odds Over Time</h3>
-                    <canvas id="chart-{{ candidate.slug }}"></canvas>
-                </div>
-
                 {% if candidate.endorsements %}
                 <div class="candidate-endorsements">
                     <h3>Key Endorsements</h3>
@@ -85,11 +79,16 @@
                 </div>
                 {% endif %}
 
-                {% if candidate.campaign_url and candidate.campaign_url != '#' %}
-                <a href="{{ candidate.campaign_url }}" target="_blank" rel="noopener noreferrer" class="campaign-link">
-                    Visit Campaign Site →
-                </a>
-                {% endif %}
+                <div class="candidate-links">
+                    <a href="/fundraising/{{ candidate.slug }}" class="fundraising-link">
+                        View Fundraising Data →
+                    </a>
+                    {% if candidate.campaign_url and candidate.campaign_url != '#' %}
+                    <a href="{{ candidate.campaign_url }}" target="_blank" rel="noopener noreferrer" class="campaign-link">
+                        Visit Campaign Site →
+                    </a>
+                    {% endif %}
+                </div>
             </article>
             {% endfor %}
         </section>
@@ -261,25 +260,6 @@
             font-size: 0.95rem;
         }
 
-        .candidate-chart-container {
-            padding: 2rem 2rem 1.5rem;
-            background: rgba(0, 0, 0, 0.3);
-            border-bottom: 1px solid rgba(230, 126, 34, 0.1);
-        }
-
-        .chart-title {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin: 0 0 1.25rem 0;
-            color: #e67e22;
-            letter-spacing: 0.3px;
-        }
-
-        .candidate-chart-container canvas {
-            max-height: 180px;
-        }
-
         .candidate-endorsements {
             padding: 1.75rem 2rem;
             border-bottom: 1px solid rgba(230, 126, 34, 0.1);
@@ -354,21 +334,47 @@
             border-color: rgba(230, 126, 34, 0.5);
         }
 
+        .candidate-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            border-top: 1px solid rgba(230, 126, 34, 0.1);
+        }
+
+        .fundraising-link,
         .campaign-link {
-            display: block;
-            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem 1.5rem;
             text-align: center;
             color: #e67e22;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
             background: rgba(230, 126, 34, 0.05);
         }
 
+        .fundraising-link {
+            border-right: 1px solid rgba(230, 126, 34, 0.1);
+        }
+
+        .fundraising-link:hover,
         .campaign-link:hover {
             background: rgba(230, 126, 34, 0.15);
             color: #ff9347;
+        }
+
+        @media (max-width: 768px) {
+            .candidate-links {
+                grid-template-columns: 1fr;
+            }
+
+            .fundraising-link {
+                border-right: none;
+                border-bottom: 1px solid rgba(230, 126, 34, 0.1);
+            }
         }
     </style>
 
@@ -411,145 +417,6 @@
         }
 
         drawGrid();
-
-        // CANDIDATE CHARTS
-        (function() {
-            // Fetch historical data and render charts for each candidate
-            fetch('/api/snapshots/chart?period=all&epsilon=0.5')
-                .then(response => response.json())
-                .then(data => {
-                    const candidates = {{ candidates | tojson }};
-
-                    candidates.forEach(candidate => {
-                        const candidateName = candidate.name;
-                        const chartId = 'chart-' + candidate.slug;
-
-                        // Extract time series for this candidate from snapshots
-                        const chartData = [];
-                        data.snapshots.forEach(snapshot => {
-                            const timestamp = snapshot.timestamp;
-                            const candidateInSnapshot = snapshot.candidates.find(c => {
-                                const normalizedName = c.name.replace('Abughazaleh', 'Abugazaleh');
-                                return normalizedName === candidateName;
-                            });
-
-                            if (candidateInSnapshot) {
-                                chartData.push({
-                                    x: new Date(timestamp),
-                                    y: candidateInSnapshot.probability
-                                });
-                            }
-                        });
-
-                        if (chartData.length === 0) return;
-
-                        // Show chart container only if we have data
-                        const chartContainer = document.getElementById('chart-container-' + candidate.slug);
-                        if (chartContainer) {
-                            chartContainer.style.display = 'block';
-                        }
-
-                        // Create chart
-                        const chartElement = document.getElementById(chartId);
-                        if (!chartElement) return;
-
-                        new Chart(chartElement, {
-                            type: 'line',
-                            data: {
-                                datasets: [{
-                                    label: candidateName,
-                                    data: chartData,
-                                    borderColor: '#e67e22',
-                                    backgroundColor: 'rgba(230, 126, 34, 0.1)',
-                                    borderWidth: 2,
-                                    pointRadius: 0,
-                                    pointHoverRadius: 4,
-                                    tension: 0.4,
-                                    fill: true
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: true,
-                                aspectRatio: 2.5,
-                                interaction: {
-                                    intersect: false,
-                                    mode: 'index'
-                                },
-                                plugins: {
-                                    legend: {
-                                        display: false
-                                    },
-                                    tooltip: {
-                                        enabled: true,
-                                        backgroundColor: 'rgba(26, 26, 26, 0.95)',
-                                        titleColor: '#e67e22',
-                                        bodyColor: '#c0c0c0',
-                                        borderColor: 'rgba(230, 126, 34, 0.5)',
-                                        borderWidth: 1,
-                                        padding: 12,
-                                        displayColors: false,
-                                        callbacks: {
-                                            title: function(context) {
-                                                const date = new Date(context[0].parsed.x);
-                                                const formatter = new Intl.DateTimeFormat('en-US', {
-                                                    timeZone: 'America/Chicago',
-                                                    month: 'short',
-                                                    day: 'numeric',
-                                                    hour: 'numeric',
-                                                    minute: '2-digit',
-                                                    hour12: true
-                                                });
-                                                return formatter.format(date) + ' CT';
-                                            },
-                                            label: function(context) {
-                                                return context.parsed.y.toFixed(1) + '%';
-                                            }
-                                        }
-                                    }
-                                },
-                                scales: {
-                                    x: {
-                                        type: 'time',
-                                        time: {
-                                            unit: 'day',
-                                            displayFormats: {
-                                                day: 'MMM d'
-                                            },
-                                            tooltipFormat: 'MMM d, h:mm a'
-                                        },
-                                        grid: {
-                                            color: 'rgba(255, 255, 255, 0.05)',
-                                            drawBorder: false
-                                        },
-                                        ticks: {
-                                            color: '#a0a0a0',
-                                            maxRotation: 0,
-                                            autoSkipPadding: 20
-                                        }
-                                    },
-                                    y: {
-                                        beginAtZero: true,
-                                        grid: {
-                                            color: 'rgba(255, 255, 255, 0.05)',
-                                            drawBorder: false
-                                        },
-                                        ticks: {
-                                            color: '#a0a0a0',
-                                            callback: function(value) {
-                                                return value + '%';
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    });
-                })
-                .catch(error => {
-                    console.error('Error loading candidate chart data:', error);
-                });
-        })();
     </script>
 </body>
 </html>

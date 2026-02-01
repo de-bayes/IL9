@@ -1013,6 +1013,35 @@ def candidates():
 
     return render_template('candidates.html', candidates=candidates_data)
 
+@app.route('/fundraising/<candidate_slug>')
+def candidate_fundraising(candidate_slug):
+    """Show individual candidate fundraising page"""
+    # Find candidate profile
+    candidate_profile = next((c for c in CANDIDATE_PROFILES if c['slug'] == candidate_slug), None)
+
+    if not candidate_profile:
+        return "Candidate not found", 404
+
+    # Get latest snapshot for current odds
+    snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
+    latest_snapshot = snapshots[-1] if snapshots else None
+
+    # Add current odds
+    candidate = candidate_profile.copy()
+    if latest_snapshot:
+        for c in latest_snapshot.get('candidates', []):
+            snapshot_name = c['name'].replace('Abughazaleh', 'Abugazaleh')
+            if snapshot_name == candidate['name']:
+                candidate['current_odds'] = c['probability']
+                candidate['has_kalshi'] = c.get('hasKalshi', False)
+                break
+
+    if 'current_odds' not in candidate:
+        candidate['current_odds'] = 0.0
+        candidate['has_kalshi'] = False
+
+    return render_template('candidate_fundraising.html', candidate=candidate)
+
 # API Endpoints
 @app.route('/api/forecast')
 def get_forecast():

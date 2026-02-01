@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="IL9Cast - {{ candidate.name }} Fundraising">
+    <title>{{ candidate.name }} - Fundraising - IL9Cast</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dark-mode">
+    <canvas id="grid-canvas"></canvas>
+
+    <div class="site-content">
+        <header>
+            <a href="/" class="logo">IL9<span>Cast</span></a>
+            <nav>
+                <a href="/markets">Markets</a>
+                <a href="/odds">Model</a>
+                <a href="/candidates">Candidates</a>
+                <a href="/fundraising">Fundraising</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/about">About</a>
+                <a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer" class="github-link" title="View on GitHub">GitHub</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <h1>{{ candidate.name }}</h1>
+            <p class="subtitle">Campaign Finance Data from FEC Filings</p>
+        </section>
+
+        <section class="fundraising-content-page">
+            <div class="back-link-container">
+                <a href="/candidates" class="back-link">← Back to All Candidates</a>
+            </div>
+
+            <article class="fec-loading-section" id="loadingSection">
+                <h2>Loading FEC Data...</h2>
+                <p>Fetching campaign finance information from the Federal Election Commission.</p>
+            </article>
+
+            <article class="fec-error-section hidden" id="errorSection">
+                <h2>Data Unavailable</h2>
+                <p id="errorMessage">Unable to load FEC data at this time. The candidate may not have filed reports yet, or there may be a temporary issue with the FEC API.</p>
+            </article>
+
+            <div id="fecDataContainer" class="hidden">
+                <!-- Summary Cards -->
+                <div class="finance-summary-grid">
+                    <div class="finance-card">
+                        <h3>Total Raised</h3>
+                        <p class="finance-value" id="totalRaised">--</p>
+                    </div>
+                    <div class="finance-card">
+                        <h3>Total Spent</h3>
+                        <p class="finance-value" id="totalSpent">--</p>
+                    </div>
+                    <div class="finance-card">
+                        <h3>Cash on Hand</h3>
+                        <p class="finance-value" id="cashOnHand">--</p>
+                    </div>
+                    <div class="finance-card">
+                        <h3>Total Donors</h3>
+                        <p class="finance-value" id="totalDonors">--</p>
+                    </div>
+                </div>
+
+                <!-- Burn Rate Section -->
+                <article class="burn-rate-section">
+                    <h2>Burn Rate Analysis</h2>
+                    <p class="section-desc">Monthly spending projections based on recent expenditure patterns</p>
+                    <div class="burn-rate-grid">
+                        <div class="burn-rate-card">
+                            <h3>2-Week Burn Rate</h3>
+                            <p class="burn-rate-value" id="burnRate2Week">--</p>
+                            <p class="burn-rate-desc">Last 2 weeks × 2</p>
+                        </div>
+                        <div class="burn-rate-card">
+                            <h3>1-Month Burn Rate</h3>
+                            <p class="burn-rate-value" id="burnRate1Month">--</p>
+                            <p class="burn-rate-desc">Last month × 1</p>
+                        </div>
+                        <div class="burn-rate-card">
+                            <h3>1.5-Month Burn Rate</h3>
+                            <p class="burn-rate-value" id="burnRate1_5Month">--</p>
+                            <p class="burn-rate-desc">Last 1.5 months × 0.67</p>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Additional Metrics -->
+                <article class="additional-metrics-section">
+                    <h2>Additional Metrics</h2>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">Average Contribution:</span>
+                            <span class="metric-value" id="avgContribution">--</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Spending Rate:</span>
+                            <span class="metric-value" id="spendingRate">--</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Cash Runway:</span>
+                            <span class="metric-value" id="cashRunway">--</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Small Dollar %:</span>
+                            <span class="metric-value" id="smallDollarPct">--</span>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </div>
+
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        .fundraising-content-page {
+            max-width: 1200px;
+            margin: 0 auto 4rem;
+            padding: 0 2rem;
+        }
+
+        .back-link-container {
+            margin-bottom: 2rem;
+        }
+
+        .back-link {
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: opacity 0.3s ease;
+        }
+
+        .back-link:hover {
+            opacity: 0.7;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .fec-loading-section,
+        .fec-error-section {
+            background: rgba(26, 26, 26, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(230, 126, 34, 0.3);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .fec-loading-section h2,
+        .fec-error-section h2 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #e67e22;
+        }
+
+        .fec-error-section {
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .fec-error-section h2 {
+            color: #ef4444;
+        }
+
+        .finance-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .finance-card {
+            background: rgba(26, 26, 26, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(230, 126, 34, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .finance-card h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0 0 1rem 0;
+            color: #a0a0a0;
+        }
+
+        .finance-value {
+            font-family: 'VT323', monospace;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 0;
+            color: #e67e22;
+        }
+
+        .burn-rate-section,
+        .additional-metrics-section {
+            background: rgba(26, 26, 26, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(230, 126, 34, 0.3);
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .burn-rate-section h2,
+        .additional-metrics-section h2 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0 0 0.5rem 0;
+            color: #e67e22;
+        }
+
+        .section-desc {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .burn-rate-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .burn-rate-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(230, 126, 34, 0.2);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .burn-rate-card h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0 0 1rem 0;
+            color: #e67e22;
+        }
+
+        .burn-rate-value {
+            font-family: 'VT323', monospace;
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0 0 0.5rem 0;
+            color: #e67e22;
+        }
+
+        .burn-rate-desc {
+            font-size: 0.85rem;
+            color: #a0a0a0;
+            margin: 0;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(230, 126, 34, 0.2);
+            border-radius: 8px;
+        }
+
+        .metric-label {
+            font-weight: 500;
+            color: #c0c0c0;
+        }
+
+        .metric-value {
+            font-family: 'VT323', monospace;
+            font-size: 1.3rem;
+            color: #e67e22;
+            font-weight: 600;
+        }
+    </style>
+
+    <script>
+        // GRID BACKGROUND
+        const canvas = document.getElementById('grid-canvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 40;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawGrid();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.055)';
+            ctx.lineWidth = 1;
+
+            for (let y = 0; y < canvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            for (let x = 0; x < canvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+        }
+
+        drawGrid();
+
+        // FEC DATA FETCHING
+        (function() {
+            const candidateName = {{ candidate.name | tojson }};
+
+            // Mock FEC data - Replace this with actual FEC API call
+            // TODO: Implement FEC API integration
+            setTimeout(() => {
+                // Show placeholder data for now
+                document.getElementById('loadingSection').classList.add('hidden');
+                document.getElementById('errorSection').classList.remove('hidden');
+                document.getElementById('errorMessage').textContent =
+                    'FEC API integration coming soon. Data will be available after the January 31st filing deadline.';
+            }, 1500);
+
+            // Example of what the FEC data fetch would look like:
+            /*
+            fetch(`/api/fec/candidate/${candidateName}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loadingSection').classList.add('hidden');
+                    document.getElementById('fecDataContainer').classList.remove('hidden');
+
+                    // Populate summary cards
+                    document.getElementById('totalRaised').textContent = '$' + formatNumber(data.total_raised);
+                    document.getElementById('totalSpent').textContent = '$' + formatNumber(data.total_spent);
+                    document.getElementById('cashOnHand').textContent = '$' + formatNumber(data.cash_on_hand);
+                    document.getElementById('totalDonors').textContent = formatNumber(data.total_donors);
+
+                    // Calculate and display burn rates
+                    document.getElementById('burnRate2Week').textContent = '$' + formatNumber(data.burn_rate_2week);
+                    document.getElementById('burnRate1Month').textContent = '$' + formatNumber(data.burn_rate_1month);
+                    document.getElementById('burnRate1_5Month').textContent = '$' + formatNumber(data.burn_rate_1_5month);
+
+                    // Additional metrics
+                    document.getElementById('avgContribution').textContent = '$' + formatNumber(data.avg_contribution);
+                    document.getElementById('spendingRate').textContent = data.spending_rate + '%';
+                    document.getElementById('cashRunway').textContent = data.cash_runway + ' months';
+                    document.getElementById('smallDollarPct').textContent = data.small_dollar_pct + '%';
+                })
+                .catch(error => {
+                    document.getElementById('loadingSection').classList.add('hidden');
+                    document.getElementById('errorSection').classList.remove('hidden');
+                    console.error('Error loading FEC data:', error);
+                });
+            */
+
+            function formatNumber(num) {
+                if (num >= 1000000) {
+                    return (num / 1000000).toFixed(2) + 'M';
+                } else if (num >= 1000) {
+                    return (num / 1000).toFixed(1) + 'K';
+                }
+                return num.toLocaleString();
+            }
+        })();
+    </script>
+</body>
+</html>
