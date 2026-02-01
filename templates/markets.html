@@ -104,6 +104,13 @@
                 </div>
             </section>
 
+            <section class="donation-section">
+                <p class="donation-text">
+                    Make a donation to line my pockets. No, to pay for server costs.
+                    <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="donation-link">Support IL9Cast</a>
+                </p>
+            </section>
+
             <section class="weights-explainer methodology-section">
                 <div class="methodology-header" onclick="toggleMarketsMethodology()">
                     <h2 style="margin: 0;">Aggregation Methodology</h2>
@@ -324,7 +331,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 IL9Cast. Built with open data.</p>
+                <p>&copy; 2026 IL9Cast. Built with open data. • <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a></p>
             </div>
         </footer>
     </div>
@@ -992,6 +999,42 @@
         }
 
         /* Calculation Breakdown */
+        .donation-section {
+            text-align: center;
+            padding: 1.5rem 2rem;
+            background: rgba(230, 126, 34, 0.08);
+            border: 1px solid rgba(230, 126, 34, 0.25);
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .donation-text {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #c0c0c0;
+            line-height: 1.6;
+        }
+
+        .donation-link {
+            display: inline-block;
+            margin-left: 0.75rem;
+            padding: 0.5rem 1.25rem;
+            background: rgba(230, 126, 34, 0.2);
+            border: 1.5px solid rgba(230, 126, 34, 0.5);
+            border-radius: 6px;
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .donation-link:hover {
+            background: rgba(230, 126, 34, 0.3);
+            border-color: rgba(230, 126, 34, 0.7);
+            color: #ff9347;
+            transform: translateY(-1px);
+        }
+
         .calculation-breakdown {
             padding: 2.5rem;
             background: rgba(26, 26, 26, 0.5);
