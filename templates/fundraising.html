@@ -759,6 +759,9 @@
                     // Show data
                     document.getElementById('fecDataContainer').classList.remove('hidden');
 
+                    // Debug: log candidates
+                    console.log(`Loaded ${data.candidates.length} candidates:`, data.candidates.map(c => c.name));
+
                     // Create visualizations
                     createSpendingChart(data.candidates);
                     populateComparisonTable(data.candidates);

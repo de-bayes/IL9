@@ -50,6 +50,8 @@ _daily_summary_sent = None  # date string of last sent daily summary
 # ===== FEC API CONFIGURATION =====
 FEC_API_KEY = os.environ.get('FEC_API_KEY', 'DEMO_KEY')
 FEC_API_BASE = 'https://api.open.fec.gov/v1'
+FEC_CACHE_PATH = resolve_data_path('fec_cache.json')
+FEC_CACHE_HOURS = 24  # Cache FEC data for 24 hours
 
 # ===== JSONL HELPER FUNCTIONS =====
 
@@ -932,8 +934,23 @@ def calculate_burn_rate(candidate_data, committee_id):
 def fetch_all_fec_data():
     """
     Fetch FEC data for all IL-09 2026 candidates with profiles.
+    Uses 24-hour cache to avoid slow FEC API queries on every load.
     Returns list of candidate financial data dicts.
     """
+    # Check cache first
+    try:
+        if os.path.exists(FEC_CACHE_PATH):
+            cache_age_hours = (datetime.now(timezone.utc).timestamp() - os.path.getmtime(FEC_CACHE_PATH)) / 3600
+            if cache_age_hours < FEC_CACHE_HOURS:
+                print(f"[{datetime.now().isoformat()}] Using FEC cache (age: {cache_age_hours:.1f} hours)")
+                with open(FEC_CACHE_PATH, 'r') as f:
+                    return json.load(f)
+    except Exception as e:
+        print(f"[{datetime.now().isoformat()}] Error reading FEC cache: {e}")
+
+    # Cache miss or expired - fetch fresh data
+    print(f"[{datetime.now().isoformat()}] Fetching fresh FEC data...")
+
     # Only fetch candidates who have profiles on the site
     candidates = [
         'Daniel Biss',
@@ -972,6 +989,15 @@ def fetch_all_fec_data():
                 data['small_dollar_pct'] = 0
 
             results.append(data)
+
+    # Save to cache
+    try:
+        os.makedirs(os.path.dirname(FEC_CACHE_PATH), exist_ok=True)
+        with open(FEC_CACHE_PATH, 'w') as f:
+            json.dump(results, f, indent=2)
+        print(f"[{datetime.now().isoformat()}] FEC data cached ({len(results)} candidates)")
+    except Exception as e:
+        print(f"[{datetime.now().isoformat()}] Error writing FEC cache: {e}")
 
     return results
 
