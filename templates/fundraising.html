@@ -55,7 +55,7 @@
                 <!-- Spending Comparison Chart -->
                 <article class="chart-section">
                     <h2>Fundraising & Spending Comparison</h2>
-                    <p class="section-desc">Dual-axis chart: Orange bars = total raised (left $-axis), Blue bars = spent % of raised (right %-axis). Independent scales allow percentage >100%.</p>
+                    <p class="section-desc">Dual-axis chart: Wide orange bars = total raised (left $-axis), Narrow blue bars nested inside = spent % of raised (right %-axis). Blue bars can exceed orange if spent >100%.</p>
                     <div class="chart-container-large">
                         <canvas id="spendingChart"></canvas>
                     </div>
@@ -565,22 +565,22 @@
                         {
                             label: 'Total Raised ($)',
                             data: sorted.map(c => c.total_raised),
-                            backgroundColor: 'rgba(230, 126, 34, 0.7)',
+                            backgroundColor: 'rgba(230, 126, 34, 0.6)',
                             borderColor: 'rgba(230, 126, 34, 1)',
                             borderWidth: 2,
-                            barPercentage: 0.9,
-                            categoryPercentage: 0.8,
-                            yAxisID: 'y-left'
+                            barThickness: 80,  // Wider outer bar
+                            yAxisID: 'y-left',
+                            order: 2  // Draw first (behind)
                         },
                         {
                             label: 'Spent % of Raised',
                             data: sorted.map(c => c.spent_pct_of_raised),
-                            backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                            backgroundColor: 'rgba(52, 152, 219, 0.8)',
                             borderColor: 'rgba(52, 152, 219, 1)',
                             borderWidth: 2,
-                            barPercentage: 0.7,  // Narrower bar for visibility
-                            categoryPercentage: 0.8,
-                            yAxisID: 'y-right'
+                            barThickness: 50,  // Narrower inner bar
+                            yAxisID: 'y-right',
+                            order: 1  // Draw second (on top)
                         }
                     ]
                 },
@@ -630,9 +630,11 @@
                     },
                     scales: {
                         x: {
+                            offset: false,  // Center bars at same X position (not grouped)
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.05)',
-                                lineWidth: 1
+                                lineWidth: 1,
+                                offset: false
                             },
                             ticks: {
                                 color: '#a0a0a0',
