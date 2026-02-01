@@ -890,7 +890,7 @@ CANDIDATE_PROFILES = [
         "slug": "kat-abugazaleh",
         "title": "Former Media Matters Researcher",
         "photo": "images/candidates/katabu.png",
-        "campaign_url": "https://katabugazaleh.com",
+        "campaign_url": "https://www.katforillinois.com/",
         "bio": "Media critic and researcher focused on combating right-wing disinformation. Running an anti-establishment campaign centered on breaking the status quo and transparent grassroots fundraising.",
         "endorsements": [
             "National Nurses United",
@@ -904,7 +904,7 @@ CANDIDATE_PROFILES = [
         "slug": "laura-fine",
         "title": "State Senator",
         "photo": "images/candidates/fine.png",
-        "campaign_url": "https://www.laurafine.org",
+        "campaign_url": "https://www.laurafineforcongress.org/",
         "bio": "Illinois State Senator and champion for families. Recently passed laws banning prior authorization for mental health services and requiring insurance coverage for neonatal intensive care.",
         "endorsements": [
             "EMILY's List",
@@ -918,7 +918,7 @@ CANDIDATE_PROFILES = [
         "slug": "mike-simmons",
         "title": "State Senator",
         "photo": "images/candidates/simmons.jpg",
-        "campaign_url": "#",
+        "campaign_url": "https://www.mikesimmons.org/",
         "bio": "First openly LGBTQ+ and Ethiopian-American Illinois State Senator. Leader on bold systemic change, passing the Jett Hawkins Act banning hair discrimination and protecting gender-affirming care.",
         "endorsements": [
             "Equality Illinois"
@@ -930,7 +930,7 @@ CANDIDATE_PROFILES = [
         "slug": "phil-andrew",
         "title": "Former FBI Agent",
         "photo": "images/candidates/philandrew.png",
-        "campaign_url": "#",
+        "campaign_url": "https://www.philandrewforcongress.com/",
         "bio": "Crisis-tested leader with background in law enforcement and hostage negotiation. Gun violence survivor advocating for evidence-based community safety strategies. Pledged to serve only 3-5 terms.",
         "endorsements": [],
         "key_issues": ["Gun violence prevention", "Community safety", "Political independence", "Refusing PAC money"]
@@ -940,7 +940,7 @@ CANDIDATE_PROFILES = [
         "slug": "bushra-amiwala",
         "title": "Skokie School Board Member",
         "photo": "images/candidates/bushra.png",
-        "campaign_url": "#",
+        "campaign_url": "https://www.bushraforcongress.com/",
         "bio": "Youngest Muslim elected official in the United States. School board member and education advocate focused on tuition-free public college and student debt cancellation.",
         "endorsements": [
             "Run for Something"
