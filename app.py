@@ -873,67 +873,45 @@ CANDIDATE_PROFILES = [
     {
         "name": "Daniel Biss",
         "slug": "daniel-biss",
-        "title": "State Senator",
+        "title": "Mayor of Evanston",
         "photo": "images/candidates/biss.jpg",
         "campaign_url": "https://www.danielbiss.com",
-        "bio": "Illinois State Senator representing the 9th district since 2013. Former State Representative and mathematics professor at the University of Chicago.",
+        "bio": "Mayor of Evanston and former Illinois State Senator. Proven progressive with a legislative track record protecting healthcare, defending immigrants, and advocating for economic justice.",
         "endorsements": [
             "Rep. Jan Schakowsky",
             "Chicago Teachers Union",
             "SEIU Healthcare Illinois",
             "Sierra Club Illinois"
         ],
-        "key_issues": ["Education funding", "Healthcare access", "Climate action"]
+        "key_issues": ["Medicare for All", "Wealth tax on billionaires", "Ban on mass deportations", "Cease-fire in Gaza"]
     },
     {
         "name": "Kat Abugazaleh",
         "slug": "kat-abugazaleh",
-        "title": "Nonprofit Executive",
+        "title": "Former Media Matters Researcher",
         "photo": "images/candidates/katabu.png",
         "campaign_url": "https://katabugazaleh.com",
-        "bio": "Executive Director of Arab American Action Network, community organizer, and advocate for immigrant rights and social justice.",
+        "bio": "Media critic and researcher focused on combating right-wing disinformation. Running an anti-establishment campaign centered on breaking the status quo and transparent grassroots fundraising.",
         "endorsements": [
             "National Nurses United",
             "Chicago Federation of Labor",
             "Progressive Democrats of America"
         ],
-        "key_issues": ["Immigrant rights", "Workers' rights", "Progressive taxation"]
+        "key_issues": ["Rejecting corporate PAC money", "Media transparency", "Combating disinformation", "Breaking the status quo"]
     },
     {
         "name": "Laura Fine",
         "slug": "laura-fine",
-        "title": "State Representative",
+        "title": "State Senator",
         "photo": "images/candidates/fine.png",
         "campaign_url": "https://www.laurafine.org",
-        "bio": "Illinois State Representative from Glenview since 2016. Former Glenview Village Trustee focused on reproductive rights and environmental issues.",
+        "bio": "Illinois State Senator and champion for families. Recently passed laws banning prior authorization for mental health services and requiring insurance coverage for neonatal intensive care.",
         "endorsements": [
             "EMILY's List",
             "Planned Parenthood Illinois Action",
             "League of Conservation Voters"
         ],
-        "key_issues": ["Reproductive rights", "Environmental protection", "Gun safety"]
-    },
-    {
-        "name": "Phil Andrew",
-        "slug": "phil-andrew",
-        "title": "Community Activist",
-        "photo": "images/candidates/philandrew.png",
-        "campaign_url": "#",
-        "bio": "Longtime Evanston resident and community activist focused on local issues and grassroots organizing.",
-        "endorsements": [],
-        "key_issues": ["Local governance", "Community engagement"]
-    },
-    {
-        "name": "Bushra Amiwala",
-        "slug": "bushra-amiwala",
-        "title": "College Board Member",
-        "photo": "images/candidates/bushra.png",
-        "campaign_url": "#",
-        "bio": "Youngest Muslim elected official in the United States. Oakton Community College Board Trustee and youth advocate.",
-        "endorsements": [
-            "Run for Something"
-        ],
-        "key_issues": ["Education access", "Youth engagement", "Diversity and inclusion"]
+        "key_issues": ["Mental health access", "Insurance reform", "Family healthcare", "Toxic metal testing in baby food"]
     },
     {
         "name": "Mike Simmons",
@@ -941,11 +919,33 @@ CANDIDATE_PROFILES = [
         "title": "State Senator",
         "photo": "images/candidates/simmons.jpg",
         "campaign_url": "#",
-        "bio": "Illinois State Senator representing the 7th district. First openly gay Black state senator in Illinois history.",
+        "bio": "First openly LGBTQ+ and Ethiopian-American Illinois State Senator. Leader on bold systemic change, passing the Jett Hawkins Act banning hair discrimination and protecting gender-affirming care.",
         "endorsements": [
             "Equality Illinois"
         ],
-        "key_issues": ["LGBTQ+ rights", "Affordable housing", "Criminal justice reform"]
+        "key_issues": ["Gender-affirming care", "Public transit expansion", "Affordable housing", "Permanent child tax credits"]
+    },
+    {
+        "name": "Phil Andrew",
+        "slug": "phil-andrew",
+        "title": "Former FBI Agent",
+        "photo": "images/candidates/philandrew.png",
+        "campaign_url": "#",
+        "bio": "Crisis-tested leader with background in law enforcement and hostage negotiation. Gun violence survivor advocating for evidence-based community safety strategies. Pledged to serve only 3-5 terms.",
+        "endorsements": [],
+        "key_issues": ["Gun violence prevention", "Community safety", "Political independence", "Refusing PAC money"]
+    },
+    {
+        "name": "Bushra Amiwala",
+        "slug": "bushra-amiwala",
+        "title": "Skokie School Board Member",
+        "photo": "images/candidates/bushra.png",
+        "campaign_url": "#",
+        "bio": "Youngest Muslim elected official in the United States. School board member and education advocate focused on tuition-free public college and student debt cancellation.",
+        "endorsements": [
+            "Run for Something"
+        ],
+        "key_issues": ["Tuition-free college", "Student debt cancellation", "Medicare for All", "Domestic infrastructure over foreign aid"]
     }
 ]
 
