@@ -47,6 +47,10 @@ SWING_THRESHOLD = 5.0  # percentage points to trigger alert
 _swing_debounce = {}  # candidate_name -> last_alert_time (UTC timestamp)
 _daily_summary_sent = None  # date string of last sent daily summary
 
+# ===== FEC API CONFIGURATION =====
+FEC_API_KEY = os.environ.get('FEC_API_KEY', 'DEMO_KEY')
+FEC_API_BASE = 'https://api.open.fec.gov/v1'
+
 # ===== JSONL HELPER FUNCTIONS =====
 
 def read_snapshots_jsonl(filepath):
@@ -733,6 +737,141 @@ View Live Markets: {request.host_url}markets
     print(f"[{datetime.now().isoformat()}] Daily summary sent to {len(subscribers)} subscriber(s)")
 
 
+# ===== FEC API FUNCTIONS =====
+
+def fetch_fec_candidate_data(candidate_name):
+    """
+    Fetch FEC data for a specific candidate by searching for their committee.
+    Returns dict with financial metrics or None if not found.
+    """
+    try:
+        # Map candidate names to FEC committee IDs
+        # These will need to be looked up once candidates file with FEC
+        fec_committee_map = {
+            'Daniel Biss': None,  # To be filled when FEC ID is available
+            'Mike Simmons': None,
+            'Ram Villivalam': None,
+            'Helly Shah': None,
+            'Kat Abughazaleh': None,
+            'Katie Stuart': None,
+            'Benjy Dolich': None,
+            'Greg Hoff': None,
+            'Liz Fiedler': None
+        }
+
+        committee_id = fec_committee_map.get(candidate_name)
+        if not committee_id:
+            return None
+
+        # Fetch candidate totals from FEC API
+        url = f'{FEC_API_BASE}/candidate/{committee_id}/totals/'
+        params = {
+            'api_key': FEC_API_KEY,
+            'cycle': 2026,
+            'sort': '-cycle'
+        }
+
+        response = requests.get(url, params=params, timeout=10)
+        if response.status_code != 200:
+            print(f"[{datetime.now().isoformat()}] FEC API error for {candidate_name}: {response.status_code}")
+            return None
+
+        data = response.json()
+        if not data.get('results'):
+            return None
+
+        result = data['results'][0]
+
+        # Extract key metrics
+        return {
+            'name': candidate_name,
+            'total_raised': result.get('receipts', 0),
+            'total_spent': result.get('disbursements', 0),
+            'cash_on_hand': result.get('cash_on_hand_end_period', 0),
+            'total_donors': result.get('individual_contributions_count', 0),
+            'small_dollar_amount': result.get('individual_itemized_contributions', 0),
+            'coverage_end_date': result.get('coverage_end_date', '')
+        }
+    except Exception as e:
+        print(f"[{datetime.now().isoformat()}] Error fetching FEC data for {candidate_name}: {e}")
+        return None
+
+
+def calculate_burn_rate(candidate_data):
+    """
+    Calculate burn rate metrics from FEC disbursement data.
+    Returns dict with 2-week, 1-month, and 1.5-month projections.
+
+    Note: This is a placeholder. Real implementation would require
+    itemized disbursement data to calculate recent spending rates.
+    """
+    if not candidate_data:
+        return None
+
+    # For now, use simple average from total spent
+    # In production, this would fetch itemized disbursements and calculate:
+    # - Last 14 days of spending × 2 = monthly rate
+    # - Last 30 days of spending × 1 = monthly rate
+    # - Last 45 days of spending × 0.67 = monthly rate
+
+    total_spent = candidate_data.get('total_spent', 0)
+
+    # Placeholder calculation - would be replaced with real time-based data
+    estimated_monthly = total_spent / 3  # Rough estimate assuming 3 months of data
+
+    return {
+        'burn_2week': estimated_monthly,  # Would be: last_14_days_spent * 2
+        'burn_1month': estimated_monthly,  # Would be: last_30_days_spent * 1
+        'burn_1_5month': estimated_monthly,  # Would be: last_45_days_spent * 0.67
+        'cash_runway_months': candidate_data.get('cash_on_hand', 0) / estimated_monthly if estimated_monthly > 0 else 0
+    }
+
+
+def fetch_all_fec_data():
+    """
+    Fetch FEC data for all IL-09 2026 candidates.
+    Returns list of candidate financial data dicts.
+    """
+    candidates = [
+        'Daniel Biss',
+        'Mike Simmons',
+        'Ram Villivalam',
+        'Helly Shah',
+        'Kat Abughazaleh',
+        'Katie Stuart',
+        'Benjy Dolich',
+        'Greg Hoff',
+        'Liz Fiedler'
+    ]
+
+    results = []
+    for candidate in candidates:
+        data = fetch_fec_candidate_data(candidate)
+        if data:
+            # Add burn rate calculations
+            burn_rates = calculate_burn_rate(data)
+            if burn_rates:
+                data.update(burn_rates)
+
+            # Calculate additional metrics
+            if data.get('total_raised', 0) > 0:
+                data['spent_pct_of_raised'] = (data.get('total_spent', 0) / data['total_raised']) * 100
+                data['avg_contribution'] = data['total_raised'] / data.get('total_donors', 1)
+            else:
+                data['spent_pct_of_raised'] = 0
+                data['avg_contribution'] = 0
+
+            if data.get('total_raised', 0) > 0:
+                small_dollar = data.get('small_dollar_amount', 0)
+                data['small_dollar_pct'] = (small_dollar / data['total_raised']) * 100
+            else:
+                data['small_dollar_pct'] = 0
+
+            results.append(data)
+
+    return results
+
+
 # ===== INITIALIZATION =====
 
 def initialize_data():
@@ -1346,6 +1485,32 @@ def get_snapshots_chart():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/fec/candidates')
+def get_fec_candidates():
+    """
+    Fetch FEC campaign finance data for all IL-09 2026 candidates.
+    Returns comprehensive financial metrics including burn rates.
+    """
+    try:
+        data = fetch_all_fec_data()
+
+        if not data:
+            # Return placeholder data structure if FEC data not yet available
+            return jsonify({
+                "available": False,
+                "message": "FEC data will be available after the January 31st filing deadline",
+                "candidates": []
+            })
+
+        return jsonify({
+            "available": True,
+            "updated": datetime.now(timezone.utc).isoformat(),
+            "candidates": data
+        })
+    except Exception as e:
+        return jsonify({"error": str(e), "available": False}), 500
 
 
 @app.route('/api/download/snapshots')

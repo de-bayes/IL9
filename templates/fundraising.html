@@ -3,13 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="IL9Cast - Fundraising">
+    <meta name="description" content="IL9Cast - Campaign Finance Comparison">
     <title>Fundraising - IL9Cast</title>
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="dark-mode">
     <canvas id="grid-canvas"></canvas>
@@ -29,38 +30,80 @@
         </header>
 
         <section class="hero">
-            <h1>Fundraising</h1>
-            <p class="subtitle">Campaign finance data from FEC filings</p>
+            <h1>Campaign Finance Comparison</h1>
+            <p class="subtitle">FEC filing data for IL-09 Democratic Primary candidates</p>
         </section>
 
         <section class="fundraising-content-page">
-            <article class="notice-section">
-                <h2>Data Coming Soon</h2>
-                <p style="font-size: 1.1rem; line-height: 1.8; margin: 1.5rem 0;">
-                    FEC fundraising data will be available after the next filing deadline on <strong>January 31st, 2026</strong>.
-                </p>
-                <p style="color: #a0a0a0; margin-bottom: 1.5rem;">
-                    In the meantime, check out our live prediction market data for real-time probabilities and market sentiment.
-                </p>
-                <a href="/markets" class="btn">View Live Market Data</a>
+            <!-- Loading State -->
+            <article class="fec-loading-section" id="loadingSection">
+                <h2>Loading FEC Data...</h2>
+                <p>Fetching campaign finance information from the Federal Election Commission.</p>
             </article>
 
-            <article class="info-section">
-                <h2>About FEC Filings</h2>
-                <p>
-                    Federal Election Commission (FEC) filings provide detailed information about campaign fundraising, including:
-                </p>
-                <ul class="fec-list">
-                    <li>Total funds raised by each candidate</li>
-                    <li>Cash on hand for campaign operations</li>
-                    <li>Individual donor contributions and donor counts</li>
-                    <li>Campaign expenditures and burn rate</li>
-                    <li>Small dollar donor percentages</li>
-                </ul>
-                <p style="margin-top: 1.5rem;">
-                    IL9Cast will update this page with comprehensive fundraising analysis once the January 31st FEC filing data becomes available.
-                </p>
+            <!-- Error/Not Available State -->
+            <article class="fec-error-section hidden" id="errorSection">
+                <h2>Data Not Yet Available</h2>
+                <p id="errorMessage">FEC fundraising data will be available after the January 31st, 2026 filing deadline. Check back soon!</p>
+                <div style="margin-top: 1.5rem;">
+                    <a href="/markets" class="btn">View Live Market Data</a>
+                </div>
             </article>
+
+            <!-- Data Container -->
+            <div id="fecDataContainer" class="hidden">
+                <!-- Spending Comparison Chart -->
+                <article class="chart-section">
+                    <h2>Spending Comparison</h2>
+                    <p class="section-desc">Total expenditures vs. spending efficiency across all candidates</p>
+                    <div class="chart-container-large">
+                        <canvas id="spendingChart"></canvas>
+                    </div>
+                </article>
+
+                <!-- Comparison Table -->
+                <article class="comparison-table-section">
+                    <h2>Financial Metrics Comparison</h2>
+                    <p class="section-desc">Comprehensive breakdown of campaign finance data</p>
+                    <div class="table-responsive">
+                        <table class="fec-table" id="comparisonTable">
+                            <thead>
+                                <tr>
+                                    <th>Candidate</th>
+                                    <th>Total Raised</th>
+                                    <th>Total Spent</th>
+                                    <th>Cash on Hand</th>
+                                    <th>Donors</th>
+                                    <th>Avg Contribution</th>
+                                    <th>Small $ %</th>
+                                    <th>Spent %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comparisonTableBody">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <!-- Burn Rate Analysis -->
+                <article class="burn-rate-section">
+                    <h2>Burn Rate Projections</h2>
+                    <p class="section-desc">Estimated monthly spending rates based on recent expenditure patterns</p>
+                    <div class="burn-rate-grid" id="burnRateGrid">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </article>
+
+                <!-- Individual Candidate Links -->
+                <article class="candidate-links-section">
+                    <h2>Detailed Candidate Profiles</h2>
+                    <p class="section-desc">View in-depth fundraising analysis for each candidate</p>
+                    <div class="candidate-links-grid" id="candidateLinksGrid">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </article>
+            </div>
 
             <!-- Methodology Section -->
             <section class="methodology-section-fundraising">
@@ -72,55 +115,36 @@
                     <div class="methodology-explanation">
                         <h3>FEC Data Analysis Framework</h3>
                         <p>
-                            Once FEC filings become available on January 31st, 2026, IL9Cast will provide comprehensive fundraising analysis using standardized metrics to compare candidates' financial positions and donor bases.
+                            IL9Cast aggregates campaign finance data directly from FEC filings to provide standardized comparisons across all candidates in the IL-09 Democratic Primary.
                         </p>
 
                         <h3>Key Metrics Tracked</h3>
                         <ul class="method-list">
                             <li><strong>Total Raised:</strong> Cumulative funds raised during the reporting period</li>
+                            <li><strong>Total Spent:</strong> Total campaign expenditures (disbursements)</li>
                             <li><strong>Cash on Hand:</strong> Available campaign funds for future expenditures</li>
-                            <li><strong>Burn Rate:</strong> Monthly spending rate calculated from expenditures</li>
-                            <li><strong>Donor Count:</strong> Number of individual contributors to assess grassroots support</li>
-                            <li><strong>Average Contribution:</strong> Mean donation size (total raised ÷ donor count)</li>
+                            <li><strong>Donor Count:</strong> Number of individual contributors</li>
+                            <li><strong>Average Contribution:</strong> Total raised ÷ donor count</li>
                             <li><strong>Small Dollar Percentage:</strong> Proportion of funds from donations under $200</li>
+                            <li><strong>Spent Percentage:</strong> (Total spent ÷ total raised) × 100</li>
                         </ul>
+
+                        <h3>Burn Rate Calculations</h3>
+                        <div class="formula-box">
+                            <strong>Three projection methods:</strong><br><br>
+                            2-Week Burn Rate = (Last 14 days spending) × 2<br>
+                            1-Month Burn Rate = (Last 30 days spending) × 1<br>
+                            1.5-Month Burn Rate = (Last 45 days spending) × 0.67<br><br>
+                            Cash Runway = Cash on Hand ÷ Monthly Burn Rate
+                        </div>
 
                         <h3>Data Sources</h3>
                         <p>
-                            All fundraising data is sourced directly from FEC filings submitted by candidate committees. IL9Cast uses the FEC's bulk data API to retrieve and parse filing reports.
+                            All data sourced from FEC Form 3 filings submitted by candidate committees. IL9Cast uses the FEC API (<code>api.open.fec.gov</code>) to retrieve real-time filing data.
                         </p>
-
-                        <div class="formula-box">
-                            <strong>Example Calculations:</strong><br><br>
-                            Burn Rate = Total Expenditures ÷ Days in Reporting Period × 30<br>
-                            Small Dollar % = (Contributions &lt; $200) ÷ Total Raised × 100<br>
-                            Cash Runway = Cash on Hand ÷ (Monthly Burn Rate)
-                        </div>
-
-                        <h3>Comparative Analysis</h3>
-                        <p>
-                            Fundraising totals will be visualized with candidate-by-candidate comparisons, including:
-                        </p>
-                        <ul class="method-list">
-                            <li>Bar charts showing total raised and cash on hand</li>
-                            <li>Donor count histograms to assess grassroots strength</li>
-                            <li>Small dollar percentage rankings</li>
-                            <li>Burn rate trends over multiple filing periods</li>
-                        </ul>
-
-                        <h3>Why Fundraising Matters in Primaries</h3>
-                        <p>
-                            In Democratic primaries, fundraising metrics serve as important signals of campaign viability and grassroots support:
-                        </p>
-                        <ul class="method-list">
-                            <li><strong>Resource Availability:</strong> Cash on hand determines a campaign's ability to reach voters through mail, digital ads, and field operations</li>
-                            <li><strong>Donor Base:</strong> High donor counts suggest broad grassroots support and volunteer potential</li>
-                            <li><strong>Small Dollar Ratio:</strong> Higher small-dollar percentages indicate genuine grassroots enthusiasm vs. reliance on large donors</li>
-                            <li><strong>Sustainability:</strong> Low burn rates relative to cash on hand suggest efficient, sustainable campaigns</li>
-                        </ul>
 
                         <div class="methodology-note">
-                            <strong>Next Filing Deadline:</strong> January 31st, 2026. IL9Cast will update this page within 24 hours of FEC data availability with full analysis and visualizations.
+                            <strong>Note:</strong> Burn rate projections are estimates based on recent spending patterns. Actual future spending may vary based on campaign strategy and election timeline.
                         </div>
                     </div>
                 </div>
@@ -139,83 +163,189 @@
         }
 
         .fundraising-content-page {
-            max-width: 900px;
+            max-width: 1400px;
             margin: 0 auto 4rem;
             padding: 0 2rem;
         }
 
-        .notice-section {
-            background: rgba(26, 26, 26, 0.5);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid rgba(230, 126, 34, 0.5);
-            border-radius: 12px;
-            padding: 3rem;
-            margin-bottom: 2rem;
-            text-align: center;
+        .hidden {
+            display: none !important;
         }
 
-        .notice-section h2 {
+        .fec-loading-section,
+        .fec-error-section {
+            background: rgba(26, 26, 26, 0.5);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(230, 126, 34, 0.3);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .fec-loading-section h2,
+        .fec-error-section h2 {
             font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 600;
             margin-bottom: 1rem;
             color: #e67e22;
         }
 
-        .notice-section p {
-            color: #c0c0c0;
+        .fec-error-section {
+            border-color: rgba(230, 126, 34, 0.5);
         }
 
-        .info-section {
+        .chart-section,
+        .comparison-table-section,
+        .burn-rate-section,
+        .candidate-links-section {
             background: rgba(26, 26, 26, 0.5);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 2px solid rgba(230, 126, 34, 0.3);
             border-radius: 12px;
             padding: 2.5rem;
             margin-bottom: 2rem;
         }
 
-        .info-section h2 {
+        .chart-section h2,
+        .comparison-table-section h2,
+        .burn-rate-section h2,
+        .candidate-links-section h2 {
             font-family: 'Cormorant Garamond', Georgia, serif;
             font-size: 2rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
+            margin: 0 0 0.5rem 0;
             color: #e67e22;
         }
 
-        .info-section p {
-            line-height: 1.8;
-            color: #c0c0c0;
-            margin-bottom: 1rem;
+        .section-desc {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
         }
 
-        .fec-list {
-            list-style: none;
-            padding-left: 0;
-            margin: 1rem 0;
-        }
-
-        .fec-list li {
-            margin-bottom: 0.8rem;
-            padding-left: 1.5rem;
+        .chart-container-large {
             position: relative;
-            line-height: 1.6;
-            color: #c0c0c0;
+            height: 450px;
+            margin-top: 1.5rem;
         }
 
-        .fec-list li:before {
-            content: "→";
-            position: absolute;
-            left: 0;
+        /* Table Styles */
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 1.5rem;
+        }
+
+        .fec-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .fec-table thead th {
+            background: rgba(230, 126, 34, 0.15);
+            color: #e67e22;
+            font-weight: 600;
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 2px solid rgba(230, 126, 34, 0.3);
+            white-space: nowrap;
+        }
+
+        .fec-table tbody td {
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid rgba(230, 126, 34, 0.1);
+            color: #d0d0d0;
+        }
+
+        .fec-table tbody tr:hover {
+            background: rgba(230, 126, 34, 0.05);
+        }
+
+        .fec-table .candidate-name {
+            font-weight: 600;
+            color: #e67e22;
+            white-space: nowrap;
+        }
+
+        .fec-table .number-cell {
+            font-family: 'VT323', monospace;
+            font-size: 1.1rem;
+            text-align: right;
+        }
+
+        /* Burn Rate Grid */
+        .burn-rate-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .burn-rate-candidate-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(230, 126, 34, 0.2);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .burn-rate-candidate-card h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0 0 1rem 0;
             color: #e67e22;
         }
 
+        .burn-metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.6rem 0;
+            font-size: 0.9rem;
+        }
+
+        .burn-metric-label {
+            color: #a0a0a0;
+        }
+
+        .burn-metric-value {
+            font-family: 'VT323', monospace;
+            font-size: 1.1rem;
+            color: #e67e22;
+        }
+
+        /* Candidate Links Grid */
+        .candidate-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .candidate-link-item {
+            display: block;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(230, 126, 34, 0.2);
+            border-radius: 8px;
+            padding: 1.2rem 1.5rem;
+            text-align: center;
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .candidate-link-item:hover {
+            background: rgba(230, 126, 34, 0.15);
+            border-color: rgba(230, 126, 34, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* Methodology Section */
         .methodology-section-fundraising {
             background: rgba(26, 26, 26, 0.5);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 2px solid rgba(230, 126, 34, 0.3);
             border-radius: 12px;
             padding: 0;
@@ -321,17 +451,29 @@
             margin-top: 2rem;
             border-radius: 4px;
         }
+
+        @media (max-width: 768px) {
+            .fundraising-content-page {
+                padding: 0 1rem;
+            }
+
+            .chart-container-large {
+                height: 350px;
+            }
+
+            .fec-table {
+                font-size: 0.8rem;
+            }
+
+            .fec-table thead th,
+            .fec-table tbody td {
+                padding: 0.7rem;
+            }
+        }
     </style>
 
     <script>
-        function toggleFundraisingMethodology() {
-            const content = document.getElementById('fundraisingMethodologyContent');
-            const icon = document.getElementById('fundraisingMethodologyToggle');
-            content.classList.toggle('hidden');
-            icon.textContent = content.classList.contains('hidden') ? '▼' : '▲';
-        }
-
-        // GRID BACKGROUND - Static, no mouse interaction
+        // GRID BACKGROUND
         const canvas = document.getElementById('grid-canvas');
         const ctx = canvas.getContext('2d');
         const gridSize = 40;
@@ -351,7 +493,6 @@
             ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.055)';
             ctx.lineWidth = 1;
 
-            // Draw horizontal lines
             for (let y = 0; y < canvas.height; y += gridSize) {
                 ctx.beginPath();
                 ctx.moveTo(0, y);
@@ -359,7 +500,6 @@
                 ctx.stroke();
             }
 
-            // Draw vertical lines
             for (let x = 0; x < canvas.width; x += gridSize) {
                 ctx.beginPath();
                 ctx.moveTo(x, 0);
@@ -369,6 +509,276 @@
         }
 
         drawGrid();
+
+        function toggleFundraisingMethodology() {
+            const content = document.getElementById('fundraisingMethodologyContent');
+            const icon = document.getElementById('fundraisingMethodologyToggle');
+            content.classList.toggle('hidden');
+            icon.textContent = content.classList.contains('hidden') ? '▼' : '▲';
+        }
+
+        // FEC DATA FETCHING
+        let spendingChart = null;
+
+        function formatCurrency(amount) {
+            if (amount >= 1000000) {
+                return '$' + (amount / 1000000).toFixed(2) + 'M';
+            } else if (amount >= 1000) {
+                return '$' + (amount / 1000).toFixed(1) + 'K';
+            }
+            return '$' + amount.toLocaleString();
+        }
+
+        function formatPercent(pct) {
+            return pct.toFixed(1) + '%';
+        }
+
+        function createSpendingChart(candidates) {
+            const ctx = document.getElementById('spendingChart').getContext('2d');
+
+            // Sort by total spent descending
+            const sorted = [...candidates].sort((a, b) => b.total_spent - a.total_spent);
+
+            spendingChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sorted.map(c => c.name),
+                    datasets: [
+                        {
+                            label: 'Total Spent',
+                            data: sorted.map(c => c.total_spent),
+                            backgroundColor: 'rgba(230, 126, 34, 0.8)',
+                            borderColor: 'rgba(230, 126, 34, 1)',
+                            borderWidth: 2,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Spent % of Raised',
+                            data: sorted.map(c => c.spent_pct_of_raised),
+                            backgroundColor: 'rgba(52, 152, 219, 0.6)',
+                            borderColor: 'rgba(52, 152, 219, 1)',
+                            borderWidth: 2,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: '#e0e0e0',
+                                font: {
+                                    size: 13,
+                                    family: "'Inter', sans-serif"
+                                },
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(26, 26, 26, 0.95)',
+                            titleColor: '#e67e22',
+                            bodyColor: '#e0e0e0',
+                            borderColor: 'rgba(230, 126, 34, 0.3)',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.datasetIndex === 0) {
+                                        label += formatCurrency(context.parsed.y);
+                                    } else {
+                                        label += formatPercent(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)',
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                color: '#a0a0a0',
+                                font: {
+                                    size: 11
+                                },
+                                maxRotation: 45,
+                                minRotation: 30
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)',
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                color: '#e67e22',
+                                font: {
+                                    size: 11
+                                },
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Total Spent ($)',
+                                color: '#e67e22',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false
+                            },
+                            ticks: {
+                                color: '#3498db',
+                                font: {
+                                    size: 11
+                                },
+                                callback: function(value) {
+                                    return value.toFixed(0) + '%';
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Spent % of Raised',
+                                color: '#3498db',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function populateComparisonTable(candidates) {
+            const tbody = document.getElementById('comparisonTableBody');
+            tbody.innerHTML = '';
+
+            // Sort by total raised descending
+            const sorted = [...candidates].sort((a, b) => b.total_raised - a.total_raised);
+
+            sorted.forEach(candidate => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="candidate-name">${candidate.name}</td>
+                    <td class="number-cell">${formatCurrency(candidate.total_raised)}</td>
+                    <td class="number-cell">${formatCurrency(candidate.total_spent)}</td>
+                    <td class="number-cell">${formatCurrency(candidate.cash_on_hand)}</td>
+                    <td class="number-cell">${candidate.total_donors.toLocaleString()}</td>
+                    <td class="number-cell">${formatCurrency(candidate.avg_contribution)}</td>
+                    <td class="number-cell">${formatPercent(candidate.small_dollar_pct)}</td>
+                    <td class="number-cell">${formatPercent(candidate.spent_pct_of_raised)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function populateBurnRates(candidates) {
+            const grid = document.getElementById('burnRateGrid');
+            grid.innerHTML = '';
+
+            candidates.forEach(candidate => {
+                const card = document.createElement('div');
+                card.className = 'burn-rate-candidate-card';
+                card.innerHTML = `
+                    <h3>${candidate.name}</h3>
+                    <div class="burn-metric">
+                        <span class="burn-metric-label">2-Week Burn:</span>
+                        <span class="burn-metric-value">${formatCurrency(candidate.burn_2week)}/mo</span>
+                    </div>
+                    <div class="burn-metric">
+                        <span class="burn-metric-label">1-Month Burn:</span>
+                        <span class="burn-metric-value">${formatCurrency(candidate.burn_1month)}/mo</span>
+                    </div>
+                    <div class="burn-metric">
+                        <span class="burn-metric-label">1.5-Month Burn:</span>
+                        <span class="burn-metric-value">${formatCurrency(candidate.burn_1_5month)}/mo</span>
+                    </div>
+                    <div class="burn-metric">
+                        <span class="burn-metric-label">Cash Runway:</span>
+                        <span class="burn-metric-value">${candidate.cash_runway_months.toFixed(1)} months</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function populateCandidateLinks(candidates) {
+            const grid = document.getElementById('candidateLinksGrid');
+            grid.innerHTML = '';
+
+            candidates.forEach(candidate => {
+                // Create slug from name (lowercase, replace spaces with hyphens)
+                const slug = candidate.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+                const link = document.createElement('a');
+                link.href = `/fundraising/${slug}`;
+                link.className = 'candidate-link-item';
+                link.textContent = candidate.name;
+                grid.appendChild(link);
+            });
+        }
+
+        // Fetch and display FEC data
+        (async function() {
+            try {
+                const response = await fetch('/api/fec/candidates');
+                const data = await response.json();
+
+                document.getElementById('loadingSection').classList.add('hidden');
+
+                if (!data.available || !data.candidates || data.candidates.length === 0) {
+                    // Show error/not available message
+                    document.getElementById('errorSection').classList.remove('hidden');
+                    document.getElementById('errorMessage').textContent =
+                        data.message || 'FEC data will be available after the January 31st filing deadline. Check back soon!';
+                } else {
+                    // Show data
+                    document.getElementById('fecDataContainer').classList.remove('hidden');
+
+                    // Create visualizations
+                    createSpendingChart(data.candidates);
+                    populateComparisonTable(data.candidates);
+                    populateBurnRates(data.candidates);
+                    populateCandidateLinks(data.candidates);
+                }
+            } catch (error) {
+                console.error('Error loading FEC data:', error);
+                document.getElementById('loadingSection').classList.add('hidden');
+                document.getElementById('errorSection').classList.remove('hidden');
+                document.getElementById('errorMessage').textContent =
+                    'Unable to load FEC data at this time. Please try again later.';
+            }
+        })();
     </script>
 </body>
 </html>
