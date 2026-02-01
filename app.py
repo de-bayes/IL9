@@ -761,6 +761,21 @@ def fetch_fec_candidate_data(candidate_name):
         if not candidate_id:
             return None
 
+        # First, get the committee_id from candidate search
+        search_url = f'{FEC_API_BASE}/candidates/search/'
+        search_params = {
+            'api_key': FEC_API_KEY,
+            'candidate_id': candidate_id
+        }
+        search_response = requests.get(search_url, params=search_params, timeout=10)
+        committee_id = None
+        if search_response.status_code == 200:
+            search_data = search_response.json()
+            if search_data.get('results'):
+                committees = search_data['results'][0].get('principal_committees', [])
+                if committees:
+                    committee_id = committees[0].get('committee_id')
+
         # Fetch candidate totals from FEC API
         url = f'{FEC_API_BASE}/candidate/{candidate_id}/totals/'
         params = {
@@ -802,41 +817,116 @@ def fetch_fec_candidate_data(candidate_name):
             'total_donors': estimated_donors,
             'small_dollar_amount': unitemized,
             'individual_total': individual_total,  # Used for small dollar % calculation
-            'coverage_end_date': result.get('coverage_end_date', '')
+            'coverage_end_date': result.get('coverage_end_date', ''),
+            'committee_id': committee_id  # Needed for burn rate calculations
         }
     except Exception as e:
         print(f"[{datetime.now().isoformat()}] Error fetching FEC data for {candidate_name}: {e}")
         return None
 
 
-def calculate_burn_rate(candidate_data):
+def calculate_burn_rate(candidate_data, committee_id):
     """
-    Calculate burn rate metrics from FEC disbursement data.
+    Calculate burn rate metrics from REAL FEC disbursement data.
+    Queries FEC schedule_b (disbursements) for recent spending.
     Returns dict with 2-week, 1-month, and 1.5-month projections.
-
-    Note: This is a placeholder. Real implementation would require
-    itemized disbursement data to calculate recent spending rates.
     """
-    if not candidate_data:
+    if not candidate_data or not committee_id:
         return None
 
-    # For now, use simple average from total spent
-    # In production, this would fetch itemized disbursements and calculate:
-    # - Last 14 days of spending × 2 = monthly rate
-    # - Last 30 days of spending × 1 = monthly rate
-    # - Last 45 days of spending × 0.67 = monthly rate
+    try:
+        from datetime import datetime, timedelta
 
-    total_spent = candidate_data.get('total_spent', 0)
+        # Get the coverage end date from FEC data
+        coverage_end = candidate_data.get('coverage_end_date', '')
+        if coverage_end:
+            # Parse FEC date format: "2025-12-31T00:00:00"
+            end_date = datetime.strptime(coverage_end[:10], '%Y-%m-%d')
+        else:
+            # Fallback to today
+            end_date = datetime.now()
 
-    # Placeholder calculation - would be replaced with real time-based data
-    estimated_monthly = total_spent / 3  # Rough estimate assuming 3 months of data
+        # Calculate date ranges
+        date_14_days = (end_date - timedelta(days=14)).strftime('%Y-%m-%d')
+        date_30_days = (end_date - timedelta(days=30)).strftime('%Y-%m-%d')
+        date_45_days = (end_date - timedelta(days=45)).strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
 
-    return {
-        'burn_2week': estimated_monthly,  # Would be: last_14_days_spent * 2
-        'burn_1month': estimated_monthly,  # Would be: last_30_days_spent * 1
-        'burn_1_5month': estimated_monthly,  # Would be: last_45_days_spent * 0.67
-        'cash_runway_months': candidate_data.get('cash_on_hand', 0) / estimated_monthly if estimated_monthly > 0 else 0
-    }
+        # Query FEC schedule_b for disbursements in each period
+        def get_period_spending(min_date, max_date):
+            url = f'{FEC_API_BASE}/schedules/schedule_b/'
+            params = {
+                'api_key': FEC_API_KEY,
+                'committee_id': committee_id,
+                'min_date': min_date,
+                'max_date': max_date,
+                'per_page': 100,
+                'sort': '-disbursement_date'
+            }
+
+            total = 0
+            page = 1
+
+            # Fetch all pages (limit to 5 pages max to avoid timeouts)
+            while page <= 5:
+                params['page'] = page
+                response = requests.get(url, params=params, timeout=10)
+
+                if response.status_code != 200:
+                    break
+
+                data = response.json()
+                results = data.get('results', [])
+
+                if not results:
+                    break
+
+                for item in results:
+                    amount = item.get('disbursement_amount', 0)
+                    if amount:
+                        total += amount
+
+                # Check if there are more pages
+                pagination = data.get('pagination', {})
+                if page >= pagination.get('pages', 1):
+                    break
+
+                page += 1
+
+            return total
+
+        # Calculate spending for each period
+        spending_14_days = get_period_spending(date_14_days, end_date_str)
+        spending_30_days = get_period_spending(date_30_days, end_date_str)
+        spending_45_days = get_period_spending(date_45_days, end_date_str)
+
+        # Calculate monthly burn rates
+        burn_2week = (spending_14_days / 14) * 30  # Daily rate × 30 days
+        burn_1month = spending_30_days  # Already monthly
+        burn_1_5month = (spending_45_days / 45) * 30  # Daily rate × 30 days
+
+        # Calculate cash runway
+        cash_on_hand = candidate_data.get('cash_on_hand', 0)
+        avg_burn = (burn_2week + burn_1month + burn_1_5month) / 3
+        cash_runway_months = cash_on_hand / avg_burn if avg_burn > 0 else 0
+
+        return {
+            'burn_2week': burn_2week,
+            'burn_1month': burn_1month,
+            'burn_1_5month': burn_1_5month,
+            'cash_runway_months': cash_runway_months
+        }
+    except Exception as e:
+        print(f"[{datetime.now().isoformat()}] Error calculating burn rate: {e}")
+        # Return fallback estimates
+        total_spent = candidate_data.get('total_spent', 0)
+        estimated_monthly = total_spent / 6 if total_spent > 0 else 0
+        return {
+            'burn_2week': estimated_monthly,
+            'burn_1month': estimated_monthly,
+            'burn_1_5month': estimated_monthly,
+            'cash_runway_months': candidate_data.get('cash_on_hand', 0) / estimated_monthly if estimated_monthly > 0 else 0
+        }
 
 
 def fetch_all_fec_data():
@@ -858,8 +948,9 @@ def fetch_all_fec_data():
     for candidate in candidates:
         data = fetch_fec_candidate_data(candidate)
         if data:
-            # Add burn rate calculations
-            burn_rates = calculate_burn_rate(data)
+            # Add burn rate calculations using real FEC expenditure data
+            committee_id = data.get('committee_id')
+            burn_rates = calculate_burn_rate(data, committee_id)
             if burn_rates:
                 data.update(burn_rates)
 
