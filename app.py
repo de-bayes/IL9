@@ -752,9 +752,9 @@ def fetch_fec_candidate_data(candidate_name):
             'Kat Abughazaleh': 'H6IL09178',   # Found: Katherine M. Abughazaleh in FEC
             'Kat Abugazaleh': 'H6IL09178',    # Alternate spelling (same person)
             'Mike Simmons': 'H6IL09293',      # Found: has FEC data
-            'Laura Fine': None,               # In FEC (FINE, LAURA) - need candidate ID
-            'Phil Andrew': None,              # In FEC (ANDREW, PHILIP JEROME) - need candidate ID
-            'Bushra Amiwala': None,           # In FEC (AMIWALA, BUSHRA) - need candidate ID
+            'Laura Fine': 'H6IL09194',        # Found: FINE, LAURA
+            'Phil Andrew': 'H6IL09301',       # Found: ANDREW, PHILIP JEROME
+            'Bushra Amiwala': 'H6IL09236',    # Found: AMIWALA, BUSHRA
         }
 
         candidate_id = fec_candidate_map.get(candidate_name)
