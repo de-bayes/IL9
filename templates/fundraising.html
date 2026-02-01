@@ -55,7 +55,7 @@
                 <!-- Spending Comparison Chart -->
                 <article class="chart-section">
                     <h2>Fundraising & Spending Comparison</h2>
-                    <p class="section-desc">Outer bar shows total raised, inner bar shows total spent (visual % of raised funds used)</p>
+                    <p class="section-desc">Dual-axis chart: Orange bars = total raised (left $-axis), Blue bars = spent % of raised (right %-axis). Independent scales allow percentage >100%.</p>
                     <div class="chart-container-large">
                         <canvas id="spendingChart"></canvas>
                     </div>
@@ -563,22 +563,24 @@
                     labels: sorted.map(c => c.name),
                     datasets: [
                         {
-                            label: 'Total Raised',
+                            label: 'Total Raised ($)',
                             data: sorted.map(c => c.total_raised),
-                            backgroundColor: 'rgba(230, 126, 34, 0.3)',
-                            borderColor: 'rgba(230, 126, 34, 0.6)',
+                            backgroundColor: 'rgba(230, 126, 34, 0.7)',
+                            borderColor: 'rgba(230, 126, 34, 1)',
                             borderWidth: 2,
-                            barThickness: 60,
-                            order: 2
+                            barPercentage: 0.9,
+                            categoryPercentage: 0.8,
+                            yAxisID: 'y-left'
                         },
                         {
-                            label: 'Total Spent',
-                            data: sorted.map(c => c.total_spent),
-                            backgroundColor: 'rgba(239, 68, 68, 0.8)',
-                            borderColor: 'rgba(239, 68, 68, 1)',
+                            label: 'Spent % of Raised',
+                            data: sorted.map(c => c.spent_pct_of_raised),
+                            backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                            borderColor: 'rgba(52, 152, 219, 1)',
                             borderWidth: 2,
-                            barThickness: 60,
-                            order: 1
+                            barPercentage: 0.7,  // Narrower bar for visibility
+                            categoryPercentage: 0.8,
+                            yAxisID: 'y-right'
                         }
                     ]
                 },
@@ -599,7 +601,9 @@
                                     size: 13,
                                     family: "'Inter', sans-serif"
                                 },
-                                padding: 15
+                                padding: 15,
+                                usePointStyle: true,
+                                pointStyle: 'rect'
                             }
                         },
                         tooltip: {
@@ -612,17 +616,14 @@
                             displayColors: true,
                             callbacks: {
                                 label: function(context) {
-                                    const candidateIndex = context.dataIndex;
-                                    const candidate = sorted[candidateIndex];
                                     const label = context.dataset.label || '';
-                                    const value = formatCurrency(context.parsed.y);
-
-                                    if (context.datasetIndex === 1) {
-                                        // Total Spent - show percentage too
-                                        const pct = formatPercent(candidate.spent_pct_of_raised);
-                                        return `${label}: ${value} (${pct} of raised)`;
+                                    if (context.datasetIndex === 0) {
+                                        // Dollar amount
+                                        return `${label}: ${formatCurrency(context.parsed.y)}`;
+                                    } else {
+                                        // Percentage
+                                        return `${label}: ${formatPercent(context.parsed.y)}`;
                                     }
-                                    return `${label}: ${value}`;
                                 }
                             }
                         }
@@ -642,9 +643,10 @@
                                 minRotation: 30
                             }
                         },
-                        y: {
+                        'y-left': {
                             type: 'linear',
                             display: true,
+                            position: 'left',
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.05)',
                                 lineWidth: 1
@@ -660,10 +662,38 @@
                             },
                             title: {
                                 display: true,
-                                text: 'Campaign Funds ($)',
+                                text: 'Total Raised ($)',
                                 color: '#e67e22',
                                 font: {
-                                    size: 12,
+                                    size: 13,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        'y-right': {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            min: 0,
+                            max: 120,  // Allow >100% to show candidates who spent more than raised
+                            grid: {
+                                drawOnChartArea: false  // Don't draw gridlines over the chart
+                            },
+                            ticks: {
+                                color: '#3498db',
+                                font: {
+                                    size: 11
+                                },
+                                callback: function(value) {
+                                    return value.toFixed(0) + '%';
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Spent % of Raised',
+                                color: '#3498db',
+                                font: {
+                                    size: 13,
                                     weight: 'bold'
                                 }
                             }
