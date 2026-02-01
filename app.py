@@ -874,7 +874,7 @@ CANDIDATE_PROFILES = [
         "name": "Daniel Biss",
         "slug": "daniel-biss",
         "title": "State Senator",
-        "photo": "https://www.danielbiss.com/images/daniel-biss-headshot.jpg",
+        "photo": "images/candidates/biss.jpg",
         "campaign_url": "https://www.danielbiss.com",
         "bio": "Illinois State Senator representing the 9th district since 2013. Former State Representative and mathematics professor at the University of Chicago.",
         "endorsements": [
@@ -889,7 +889,7 @@ CANDIDATE_PROFILES = [
         "name": "Kat Abugazaleh",
         "slug": "kat-abugazaleh",
         "title": "Nonprofit Executive",
-        "photo": "https://katabugazaleh.com/images/kat-headshot.jpg",
+        "photo": "images/candidates/katabu.png",
         "campaign_url": "https://katabugazaleh.com",
         "bio": "Executive Director of Arab American Action Network, community organizer, and advocate for immigrant rights and social justice.",
         "endorsements": [
@@ -903,7 +903,7 @@ CANDIDATE_PROFILES = [
         "name": "Laura Fine",
         "slug": "laura-fine",
         "title": "State Representative",
-        "photo": "https://www.laurafine.org/images/laura-fine-headshot.jpg",
+        "photo": "images/candidates/fine.png",
         "campaign_url": "https://www.laurafine.org",
         "bio": "Illinois State Representative from Glenview since 2016. Former Glenview Village Trustee focused on reproductive rights and environmental issues.",
         "endorsements": [
@@ -917,7 +917,7 @@ CANDIDATE_PROFILES = [
         "name": "Phil Andrew",
         "slug": "phil-andrew",
         "title": "Community Activist",
-        "photo": "https://via.placeholder.com/400x400/e67e22/ffffff?text=PA",
+        "photo": "images/candidates/philandrew.png",
         "campaign_url": "#",
         "bio": "Longtime Evanston resident and community activist focused on local issues and grassroots organizing.",
         "endorsements": [],
@@ -927,7 +927,7 @@ CANDIDATE_PROFILES = [
         "name": "Bushra Amiwala",
         "slug": "bushra-amiwala",
         "title": "College Board Member",
-        "photo": "https://via.placeholder.com/400x400/e67e22/ffffff?text=BA",
+        "photo": "images/candidates/bushra.png",
         "campaign_url": "#",
         "bio": "Youngest Muslim elected official in the United States. Oakton Community College Board Trustee and youth advocate.",
         "endorsements": [
@@ -939,7 +939,7 @@ CANDIDATE_PROFILES = [
         "name": "Mike Simmons",
         "slug": "mike-simmons",
         "title": "State Senator",
-        "photo": "https://via.placeholder.com/400x400/e67e22/ffffff?text=MS",
+        "photo": "images/candidates/simmons.jpg",
         "campaign_url": "#",
         "bio": "Illinois State Senator representing the 7th district. First openly gay Black state senator in Illinois history.",
         "endorsements": [

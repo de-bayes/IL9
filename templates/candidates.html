@@ -39,7 +39,7 @@
             <article class="candidate-card">
                 <div class="candidate-header">
                     <div class="candidate-photo-container">
-                        <img src="{{ candidate.photo }}" alt="{{ candidate.name }}" class="candidate-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <img src="{{ url_for('static', filename=candidate.photo) }}" alt="{{ candidate.name }}" class="candidate-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         <div class="candidate-photo-fallback" style="display: none;">
                             <span>{{ candidate.name.split()[0][0] }}{{ candidate.name.split()[-1][0] }}</span>
                         </div>
