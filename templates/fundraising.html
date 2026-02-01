@@ -568,7 +568,8 @@
                             backgroundColor: 'rgba(230, 126, 34, 0.6)',
                             borderColor: 'rgba(230, 126, 34, 1)',
                             borderWidth: 2,
-                            barThickness: 80,  // Wider outer bar
+                            barPercentage: 1.0,  // Full width of category
+                            categoryPercentage: 0.7,  // Category width
                             yAxisID: 'y-left',
                             order: 2  // Draw first (behind)
                         },
@@ -578,7 +579,8 @@
                             backgroundColor: 'rgba(52, 152, 219, 0.8)',
                             borderColor: 'rgba(52, 152, 219, 1)',
                             borderWidth: 2,
-                            barThickness: 50,  // Narrower inner bar
+                            barPercentage: 0.6,  // 60% of orange bar width
+                            categoryPercentage: 0.7,  // Same category width
                             yAxisID: 'y-right',
                             order: 1  // Draw second (on top)
                         }
@@ -630,11 +632,10 @@
                     },
                     scales: {
                         x: {
-                            offset: false,  // Center bars at same X position (not grouped)
+                            stacked: false,
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.05)',
-                                lineWidth: 1,
-                                offset: false
+                                lineWidth: 1
                             },
                             ticks: {
                                 color: '#a0a0a0',
