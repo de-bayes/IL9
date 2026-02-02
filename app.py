@@ -1165,6 +1165,21 @@ def candidate_fundraising(candidate_slug):
         candidate['current_odds'] = 0.0
         candidate['has_kalshi'] = False
 
+    # Get FEC data for this candidate
+    all_fec_data = fetch_all_fec_data()
+    fec_data = None
+    for fec_candidate in all_fec_data:
+        # Normalize names for matching
+        fec_name = fec_candidate['name']
+        candidate_name = candidate['name']
+        if fec_name == candidate_name or fec_name.replace('Abugazaleh', 'Abughazaleh') == candidate_name:
+            fec_data = fec_candidate
+            break
+
+    # Add FEC data to candidate object
+    if fec_data:
+        candidate.update(fec_data)
+
     return render_template('candidate_fundraising.html', candidate=candidate)
 
 # API Endpoints

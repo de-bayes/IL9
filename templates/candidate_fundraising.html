@@ -348,49 +348,7 @@
 
         // FEC DATA FETCHING
         (function() {
-            const candidateName = {{ candidate.name | tojson }};
-
-            // Mock FEC data - Replace this with actual FEC API call
-            // TODO: Implement FEC API integration
-            setTimeout(() => {
-                // Show placeholder data for now
-                document.getElementById('loadingSection').classList.add('hidden');
-                document.getElementById('errorSection').classList.remove('hidden');
-                document.getElementById('errorMessage').textContent =
-                    'FEC API integration coming soon. Data will be available after the January 31st filing deadline.';
-            }, 1500);
-
-            // Example of what the FEC data fetch would look like:
-            /*
-            fetch(`/api/fec/candidate/${candidateName}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('loadingSection').classList.add('hidden');
-                    document.getElementById('fecDataContainer').classList.remove('hidden');
-
-                    // Populate summary cards
-                    document.getElementById('totalRaised').textContent = '$' + formatNumber(data.total_raised);
-                    document.getElementById('totalSpent').textContent = '$' + formatNumber(data.total_spent);
-                    document.getElementById('cashOnHand').textContent = '$' + formatNumber(data.cash_on_hand);
-                    document.getElementById('totalDonors').textContent = formatNumber(data.total_donors);
-
-                    // Calculate and display burn rates
-                    document.getElementById('burnRate2Week').textContent = '$' + formatNumber(data.burn_rate_2week);
-                    document.getElementById('burnRate1Month').textContent = '$' + formatNumber(data.burn_rate_1month);
-                    document.getElementById('burnRate1_5Month').textContent = '$' + formatNumber(data.burn_rate_1_5month);
-
-                    // Additional metrics
-                    document.getElementById('avgContribution').textContent = '$' + formatNumber(data.avg_contribution);
-                    document.getElementById('spendingRate').textContent = data.spending_rate + '%';
-                    document.getElementById('cashRunway').textContent = data.cash_runway + ' months';
-                    document.getElementById('smallDollarPct').textContent = data.small_dollar_pct + '%';
-                })
-                .catch(error => {
-                    document.getElementById('loadingSection').classList.add('hidden');
-                    document.getElementById('errorSection').classList.remove('hidden');
-                    console.error('Error loading FEC data:', error);
-                });
-            */
+            const candidate = {{ candidate | tojson }};
 
             function formatNumber(num) {
                 if (num >= 1000000) {
@@ -399,6 +357,45 @@
                     return (num / 1000).toFixed(1) + 'K';
                 }
                 return num.toLocaleString();
+            }
+
+            function formatCurrency(amount) {
+                return '$' + amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            }
+
+            // Check if candidate has FEC data
+            if (candidate.total_raised) {
+                // Hide loading, show data
+                document.getElementById('loadingSection').classList.add('hidden');
+                document.getElementById('fecDataContainer').classList.remove('hidden');
+
+                // Populate summary cards
+                document.getElementById('totalRaised').textContent = formatCurrency(candidate.total_raised);
+                document.getElementById('totalSpent').textContent = formatCurrency(candidate.total_spent);
+                document.getElementById('cashOnHand').textContent = formatCurrency(candidate.cash_on_hand);
+                document.getElementById('totalDonors').textContent = formatNumber(candidate.total_donors);
+
+                // Populate burn rates
+                const burn2wk = candidate.burn_2week || 0;
+                const burn1mo = candidate.burn_1month || 0;
+                const burn1_5mo = candidate.burn_1_5month || 0;
+
+                document.getElementById('burnRate2Week').textContent = burn2wk > 0 ? formatCurrency(burn2wk) + '/mo' : 'N/A';
+                document.getElementById('burnRate1Month').textContent = burn1mo > 0 ? formatCurrency(burn1mo) + '/mo' : 'N/A';
+                document.getElementById('burnRate1_5Month').textContent = burn1_5mo > 0 ? formatCurrency(burn1_5mo) + '/mo' : 'N/A';
+
+                // Additional metrics
+                document.getElementById('avgContribution').textContent = formatCurrency(candidate.avg_contribution || 0);
+                document.getElementById('spendingRate').textContent = (candidate.spent_pct_of_raised || 0).toFixed(1) + '%';
+                document.getElementById('cashRunway').textContent = candidate.cash_runway_months > 0 ?
+                    candidate.cash_runway_months.toFixed(1) + ' months' : 'N/A';
+                document.getElementById('smallDollarPct').textContent = (candidate.small_dollar_pct || 0).toFixed(1) + '%';
+            } else {
+                // No FEC data available
+                document.getElementById('loadingSection').classList.add('hidden');
+                document.getElementById('errorSection').classList.remove('hidden');
+                document.getElementById('errorMessage').textContent =
+                    'FEC data not yet available for this candidate. Check back after the next filing deadline.';
             }
         })();
     </script>
