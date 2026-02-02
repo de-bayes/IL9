@@ -143,6 +143,27 @@
                 </div>
             </section>
 
+            <section class="heatmap-explainer methodology-section">
+                <div class="methodology-header" onclick="toggleHeatmapMethodology()">
+                    <h2 style="margin: 0;">Results Heatmap Methodology</h2>
+                    <span class="toggle-icon" id="heatmapMethodologyToggle">▼</span>
+                </div>
+                <div class="methodology-content hidden" id="heatmapMethodologyContent">
+                    <div class="methodology-note">
+                        <p><strong>What is the heatmap?</strong> The Results Heatmap shows the derived probability of every possible 1st-place and 2nd-place finish combination in the race. Rows represent 1st-place finishers, columns represent 2nd-place finishers. Brighter orange cells indicate higher probability pairs.</p>
+                        <p style="margin-top: 0.8rem;"><strong>Why derive joint probabilities?</strong> Prediction markets only provide marginal win probabilities — the probability that each candidate wins. We use conditional probability to derive the joint probability of specific 1st/2nd combinations:</p>
+                    </div>
+                    <div class="formula">
+                        <strong>Formula:</strong> P(A finishes 1st, B finishes 2nd) = P(A wins) × P(B wins) / (1 − P(A wins))
+                    </div>
+                    <div class="methodology-note">
+                        <p><strong>Intuition:</strong> If candidate A wins (with probability P(A)), the remaining candidates compete for 2nd place. We assume their relative win probabilities determine who finishes 2nd. So candidate B's chance of finishing 2nd, given A won, equals B's probability renormalized among all non-A candidates: P(B) / (1 − P(A)). Multiplying by P(A) gives the joint probability of A finishing 1st <em>and</em> B finishing 2nd.</p>
+                        <p style="margin-top: 0.8rem;"><strong>Key assumption:</strong> This treats candidates as independent — it assumes that A winning doesn't change the relative ordering of the remaining candidates. In practice, ideologically similar candidates may cannibalize each other's support, which would make some 2nd-place finishes more or less likely than this model predicts. The heatmap is a first-order approximation, not a full correlated model.</p>
+                        <p style="margin-top: 0.8rem;"><strong>For the full methodology details,</strong> see the <a href="/methodology#heatmap-methodology">Results Heatmap section</a> on the Methodology page.</p>
+                    </div>
+                </div>
+            </section>
+
             <section class="donation-section">
                 <p class="donation-text">
                     Make a donation to line my pockets. No, to pay for server costs.
@@ -2025,6 +2046,13 @@ function updateStatusBadges(manifoldTime, kalshiTime) {
 function toggleMarketsMethodology() {
     const content = document.getElementById('marketsMethodologyContent');
     const icon = document.getElementById('marketsMethodologyToggle');
+    content.classList.toggle('hidden');
+    icon.textContent = content.classList.contains('hidden') ? '▼' : '▲';
+}
+
+function toggleHeatmapMethodology() {
+    const content = document.getElementById('heatmapMethodologyContent');
+    const icon = document.getElementById('heatmapMethodologyToggle');
     content.classList.toggle('hidden');
     icon.textContent = content.classList.contains('hidden') ? '▼' : '▲';
 }
