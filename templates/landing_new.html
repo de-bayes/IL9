@@ -77,7 +77,7 @@
                     </div>
                     <div class="feature-item">
                         <h3>Historical Tracking</h3>
-                        <p><span id="snapshotCount">4,000+</span> total snapshots and counting</p>
+                        <p><span id="snapshotCount">33,000+</span> total snapshots and counting</p>
                     </div>
                     <div class="feature-item">
                         <h3>Downloadable Data</h3>
@@ -191,14 +191,16 @@
             const element = document.getElementById('snapshotCount');
             if (!element) return;
 
-            let liveCount = 0;
+            let liveCount = 33000; // Fallback if API fails
             try {
                 const resp = await fetch('/api/snapshots/count');
                 const data = await resp.json();
-                liveCount = data.count || 0;
-            } catch (e) {}
+                liveCount = data.count || 33000;
+            } catch (e) {
+                console.error('Failed to fetch snapshot count:', e);
+            }
 
-            const finalValue = 4000 + liveCount;
+            const finalValue = liveCount;
             const duration = 1500;
             const startTime = Date.now();
 
