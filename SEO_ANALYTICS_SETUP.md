@@ -34,7 +34,7 @@ This guide will help you set up Google Analytics tracking and optimize your site
 ### Set Up Data Stream
 
 1. Choose platform: **Web**
-2. Website URL: `https://il9cast.com`
+2. Website URL: `https://il9.org`
 3. Stream name: `IL9Cast Website`
 4. Click **"Create stream"**
 
@@ -89,7 +89,7 @@ find templates/ -name "*.html" -type f -exec sed -i 's/G-XXXXXXXXXX/YOUR_ID/g' {
 1. Go to [Google Search Console](https://search.google.com/search-console)
 2. Click **"Add property"**
 3. Choose **"URL prefix"**
-4. Enter: `https://il9cast.com`
+4. Enter: `https://il9.org`
 5. Click **"Continue"**
 
 ### Verify Ownership
@@ -113,7 +113,7 @@ find templates/ -name "*.html" -type f -exec sed -i 's/G-XXXXXXXXXX/YOUR_ID/g' {
 2. Enter: `sitemap.xml`
 3. Click **"Submit"**
 
-Your sitemap is already live at: `https://il9cast.com/sitemap.xml`
+Your sitemap is already live at: `https://il9.org/sitemap.xml`
 
 Google will start crawling your pages within 24-48 hours.
 
@@ -307,10 +307,10 @@ Your site is already optimized for these searches:
 find templates/ -name "*.html" -type f -exec sed -i 's/G-XXXXXXXXXX/YOUR_ID/g' {} +
 
 # Test sitemap
-curl https://il9cast.com/sitemap.xml
+curl https://il9.org/sitemap.xml
 
 # Test robots.txt
-curl https://il9cast.com/robots.txt
+curl https://il9.org/robots.txt
 
 # Deploy changes
 git add .

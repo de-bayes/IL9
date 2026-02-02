@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://il9cast.com/sitemap.xml
+Sitemap: https://il9.org/sitemap.xml
 
 # Optimize crawl budget - prioritize important pages
 User-agent: Googlebot
