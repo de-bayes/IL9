@@ -143,6 +143,20 @@
                         </ul>
 
                         <p>Historical snapshots are saved with every update and aggregated hourly for clean trend visualization.</p>
+
+                        <h3>Results Heatmap (1st &amp; 2nd Place Probabilities)</h3>
+                        <p>The <a href="/markets">Markets page</a> includes a results heatmap showing the derived probability of every possible 1st-place and 2nd-place finish combination. Since prediction markets only provide marginal win probabilities (P(candidate wins)), we derive the joint probabilities using conditional probability:</p>
+
+                        <div class="formula-box">
+                            <strong>Joint probability formula:</strong><br>
+                            P(A finishes 1st, B finishes 2nd) = P(A wins) &times; P(B wins) / (1 &minus; P(A wins))
+                        </div>
+
+                        <p><strong>Intuition:</strong> If candidate A wins (with probability P(A)), the remaining candidates compete for 2nd place. We assume their relative win probabilities determine who finishes 2nd. So candidate B's chance of finishing 2nd, given A won, equals B's probability renormalized among all non-A candidates: P(B) / (1 &minus; P(A)). Multiplying by P(A) gives the joint probability of A finishing 1st <em>and</em> B finishing 2nd.</p>
+
+                        <p><strong>Key assumption:</strong> This treats candidates as independent — it assumes that A winning doesn't change the relative ordering of the remaining candidates. In practice, ideologically similar candidates may cannibalize each other's support, which would make some 2nd-place finishes more or less likely than this model predicts. The heatmap is a first-order approximation, not a full correlated model.</p>
+
+                        <p><strong>Reading the heatmap:</strong> Rows represent the 1st-place finisher, columns represent the 2nd-place finisher. The diagonal is empty (a candidate can't finish both 1st and 2nd). Brighter orange cells indicate higher probability pairs. The most likely 1st/2nd combination is highlighted at the top.</p>
                     </div>
                 </div>
             </div>
