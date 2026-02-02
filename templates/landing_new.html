@@ -3,13 +3,78 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="IL9Cast - Illinois 9th District Democratic Primary Forecast">
-    <title>IL9Cast - Illinois 9th District Forecast</title>
+
+    <!-- Primary Meta Tags -->
+    <title>IL9Cast - Illinois 9th District Democratic Primary 2026 Forecast</title>
+    <meta name="title" content="IL9Cast - Illinois 9th District Democratic Primary 2026 Forecast">
+    <meta name="description" content="Live prediction market aggregation for Illinois 9th District Democratic Primary election on March 17, 2026. Real-time odds from Manifold Markets and Kalshi, updated every 3 minutes.">
+    <meta name="keywords" content="IL9Cast, Illinois 9th District, Democratic Primary, primary election 2026, prediction markets, Manifold Markets, Kalshi, election forecast, Daniel Biss, Jan Schakowsky">
+    <link rel="canonical" href="https://il9cast.com/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://il9cast.com/">
+    <meta property="og:title" content="IL9Cast - Illinois 9th District Democratic Primary 2026 Forecast">
+    <meta property="og:description" content="Live prediction market aggregation for Illinois 9th District Democratic Primary. Real-time odds updated every 3 minutes from Manifold Markets and Kalshi.">
+    <meta property="og:site_name" content="IL9Cast">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://il9cast.com/">
+    <meta property="twitter:title" content="IL9Cast - Illinois 9th District Democratic Primary 2026 Forecast">
+    <meta property="twitter:description" content="Live prediction market aggregation for Illinois 9th District Democratic Primary. Real-time odds updated every 3 minutes.">
+
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "IL9Cast",
+        "url": "https://il9cast.com",
+        "description": "Live prediction market aggregation for Illinois 9th District Democratic Primary election on March 17, 2026",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://il9cast.com/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Event",
+        "name": "Illinois 9th District Democratic Primary Election",
+        "startDate": "2026-03-17T19:00:00-06:00",
+        "endDate": "2026-03-17T20:00:00-06:00",
+        "eventStatus": "https://schema.org/EventScheduled",
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "location": {
+            "@type": "Place",
+            "name": "Illinois 9th Congressional District",
+            "address": {
+                "@type": "PostalAddress",
+                "addressRegion": "IL",
+                "addressCountry": "US"
+            }
+        },
+        "description": "Democratic Primary election for Illinois 9th Congressional District"
+    }
+    </script>
 </head>
 <body class="dark-mode">
     <canvas id="grid-canvas"></canvas>
