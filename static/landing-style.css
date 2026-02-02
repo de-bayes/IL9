@@ -98,7 +98,7 @@ body.dark-mode header {
 nav {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
     margin-left: auto;
 }
 
@@ -107,6 +107,7 @@ nav a {
     text-decoration: none;
     font-size: 0.9rem;
     transition: color 0.2s ease;
+    white-space: nowrap;
 }
 
 nav a:hover, nav a.active {
@@ -124,6 +125,7 @@ nav a.github-link {
     border-radius: 8px;
     border: 1px solid rgba(128, 128, 128, 0.3);
     display: inline-block;
+    margin-left: 1rem;
 }
 
 nav a.github-link:hover {
@@ -154,7 +156,7 @@ nav a.donate-link {
     border-radius: 8px;
     border: 1px solid rgba(230, 126, 34, 0.4);
     display: inline-block;
-    margin-left: -1rem;
+    margin-left: -0.5rem;
 }
 
 nav a.donate-link:hover {
