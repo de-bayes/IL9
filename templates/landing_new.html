@@ -77,7 +77,7 @@
                     </div>
                     <div class="feature-item">
                         <h3>Historical Tracking</h3>
-                        <p><span id="snapshotCount">33,000+</span> total snapshots and counting</p>
+                        <p><span id="snapshotCount">5,000+</span> snapshots (<span id="dataPointCount">30,000+</span> data points)</p>
                     </div>
                     <div class="feature-item">
                         <h3>Downloadable Data</h3>
@@ -186,34 +186,44 @@
             }
         });
 
-        // Counter animation for snapshot count
+        // Counter animation for snapshot count and data points
         async function animateCounter() {
-            const element = document.getElementById('snapshotCount');
-            if (!element) return;
+            const snapshotElement = document.getElementById('snapshotCount');
+            const dataPointElement = document.getElementById('dataPointCount');
+            if (!snapshotElement || !dataPointElement) return;
 
-            let liveCount = 33000; // Fallback if API fails
+            let snapshotCount = 5000; // Fallback if API fails
+            let dataPointsCount = 30000; // Fallback if API fails
+
             try {
                 const resp = await fetch('/api/snapshots/count');
                 const data = await resp.json();
-                liveCount = data.count || 33000;
+                snapshotCount = data.snapshots || data.count || 5000;
+                dataPointsCount = data.data_points || 30000;
             } catch (e) {
                 console.error('Failed to fetch snapshot count:', e);
             }
 
-            const finalValue = liveCount;
             const duration = 1500;
             const startTime = Date.now();
 
             function update() {
                 const elapsed = Date.now() - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                const current = Math.floor(progress * finalValue);
-                element.textContent = current.toLocaleString() + '+';
+
+                // Animate snapshot count
+                const currentSnapshots = Math.floor(progress * snapshotCount);
+                snapshotElement.textContent = currentSnapshots.toLocaleString() + '+';
+
+                // Animate data points count
+                const currentDataPoints = Math.floor(progress * dataPointsCount);
+                dataPointElement.textContent = currentDataPoints.toLocaleString() + '+';
 
                 if (progress < 1) {
                     requestAnimationFrame(update);
                 } else {
-                    element.textContent = finalValue.toLocaleString() + '+';
+                    snapshotElement.textContent = snapshotCount.toLocaleString() + '+';
+                    dataPointElement.textContent = dataPointsCount.toLocaleString() + '+';
                 }
             }
 
