@@ -217,6 +217,28 @@
                 </div>
             </section>
 
+            <section class="calculation-breakdown method-foldout" id="heatmapSection">
+                <button class="foldout-trigger" onclick="toggleHeatmapFoldout()">
+                    <div class="foldout-trigger-left">
+                        <div>
+                            <h2>Results Heatmap</h2>
+                            <p class="foldout-desc">Derived probabilities for every 1st &amp; 2nd place finish combination</p>
+                        </div>
+                    </div>
+                    <span class="foldout-arrow" id="heatmap-foldout-arrow">+</span>
+                </button>
+                <div class="foldout-body" id="heatmap-foldout-body">
+                    <div class="foldout-inner">
+                        <div id="heatmapContent">
+                            <p style="color: #a0a0a0;">Loading market data...</p>
+                        </div>
+                        <p class="breakdown-desc" style="font-size: 0.85rem; color: #a0a0a0; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(230, 126, 34, 0.2);">
+                            Derived from current aggregate win probabilities. P(A 1st, B 2nd) = P(A wins) &times; P(B wins) / (1 &minus; P(A wins)). Assumes remaining candidates' relative odds determine 2nd place. Diagonal is empty (can't finish both 1st and 2nd).
+                        </p>
+                    </div>
+                </div>
+            </section>
+
             <section class="additional-markets">
                 <h2>Market Sources</h2>
 
@@ -1207,6 +1229,101 @@
             padding-top: 1.8rem;
         }
 
+        /* ===== RESULTS HEATMAP ===== */
+        .heatmap-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .heatmap-table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 500px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+        }
+
+        .heatmap-table th {
+            padding: 0.6rem 0.5rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .heatmap-table th.heatmap-corner {
+            background: transparent;
+            border: none;
+        }
+
+        .heatmap-table th.heatmap-col-header {
+            border-bottom: 1px solid rgba(230, 126, 34, 0.2);
+            writing-mode: vertical-lr;
+            transform: rotate(180deg);
+            height: 90px;
+            vertical-align: bottom;
+            padding-bottom: 0.6rem;
+        }
+
+        .heatmap-table th.heatmap-row-header {
+            text-align: right;
+            padding-right: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            border-right: 1px solid rgba(230, 126, 34, 0.2);
+            white-space: nowrap;
+        }
+
+        .heatmap-table td {
+            text-align: center;
+            padding: 0.55rem 0.4rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: transform 0.15s ease;
+        }
+
+        .heatmap-table td:hover:not(.heatmap-diagonal) {
+            transform: scale(1.08);
+            z-index: 1;
+            position: relative;
+        }
+
+        .heatmap-table td.heatmap-diagonal {
+            background: rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 0.7rem;
+        }
+
+        .heatmap-label-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+        }
+
+        .heatmap-axis-label {
+            font-size: 0.75rem;
+            color: rgba(230, 126, 34, 0.7);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        @media (max-width: 600px) {
+            .heatmap-table th.heatmap-col-header {
+                height: 70px;
+                font-size: 0.65rem;
+            }
+            .heatmap-table th.heatmap-row-header {
+                font-size: 0.65rem;
+                padding-right: 0.4rem;
+            }
+            .heatmap-table td {
+                font-size: 0.7rem;
+                padding: 0.4rem 0.25rem;
+            }
+        }
+
         .breakdown-desc {
             color: #a0a0a0;
             margin-bottom: 0.5rem;
@@ -2054,6 +2171,7 @@ async function calculateAggregate() {
     await renderMarketTrendChart(aggregated);
 
     renderBreakdown(breakdowns);
+    renderHeatmap(aggregated);
 }
 
 async function saveSnapshot(candidates) {
@@ -2138,6 +2256,105 @@ function toggleCalcFoldout() {
     body.classList.toggle('open');
     arrow.classList.toggle('open');
     foldout.classList.toggle('active');
+}
+
+function toggleHeatmapFoldout() {
+    const body = document.getElementById('heatmap-foldout-body');
+    const arrow = document.getElementById('heatmap-foldout-arrow');
+    const foldout = document.getElementById('heatmapSection');
+    body.classList.toggle('open');
+    arrow.classList.toggle('open');
+    foldout.classList.toggle('active');
+}
+
+function renderHeatmap(candidates) {
+    const container = document.getElementById('heatmapContent');
+    if (!candidates || candidates.length < 2) {
+        container.innerHTML = '<p style="color: #a0a0a0;">Waiting for market data...</p>';
+        return;
+    }
+
+    // Sort by probability descending, take top 6
+    const sorted = candidates.slice().sort((a, b) => b.probability - a.probability).slice(0, 6);
+    const n = sorted.length;
+
+    // Compute conditional probability matrix
+    // P(row=1st, col=2nd) = P(row wins) * P(col wins) / (1 - P(row wins))
+    const matrix = [];
+    for (let i = 0; i < n; i++) {
+        matrix[i] = [];
+        const pWin = sorted[i].probability / 100;
+        for (let j = 0; j < n; j++) {
+            if (i === j) {
+                matrix[i][j] = null; // diagonal
+            } else {
+                const pOther = sorted[j].probability / 100;
+                const denom = 1 - pWin;
+                matrix[i][j] = denom > 0 ? (pWin * pOther / denom) * 100 : 0;
+            }
+        }
+    }
+
+    // Find max value for color scaling
+    let maxVal = 0;
+    for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+            if (matrix[i][j] !== null && matrix[i][j] > maxVal) {
+                maxVal = matrix[i][j];
+            }
+        }
+    }
+
+    // Color function: orange intensity based on value
+    function cellColor(val) {
+        if (val === null) return '';
+        const intensity = maxVal > 0 ? val / maxVal : 0;
+        const r = 230, g = 126, b = 34; // #e67e22
+        const alpha = 0.08 + intensity * 0.55;
+        return `background: rgba(${r}, ${g}, ${b}, ${alpha.toFixed(2)});`;
+    }
+
+    function cellTextColor(val) {
+        if (val === null) return '';
+        const intensity = maxVal > 0 ? val / maxVal : 0;
+        return intensity > 0.5 ? 'color: #fff;' : 'color: rgba(255,255,255,0.85);';
+    }
+
+    // Get last names for column headers
+    function lastName(name) {
+        const parts = name.trim().split(' ');
+        return parts[parts.length - 1];
+    }
+
+    // Build table HTML
+    let html = '<div class="heatmap-label-row">';
+    html += '<span class="heatmap-axis-label">&#8595; Finishes 1st</span>';
+    html += '<span class="heatmap-axis-label">Finishes 2nd &#8594;</span>';
+    html += '</div>';
+    html += '<div class="heatmap-wrapper"><table class="heatmap-table"><thead><tr>';
+    html += '<th class="heatmap-corner"></th>';
+    for (let j = 0; j < n; j++) {
+        html += `<th class="heatmap-col-header">${lastName(sorted[j].name)}</th>`;
+    }
+    html += '</tr></thead><tbody>';
+
+    for (let i = 0; i < n; i++) {
+        html += '<tr>';
+        html += `<th class="heatmap-row-header">${lastName(sorted[i].name)}</th>`;
+        for (let j = 0; j < n; j++) {
+            const val = matrix[i][j];
+            if (val === null) {
+                html += '<td class="heatmap-diagonal">&mdash;</td>';
+            } else {
+                const display = val < 0.1 ? '&lt;0.1%' : val.toFixed(1) + '%';
+                html += `<td style="${cellColor(val)} ${cellTextColor(val)}" title="${sorted[i].name} 1st, ${sorted[j].name} 2nd: ${val.toFixed(2)}%">${display}</td>`;
+            }
+        }
+        html += '</tr>';
+    }
+
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
 }
 
 async function fetchManifoldData() {
