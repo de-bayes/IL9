@@ -140,35 +140,9 @@
                     <div id="heatmapContent">
                         <p style="color: #a0a0a0;">Loading market data...</p>
                     </div>
-                </div>
-            </section>
-
-            <section class="heatmap-explainer method-foldout" id="heatmapMethodology">
-                <button class="foldout-trigger" onclick="toggleHeatmapMethodology()">
-                    <div class="foldout-trigger-left">
-                        <div>
-                            <h2>Results Heatmap Methodology</h2>
-                            <p class="foldout-desc">Joint probability formula for 1st &amp; 2nd place finishes</p>
-                        </div>
-                    </div>
-                    <span class="foldout-arrow" id="heatmap-foldout-arrow">+</span>
-                </button>
-                <div class="foldout-body" id="heatmap-foldout-body">
-                    <div class="foldout-inner">
-                        <p><strong>What is the heatmap?</strong> The Results Heatmap shows the derived probability of every possible 1st-place and 2nd-place finish combination in the race. Rows represent 1st-place finishers, columns represent 2nd-place finishers. Brighter orange cells indicate higher probability pairs.</p>
-
-                        <p style="margin-top: 1rem;"><strong>Why derive joint probabilities?</strong> Prediction markets only provide marginal win probabilities — the probability that each candidate wins. We use conditional probability to derive the joint probability of specific 1st/2nd combinations:</p>
-
-                        <div class="formula">
-                            <strong>Formula:</strong> P(A finishes 1st, B finishes 2nd) = P(A wins) × P(B wins) / (1 − P(A wins))
-                        </div>
-
-                        <p style="margin-top: 1rem;"><strong>Intuition:</strong> If candidate A wins (with probability P(A)), the remaining candidates compete for 2nd place. We assume their relative win probabilities determine who finishes 2nd. So candidate B's chance of finishing 2nd, given A won, equals B's probability renormalized among all non-A candidates: P(B) / (1 − P(A)). Multiplying by P(A) gives the joint probability of A finishing 1st <em>and</em> B finishing 2nd.</p>
-
-                        <p style="margin-top: 1rem;"><strong>Key assumption:</strong> This treats candidates as independent — it assumes that A winning doesn't change the relative ordering of the remaining candidates. In practice, ideologically similar candidates may cannibalize each other's support, which would make some 2nd-place finishes more or less likely than this model predicts. The heatmap is a first-order approximation, not a full correlated model.</p>
-
-                        <p style="margin-top: 1rem;"><strong>For the full methodology details,</strong> see the <a href="/methodology#heatmap-methodology">Results Heatmap section</a> on the Methodology page.</p>
-                    </div>
+                    <p style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(230, 126, 34, 0.15); font-size: 0.9rem; color: #a0a0a0;">
+                        For the full methodology details, see the <a href="/methodology#heatmap-methodology" style="color: #e67e22; text-decoration: underline;">Results Heatmap section</a> on the Methodology page.
+                    </p>
                 </div>
             </section>
 
@@ -1248,126 +1222,6 @@
             padding-top: 1.8rem;
         }
 
-        /* ===== HEATMAP METHODOLOGY ===== */
-        .heatmap-explainer.method-foldout {
-            background: rgba(26, 26, 26, 0.5);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid rgba(230, 126, 34, 0.3);
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            overflow: hidden;
-            padding: 0;
-        }
-
-        .heatmap-explainer.method-foldout.active {
-            border-color: rgba(230, 126, 34, 0.5);
-            box-shadow: 0 0 20px rgba(230, 126, 34, 0.08);
-        }
-
-        .heatmap-explainer .foldout-trigger {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1.8rem 2.2rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            text-align: left;
-            color: inherit;
-            transition: background 0.3s ease;
-        }
-
-        .heatmap-explainer .foldout-trigger:hover {
-            background: rgba(230, 126, 34, 0.06);
-        }
-
-        .heatmap-explainer .foldout-trigger-left {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-        }
-
-        .heatmap-explainer .foldout-trigger h2 {
-            margin-bottom: 0;
-            font-size: 1.6rem;
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-weight: 600;
-            color: #e67e22;
-            line-height: 1.3;
-        }
-
-        .heatmap-explainer .foldout-desc {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.45);
-            margin: 0.2rem 0 0 0;
-            line-height: 1.4;
-        }
-
-        .heatmap-explainer .foldout-arrow {
-            font-family: 'Inter', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 300;
-            color: rgba(230, 126, 34, 0.6);
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            flex-shrink: 0;
-            width: 30px;
-            text-align: center;
-            line-height: 1;
-        }
-
-        .heatmap-explainer .foldout-arrow.open {
-            transform: rotate(45deg);
-        }
-
-        .heatmap-explainer .foldout-body {
-            display: grid;
-            grid-template-rows: 0fr;
-            transition: grid-template-rows 0.5s cubic-bezier(0.34, 1.12, 0.64, 1),
-                        opacity 0.4s ease;
-            opacity: 0;
-        }
-
-        .heatmap-explainer .foldout-body.open {
-            grid-template-rows: 1fr;
-            opacity: 1;
-        }
-
-        .heatmap-explainer .foldout-inner {
-            overflow: hidden;
-            padding: 0 2.2rem;
-        }
-
-        .heatmap-explainer .foldout-body.open .foldout-inner {
-            padding-bottom: 2.2rem;
-        }
-
-        .heatmap-explainer .foldout-body .foldout-inner {
-            border-top: 1px solid rgba(230, 126, 34, 0.15);
-            padding-top: 0;
-            transition: padding-top 0.4s ease;
-        }
-
-        .heatmap-explainer .foldout-body.open .foldout-inner {
-            padding-top: 1.8rem;
-        }
-
-        .heatmap-explainer .foldout-inner p {
-            margin-bottom: 0.8rem;
-            line-height: 1.8;
-            color: #c0c0c0;
-        }
-
-        .heatmap-explainer .foldout-inner a {
-            color: #e67e22;
-            text-decoration: underline;
-        }
-
-        .heatmap-explainer .foldout-inner a:hover {
-            opacity: 0.8;
-        }
-
         /* ===== RESULTS HEATMAP CALLOUT ===== */
         .heatmap-callout {
             background: rgba(26, 26, 26, 0.5);
@@ -2176,17 +2030,6 @@ function toggleMarketsMethodology() {
     const icon = document.getElementById('marketsMethodologyToggle');
     content.classList.toggle('hidden');
     icon.textContent = content.classList.contains('hidden') ? '▼' : '▲';
-}
-
-function toggleHeatmapMethodology() {
-    const body = document.getElementById('heatmap-foldout-body');
-    const arrow = document.getElementById('heatmap-foldout-arrow');
-    const section = document.getElementById('heatmapMethodology');
-    const isOpen = body.classList.contains('open');
-
-    body.classList.toggle('open');
-    arrow.classList.toggle('open');
-    section.classList.toggle('active');
 }
 
 let marketChart = null;
