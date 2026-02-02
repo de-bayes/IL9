@@ -175,6 +175,86 @@ body.dark-mode nav a.donate-link:hover {
     border-color: rgba(230, 126, 34, 0.6);
 }
 
+/* COUNTDOWN TIMER */
+.countdown-section {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 2rem;
+    text-align: center;
+    background: rgba(230, 126, 34, 0.05);
+    border: 2px solid rgba(230, 126, 34, 0.2);
+    border-radius: 16px;
+}
+
+.countdown-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #e67e22;
+    margin: 0 0 1.5rem 0;
+}
+
+.countdown-timer {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1rem;
+}
+
+.countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100px;
+}
+
+.countdown-value {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 3.5rem;
+    line-height: 1;
+    color: #e67e22;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.countdown-label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    margin-top: 0.5rem;
+}
+
+.countdown-date {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: #888;
+    margin: 0;
+}
+
+body.dark-mode .countdown-section {
+    background: rgba(230, 126, 34, 0.08);
+    border-color: rgba(230, 126, 34, 0.3);
+}
+
+body.dark-mode .countdown-title {
+    color: #e67e22;
+}
+
+body.dark-mode .countdown-value {
+    color: #e67e22;
+}
+
+body.dark-mode .countdown-label {
+    color: #a0a0a0;
+}
+
+body.dark-mode .countdown-date {
+    color: #a0a0a0;
+}
+
 /* HERO */
 .hero {
     max-width: 900px;
@@ -581,6 +661,35 @@ body.dark-mode #mobileNav.active {
 }
 
 @media (max-width: 768px) {
+    .countdown-section {
+        padding: 1.5rem 1rem;
+        margin: 1.5rem 1rem;
+    }
+
+    .countdown-title {
+        font-size: 1.5rem;
+    }
+
+    .countdown-timer {
+        gap: 1rem;
+    }
+
+    .countdown-unit {
+        min-width: 70px;
+    }
+
+    .countdown-value {
+        font-size: 2.5rem;
+    }
+
+    .countdown-label {
+        font-size: 0.75rem;
+    }
+
+    .countdown-date {
+        font-size: 0.9rem;
+    }
+
     .footer-content {
         grid-template-columns: 1fr;
         gap: 2rem;

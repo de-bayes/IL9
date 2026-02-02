@@ -39,6 +39,30 @@
             <p class="subtitle">Live prediction market aggregation for the March 17, 2026 primary election</p>
         </section>
 
+        <!-- Countdown Timer -->
+        <section class="countdown-section">
+            <h2 class="countdown-title">Polls Close In</h2>
+            <div class="countdown-timer" id="countdown">
+                <div class="countdown-unit">
+                    <span class="countdown-value" id="days">--</span>
+                    <span class="countdown-label">Days</span>
+                </div>
+                <div class="countdown-unit">
+                    <span class="countdown-value" id="hours">--</span>
+                    <span class="countdown-label">Hours</span>
+                </div>
+                <div class="countdown-unit">
+                    <span class="countdown-value" id="minutes">--</span>
+                    <span class="countdown-label">Minutes</span>
+                </div>
+                <div class="countdown-unit">
+                    <span class="countdown-value" id="seconds">--</span>
+                    <span class="countdown-label">Seconds</span>
+                </div>
+            </div>
+            <p class="countdown-date">March 17, 2026 • 7:00 PM CT</p>
+        </section>
+
         <section class="features-section">
             <div class="features-callout">
                 <h2 class="features-title">Why IL9Cast?</h2>
@@ -196,6 +220,38 @@
 
         // Run counter animation when page loads
         window.addEventListener('load', animateCounter);
+
+        // Countdown Timer to Election Day
+        function updateCountdown() {
+            // March 17, 2026 at 7:00 PM Central Time
+            // Convert to UTC: 7 PM CT = 1 AM UTC (next day during CST)
+            const electionDate = new Date('2026-03-18T01:00:00Z'); // March 17 7PM CT = March 18 1AM UTC
+            const now = new Date();
+            const timeDiff = electionDate - now;
+
+            if (timeDiff <= 0) {
+                // Election has passed
+                document.getElementById('days').textContent = '0';
+                document.getElementById('hours').textContent = '0';
+                document.getElementById('minutes').textContent = '0';
+                document.getElementById('seconds').textContent = '0';
+                return;
+            }
+
+            const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+            document.getElementById('days').textContent = days;
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        }
+
+        // Update countdown every second
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
 
         // GRID BACKGROUND - Static, no mouse interaction
         const canvas = document.getElementById('grid-canvas');
