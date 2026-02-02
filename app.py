@@ -47,12 +47,6 @@ SWING_THRESHOLD = 5.0  # percentage points to trigger alert
 _swing_debounce = {}  # candidate_name -> last_alert_time (UTC timestamp)
 _daily_summary_sent = None  # date string of last sent daily summary
 
-# ===== FEC API CONFIGURATION =====
-FEC_API_KEY = os.environ.get('FEC_API_KEY', 'DEMO_KEY')
-FEC_API_BASE = 'https://api.open.fec.gov/v1'
-FEC_CACHE_PATH = resolve_data_path('fec_cache.json')
-FEC_CACHE_HOURS = 24  # Cache FEC data for 24 hours
-
 # ===== JSONL HELPER FUNCTIONS =====
 
 def read_snapshots_jsonl(filepath):
@@ -741,265 +735,127 @@ View Live Markets: {request.host_url}markets
 
 # ===== FEC API FUNCTIONS =====
 
-def fetch_fec_candidate_data(candidate_name):
-    """
-    Fetch FEC data for a specific candidate by searching for their committee.
-    Returns dict with financial metrics or None if not found.
-    """
-    try:
-        # Map candidate names to FEC candidate IDs (not committee IDs)
-        # Format: H6IL09XXX (H = House, 6 = 2026 cycle, IL09 = district)
-        fec_candidate_map = {
-            'Daniel Biss': 'H6IL09228',       # Found: has FEC data
-            'Kat Abughazaleh': 'H6IL09178',   # Found: Katherine M. Abughazaleh in FEC
-            'Kat Abugazaleh': 'H6IL09178',    # Alternate spelling (same person)
-            'Mike Simmons': 'H6IL09293',      # Found: has FEC data
-            'Laura Fine': 'H6IL09194',        # Found: FINE, LAURA
-            'Phil Andrew': 'H6IL09301',       # Found: ANDREW, PHILIP JEROME
-            'Bushra Amiwala': 'H6IL09236',    # Found: AMIWALA, BUSHRA
-        }
-
-        candidate_id = fec_candidate_map.get(candidate_name)
-        if not candidate_id:
-            return None
-
-        # First, get the committee_id from candidate search
-        search_url = f'{FEC_API_BASE}/candidates/search/'
-        search_params = {
-            'api_key': FEC_API_KEY,
-            'candidate_id': candidate_id
-        }
-        search_response = requests.get(search_url, params=search_params, timeout=10)
-        committee_id = None
-        if search_response.status_code == 200:
-            search_data = search_response.json()
-            if search_data.get('results'):
-                committees = search_data['results'][0].get('principal_committees', [])
-                if committees:
-                    committee_id = committees[0].get('committee_id')
-
-        # Fetch candidate totals from FEC API
-        url = f'{FEC_API_BASE}/candidate/{candidate_id}/totals/'
-        params = {
-            'api_key': FEC_API_KEY,
-            'cycle': 2026,
-            'sort': '-cycle'
-        }
-
-        response = requests.get(url, params=params, timeout=10)
-        if response.status_code != 200:
-            print(f"[{datetime.now().isoformat()}] FEC API error for {candidate_name}: {response.status_code}")
-            return None
-
-        data = response.json()
-        if not data.get('results'):
-            return None
-
-        result = data['results'][0]
-
-        # Extract key metrics from FEC totals
-        total_raised = result.get('receipts', 0)
-        total_spent = result.get('disbursements', 0)
-        cash_on_hand = result.get('last_cash_on_hand_end_period', 0)
-
-        # Individual contributions breakdown (for small dollar %)
-        individual_total = result.get('individual_contributions', 0)
-        unitemized = result.get('individual_unitemized_contributions', 0)  # < $200 (small dollar)
-        itemized = result.get('individual_itemized_contributions', 0)      # >= $200
-
-        # Estimate donor count (FEC doesn't provide exact count)
-        # Average small donor ~$50, large donor ~$500
-        estimated_donors = int((unitemized / 50) + (itemized / 500)) if (unitemized + itemized) > 0 else 0
-
-        return {
-            'name': candidate_name,
-            'total_raised': total_raised,
-            'total_spent': total_spent,
-            'cash_on_hand': cash_on_hand,
-            'total_donors': estimated_donors,
-            'small_dollar_amount': unitemized,
-            'individual_total': individual_total,  # Used for small dollar % calculation
-            'coverage_end_date': result.get('coverage_end_date', ''),
-            'committee_id': committee_id  # Needed for burn rate calculations
-        }
-    except Exception as e:
-        print(f"[{datetime.now().isoformat()}] Error fetching FEC data for {candidate_name}: {e}")
-        return None
-
-
-def calculate_burn_rate(candidate_data, committee_id):
-    """
-    Calculate burn rate metrics from REAL FEC disbursement data.
-    Queries FEC schedule_b (disbursements) for recent spending.
-    Returns dict with 2-week, 1-month, and 1.5-month projections.
-    """
-    if not candidate_data or not committee_id:
-        return None
-
-    try:
-        from datetime import datetime, timedelta
-
-        # Get the coverage end date from FEC data
-        coverage_end = candidate_data.get('coverage_end_date', '')
-        if coverage_end:
-            # Parse FEC date format: "2025-12-31T00:00:00"
-            end_date = datetime.strptime(coverage_end[:10], '%Y-%m-%d')
-        else:
-            # Fallback to today
-            end_date = datetime.now()
-
-        # Calculate date ranges
-        date_14_days = (end_date - timedelta(days=14)).strftime('%Y-%m-%d')
-        date_30_days = (end_date - timedelta(days=30)).strftime('%Y-%m-%d')
-        date_45_days = (end_date - timedelta(days=45)).strftime('%Y-%m-%d')
-        end_date_str = end_date.strftime('%Y-%m-%d')
-
-        # Query FEC schedule_b for disbursements in each period
-        def get_period_spending(min_date, max_date):
-            url = f'{FEC_API_BASE}/schedules/schedule_b/'
-            params = {
-                'api_key': FEC_API_KEY,
-                'committee_id': committee_id,
-                'min_date': min_date,
-                'max_date': max_date,
-                'per_page': 100,
-                'sort': '-disbursement_date'
-            }
-
-            total = 0
-            page = 1
-
-            # Fetch all pages (limit to 5 pages max to avoid timeouts)
-            while page <= 5:
-                params['page'] = page
-                response = requests.get(url, params=params, timeout=10)
-
-                if response.status_code != 200:
-                    break
-
-                data = response.json()
-                results = data.get('results', [])
-
-                if not results:
-                    break
-
-                for item in results:
-                    amount = item.get('disbursement_amount', 0)
-                    if amount:
-                        total += amount
-
-                # Check if there are more pages
-                pagination = data.get('pagination', {})
-                if page >= pagination.get('pages', 1):
-                    break
-
-                page += 1
-
-            return total
-
-        # Calculate spending for each period
-        spending_14_days = get_period_spending(date_14_days, end_date_str)
-        spending_30_days = get_period_spending(date_30_days, end_date_str)
-        spending_45_days = get_period_spending(date_45_days, end_date_str)
-
-        # Calculate monthly burn rates
-        burn_2week = (spending_14_days / 14) * 30  # Daily rate × 30 days
-        burn_1month = spending_30_days  # Already monthly
-        burn_1_5month = (spending_45_days / 45) * 30  # Daily rate × 30 days
-
-        # Calculate cash runway
-        cash_on_hand = candidate_data.get('cash_on_hand', 0)
-        avg_burn = (burn_2week + burn_1month + burn_1_5month) / 3
-        cash_runway_months = cash_on_hand / avg_burn if avg_burn > 0 else 0
-
-        return {
-            'burn_2week': burn_2week,
-            'burn_1month': burn_1month,
-            'burn_1_5month': burn_1_5month,
-            'cash_runway_months': cash_runway_months
-        }
-    except Exception as e:
-        print(f"[{datetime.now().isoformat()}] Error calculating burn rate: {e}")
-        # Return fallback estimates
-        total_spent = candidate_data.get('total_spent', 0)
-        estimated_monthly = total_spent / 6 if total_spent > 0 else 0
-        return {
-            'burn_2week': estimated_monthly,
-            'burn_1month': estimated_monthly,
-            'burn_1_5month': estimated_monthly,
-            'cash_runway_months': candidate_data.get('cash_on_hand', 0) / estimated_monthly if estimated_monthly > 0 else 0
-        }
-
-
 def fetch_all_fec_data():
     """
-    Fetch FEC data for all IL-09 2026 candidates with profiles.
-    Uses 24-hour cache to avoid slow FEC API queries on every load.
-    Returns list of candidate financial data dicts.
+    Returns hardcoded FEC data for all IL-09 2026 candidates with profiles.
+    Data is static until new FEC reports are filed (expected April 2026).
+    Source: FEC filings as of Dec 31, 2025 (retrieved Feb 1, 2026).
+
+    Burn rate formulas (corrected):
+    - 2-week burn: last 2 weeks expenditures × 2 = monthly
+    - 1-month burn: last 1 month expenditures = monthly
+    - 1.5-month burn: last 1.5 months expenditures × 0.66 = monthly
     """
-    # Check cache first
-    try:
-        if os.path.exists(FEC_CACHE_PATH):
-            cache_age_hours = (datetime.now(timezone.utc).timestamp() - os.path.getmtime(FEC_CACHE_PATH)) / 3600
-            if cache_age_hours < FEC_CACHE_HOURS:
-                print(f"[{datetime.now().isoformat()}] Using FEC cache (age: {cache_age_hours:.1f} hours)")
-                with open(FEC_CACHE_PATH, 'r') as f:
-                    return json.load(f)
-    except Exception as e:
-        print(f"[{datetime.now().isoformat()}] Error reading FEC cache: {e}")
-
-    # Cache miss or expired - fetch fresh data
-    print(f"[{datetime.now().isoformat()}] Fetching fresh FEC data...")
-
-    # Only fetch candidates who have profiles on the site
-    candidates = [
-        'Daniel Biss',
-        'Kat Abugazaleh',      # Note: spelled differently than FEC (Abughazaleh)
-        'Laura Fine',
-        'Mike Simmons',
-        'Phil Andrew',
-        'Bushra Amiwala'
+    return [
+        {
+            "name": "Daniel Biss",
+            "total_raised": 1984528.24,
+            "total_spent": 608223.67,
+            "cash_on_hand": 1376304.57,
+            "total_donors": 5590,
+            "small_dollar_amount": 97977.94,
+            "individual_total": 1913366.89,
+            "coverage_end_date": "2025-12-31T00:00:00",
+            "committee_id": "C00905307",
+            "burn_2week": 0,
+            "burn_1month": 0,
+            "burn_1_5month": 0.0,
+            "cash_runway_months": 0,
+            "spent_pct_of_raised": 30.648274876652803,
+            "avg_contribution": 355.01399642218246,
+            "small_dollar_pct": 5.120708449177775
+        },
+        {
+            "name": "Kat Abugazaleh",
+            "total_raised": 2705175.67,
+            "total_spent": 1894222.66,
+            "cash_on_hand": 810953.01,
+            "total_donors": 39569,
+            "small_dollar_amount": 1898015.77,
+            "individual_total": 2702469.35,
+            "coverage_end_date": "2025-12-31T00:00:00",
+            "committee_id": "C00900449",
+            "burn_2week": 0,
+            "burn_1month": 0,
+            "burn_1_5month": 0.0,
+            "cash_runway_months": 0,
+            "spent_pct_of_raised": 70.02216828306754,
+            "avg_contribution": 68.36603578558973,
+            "small_dollar_pct": 70.23264741189386
+        },
+        {
+            "name": "Laura Fine",
+            "total_raised": 1921415.34,
+            "total_spent": 481445.18,
+            "cash_on_hand": 1439970.16,
+            "total_donors": 4874,
+            "small_dollar_amount": 59768.25,
+            "individual_total": 1899148.18,
+            "coverage_end_date": "2025-12-31T00:00:00",
+            "committee_id": "C00904326",
+            "burn_2week": 0,
+            "burn_1month": 0,
+            "burn_1_5month": 0.0,
+            "cash_runway_months": 0,
+            "spent_pct_of_raised": 25.056799015667274,
+            "avg_contribution": 394.21734509643005,
+            "small_dollar_pct": 3.147108299890533
+        },
+        {
+            "name": "Mike Simmons",
+            "total_raised": 324880.07,
+            "total_spent": 189728.52,
+            "cash_on_hand": 135151.55,
+            "total_donors": 1384,
+            "small_dollar_amount": 42440.7,
+            "individual_total": 310380.07,
+            "coverage_end_date": "2025-12-31T00:00:00",
+            "committee_id": "C00910976",
+            "burn_2week": 0,
+            "burn_1month": 0,
+            "burn_1_5month": 0.0,
+            "cash_runway_months": 0,
+            "spent_pct_of_raised": 58.399556488645175,
+            "avg_contribution": 234.73993497109828,
+            "small_dollar_pct": 13.673783886961555
+        },
+        {
+            "name": "Phil Andrew",
+            "total_raised": 1210786.43,
+            "total_spent": 249372.83,
+            "cash_on_hand": 961413.6,
+            "total_donors": 2367,
+            "small_dollar_amount": 42544.0,
+            "individual_total": 800978.51,
+            "coverage_end_date": "2025-12-31T00:00:00",
+            "committee_id": "C00911024",
+            "burn_2week": 0,
+            "burn_1month": 0,
+            "burn_1_5month": 0.0,
+            "cash_runway_months": 0,
+            "spent_pct_of_raised": 20.595938624782903,
+            "avg_contribution": 511.5278538234051,
+            "small_dollar_pct": 5.311503301131013
+        },
+        {
+            "name": "Bushra Amiwala",
+            "total_raised": 663802.8,
+            "total_spent": 185643.0,
+            "cash_on_hand": 478159.8,
+            "total_donors": 4356,
+            "small_dollar_amount": 168958.8,
+            "individual_total": 657402.8,
+            "coverage_end_date": "2025-09-30T00:00:00",
+            "committee_id": "C00906842",
+            "burn_2week": 44959.720000000016,
+            "burn_1month": 51723.530000000006,
+            "burn_1_5month": 43488.07320000001,
+            "cash_runway_months": 10.233757998797286,
+            "spent_pct_of_raised": 27.966588872478393,
+            "avg_contribution": 152.38815426997246,
+            "small_dollar_pct": 25.70095533514612
+        }
     ]
-
-    results = []
-    for candidate in candidates:
-        data = fetch_fec_candidate_data(candidate)
-        if data:
-            # Add burn rate calculations using real FEC expenditure data
-            committee_id = data.get('committee_id')
-            burn_rates = calculate_burn_rate(data, committee_id)
-            if burn_rates:
-                data.update(burn_rates)
-
-            # Calculate additional metrics
-            if data.get('total_raised', 0) > 0:
-                data['spent_pct_of_raised'] = (data.get('total_spent', 0) / data['total_raised']) * 100
-                data['avg_contribution'] = data['total_raised'] / data.get('total_donors', 1)
-            else:
-                data['spent_pct_of_raised'] = 0
-                data['avg_contribution'] = 0
-
-            # Small dollar % should be calculated against individual contributions, not total receipts
-            # (Total receipts includes PAC money, transfers, etc.)
-            individual_total = data.get('individual_total', 0)
-            if individual_total > 0:
-                small_dollar = data.get('small_dollar_amount', 0)
-                data['small_dollar_pct'] = (small_dollar / individual_total) * 100
-            else:
-                data['small_dollar_pct'] = 0
-
-            results.append(data)
-
-    # Save to cache
-    try:
-        os.makedirs(os.path.dirname(FEC_CACHE_PATH), exist_ok=True)
-        with open(FEC_CACHE_PATH, 'w') as f:
-            json.dump(results, f, indent=2)
-        print(f"[{datetime.now().isoformat()}] FEC data cached ({len(results)} candidates)")
-    except Exception as e:
-        print(f"[{datetime.now().isoformat()}] Error writing FEC cache: {e}")
-
-    return results
 
 
 # ===== INITIALIZATION =====

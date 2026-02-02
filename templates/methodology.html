@@ -176,11 +176,77 @@
                 </button>
                 <div class="foldout-body" id="foldout-body-fundraising">
                     <div class="foldout-inner">
-                        <div class="coming-soon-block">
-                            <span class="coming-soon-icon">&#9881;</span>
-                            <h3>Coming Soon</h3>
-                            <p>The fundraising methodology will be published here once FEC filing data is integrated on the <a href="/fundraising">Fundraising page</a>. It will detail how we source, normalize, and visualize campaign finance data including total raised, cash on hand, donor counts, and burn rates from Federal Election Commission filings.</p>
+
+                        <p>The <a href="/fundraising">Fundraising page</a> aggregates campaign finance data directly from the Federal Election Commission's public API. This gives us real-time insights into total raised, cash on hand, spending patterns, and grassroots support metrics for all candidates in the race.</p>
+
+                        <h3>FEC API Data Sources</h3>
+                        <p>We pull data from two primary FEC API endpoints:</p>
+                        <div class="formula-box">
+                            <strong>Candidate Totals:</strong> <code>GET /v1/candidate/{candidate_id}/totals/</code><br>
+                            Returns aggregate financial summary including receipts, disbursements, cash on hand, and individual contribution breakdowns.
                         </div>
+                        <div class="formula-box" style="margin-top: 0.75rem;">
+                            <strong>Disbursements:</strong> <code>GET /v1/schedules/schedule_b/</code><br>
+                            Returns itemized expenditure records (Schedule B) used for burn rate calculations.
+                        </div>
+                        <p>Each candidate is identified by their FEC candidate ID (format: <code>H6IL09XXX</code>). We map candidate names to their IDs and then query their principal campaign committee for financial data. For example:</p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li><strong>Daniel Biss</strong> → H6IL09228 → Committee C00855619</li>
+                            <li><strong>Kat Abughazaleh</strong> → H6IL09178 → Committee C00851154</li>
+                            <li><strong>Mike Simmons</strong> → H6IL09293 → Committee C00857847</li>
+                        </ul>
+
+                        <h3>Small Dollar Donations</h3>
+                        <p>The "Small $%" metric measures grassroots support by calculating what percentage of a candidate's individual contributions come from donations under $200. This is the FEC's standard definition of small-dollar/grassroots fundraising.</p>
+                        <p><strong>Calculation formula:</strong></p>
+                        <div class="formula-box">
+                            Small Dollar % = (individual_unitemized_contributions ÷ individual_contributions) × 100
+                        </div>
+                        <p>The FEC breaks down individual contributions into two categories:</p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li><strong>Itemized contributions</strong> — Individual donations of $200 or more (reported with donor names)</li>
+                            <li><strong>Unitemized contributions</strong> — Individual donations under $200 (aggregated without names)</li>
+                        </ul>
+                        <p><strong>Why we use individual_contributions as the denominator:</strong> Total receipts include PAC money, party transfers, and other non-individual sources. To accurately measure grassroots support, we only consider money from individual human donors.</p>
+                        <p><strong>Real example from Kat Abughazaleh's FEC data:</strong></p>
+                        <div class="formula-box">
+                            Individual contributions (total): $2,702,469.35<br>
+                            Unitemized (under $200): $1,898,015.77<br>
+                            Itemized ($200+): $804,453.58<br><br>
+                            Small Dollar % = ($1,898,015.77 ÷ $2,702,469.35) × 100 = <strong>70.2%</strong>
+                        </div>
+                        <p>This means 70.2% of Kat's individual donations came from contributors giving less than $200 — a strong indicator of broad grassroots support.</p>
+
+                        <h3>Burn Rate Projections</h3>
+                        <p>Burn rate measures how quickly a campaign is spending money, projected forward to estimate monthly cash consumption. We calculate three different burn rate metrics using real disbursement data from FEC Schedule B filings:</p>
+                        <div class="formula-box">
+                            <strong>2-Week Burn:</strong> Last 2 weeks expenditures × 2 = monthly rate<br>
+                            <strong>1-Month Burn:</strong> Last 1 month expenditures = monthly rate<br>
+                            <strong>1.5-Month Burn:</strong> Last 1.5 months expenditures × 0.66 = monthly rate
+                        </div>
+                        <p>For each candidate, we:</p>
+                        <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Get their most recent FEC filing's <code>coverage_end_date</code></li>
+                            <li>Query Schedule B for all disbursements in the lookback period (14, 30, or 45 days)</li>
+                            <li>Sum total disbursement amounts for that period</li>
+                            <li>Multiply by the appropriate factor to normalize to a 30-day monthly rate</li>
+                        </ol>
+                        <p>This gives us three perspectives on spending velocity: recent (2-week), medium-term (1-month), and longer-term (1.5-month). Campaigns often ramp up spending closer to election day, so the 2-week burn tends to be highest.</p>
+                        <p><strong>Implementation:</strong> The system first finds the most recent disbursement within the last 60 days of the reporting period. If found, it uses that date as the anchor point and calculates backwards. If no recent disbursements exist, burn rates show as $0/mo.</p>
+                        <p><strong>Note:</strong> Many campaigns show $0/mo burn rates because they had no expenditures in the final weeks of the Dec 31, 2025 reporting period. This is normal for campaigns between quarterly filing deadlines.</p>
+
+                        <h3>Data Source & Updates</h3>
+                        <p>The fundraising data is currently <strong>hardcoded</strong> into the application using FEC filings as of December 31, 2025 (retrieved February 1, 2026). Since campaigns won't file new quarterly reports until April 2026, the data is static and doesn't require live API calls.</p>
+                        <p>This approach provides instant page loads (no 2-3 second API delays) while ensuring the displayed data remains accurate. When new FEC reports are filed in April, the hardcoded data will be updated to reflect the latest filings.</p>
+
+                        <h3>Chart Visualization</h3>
+                        <p>The fundraising chart uses a dual Y-axis approach to compare two fundamentally different metrics:</p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li><strong>Orange bars (left Y-axis):</strong> Total dollars raised, scaled in currency</li>
+                            <li><strong>Blue bars (right Y-axis):</strong> Percentage of raised funds spent, scaled 0-100%</li>
+                        </ul>
+                        <p>The blue bars are nested inside the orange bars (same X position, narrower width) to save horizontal space while keeping both metrics independently readable on their own scales. This nested-bar technique is implemented using Chart.js with <code>stack: 'combined'</code> and <code>stacked: false</code> to center both bars at the same position without summing their values.</p>
+
                     </div>
                 </div>
             </div>
