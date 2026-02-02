@@ -197,13 +197,24 @@
                 </div>
             </section>
 
-            <section class="calculation-breakdown" id="calculationBreakdown">
-                <h2>Calculation Breakdown</h2>
-                <p class="breakdown-desc">Live formula application for each candidate</p>
-                <div id="breakdownContent"></div>
-                <p class="breakdown-desc" style="font-size: 0.85rem; color: #a0a0a0; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(230, 126, 34, 0.2);">
-                    <strong>*</strong> = No Kalshi market available. Uses 100% of Manifold probability. Probabilities are lightly normalized (30% strength) to prevent excessive drift while preserving raw market values for top candidates.
-                </p>
+            <section class="calculation-breakdown method-foldout" id="calculationBreakdown">
+                <button class="foldout-trigger" onclick="toggleCalcFoldout()">
+                    <div class="foldout-trigger-left">
+                        <div>
+                            <h2>Calculation Breakdown</h2>
+                            <p class="foldout-desc">Live formula application for each candidate</p>
+                        </div>
+                    </div>
+                    <span class="foldout-arrow" id="calc-foldout-arrow">+</span>
+                </button>
+                <div class="foldout-body" id="calc-foldout-body">
+                    <div class="foldout-inner">
+                        <div id="breakdownContent"></div>
+                        <p class="breakdown-desc" style="font-size: 0.85rem; color: #a0a0a0; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(230, 126, 34, 0.2);">
+                            <strong>*</strong> = No Kalshi market available. Uses 100% of Manifold probability. Probabilities are lightly normalized (30% strength) to prevent excessive drift while preserving raw market values for top candidates.
+                        </p>
+                    </div>
+                </div>
             </section>
 
             <section class="additional-markets">
@@ -1091,22 +1102,109 @@
             transform: translateY(-1px);
         }
 
-        .calculation-breakdown {
-            padding: 2.5rem;
+        /* ===== CALCULATION BREAKDOWN FOLDOUT ===== */
+        .calculation-breakdown.method-foldout {
             background: rgba(26, 26, 26, 0.5);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 2px solid rgba(230, 126, 34, 0.3);
             border-radius: 12px;
             margin-bottom: 2rem;
+            overflow: hidden;
+            padding: 0;
         }
 
-        .calculation-breakdown h2 {
-            margin-bottom: 1rem;
-            font-size: 2rem;
+        .calculation-breakdown.method-foldout.active {
+            border-color: rgba(230, 126, 34, 0.5);
+            box-shadow: 0 0 20px rgba(230, 126, 34, 0.08);
+        }
+
+        .calculation-breakdown .foldout-trigger {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.8rem 2.2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            color: inherit;
+            transition: background 0.3s ease;
+        }
+
+        .calculation-breakdown .foldout-trigger:hover {
+            background: rgba(230, 126, 34, 0.06);
+        }
+
+        .calculation-breakdown .foldout-trigger-left {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .calculation-breakdown .foldout-trigger h2 {
+            margin-bottom: 0;
+            font-size: 1.6rem;
             font-family: 'Cormorant Garamond', Georgia, serif;
             font-weight: 600;
             color: #e67e22;
+            line-height: 1.3;
+        }
+
+        .calculation-breakdown .foldout-desc {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.45);
+            margin: 0.2rem 0 0 0;
+            line-height: 1.4;
+        }
+
+        .calculation-breakdown .foldout-arrow {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 300;
+            color: rgba(230, 126, 34, 0.6);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            flex-shrink: 0;
+            width: 30px;
+            text-align: center;
+            line-height: 1;
+        }
+
+        .calculation-breakdown .foldout-arrow.open {
+            transform: rotate(45deg);
+        }
+
+        .calculation-breakdown .foldout-body {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.5s cubic-bezier(0.34, 1.12, 0.64, 1),
+                        opacity 0.4s ease;
+            opacity: 0;
+        }
+
+        .calculation-breakdown .foldout-body.open {
+            grid-template-rows: 1fr;
+            opacity: 1;
+        }
+
+        .calculation-breakdown .foldout-inner {
+            overflow: hidden;
+            padding: 0 2.2rem;
+        }
+
+        .calculation-breakdown .foldout-body.open .foldout-inner {
+            padding-bottom: 2.2rem;
+        }
+
+        .calculation-breakdown .foldout-body .foldout-inner {
+            border-top: 1px solid rgba(230, 126, 34, 0.15);
+            padding-top: 0;
+            transition: padding-top 0.4s ease;
+        }
+
+        .calculation-breakdown .foldout-body.open .foldout-inner {
+            padding-top: 1.8rem;
         }
 
         .breakdown-desc {
@@ -2031,6 +2129,15 @@ function renderBreakdown(breakdowns) {
 function toggleBreakdown(idx) {
     const breakdown = document.getElementById(`breakdown-${idx}`);
     breakdown.classList.toggle('open');
+}
+
+function toggleCalcFoldout() {
+    const body = document.getElementById('calc-foldout-body');
+    const arrow = document.getElementById('calc-foldout-arrow');
+    const foldout = document.getElementById('calculationBreakdown');
+    body.classList.toggle('open');
+    arrow.classList.toggle('open');
+    foldout.classList.toggle('active');
 }
 
 async function fetchManifoldData() {
