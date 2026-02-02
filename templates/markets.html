@@ -501,6 +501,51 @@
             line-height: 1;
         }
 
+        /* Tablet and large phone landscape */
+        @media (max-width: 768px) {
+            .markets-content-page {
+                padding: 0 1.5rem;
+            }
+
+            .leader-card {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 2rem;
+            }
+
+            .leader-photo {
+                width: 120px;
+                height: 120px;
+            }
+
+            .leader-name {
+                font-size: 2rem;
+            }
+
+            .leader-main-value {
+                font-size: 3rem;
+            }
+
+            .leader-sub-stats {
+                justify-content: center;
+                gap: 1.25rem 1.75rem;
+            }
+
+            .big-odds-display {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .market-chart-section h2 {
+                font-size: 1.5rem;
+            }
+
+            .market-chart-section .chart-wrapper {
+                height: 280px;
+            }
+        }
+
+        /* Large phones */
         @media (max-width: 600px) {
             .leader-card {
                 flex-direction: column;
