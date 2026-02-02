@@ -34,6 +34,35 @@
         </section>
 
         <section class="fundraising-content-page">
+            <!-- Live Money Ticker - Hidden until data loads -->
+            <article class="live-money-ticker hidden" id="liveMoneyTicker">
+                <div class="ticker-header">
+                    <h2>💰 Campaign Finance Live Tracker</h2>
+                    <p class="ticker-subtitle">Real-time estimate based on average fundraising velocity</p>
+                </div>
+
+                <div class="ticker-stats-grid">
+                    <div class="ticker-stat-card ticker-stat-primary">
+                        <div class="ticker-label">Total Raised (All Candidates)</div>
+                        <div class="ticker-value" id="totalRaisedDisplay">$0</div>
+                    </div>
+
+                    <div class="ticker-stat-card ticker-stat-secondary">
+                        <div class="ticker-label">Total Spent (All Candidates)</div>
+                        <div class="ticker-value" id="totalSpentDisplay">$0</div>
+                    </div>
+
+                    <div class="ticker-stat-card ticker-stat-live">
+                        <div class="ticker-label">
+                            <span class="live-pulse"></span>
+                            Raised Since You Loaded This Page
+                        </div>
+                        <div class="ticker-value ticker-value-live" id="liveCounterDisplay">$0.00</div>
+                        <div class="ticker-velocity">~$<span id="velocityDisplay">0</span>/hour across all campaigns</div>
+                    </div>
+                </div>
+            </article>
+
             <!-- Loading State -->
             <article class="fec-loading-section" id="loadingSection">
                 <h2>Loading FEC Data...</h2>
@@ -168,6 +197,168 @@
 
         .fec-error-section {
             border-color: rgba(230, 126, 34, 0.5);
+        }
+
+        /* Live Money Ticker Styles */
+        .live-money-ticker {
+            background: linear-gradient(135deg, rgba(46, 204, 64, 0.15) 0%, rgba(230, 126, 34, 0.15) 100%);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(46, 204, 64, 0.4);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(46, 204, 64, 0.2);
+        }
+
+        .ticker-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .ticker-header h2 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 0 0 0.5rem 0;
+            color: #2ECC40;
+            text-shadow: 0 0 20px rgba(46, 204, 64, 0.3);
+        }
+
+        .ticker-subtitle {
+            color: #a0a0a0;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .ticker-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .ticker-stat-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(230, 126, 34, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .ticker-stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(230, 126, 34, 0.3);
+        }
+
+        .ticker-stat-primary {
+            border-color: rgba(230, 126, 34, 0.5);
+            background: rgba(230, 126, 34, 0.1);
+        }
+
+        .ticker-stat-secondary {
+            border-color: rgba(52, 152, 219, 0.5);
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .ticker-stat-live {
+            border-color: rgba(46, 204, 64, 0.6);
+            background: rgba(46, 204, 64, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ticker-stat-live::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(46, 204, 64, 0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .ticker-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #a0a0a0;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .ticker-value {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #e67e22;
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+
+        .ticker-stat-primary .ticker-value {
+            color: #e67e22;
+        }
+
+        .ticker-stat-secondary .ticker-value {
+            color: #3498db;
+        }
+
+        .ticker-stat-live .ticker-value {
+            color: #2ECC40;
+        }
+
+        .ticker-value-live {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                text-shadow: 0 0 10px rgba(46, 204, 64, 0.5);
+            }
+            50% {
+                text-shadow: 0 0 20px rgba(46, 204, 64, 0.8);
+            }
+        }
+
+        .ticker-velocity {
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+            color: #2ECC40;
+            font-weight: 600;
+        }
+
+        .live-pulse {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #2ECC40;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(46, 204, 64, 0.8);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+                box-shadow: 0 0 8px rgba(46, 204, 64, 0.8);
+            }
+            50% {
+                opacity: 0.6;
+                transform: scale(1.2);
+                box-shadow: 0 0 12px rgba(46, 204, 64, 1);
+            }
         }
 
         .chart-section,
@@ -308,6 +499,72 @@
             .fec-table thead th,
             .fec-table tbody td {
                 padding: 0.7rem;
+            }
+
+            /* Mobile ticker adjustments */
+            .live-money-ticker {
+                padding: 1.5rem 1rem;
+            }
+
+            .ticker-header h2 {
+                font-size: 1.8rem;
+            }
+
+            .ticker-subtitle {
+                font-size: 0.85rem;
+            }
+
+            .ticker-stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .ticker-stat-card {
+                padding: 1.5rem 1rem;
+            }
+
+            .ticker-value {
+                font-size: 2.25rem;
+            }
+
+            .ticker-label {
+                font-size: 0.75rem;
+            }
+
+            .ticker-velocity {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .live-money-ticker {
+                padding: 1.25rem 0.75rem;
+                border-radius: 12px;
+            }
+
+            .ticker-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .ticker-subtitle {
+                font-size: 0.8rem;
+            }
+
+            .ticker-stat-card {
+                padding: 1.25rem 0.75rem;
+            }
+
+            .ticker-value {
+                font-size: 1.9rem;
+            }
+
+            .ticker-label {
+                font-size: 0.7rem;
+                letter-spacing: 0.05em;
+            }
+
+            .ticker-velocity {
+                font-size: 0.75rem;
             }
         }
     </style>
@@ -581,6 +838,49 @@
             });
         }
 
+        // Live Money Ticker
+        let liveCounterInterval = null;
+        let liveCounterAmount = 0;
+        let velocityPerSecond = 0;
+
+        function startLiveCounter(totalRaised, totalSpent, candidates) {
+            // Calculate velocity: assume campaigns have been running for ~45 days (mid-Dec to late Jan)
+            // This is an estimate - adjust based on actual campaign start dates
+            const daysRunning = 45;
+            const hoursRunning = daysRunning * 24;
+            const velocityPerHour = totalRaised / hoursRunning;
+            velocityPerSecond = velocityPerHour / 3600;
+
+            // Display totals
+            document.getElementById('totalRaisedDisplay').textContent = formatCurrency(totalRaised);
+            document.getElementById('totalSpentDisplay').textContent = formatCurrency(totalSpent);
+            document.getElementById('velocityDisplay').textContent = Math.round(velocityPerHour).toLocaleString();
+
+            // Start live counter
+            liveCounterAmount = 0;
+            document.getElementById('liveCounterDisplay').textContent = '$0.00';
+
+            // Update every 100ms for smooth animation
+            if (liveCounterInterval) clearInterval(liveCounterInterval);
+            liveCounterInterval = setInterval(() => {
+                liveCounterAmount += velocityPerSecond * 0.1; // 100ms = 0.1 seconds
+
+                if (liveCounterAmount < 100) {
+                    document.getElementById('liveCounterDisplay').textContent =
+                        '$' + liveCounterAmount.toFixed(2);
+                } else if (liveCounterAmount < 1000) {
+                    document.getElementById('liveCounterDisplay').textContent =
+                        '$' + liveCounterAmount.toFixed(0);
+                } else {
+                    document.getElementById('liveCounterDisplay').textContent =
+                        formatCurrency(liveCounterAmount);
+                }
+            }, 100);
+
+            // Show ticker
+            document.getElementById('liveMoneyTicker').classList.remove('hidden');
+        }
+
         // Fetch and display FEC data
         (async function() {
             try {
@@ -595,11 +895,19 @@
                     document.getElementById('errorMessage').textContent =
                         data.message || 'FEC data will be available after the January 31st filing deadline. Check back soon!';
                 } else {
+                    // Calculate totals
+                    const totalRaised = data.candidates.reduce((sum, c) => sum + c.total_raised, 0);
+                    const totalSpent = data.candidates.reduce((sum, c) => sum + c.total_spent, 0);
+
+                    // Start live money ticker
+                    startLiveCounter(totalRaised, totalSpent, data.candidates);
+
                     // Show data
                     document.getElementById('fecDataContainer').classList.remove('hidden');
 
                     // Debug: log candidates
                     console.log(`Loaded ${data.candidates.length} candidates:`, data.candidates.map(c => c.name));
+                    console.log(`Total raised: ${formatCurrency(totalRaised)}, Total spent: ${formatCurrency(totalSpent)}`);
 
                     // Create visualizations
                     createSpendingChart(data.candidates);
