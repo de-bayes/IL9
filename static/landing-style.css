@@ -144,6 +144,36 @@ body.dark-mode nav a.github-link:hover {
     border-color: rgba(230, 126, 34, 0.5);
 }
 
+nav a.donate-link {
+    color: #555555;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s ease, background-color 0.2s ease;
+    background: rgba(230, 126, 34, 0.2);
+    padding: 0.5rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid rgba(230, 126, 34, 0.4);
+    display: inline-block;
+}
+
+nav a.donate-link:hover {
+    color: #fff;
+    background: rgba(230, 126, 34, 0.4);
+    border-color: rgba(230, 126, 34, 0.6);
+}
+
+body.dark-mode nav a.donate-link {
+    color: #e67e22;
+    background: rgba(230, 126, 34, 0.2);
+    border-color: rgba(230, 126, 34, 0.4);
+}
+
+body.dark-mode nav a.donate-link:hover {
+    color: #fff;
+    background: rgba(230, 126, 34, 0.3);
+    border-color: rgba(230, 126, 34, 0.6);
+}
+
 /* HERO */
 .hero {
     max-width: 900px;
@@ -649,6 +679,11 @@ body.dark-mode #mobileNav.active {
     }
 
     #mobileNav a.github-link {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.8rem;
+    }
+
+    #mobileNav a.donate-link {
         padding: 0.4rem 0.7rem;
         font-size: 0.8rem;
     }
