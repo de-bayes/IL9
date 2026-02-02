@@ -154,6 +154,7 @@ nav a.donate-link {
     border-radius: 8px;
     border: 1px solid rgba(230, 126, 34, 0.4);
     display: inline-block;
+    margin-left: -1rem;
 }
 
 nav a.donate-link:hover {
