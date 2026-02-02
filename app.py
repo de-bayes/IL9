@@ -1156,6 +1156,18 @@ def candidates():
 
     return render_template('candidates.html', candidates=candidates_data)
 
+@app.route('/sitemap.xml')
+def sitemap():
+    """Serve sitemap.xml for search engines"""
+    from flask import Response
+    return Response(render_template('sitemap.xml'), mimetype='application/xml')
+
+@app.route('/robots.txt')
+def robots():
+    """Serve robots.txt for search engine crawlers"""
+    from flask import Response
+    return Response(render_template('robots.txt'), mimetype='text/plain')
+
 @app.route('/fundraising/<candidate_slug>')
 def candidate_fundraising(candidate_slug):
     """Show individual candidate fundraising page"""

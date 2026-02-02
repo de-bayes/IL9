@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://il9.org/sitemap.xml
+
+# Optimize crawl budget - prioritize important pages
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Block API endpoints from being indexed (but allow crawling for discovery)
+User-agent: *
+Disallow: /api/
+
+# Allow static assets
+Allow: /static/

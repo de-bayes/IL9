@@ -3,13 +3,41 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="IL9Cast - Prediction Markets">
-    <title>Prediction Markets - IL9Cast</title>
+
+    <!-- Primary Meta Tags -->
+    <title>Live Prediction Markets - IL9Cast | Illinois 9th District Primary 2026</title>
+    <meta name="title" content="Live Prediction Markets - IL9Cast | Illinois 9th District Primary 2026">
+    <meta name="description" content="Real-time prediction market odds for Illinois 9th District Democratic Primary 2026. Aggregated data from Manifold Markets and Kalshi, updated every 3 minutes. See live market trends and historical charts.">
+    <meta name="keywords" content="prediction markets, IL9 primary odds, Manifold Markets IL9, Kalshi IL9, Illinois 9th District forecast, live election odds, market trends">
+    <link rel="canonical" href="https://il9.org/markets">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://il9.org/markets">
+    <meta property="og:title" content="Live Prediction Markets - IL9Cast | Illinois 9th District Primary 2026">
+    <meta property="og:description" content="Real-time prediction market odds for Illinois 9th District Democratic Primary 2026. Updated every 3 minutes from Manifold Markets and Kalshi.">
+    <meta property="og:site_name" content="IL9Cast">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://il9.org/markets">
+    <meta property="twitter:title" content="Live Prediction Markets - IL9Cast">
+    <meta property="twitter:description" content="Real-time prediction market odds for Illinois 9th District Democratic Primary 2026.">
+
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WVTWQBBG8S"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-WVTWQBBG8S');
+    </script>
 </head>
 <body class="dark-mode">
     <canvas id="grid-canvas"></canvas>
