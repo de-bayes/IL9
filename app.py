@@ -129,6 +129,24 @@ def count_snapshots_jsonl(filepath):
                 count += 1
     return count
 
+def count_data_points_jsonl(filepath):
+    """Count total data points (candidates across all snapshots) in JSONL file"""
+    if not os.path.exists(filepath):
+        return 0
+
+    total_data_points = 0
+    with open(filepath, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                try:
+                    snapshot = json.loads(line)
+                    candidates = snapshot.get('candidates', [])
+                    total_data_points += len(candidates)
+                except:
+                    pass  # Skip malformed lines
+    return total_data_points
+
 # ===== TIMESTAMP PARSING =====
 
 def parse_snapshot_timestamp(ts_str):
@@ -1312,12 +1330,17 @@ def save_snapshot():
 
 @app.route('/api/snapshots/count')
 def get_snapshot_count():
-    """Return total snapshot count without loading all data"""
+    """Return total snapshot count and data points without loading all data"""
     try:
-        count = count_snapshots_jsonl(HISTORICAL_DATA_PATH)
-        return jsonify({"count": count})
+        snapshot_count = count_snapshots_jsonl(HISTORICAL_DATA_PATH)
+        data_points = count_data_points_jsonl(HISTORICAL_DATA_PATH)
+        return jsonify({
+            "count": snapshot_count,
+            "snapshots": snapshot_count,
+            "data_points": data_points
+        })
     except Exception as e:
-        return jsonify({"count": 0})
+        return jsonify({"count": 0, "snapshots": 0, "data_points": 0})
 
 @app.route('/api/snapshots')
 def get_snapshots():
