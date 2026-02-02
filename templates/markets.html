@@ -153,63 +153,10 @@
                 </p>
             </section>
 
-            <section class="weights-explainer methodology-section">
-                <div class="methodology-header" onclick="toggleMarketsMethodology()">
-                    <h2 style="margin: 0;">Aggregation Methodology</h2>
-                    <span class="toggle-icon" id="marketsMethodologyToggle">▼</span>
-                </div>
-                <div class="methodology-content hidden" id="marketsMethodologyContent">
-                    <div class="weights-list">
-                    <div class="weight-row">
-                        <span class="weight-title">Manifold Markets</span>
-                        <span class="weight-percentage">40%</span>
-                    </div>
-                    <div class="weight-row">
-                        <span class="weight-title">Kalshi (Last Price)</span>
-                        <span class="weight-percentage">42%</span>
-                    </div>
-                    <div class="weight-row">
-                        <span class="weight-title">Kalshi (Midpoint)</span>
-                        <span class="weight-percentage">12%</span>
-                    </div>
-                    <div class="weight-row">
-                        <span class="weight-title">Kalshi (Liquidity)</span>
-                        <span class="weight-percentage">6%</span>
-                    </div>
-                </div>
-                <div class="methodology-note">
-                    <p><strong>Why this approach?</strong> Kalshi's 60% weight emphasizes recent trade execution (70% of Kalshi weight → 42% overall) while incorporating midpoint (20% of Kalshi weight → 12%) and liquidity-weighted pricing (10% of Kalshi weight → 6%). This reflects that last trades show real money flow.</p>
-                    <p style="margin-top: 0.8rem;"><strong>Why these weights?</strong> Manifold uses an AMM with liquidity banding that concentrates market-making capital around the current probability, making prices more responsive to trades near equilibrium but requiring larger trades to move prices significantly. Kalshi's real-money order book shows actual conviction through limit orders. Last price dominates because it reflects the most recent trades where people put capital at risk.</p>
-                    <p style="margin-top: 0.8rem;"><strong>Why not rely solely on Kalshi's last price?</strong> Kalshi often has immensely wide bid-ask spreads (sometimes 10-20 percentage points), meaning the last completed trade may have occurred at an unrepresentative price. A market with a 45% bid / 55% ask and a last trade at 45% only demonstrates that someone was willing to sell at the bid—not that 45% is the accurate price. The true fair value likely sits somewhere in the middle of that spread, but Kalshi's order book structure means you only observe trades at the extremes when someone crosses the spread. Manifold has none of this problem: its AMM with liquidity banding provides instant, algorithmic two-way pricing with minimal spread, always reflecting current probability estimates without the friction of waiting for counterparties.</p>
-                    <p style="margin-top: 0.8rem;"><strong>Liquidity-weighted pricing:</strong> Analyzes where the last trade occurred within Kalshi's bid-ask spread to capture buying vs selling pressure. Position near the ask (buyers aggressive) shifts the price up slightly; position near the bid (sellers aggressive) shifts down. Wider spreads dampen the adjustment. This only applies to Kalshi because it uses an order book exchange—Manifold's AMM algorithmically sets prices with liquidity banding that concentrates depth around current probabilities, so order book analysis doesn't apply. Manifold's continuous pricing eliminates the information gaps that plague order book exchanges with sparse liquidity.</p>
-                </div>
-                <div class="formula">
-                    <strong>Formula:</strong> Aggregate = (0.40 × Manifold) + (0.42 × Last) + (0.12 × Midpoint) + (0.06 × Liquidity)
-
-                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                        <strong>Sub-calculations:</strong><br>
-                        Midpoint = (yes_bid + yes_ask) / 2<br>
-                        <br>
-                        Liquidity = Midpoint + Shift<br>
-                        &nbsp;&nbsp;where Shift = offset × 6 × spread_factor<br>
-                        &nbsp;&nbsp;offset = (Last - yes_bid) / (yes_ask - yes_bid) - 0.5<br>
-                        &nbsp;&nbsp;spread_factor = max(0.2, 1 - spread/10 × 0.8)<br>
-                        &nbsp;&nbsp;spread = yes_ask - yes_bid<br>
-                        <br>
-                        <strong>Thin-market fallback:</strong> When yes_bid = 0 (no buy-side orders),
-                        both Midpoint and Liquidity fall back to last_price instead.
-                        A midpoint between zero and the ask is not a real price signal — it
-                        would massively inflate candidates with no buyer interest.
-                        For example, Mike Simmons at yes_bid=0, yes_ask=19, last_price=1
-                        would incorrectly show Midpoint=9.5% instead of the correct 1%.<br>
-                        <br>
-                        Soft Normalization (30% strength):<br>
-                        &nbsp;&nbsp;Fully_Normalized = (Raw_Aggregate / Sum_All_Aggregates) × 100<br>
-                        &nbsp;&nbsp;Adjustment = Fully_Normalized - Raw_Aggregate<br>
-                        &nbsp;&nbsp;Final = Raw_Aggregate + (Adjustment × 0.30)
-                    </div>
-                </div>
-                </div>
+            <section style="text-align: center; margin-bottom: 2rem;">
+                <p style="color: #a0a0a0; font-size: 0.95rem;">
+                    For detailed aggregation methodology, see the <a href="/methodology#foldout-pm" style="color: #e67e22; text-decoration: underline;">Prediction Markets Aggregation section</a> on the Methodology page.
+                </p>
             </section>
 
             <section class="calculation-breakdown method-foldout" id="calculationBreakdown">
@@ -748,18 +695,6 @@
                 margin-top: 0.6rem;
             }
 
-            .methodology-section {
-                padding: 1rem;
-            }
-
-            .methodology-header {
-                padding: 0.75rem;
-            }
-
-            .methodology-header h2 {
-                font-size: 1.1rem !important;
-            }
-
             .market-chart-section > div {
                 flex-direction: column;
                 gap: 0.75rem;
@@ -966,120 +901,6 @@
         }
 
         /* Methodology Foldout */
-        .weights-explainer {
-            background: rgba(26, 26, 26, 0.5);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid rgba(230, 126, 34, 0.3);
-            border-radius: 12px;
-            padding: 0;
-            margin-bottom: 2rem;
-        }
-
-        .methodology-header {
-            padding: 2rem;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.3s ease;
-        }
-
-        .methodology-header:hover {
-            background: rgba(230, 126, 34, 0.1);
-        }
-
-        .methodology-header h2 {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 2rem;
-            color: #e67e22;
-        }
-
-        .toggle-icon {
-            font-size: 1.5rem;
-            color: #e67e22;
-            transition: transform 0.3s ease;
-        }
-
-        .methodology-content {
-            padding: 0 2rem 2rem;
-            max-height: 3000px;
-            overflow: hidden;
-            transition: max-height 0.5s ease, padding 0.3s ease;
-        }
-
-        .methodology-content.hidden {
-            max-height: 0;
-            padding: 0 2rem;
-        }
-
-        .weights-explainer h2 {
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-            color: #e0e0e0;
-        }
-
-        .weights-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            background: rgba(230, 126, 34, 0.05);
-            border: 1px solid rgba(230, 126, 34, 0.15);
-            border-radius: 6px;
-        }
-
-        .weight-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-        }
-
-        .weight-title {
-            font-size: 0.95rem;
-            color: #e0e0e0;
-            font-weight: 500;
-        }
-
-        .weight-percentage {
-            font-size: 1.1rem;
-            font-weight: 700;
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            color: #e67e22;
-            min-width: 50px;
-            text-align: right;
-        }
-
-        .methodology-note {
-            line-height: 1.7;
-            color: #c0c0c0;
-            margin-bottom: 1.5rem;
-            padding: 1rem 1.25rem;
-            background: rgba(230, 126, 34, 0.08);
-            border-left: 3px solid rgba(230, 126, 34, 0.4);
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
-
-        .methodology-note p {
-            margin: 0;
-            color: #c0c0c0;
-        }
-
-        .formula {
-            font-family: 'Inter', sans-serif; font-weight: 600;
-            font-size: 1rem;
-            color: #e0e0e0;
-            padding: 1.5rem;
-            background: rgba(230, 126, 34, 0.1);
-            border-left: 4px solid #e67e22;
-            border-radius: 4px;
-            margin: 0;
-            overflow-x: auto;
-        }
-
         /* Calculation Breakdown */
         .donation-section {
             text-align: center;
@@ -2023,13 +1844,6 @@ function updateStatusBadges(manifoldTime, kalshiTime) {
     if (awsDot) {
         awsDot.classList.add('online');
     }
-}
-
-function toggleMarketsMethodology() {
-    const content = document.getElementById('marketsMethodologyContent');
-    const icon = document.getElementById('marketsMethodologyToggle');
-    content.classList.toggle('hidden');
-    icon.textContent = content.classList.contains('hidden') ? '▼' : '▲';
 }
 
 let marketChart = null;
