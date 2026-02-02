@@ -2200,7 +2200,64 @@ p {
     }
 }
 
+/* Large phones (iPhone 12-14, most Android) */
+@media (max-width: 600px) {
+    .navbar {
+        padding: 1.25rem 1.5rem;
+    }
+
+    .nav-brand {
+        font-size: 1.5rem;
+    }
+
+    .nav-links {
+        gap: 0.65rem;
+    }
+
+    .nav-link {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .hero-title {
+        font-size: 2.2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.05rem;
+    }
+
+    .hero-section {
+        padding: 3rem 1.5rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+    }
+
+    .methodology-content {
+        padding: 2.5rem 1.5rem;
+    }
+
+    .method-section h2 {
+        font-size: 1.5rem;
+    }
+
+    .inner-content {
+        padding: 3rem 1.5rem;
+    }
+
+    .inner-title {
+        font-size: 2.75rem;
+    }
+}
+
+/* Standard phones (iPhone SE, smaller devices) */
 @media (max-width: 480px) {
+    .navbar {
+        padding: 1rem 1.25rem;
+    }
+
     .nav-brand {
         font-size: 1.4rem;
     }
@@ -2219,7 +2276,12 @@ p {
     }
 
     .hero-title {
-        font-size: 1.8rem;
+        font-size: 1.9rem;
+        line-height: 1.2;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
     }
 
     .hero-section {
@@ -2244,11 +2306,31 @@ p {
     }
 
     .inner-title {
-        font-size: 1.5rem;
+        font-size: 2rem;
+    }
+
+    .inner-content {
+        padding: 2rem 1rem;
     }
 
     .page-subtitle {
         font-size: 0.85rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .methodology-content {
+        padding: 2rem 1rem;
+    }
+
+    .method-section h2 {
+        font-size: 1.4rem;
+    }
+
+    .method-section p {
+        font-size: 0.95rem;
     }
 
     .big-odds-display {
@@ -2295,6 +2377,76 @@ p {
 
     .odds-table td:last-child {
         border-bottom: none;
+    }
+}
+
+/* Small phones (iPhone SE 1st gen, older devices) */
+@media (max-width: 375px) {
+    .navbar {
+        padding: 0.875rem 1rem;
+    }
+
+    .nav-brand {
+        font-size: 1.3rem;
+    }
+
+    .nav-link {
+        font-size: 0.7rem;
+    }
+
+    .hero-title {
+        font-size: 1.6rem;
+    }
+
+    .hero-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .hero-section {
+        padding: 1.5rem 0.875rem;
+    }
+
+    .page-header {
+        padding: 2rem 1rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .inner-title {
+        font-size: 1.75rem;
+    }
+
+    .inner-content {
+        padding: 1.5rem 0.875rem;
+    }
+
+    .methodology-content {
+        padding: 1.5rem 0.875rem;
+    }
+
+    .method-section h2 {
+        font-size: 1.25rem;
+    }
+
+    .method-section p,
+    .method-list li {
+        font-size: 0.9rem;
+        line-height: 1.7;
+    }
+
+    .big-percent {
+        font-size: 1.75rem;
+    }
+
+    .big-name {
+        font-size: 0.8rem;
+    }
+
+    .footer {
+        padding: 2rem 1rem;
+        font-size: 0.8rem;
     }
 }
 
