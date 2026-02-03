@@ -2636,16 +2636,13 @@ p {
 /* ==================== Footer ==================== */
 
 .site-footer {
-    position: relative;
-    width: 100vw;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-    margin-top: 4rem;
-    margin-bottom: 0;
+    margin: 4rem 0 0 0;
     padding: 0;
-    overflow: hidden;
+    line-height: 0;
+    font-size: 0;
+    background: none;
+    border: none;
+    box-shadow: none;
 }
 
 .site-footer img {
@@ -2654,7 +2651,6 @@ p {
     display: block;
     margin: 0;
     padding: 0;
-    max-width: none;
 }
 
 @media (max-width: 768px) {
