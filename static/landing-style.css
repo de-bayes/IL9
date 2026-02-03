@@ -105,8 +105,7 @@ body.dark-mode header {
     cursor: pointer;
     transition: opacity 0.15s ease;
     flex-shrink: 0;
-    order: 2;
-    margin: 0 auto 0 0;
+    order: 1;
 }
 
 .logo:hover {
@@ -629,7 +628,8 @@ body.dark-mode .footer-bottom {
     padding: 0.5rem;
     gap: 6px;
     z-index: 1001;
-    order: 1;
+    order: 3;
+    margin-left: 1rem;
 }
 
 .hamburger span {
@@ -665,29 +665,53 @@ body.dark-mode .hamburger span {
     flex-direction: column;
     position: absolute;
     top: 56px;
-    left: 0;
-    background: var(--bg-surface);
-    padding: 1.5rem 2rem;
-    gap: 1rem;
-    border-bottom: 1px solid var(--border-default);
-    border-right: 1px solid var(--border-default);
-    animation: slideDown 0.15s ease;
-    min-width: 200px;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    right: 0;
+    background: linear-gradient(180deg, rgba(24, 24, 28, 1) 0%, rgba(18, 18, 22, 1) 100%);
+    padding: 1rem 0;
+    gap: 0;
+    border-bottom-left-radius: 8px;
+    border-left: 1px solid rgba(91, 155, 213, 0.3);
+    border-bottom: 1px solid rgba(91, 155, 213, 0.3);
+    animation: slideDownRight 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 180px;
+    box-shadow: -2px 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+#mobileNav.active a {
+    padding: 0.85rem 1.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+#mobileNav.active a:hover {
+    background: rgba(91, 155, 213, 0.1);
+    color: var(--accent-blue);
+    border-left-color: var(--accent-blue);
+}
+
+#mobileNav.active a.active {
+    background: rgba(91, 155, 213, 0.15);
+    color: var(--accent-blue);
+    border-left-color: var(--accent-blue);
+    font-weight: 600;
 }
 
 body.dark-mode #mobileNav.active {
-    background: var(--bg-surface);
+    background: linear-gradient(180deg, rgba(24, 24, 28, 1) 0%, rgba(18, 18, 22, 1) 100%);
 }
 
-@keyframes slideDown {
+@keyframes slideDownRight {
     from {
         opacity: 0;
-        transform: translateY(-12px);
+        transform: translateY(-8px) translateX(4px);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) translateX(0);
     }
 }
 
@@ -697,7 +721,7 @@ body.dark-mode #mobileNav.active {
     align-items: center;
     gap: 0.75rem;
     margin-left: auto;
-    order: 3;
+    order: 2;
 }
 
 .header-actions .github-link {
