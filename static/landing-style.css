@@ -619,7 +619,7 @@ body.dark-mode .footer-bottom {
 
 /* Hamburger Menu */
 .hamburger {
-    display: none;
+    display: flex;
     flex-direction: column;
     background: none;
     border: none;
@@ -634,7 +634,7 @@ body.dark-mode .footer-bottom {
     height: 3px;
     background: var(--text-secondary);
     border-radius: 2px;
-    transition: all 0.15s ease;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 body.dark-mode .hamburger span {
@@ -642,7 +642,7 @@ body.dark-mode .hamburger span {
 }
 
 .hamburger.active span:nth-child(1) {
-    transform: rotate(45deg) translate(12px, 12px);
+    transform: rotate(45deg) translate(9px, 9px);
 }
 
 .hamburger.active span:nth-child(2) {
@@ -650,14 +650,11 @@ body.dark-mode .hamburger span {
 }
 
 .hamburger.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(8px, -8px);
+    transform: rotate(-45deg) translate(9px, -9px);
 }
 
 #mobileNav {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    margin-left: auto;
+    display: none;
 }
 
 #mobileNav.active {
@@ -687,6 +684,29 @@ body.dark-mode #mobileNav.active {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Permanent header buttons (GitHub and Donate) */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: auto;
+}
+
+.header-actions .github-link,
+.header-actions .donate-link {
+    margin-left: 0;
+}
+
+/* Hide nav links inside hamburger on mobile */
+#mobileNav.active a:not(.github-link):not(.donate-link) {
+    display: block;
+}
+
+#mobileNav.active a.github-link,
+#mobileNav.active a.donate-link {
+    display: none;
 }
 
 /* ============================================
@@ -720,18 +740,6 @@ body.dark-mode #mobileNav.active {
 
     .logo {
         font-size: 1.35rem;
-    }
-
-    .hamburger {
-        display: flex;
-    }
-
-    #mobileNav {
-        display: none;
-    }
-
-    #mobileNav.active {
-        display: flex;
     }
 
     .countdown-section {
