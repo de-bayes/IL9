@@ -107,7 +107,7 @@ header {
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--border-subtle);
-    height: 56px;
+    height: 64px;
 }
 
 body.dark-mode header {
@@ -117,7 +117,7 @@ body.dark-mode header {
 
 .logo {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
     letter-spacing: -0.02em;
     text-decoration: none;
@@ -145,14 +145,14 @@ body.dark-mode header {
 .mobile-nav {
     display: none;
     position: fixed;
-    top: 56px;
+    top: 64px;
     left: 0;
     right: 0;
     background: var(--bg-surface);
     border-bottom: 1px solid var(--border-default);
     flex-direction: column;
     padding: 1rem 0;
-    max-height: calc(100vh - 56px);
+    max-height: calc(100vh - 64px);
     overflow-y: auto;
     z-index: 199;
 }
