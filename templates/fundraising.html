@@ -94,7 +94,7 @@
                 <!-- Spending Comparison Chart -->
                 <article class="chart-section">
                     <h2>Fundraising & Spending Comparison</h2>
-                    <p class="section-desc">Dual-axis chart: Wide orange bars = total raised (left $-axis), Narrow blue bars nested inside = spent % of raised (right %-axis).</p>
+                    <p class="section-desc">Dual-axis chart: Wide bars = total raised (left $-axis), Narrow bars nested inside = spent % of raised (right %-axis).</p>
                     <div class="chart-container-large">
                         <canvas id="spendingChart"></canvas>
                     </div>
@@ -164,6 +164,34 @@
             </div>
 
         </section>
+
+        <footer class="site-footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>About</h4>
+                    <ul>
+                        <li><a href="/about">About IL9Cast</a></li>
+                        <li><a href="/methodology">Methodology</a></li>
+                        <li><a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Markets</h4>
+                    <ul>
+                        <li><a href="/markets">Live Markets</a></li>
+                        <li><a href="/markets">Download Data</a></li>
+                        <li>Updated every 3 minutes</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Disclaimer</h4>
+                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data for informational purposes.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 IL9Cast. Built with open data. • Railway & AWS Storage: Live • <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a></p>
+            </div>
+        </footer>
     </div>
 
     <style>
@@ -188,10 +216,9 @@
 
         .fec-loading-section,
         .fec-error-section {
-            background: rgba(26, 26, 26, 0.5);
-            backdrop-filter: blur(12px);
-            border: 2px solid rgba(230, 126, 34, 0.3);
-            border-radius: 12px;
+            background: rgba(26, 26, 26, 0.3);
+            border: 1px solid rgba(160, 160, 160, 0.15);
+            border-radius: 8px;
             padding: 3rem;
             text-align: center;
             margin-bottom: 2rem;
@@ -203,11 +230,11 @@
             font-size: 2rem;
             font-weight: 600;
             margin-bottom: 1rem;
-            color: #e67e22;
+            color: #d0d0d0;
         }
 
         .fec-error-section {
-            border-color: rgba(230, 126, 34, 0.5);
+            border-color: rgba(160, 160, 160, 0.2);
         }
 
         /* Live Money Ticker Styles */
@@ -383,10 +410,9 @@
         .comparison-table-section,
         .burn-rate-section,
         .candidate-links-section {
-            background: rgba(26, 26, 26, 0.5);
-            backdrop-filter: blur(12px);
-            border: 2px solid rgba(230, 126, 34, 0.3);
-            border-radius: 12px;
+            background: rgba(26, 26, 26, 0.3);
+            border: 1px solid rgba(160, 160, 160, 0.12);
+            border-radius: 8px;
             padding: 2.5rem;
             margin-bottom: 2rem;
         }
@@ -399,7 +425,7 @@
             font-size: 2rem;
             font-weight: 600;
             margin: 0 0 0.5rem 0;
-            color: #e67e22;
+            color: #d0d0d0;
         }
 
         .section-desc {
@@ -427,28 +453,28 @@
         }
 
         .fec-table thead th {
-            background: rgba(230, 126, 34, 0.15);
-            color: #e67e22;
+            background: rgba(160, 160, 160, 0.08);
+            color: #d0d0d0;
             font-weight: 600;
             padding: 1rem;
             text-align: left;
-            border-bottom: 2px solid rgba(230, 126, 34, 0.3);
+            border-bottom: 1px solid rgba(160, 160, 160, 0.15);
             white-space: nowrap;
         }
 
         .fec-table tbody td {
             padding: 0.9rem 1rem;
-            border-bottom: 1px solid rgba(230, 126, 34, 0.1);
+            border-bottom: 1px solid rgba(160, 160, 160, 0.08);
             color: #d0d0d0;
         }
 
         .fec-table tbody tr:hover {
-            background: rgba(230, 126, 34, 0.05);
+            background: rgba(160, 160, 160, 0.05);
         }
 
         .fec-table .candidate-name {
             font-weight: 600;
-            color: #e67e22;
+            color: #ffffff;
             white-space: nowrap;
         }
 
@@ -461,8 +487,8 @@
         .table-note {
             margin-top: 1.5rem;
             padding: 1rem 1.5rem;
-            background: rgba(230, 126, 34, 0.1);
-            border-left: 4px solid #e67e22;
+            background: rgba(160, 160, 160, 0.08);
+            border-left: 3px solid rgba(160, 160, 160, 0.3);
             border-radius: 4px;
             font-size: 0.9rem;
             color: #c0c0c0;
@@ -470,7 +496,7 @@
         }
 
         .table-note strong {
-            color: #e67e22;
+            color: #ffffff;
         }
 
 
@@ -485,19 +511,19 @@
         .candidate-link-item {
             display: block;
             background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(230, 126, 34, 0.2);
+            border: 1px solid rgba(160, 160, 160, 0.15);
             border-radius: 8px;
             padding: 1.2rem 1.5rem;
             text-align: center;
-            color: #e67e22;
+            color: #d0d0d0;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
         }
 
         .candidate-link-item:hover {
-            background: rgba(230, 126, 34, 0.15);
-            border-color: rgba(230, 126, 34, 0.5);
+            background: rgba(160, 160, 160, 0.1);
+            border-color: rgba(160, 160, 160, 0.3);
             transform: translateY(-2px);
         }
 
@@ -663,9 +689,9 @@
                         {
                             label: 'Total Raised ($)',
                             data: sorted.map(c => c.total_raised),
-                            backgroundColor: 'rgba(230, 126, 34, 0.6)',
-                            borderColor: 'rgba(230, 126, 34, 1)',
-                            borderWidth: 2,
+                            backgroundColor: 'rgba(180, 180, 180, 0.5)',
+                            borderColor: 'rgba(180, 180, 180, 0.8)',
+                            borderWidth: 1,
                             barPercentage: 0.95,  // Wider bars
                             categoryPercentage: 0.95,  // More space per candidate
                             yAxisID: 'y-left',
@@ -675,9 +701,9 @@
                         {
                             label: 'Spent % of Raised',
                             data: sorted.map(c => c.spent_pct_of_raised),
-                            backgroundColor: 'rgba(52, 152, 219, 0.8)',
-                            borderColor: 'rgba(52, 152, 219, 1)',
-                            borderWidth: 2,
+                            backgroundColor: 'rgba(120, 160, 200, 0.75)',
+                            borderColor: 'rgba(120, 160, 200, 1)',
+                            borderWidth: 1,
                             barPercentage: 0.65,  // Wider nested bar
                             categoryPercentage: 0.95,  // More space per candidate
                             yAxisID: 'y-right',
@@ -710,9 +736,9 @@
                         },
                         tooltip: {
                             backgroundColor: 'rgba(26, 26, 26, 0.95)',
-                            titleColor: '#e67e22',
+                            titleColor: '#d0d0d0',
                             bodyColor: '#e0e0e0',
-                            borderColor: 'rgba(230, 126, 34, 0.3)',
+                            borderColor: 'rgba(160, 160, 160, 0.3)',
                             borderWidth: 1,
                             padding: 12,
                             displayColors: true,
@@ -756,7 +782,7 @@
                                 lineWidth: 1
                             },
                             ticks: {
-                                color: '#e67e22',
+                                color: '#b0b0b0',
                                 font: {
                                     size: 11
                                 },
@@ -767,7 +793,7 @@
                             title: {
                                 display: true,
                                 text: 'Total Raised ($)',
-                                color: '#e67e22',
+                                color: '#b0b0b0',
                                 font: {
                                     size: 13,
                                     weight: 'bold'
@@ -785,7 +811,7 @@
                                 drawOnChartArea: false
                             },
                             ticks: {
-                                color: '#3498db',
+                                color: '#9090b0',
                                 font: {
                                     size: 11
                                 },
@@ -796,7 +822,7 @@
                             title: {
                                 display: true,
                                 text: 'Spent % of Raised',
-                                color: '#3498db',
+                                color: '#9090b0',
                                 font: {
                                     size: 13,
                                     weight: 'bold'

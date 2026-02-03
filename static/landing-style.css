@@ -92,7 +92,7 @@ body.dark-mode header {
 }
 
 .logo span {
-    color: #e67e22;
+    color: #999999;
 }
 
 nav {
@@ -129,9 +129,9 @@ nav a.github-link {
 }
 
 nav a.github-link:hover {
-    color: #e67e22;
-    background: rgba(230, 126, 34, 0.1);
-    border-color: rgba(230, 126, 34, 0.4);
+    color: #ffffff;
+    background: rgba(160, 160, 160, 0.25);
+    border-color: rgba(160, 160, 160, 0.5);
 }
 
 body.dark-mode nav a.github-link {
@@ -141,9 +141,9 @@ body.dark-mode nav a.github-link {
 }
 
 body.dark-mode nav a.github-link:hover {
-    color: #e67e22;
-    background: rgba(230, 126, 34, 0.15);
-    border-color: rgba(230, 126, 34, 0.5);
+    color: #ffffff;
+    background: rgba(160, 160, 160, 0.25);
+    border-color: rgba(160, 160, 160, 0.5);
 }
 
 nav a.donate-link {
@@ -151,30 +151,30 @@ nav a.donate-link {
     text-decoration: none;
     font-size: 0.9rem;
     transition: color 0.2s ease, background-color 0.2s ease;
-    background: rgba(230, 126, 34, 0.2);
+    background: rgba(160, 160, 160, 0.18);
     padding: 0.5rem 0.85rem;
     border-radius: 8px;
-    border: 1px solid rgba(230, 126, 34, 0.4);
+    border: 1px solid rgba(160, 160, 160, 0.35);
     display: inline-block;
     margin-left: -0.5rem;
 }
 
 nav a.donate-link:hover {
     color: #fff;
-    background: rgba(230, 126, 34, 0.4);
-    border-color: rgba(230, 126, 34, 0.6);
+    background: rgba(160, 160, 160, 0.35);
+    border-color: rgba(160, 160, 160, 0.55);
 }
 
 body.dark-mode nav a.donate-link {
-    color: #e67e22;
-    background: rgba(230, 126, 34, 0.2);
-    border-color: rgba(230, 126, 34, 0.4);
+    color: #d0d0d0;
+    background: rgba(160, 160, 160, 0.18);
+    border-color: rgba(160, 160, 160, 0.35);
 }
 
 body.dark-mode nav a.donate-link:hover {
     color: #fff;
-    background: rgba(230, 126, 34, 0.3);
-    border-color: rgba(230, 126, 34, 0.6);
+    background: rgba(160, 160, 160, 0.35);
+    border-color: rgba(160, 160, 160, 0.55);
 }
 
 /* COUNTDOWN TIMER */
@@ -183,16 +183,16 @@ body.dark-mode nav a.donate-link:hover {
     margin: 2rem auto;
     padding: 2rem;
     text-align: center;
-    background: rgba(230, 126, 34, 0.05);
-    border: 2px solid rgba(230, 126, 34, 0.2);
-    border-radius: 16px;
+    background: rgba(160, 160, 160, 0.04);
+    border: 1px solid rgba(160, 160, 160, 0.15);
+    border-radius: 12px;
 }
 
 .countdown-title {
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 1.8rem;
     font-weight: 600;
-    color: #e67e22;
+    color: #d0d0d0;
     margin: 0 0 1.5rem 0;
 }
 
@@ -215,8 +215,7 @@ body.dark-mode nav a.donate-link:hover {
     font-weight: 700;
     font-size: 3.5rem;
     line-height: 1;
-    color: #e67e22;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #ffffff;
 }
 
 .countdown-label {
@@ -237,16 +236,16 @@ body.dark-mode nav a.donate-link:hover {
 }
 
 body.dark-mode .countdown-section {
-    background: rgba(230, 126, 34, 0.08);
-    border-color: rgba(230, 126, 34, 0.3);
+    background: rgba(160, 160, 160, 0.04);
+    border-color: rgba(160, 160, 160, 0.15);
 }
 
 body.dark-mode .countdown-title {
-    color: #e67e22;
+    color: #d0d0d0;
 }
 
 body.dark-mode .countdown-value {
-    color: #e67e22;
+    color: #ffffff;
 }
 
 body.dark-mode .countdown-label {
