@@ -136,12 +136,70 @@ body.dark-mode header {
     color: var(--accent-blue);
 }
 
-/* Header Controls */
-.header-controls {
+/* Desktop Navigation */
+.desktop-nav {
+    display: none;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: 2rem;
+}
+
+.desktop-nav a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+    padding: 0.5rem 0.85rem;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.desktop-nav a:hover {
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+}
+
+.desktop-nav a.active {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Header Right Section */
+.header-right {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
     margin-left: auto;
+}
+
+.header-right .github-link,
+.header-right .donate-link {
+    display: none;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+    padding: 0.5rem 0.85rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-default);
+    background: var(--bg-elevated);
+}
+
+.header-right .github-link:hover {
+    color: var(--text-primary);
+    background: var(--bg-surface-hover);
+    border-color: var(--border-hover);
+}
+
+.header-right .donate-link {
+    color: var(--accent-blue);
+}
+
+.header-right .donate-link:hover {
+    color: #fff;
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
 }
 
 /* Theme Toggle */
@@ -171,30 +229,53 @@ body.dark-mode header {
     line-height: 1;
 }
 
-nav {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    margin-left: auto;
+/* Mobile Navigation */
+.mobile-nav {
+    display: none;
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-default);
+    flex-direction: column;
+    padding: 1rem 0;
+    max-height: calc(100vh - 56px);
+    overflow-y: auto;
 }
 
-nav a {
+.mobile-nav.active {
+    display: flex;
+}
+
+.mobile-nav a {
     color: var(--text-secondary);
     text-decoration: none;
-    font-size: 0.875rem;
-    transition: color 0.15s ease;
-    white-space: nowrap;
+    font-size: 0.95rem;
+    padding: 0.75rem 2rem;
+    transition: all 0.15s ease;
 }
 
-nav a:hover {
-    color: var(--text-primary);
-}
-
-nav a.active {
+.mobile-nav a:hover,
+.mobile-nav a.active {
     background: var(--bg-elevated);
-    border-radius: 6px;
-    padding: 0.35rem 0.75rem;
     color: var(--text-primary);
+}
+
+/* Show desktop nav on larger screens */
+@media (min-width: 900px) {
+    .desktop-nav {
+        display: flex;
+    }
+
+    .header-right .github-link,
+    .header-right .donate-link {
+        display: inline-block;
+    }
+
+    .hamburger {
+        display: none;
+    }
 }
 
 /* GitHub Link */
@@ -671,6 +752,28 @@ body.dark-mode .footer-bottom {
 .footer-support-link:hover {
     opacity: 0.7;
     text-decoration: underline;
+}
+
+/* Flag Footer Image */
+.flag-footer-image {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 0;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.flag-footer-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
 }
 
 /* Hamburger Menu */

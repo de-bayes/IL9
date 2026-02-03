@@ -45,7 +45,17 @@
     <div class="site-content">
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
-            <div class="header-controls">
+            <nav class="desktop-nav">
+                <a href="/">Home</a>
+                <a href="/markets" class="active">Markets</a>
+                <a href="/candidates">Candidates</a>
+                <a href="/fundraising">Fundraising</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/about">About</a>
+            </nav>
+            <div class="header-right">
+                <a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer" class="github-link" title="View on GitHub">GitHub</a>
+                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="donate-link" title="Support IL9Cast">Donate</a>
                 <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">
                     <span class="theme-icon">◐</span>
                 </button>
@@ -55,17 +65,16 @@
                     <span></span>
                 </button>
             </div>
-            <nav id="mobileNav">
+            <nav class="mobile-nav" id="mobileNav">
+                <a href="/">Home</a>
                 <a href="/markets" class="active">Markets</a>
                 <a href="/candidates">Candidates</a>
                 <a href="/fundraising">Fundraising</a>
                 <a href="/methodology">Methodology</a>
                 <a href="/about">About</a>
+                <a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer" class="github-link">GitHub</a>
+                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="donate-link">Donate</a>
             </nav>
-            <div class="header-actions">
-                <a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer" class="github-link" title="View on GitHub">GitHub</a>
-                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="donate-link" title="Support IL9Cast">Donate</a>
-            </div>
         </header>
 
         <section class="hero">
@@ -324,6 +333,9 @@
                 <p>&copy; 2026 IL9Cast. Built with open data. • Railway & AWS Storage: Live • <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a></p>
             </div>
         </footer>
+        <div class="flag-footer-image">
+            <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer">
+        </div>
     </div>
 
     <style>
@@ -2982,7 +2994,6 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
 
     <footer class="site-footer">
-        <img src="{{ url_for('static', filename='flag-footer.svg') }}" alt="Decorative flag footer">
     </footer>
 </body>
 </html>
