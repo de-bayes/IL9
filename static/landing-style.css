@@ -136,100 +136,12 @@ body.dark-mode header {
     color: var(--accent-blue);
 }
 
-/* Desktop Navigation */
-.desktop-nav {
-    display: none;
-    align-items: center;
-    gap: 0.25rem;
-    margin-left: 2rem;
-}
-
-.desktop-nav a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: 0.875rem;
-    transition: all 0.15s ease;
-    padding: 0.5rem 0.85rem;
-    border-radius: 6px;
-    white-space: nowrap;
-}
-
-.desktop-nav a:hover {
-    color: var(--text-primary);
-    background: var(--bg-elevated);
-}
-
-.desktop-nav a.active {
-    background: var(--bg-elevated);
-    color: var(--text-primary);
-    font-weight: 500;
-}
-
-/* Header Right Section */
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+/* Hamburger - always visible on right */
+.hamburger {
     margin-left: auto;
 }
 
-.header-right .github-link,
-.header-right .donate-link {
-    display: none;
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: 0.875rem;
-    transition: all 0.15s ease;
-    padding: 0.5rem 0.85rem;
-    border-radius: 6px;
-    border: 1px solid var(--border-default);
-    background: var(--bg-elevated);
-}
-
-.header-right .github-link:hover {
-    color: var(--text-primary);
-    background: var(--bg-surface-hover);
-    border-color: var(--border-hover);
-}
-
-.header-right .donate-link {
-    color: var(--accent-blue);
-}
-
-.header-right .donate-link:hover {
-    color: #fff;
-    background: var(--accent-blue);
-    border-color: var(--accent-blue);
-}
-
-/* Theme Toggle */
-.theme-toggle {
-    background: var(--bg-elevated);
-    border: 1px solid var(--border-default);
-    border-radius: 6px;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    font-size: 1.2rem;
-    color: var(--text-secondary);
-}
-
-.theme-toggle:hover {
-    background: var(--bg-surface-hover);
-    border-color: var(--border-hover);
-    color: var(--text-primary);
-}
-
-.theme-icon {
-    display: block;
-    line-height: 1;
-}
-
-/* Mobile Navigation */
+/* Mobile Navigation - only visible when menu is clicked */
 .mobile-nav {
     display: none;
     position: fixed;
@@ -242,6 +154,7 @@ body.dark-mode header {
     padding: 1rem 0;
     max-height: calc(100vh - 56px);
     overflow-y: auto;
+    z-index: 199;
 }
 
 .mobile-nav.active {
@@ -260,22 +173,6 @@ body.dark-mode header {
 .mobile-nav a.active {
     background: var(--bg-elevated);
     color: var(--text-primary);
-}
-
-/* Show desktop nav on larger screens */
-@media (min-width: 900px) {
-    .desktop-nav {
-        display: flex;
-    }
-
-    .header-right .github-link,
-    .header-right .donate-link {
-        display: inline-block;
-    }
-
-    .hamburger {
-        display: none;
-    }
 }
 
 /* GitHub Link */
@@ -754,7 +651,7 @@ body.dark-mode .footer-bottom {
     text-decoration: underline;
 }
 
-/* Flag Footer Image */
+/* Flag Footer Image - edge to edge at very bottom */
 .flag-footer-image {
     width: 100vw;
     position: relative;
@@ -774,6 +671,17 @@ body.dark-mode .footer-bottom {
     height: auto;
     display: block;
     object-fit: cover;
+}
+
+/* Ensure site-content and body don't add extra spacing */
+.site-content {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+body {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 /* Hamburger Menu */
