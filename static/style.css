@@ -5,11 +5,11 @@
     --bg-secondary: #141829;
     --text-primary: #FFFFFF;
     --text-secondary: #B0B8D4;
-    --accent: #2ECC40;
-    --accent-hover: #27AE36;
+    --accent: #0088FF;
+    --accent-hover: #0066DD;
     --accent-cyan: #00D9FF;
-    --accent-green: #2ECC40;
-    --accent-green-bright: #39FF14;
+    --accent-green: #0088FF;
+    --accent-green-bright: #00BBFF;
     --border: #2A2F4A;
 
     --font-mono: 'Inconsolata', 'Courier New', monospace;
@@ -117,20 +117,20 @@ p {
     display: inline-block;
     width: 6px;
     height: 6px;
-    background: #2ECC40;
+    background: #0088FF;
     border-radius: 50%;
-    box-shadow: 0 0 6px rgba(46, 204, 64, 0.9);
+    box-shadow: 0 0 6px rgba(0, 136, 255, 0.9);
     animation: pulse-live-green 2s ease-in-out infinite;
 }
 
 @keyframes pulse-live-green {
     0%, 100% {
         opacity: 1;
-        box-shadow: 0 0 6px rgba(46, 204, 64, 0.9);
+        box-shadow: 0 0 6px rgba(0, 136, 255, 0.9);
     }
     50% {
         opacity: 0.7;
-        box-shadow: 0 0 10px rgba(46, 204, 64, 1);
+        box-shadow: 0 0 10px rgba(0, 136, 255, 1);
     }
 }
 
@@ -187,20 +187,20 @@ p {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: rgba(46, 204, 64, 0.9);
+    color: rgba(0, 136, 255, 0.9);
     font-weight: 600;
     padding: 0.4rem 0.8rem;
-    background: rgba(46, 204, 64, 0.08);
-    border: 1px solid rgba(46, 204, 64, 0.3);
+    background: rgba(0, 136, 255, 0.08);
+    border: 1px solid rgba(0, 136, 255, 0.3);
     border-radius: 6px;
     transition: all 0.3s ease;
 }
 
 .nav-link-live:hover {
-    color: rgba(46, 204, 64, 1);
-    background: rgba(46, 204, 64, 0.15);
-    border-color: rgba(46, 204, 64, 0.6);
-    text-shadow: 0 0 10px rgba(46, 204, 64, 0.5);
+    color: rgba(0, 136, 255, 1);
+    background: rgba(0, 136, 255, 0.15);
+    border-color: rgba(0, 136, 255, 0.6);
+    text-shadow: 0 0 10px rgba(0, 136, 255, 0.5);
 }
 
 .nav-link-live::after {
@@ -223,8 +223,8 @@ p {
 
 .github-link:hover {
     color: var(--accent);
-    background: rgba(46, 204, 64, 0.1);
-    border-color: rgba(46, 204, 64, 0.4);
+    background: rgba(0, 136, 255, 0.1);
+    border-color: rgba(0, 136, 255, 0.4);
 }
 
 .github-link::after {
@@ -462,13 +462,13 @@ p {
     border: none;
     border-radius: 5px;
     transition: all 0.3s ease;
-    background: #2ECC40;
-    box-shadow: 0 0 12px rgba(46, 204, 64, 0.4);
+    background: #0088FF;
+    box-shadow: 0 0 12px rgba(0, 136, 255, 0.4);
 }
 
 .nav-btn-landing:hover {
-    background: #3bd950;
-    box-shadow: 0 0 18px rgba(46, 204, 64, 0.6);
+    background: #0099FF;
+    box-shadow: 0 0 18px rgba(0, 136, 255, 0.6);
     transform: translateY(-1px);
 }
 
@@ -532,13 +532,13 @@ p {
 
 .status-label {
     font-size: 0.75rem;
-    color: #FFD700;
+    color: #00BBFF;
     letter-spacing: 0.02em;
 }
 
 .status-value {
     font-size: 0.75rem;
-    color: #FFD700;
+    color: #00BBFF;
 }
 
 .landing-right {
@@ -808,9 +808,9 @@ p {
     left: 5%;
     width: 45%;
     height: 55%;
-    background: radial-gradient(ellipse at center, rgba(255, 180, 80, 0.5) 0%, rgba(255, 140, 50, 0.25) 25%, transparent 55%);
+    background: radial-gradient(ellipse at center, rgba(0, 136, 255, 0.25) 0%, rgba(0, 100, 220, 0.12) 25%, transparent 55%);
     filter: blur(75px);
-    opacity: 0.35;
+    opacity: 0.2;
     pointer-events: none;
     z-index: 1;
 }
@@ -819,7 +819,7 @@ p {
 
 .silver-bulletin-tag {
     display: inline-block;
-    background: #2ECC40;
+    background: #0088FF;
     color: #000000;
     font-family: 'Arial Black', 'Arial Bold', Arial, sans-serif;
     font-size: 0.75rem;
@@ -828,7 +828,7 @@ p {
     text-transform: uppercase;
     padding: 0.4rem 1rem;
     border-radius: 4px;
-    box-shadow: 0 0 12px rgba(46, 204, 64, 0.3);
+    box-shadow: 0 0 12px rgba(0, 136, 255, 0.3);
 }
 
 .landing-title-new {
@@ -837,10 +837,10 @@ p {
     font-weight: 900;
     font-style: italic;
     line-height: 1.15;
-    color: #2ECC40;
+    color: #0088FF;
     letter-spacing: -0.02em;
     text-transform: uppercase;
-    text-shadow: 0 0 15px rgba(46, 204, 64, 0.35);
+    text-shadow: 0 0 15px rgba(0, 136, 255, 0.35);
     margin: 0;
 }
 
@@ -880,7 +880,7 @@ p {
 
 .hero-cta-button {
     display: inline-block;
-    background: rgba(46, 204, 64, 0.9);
+    background: rgba(0, 136, 255, 0.9);
     color: #000000;
     font-family: 'Arial', sans-serif;
     font-size: 0.95rem;
@@ -889,13 +889,13 @@ p {
     border-radius: 6px;
     text-decoration: none;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(46, 204, 64, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 136, 255, 0.3);
 }
 
 .hero-cta-button:hover {
-    background: rgba(46, 204, 64, 1);
+    background: rgba(0, 136, 255, 1);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(46, 204, 64, 0.4);
+    box-shadow: 0 6px 16px rgba(0, 136, 255, 0.4);
 }
 
 .trend-lines {
