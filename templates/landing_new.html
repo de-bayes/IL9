@@ -249,24 +249,31 @@
                 console.error('Failed to fetch snapshot count:', e);
             }
 
-            const duration = 1500;
+            const duration = 2000; // Slightly longer for smoother animation
             const startTime = Date.now();
+
+            // Easing function for smooth deceleration
+            function easeOutQuart(t) {
+                return 1 - Math.pow(1 - t, 4);
+            }
 
             function update() {
                 const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / duration, 1);
+                const linearProgress = Math.min(elapsed / duration, 1);
+                const easedProgress = easeOutQuart(linearProgress);
 
-                // Animate snapshot count
-                const currentSnapshots = Math.floor(progress * snapshotCount);
+                // Animate snapshot count with easing
+                const currentSnapshots = Math.floor(easedProgress * snapshotCount);
                 snapshotElement.textContent = currentSnapshots.toLocaleString() + '+';
 
-                // Animate data points count
-                const currentDataPoints = Math.floor(progress * dataPointsCount);
+                // Animate data points count with easing
+                const currentDataPoints = Math.floor(easedProgress * dataPointsCount);
                 dataPointElement.textContent = currentDataPoints.toLocaleString() + '+';
 
-                if (progress < 1) {
+                if (linearProgress < 1) {
                     requestAnimationFrame(update);
                 } else {
+                    // Ensure final values are exact
                     snapshotElement.textContent = snapshotCount.toLocaleString() + '+';
                     dataPointElement.textContent = dataPointsCount.toLocaleString() + '+';
                 }
