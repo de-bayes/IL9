@@ -2628,3 +2628,45 @@ p {
         font-size: 0.55rem;
     }
 }
+
+/* ==================== Footer ==================== */
+
+.site-footer {
+    width: 100%;
+    margin-top: 4rem;
+    background-color: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+}
+
+.site-footer svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 200px;
+}
+
+@media (max-width: 1024px) {
+    .site-footer svg {
+        max-height: 150px;
+    }
+}
+
+@media (max-width: 768px) {
+    .site-footer {
+        margin-top: 3rem;
+    }
+
+    .site-footer svg {
+        max-height: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .site-footer {
+        margin-top: 2rem;
+    }
+
+    .site-footer svg {
+        max-height: 80px;
+    }
+}
