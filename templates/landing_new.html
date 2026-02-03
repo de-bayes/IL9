@@ -82,11 +82,16 @@
     <div class="site-content">
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
-            <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+            <div class="header-controls">
+                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+                    <span class="theme-icon">◐</span>
+                </button>
+                <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
             <nav id="mobileNav">
                 <a href="/" class="active">Home</a>
                 <a href="/markets">Markets</a>
@@ -204,6 +209,30 @@
     </div>
 
     <script>
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.querySelector('.theme-icon');
+            if (icon) {
+                icon.textContent = theme === 'dark' ? '◐' : '◑';
+            }
+        }
+
+        // Initialize theme on page load
+        (function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        })();
+
         // Mobile hamburger menu toggle
         function toggleMobileMenu() {
             const hamburger = document.getElementById('hamburger');

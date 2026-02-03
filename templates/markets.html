@@ -45,11 +45,16 @@
     <div class="site-content">
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
-            <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+            <div class="header-controls">
+                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+                    <span class="theme-icon">◐</span>
+                </button>
+                <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
             <nav id="mobileNav">
                 <a href="/markets" class="active">Markets</a>
                 <a href="/candidates">Candidates</a>
@@ -322,10 +327,40 @@
     </div>
 
     <style>
+        :root {
+            --bg-primary: #131517;
+            --bg-surface: #1C1E21;
+            --bg-surface-hover: #242628;
+            --bg-elevated: #2A2D31;
+            --border-subtle: rgba(255,255,255,0.06);
+            --border-default: rgba(255,255,255,0.10);
+            --border-hover: rgba(255,255,255,0.18);
+            --text-primary: #F0F0F0;
+            --text-secondary: #9BA1A6;
+            --text-tertiary: #6B7280;
+            --accent-blue: #4C9EEB;
+            --grid-color: rgba(76, 158, 235, 0.025);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #E8E6E1;
+            --bg-surface: #F5F3F0;
+            --bg-surface-hover: #EEECE7;
+            --bg-elevated: #F0EDE8;
+            --border-subtle: rgba(0,0,0,0.08);
+            --border-default: rgba(0,0,0,0.12);
+            --border-hover: rgba(0,0,0,0.18);
+            --text-primary: #1A1A1A;
+            --text-secondary: #5A5A5A;
+            --text-tertiary: #8A8A8A;
+            --accent-blue: #3B8AD9;
+            --grid-color: rgba(76, 158, 235, 0.04);
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #131517;
-            color: #e0e0e0;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             min-height: 100vh;
@@ -365,8 +400,8 @@
             right: 0;
             bottom: 0;
             background-image:
-                linear-gradient(rgba(76, 158, 235, 0.025) 1.5px, transparent 1.5px),
-                linear-gradient(90deg, rgba(76, 158, 235, 0.025) 1.5px, transparent 1.5px);
+                linear-gradient(var(--grid-color, rgba(76, 158, 235, 0.025)) 1.5px, transparent 1.5px),
+                linear-gradient(90deg, var(--grid-color, rgba(76, 158, 235, 0.025)) 1.5px, transparent 1.5px);
             background-size: 50px 50px;
             pointer-events: none;
             z-index: -1;
@@ -950,7 +985,7 @@
 
         /* ===== CALCULATION BREAKDOWN FOLDOUT ===== */
         .calculation-breakdown.method-foldout {
-            background: rgba(26, 26, 26, 0.5);
+            background: var(--bg-surface);
             border: 2px solid rgba(76, 158, 235, 0.35);
             border-radius: 8px;
             margin-bottom: 2rem;
@@ -1053,7 +1088,7 @@
 
         /* ===== RESULTS HEATMAP CALLOUT ===== */
         .heatmap-callout {
-            background: rgba(26, 26, 26, 0.5);
+            background: var(--bg-surface);
             border: 2px solid rgba(76, 158, 235, 0.35);
             border-radius: 8px;
             margin-bottom: 2rem;
@@ -1449,7 +1484,7 @@
         /* Download Section */
         .download-data-section {
             padding: 2.5rem;
-            background: rgba(26, 26, 26, 0.5);
+            background: var(--bg-surface);
             border: 2px solid rgba(76, 158, 235, 0.35);
             border-radius: 8px;
             text-align: center;
@@ -1519,7 +1554,7 @@
         /* Email Alerts Section */
         .email-alerts-section {
             padding: 2.5rem;
-            background: rgba(26, 26, 26, 0.5);
+            background: var(--bg-surface);
             border: 2px solid rgba(76, 158, 235, 0.35);
             border-radius: 8px;
             text-align: center;
@@ -1551,7 +1586,7 @@
             padding: 0.75rem 1rem;
             border: 1px solid #444;
             border-radius: 6px;
-            background: #2a2a2a;
+            background: var(--bg-elevated);
             color: #e0e0e0;
             font-size: 1rem;
             font-family: 'Inter', sans-serif;
@@ -1573,7 +1608,7 @@
             padding: 0.75rem 1rem;
             border: 1px solid #444;
             border-radius: 6px;
-            background: #2a2a2a;
+            background: var(--bg-elevated);
             color: #e0e0e0;
             font-size: 0.95rem;
             font-family: 'Inter', sans-serif;
@@ -1649,14 +1684,14 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
+            background: var(--bg-primary);
         }
 
         .email-modal-content {
             position: relative;
             max-width: 500px;
             margin: 15% auto;
-            background: rgba(26, 26, 26, 0.95);
+            background: var(--bg-surface);
             border: 2px solid rgba(76, 158, 235, 0.4);
             border-radius: 16px;
             padding: 40px;
@@ -1730,6 +1765,30 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script>
+// Theme toggle
+function toggleTheme() {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+function updateThemeIcon(theme) {
+    const icon = document.querySelector('.theme-icon');
+    if (icon) {
+        icon.textContent = theme === 'dark' ? '◐' : '◑';
+    }
+}
+
+// Initialize theme on page load
+(function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+})();
+
 // Mobile hamburger menu toggle
 function toggleMobileMenu() {
     const hamburger = document.getElementById('hamburger');

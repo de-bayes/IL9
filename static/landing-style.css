@@ -3,6 +3,7 @@
    ============================================ */
 
 :root {
+    /* Dark mode (default) */
     --bg-primary:       #131517;
     --bg-surface:       #1C1E21;
     --bg-surface-hover: #242628;
@@ -16,6 +17,25 @@
     --accent-blue:      #4C9EEB;
     --accent-green:     #22C55E;
     --accent-red:       #EF4444;
+    --grid-color:       rgba(76, 158, 235, 0.025);
+}
+
+/* Light mode */
+[data-theme="light"] {
+    --bg-primary:       #E8E6E1;
+    --bg-surface:       #F5F3F0;
+    --bg-surface-hover: #EEECE7;
+    --bg-elevated:      #F0EDE8;
+    --border-subtle:    rgba(0,0,0,0.08);
+    --border-default:   rgba(0,0,0,0.12);
+    --border-hover:     rgba(0,0,0,0.18);
+    --text-primary:     #1A1A1A;
+    --text-secondary:   #5A5A5A;
+    --text-tertiary:    #8A8A8A;
+    --accent-blue:      #3B8AD9;
+    --accent-green:     #1FA84F;
+    --accent-red:       #DC3545;
+    --grid-color:       rgba(76, 158, 235, 0.04);
 }
 
 * {
@@ -42,8 +62,8 @@ body::before {
     right: 0;
     bottom: 0;
     background-image:
-        linear-gradient(rgba(76, 158, 235, 0.025) 1.5px, transparent 1.5px),
-        linear-gradient(90deg, rgba(76, 158, 235, 0.025) 1.5px, transparent 1.5px);
+        linear-gradient(var(--grid-color) 1.5px, transparent 1.5px),
+        linear-gradient(90deg, var(--grid-color) 1.5px, transparent 1.5px);
     background-size: 50px 50px;
     pointer-events: none;
     z-index: -1;
@@ -114,6 +134,41 @@ body.dark-mode header {
 
 .logo span {
     color: var(--accent-blue);
+}
+
+/* Header Controls */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: auto;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
+.theme-toggle:hover {
+    background: var(--bg-surface-hover);
+    border-color: var(--border-hover);
+    color: var(--text-primary);
+}
+
+.theme-icon {
+    display: block;
+    line-height: 1;
 }
 
 nav {
