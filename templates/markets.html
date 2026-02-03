@@ -27,7 +27,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
 
     <!-- Google Analytics -->
@@ -40,7 +40,7 @@
     </script>
 </head>
 <body class="dark-mode">
-    <canvas id="grid-canvas"></canvas>
+
 
     <div class="site-content">
         <header>
@@ -129,8 +129,8 @@
                         <span class="share-text">Share Current Standings</span>
                     </button>
                 </div>
-                <p style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(91, 155, 213, 0.25); font-size: 0.8rem; color: #808080; text-align: center;">
-                    For detailed aggregation methodology, see the <a href="/methodology#foldout-pm" style="color: #5B9BD5; text-decoration: underline;">Prediction Markets Aggregation section</a> on the Methodology page.
+                <p style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(76, 158, 235, 0.25); font-size: 0.8rem; color: #808080; text-align: center;">
+                    For detailed aggregation methodology, see the <a href="/methodology#foldout-pm" style="color: #4C9EEB; text-decoration: underline;">Prediction Markets Aggregation section</a> on the Methodology page.
                 </p>
             </section>
 
@@ -143,8 +143,8 @@
                     <div id="heatmapContent">
                         <p style="color: #a0a0a0;">Loading market data...</p>
                     </div>
-                    <p style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(91, 155, 213, 0.25); font-size: 0.9rem; color: #a0a0a0;">
-                        For the full methodology details, see the <a href="/methodology#heatmap-methodology" style="color: #5B9BD5; text-decoration: underline;">Results Heatmap section</a> on the Methodology page.
+                    <p style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(76, 158, 235, 0.25); font-size: 0.9rem; color: #a0a0a0;">
+                        For the full methodology details, see the <a href="/methodology#heatmap-methodology" style="color: #4C9EEB; text-decoration: underline;">Results Heatmap section</a> on the Methodology page.
                     </p>
                 </div>
             </section>
@@ -169,7 +169,7 @@
                 <div class="foldout-body" id="calc-foldout-body">
                     <div class="foldout-inner">
                         <div id="breakdownContent"></div>
-                        <p class="breakdown-desc" style="font-size: 0.85rem; color: #a0a0a0; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(91, 155, 213, 0.25);">
+                        <p class="breakdown-desc" style="font-size: 0.85rem; color: #a0a0a0; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(76, 158, 235, 0.25);">
                             <strong>*</strong> = No Kalshi market available. Uses 100% of Manifold probability. Probabilities are lightly normalized (30% strength) to prevent excessive drift while preserving raw market values for top candidates.
                         </p>
                     </div>
@@ -321,7 +321,7 @@
     <style>
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #1a1a1a;
+            background: #131517;
             color: #e0e0e0;
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
@@ -351,6 +351,22 @@
             max-width: 900px;
             margin: 0 auto 4rem;
             padding: 0 2rem;
+            position: relative;
+        }
+
+        .markets-content-page::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(rgba(76, 158, 235, 0.025) 1.5px, transparent 1.5px),
+                linear-gradient(90deg, rgba(76, 158, 235, 0.025) 1.5px, transparent 1.5px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: -1;
         }
 
         /* Share Button */
@@ -359,7 +375,7 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, #5B9BD5 0%, #4A7BA7 100%);
+            background: linear-gradient(135deg, #4C9EEB 0%, #4A7BA7 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -373,7 +389,7 @@
         .share-button:hover {
             background: linear-gradient(135deg, #4A7BA7 0%, #3D5A80 100%);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(91, 155, 213, 0.4);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         .share-button:active {
@@ -401,7 +417,7 @@
             gap: 2rem;
             padding: 2.5rem;
             background: rgba(18, 18, 22, 1);
-            border: 1px solid rgba(91, 155, 213, 0.25);
+            border: 1px solid rgba(76, 158, 235, 0.25);
             border-radius: 8px;
         }
 
@@ -434,7 +450,7 @@
             font-size: 2.5rem;
             font-weight: 600;
             color: #e0e0e0;
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
             margin-bottom: 1rem;
         }
 
@@ -455,8 +471,8 @@
         .leader-main-value {
             font-size: 3.5rem;
             font-weight: 600;
-            color: #5B9BD5;
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            color: #4C9EEB;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
             line-height: 1;
             letter-spacing: -0.02em;
         }
@@ -493,7 +509,7 @@
             font-size: 1.25rem;
             font-weight: 600;
             color: #c0c0c0;
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
             line-height: 1;
         }
 
@@ -649,7 +665,7 @@
 
             .big-odds-candidate {
                 padding: 1rem 0.4rem;
-                border-radius: 10px;
+                border-radius: 8px;
             }
 
             .big-percent {
@@ -664,7 +680,7 @@
             .market-chart-section {
                 padding: 1.25rem;
                 margin-bottom: 1.5rem;
-                border-radius: 10px;
+                border-radius: 8px;
             }
 
             .market-chart-section h2 {
@@ -787,15 +803,15 @@
             align-items: center;
             padding: 1.5rem 0.5rem;
             background: rgba(18, 18, 22, 1);
-            border: 1px solid rgba(91, 155, 213, 0.25);
+            border: 1px solid rgba(76, 158, 235, 0.25);
             border-radius: 8px;
         }
 
         .big-percent {
             font-size: 3.5rem;
             font-weight: 600;
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            color: #5B9BD5;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
+            color: #4C9EEB;
             line-height: 1;
             margin-bottom: 0.5rem;
             letter-spacing: -0.02em;
@@ -826,7 +842,7 @@
         .market-chart-section {
             padding: 2rem;
             background: rgba(18, 18, 22, 1);
-            border: 1px solid rgba(91, 155, 213, 0.25);
+            border: 1px solid rgba(76, 158, 235, 0.25);
             border-radius: 8px;
             margin-bottom: 2rem;
         }
@@ -842,8 +858,8 @@
         .market-chart-section h2 {
             margin-bottom: 1.5rem;
             font-size: 1.6rem;
-            color: #5B9BD5;
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            color: #4C9EEB;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
             font-weight: 600;
         }
 
@@ -860,7 +876,7 @@
             background: rgba(0, 0, 0, 0.3);
             padding: 4px;
             border-radius: 8px;
-            border: 1px solid rgba(91, 155, 213, 0.25);
+            border: 1px solid rgba(76, 158, 235, 0.25);
             flex-wrap: wrap;
             justify-content: center;
             width: auto;
@@ -876,7 +892,7 @@
             cursor: pointer;
             font-size: 0.85rem;
             font-weight: 500;
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
             transition: all 0.25s ease;
         }
 
@@ -886,9 +902,9 @@
         }
 
         .toggle-btn.active {
-            background: rgba(91, 155, 213, 0.25);
-            color: #5B9BD5;
-            box-shadow: 0 0 12px rgba(91, 155, 213, 0.25);
+            background: rgba(76, 158, 235, 0.25);
+            color: #4C9EEB;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
         /* Methodology Foldout */
@@ -896,9 +912,9 @@
         .donation-section {
             text-align: center;
             padding: 1.5rem 2rem;
-            background: rgba(91, 155, 213, 0.1);
-            border: 1px solid rgba(91, 155, 213, 0.3);
-            border-radius: 10px;
+            background: rgba(76, 158, 235, 0.1);
+            border: 1px solid rgba(76, 158, 235, 0.3);
+            border-radius: 8px;
             margin-bottom: 2rem;
         }
 
@@ -913,37 +929,35 @@
             display: inline-block;
             margin-left: 0.75rem;
             padding: 0.5rem 1.25rem;
-            background: rgba(91, 155, 213, 0.25);
-            border: 1.5px solid rgba(91, 155, 213, 0.5);
+            background: rgba(76, 158, 235, 0.25);
+            border: 1.5px solid rgba(76, 158, 235, 0.5);
             border-radius: 6px;
-            color: #5B9BD5;
+            color: #4C9EEB;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
         }
 
         .donation-link:hover {
-            background: rgba(91, 155, 213, 0.35);
-            border-color: rgba(91, 155, 213, 0.7);
-            color: #5B9BD5;
+            background: rgba(76, 158, 235, 0.35);
+            border-color: rgba(76, 158, 235, 0.7);
+            color: #4C9EEB;
             transform: translateY(-1px);
         }
 
         /* ===== CALCULATION BREAKDOWN FOLDOUT ===== */
         .calculation-breakdown.method-foldout {
             background: rgba(26, 26, 26, 0.5);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid rgba(91, 155, 213, 0.35);
-            border-radius: 12px;
+            border: 2px solid rgba(76, 158, 235, 0.35);
+            border-radius: 8px;
             margin-bottom: 2rem;
             overflow: hidden;
             padding: 0;
         }
 
         .calculation-breakdown.method-foldout.active {
-            border-color: rgba(91, 155, 213, 0.5);
-            box-shadow: 0 0 20px rgba(91, 155, 213, 0.1);
+            border-color: rgba(76, 158, 235, 0.5);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
         .calculation-breakdown .foldout-trigger {
@@ -961,7 +975,7 @@
         }
 
         .calculation-breakdown .foldout-trigger:hover {
-            background: rgba(91, 155, 213, 0.08);
+            background: rgba(76, 158, 235, 0.08);
         }
 
         .calculation-breakdown .foldout-trigger-left {
@@ -973,9 +987,9 @@
         .calculation-breakdown .foldout-trigger h2 {
             margin-bottom: 0;
             font-size: 1.6rem;
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
             font-weight: 600;
-            color: #5B9BD5;
+            color: #4C9EEB;
             line-height: 1.3;
         }
 
@@ -990,7 +1004,7 @@
             font-family: 'Inter', sans-serif;
             font-size: 1.6rem;
             font-weight: 300;
-            color: rgba(91, 155, 213, 0.6);
+            color: rgba(76, 158, 235, 0.6);
             transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             flex-shrink: 0;
             width: 30px;
@@ -1025,7 +1039,7 @@
         }
 
         .calculation-breakdown .foldout-body .foldout-inner {
-            border-top: 1px solid rgba(91, 155, 213, 0.25);
+            border-top: 1px solid rgba(76, 158, 235, 0.25);
             padding-top: 0;
             transition: padding-top 0.4s ease;
         }
@@ -1037,10 +1051,8 @@
         /* ===== RESULTS HEATMAP CALLOUT ===== */
         .heatmap-callout {
             background: rgba(26, 26, 26, 0.5);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid rgba(91, 155, 213, 0.35);
-            border-radius: 12px;
+            border: 2px solid rgba(76, 158, 235, 0.35);
+            border-radius: 8px;
             margin-bottom: 2rem;
             overflow: hidden;
         }
@@ -1052,9 +1064,9 @@
         .heatmap-callout-header h2 {
             margin: 0 0 0.2rem 0;
             font-size: 1.6rem;
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
             font-weight: 600;
-            color: #5B9BD5;
+            color: #4C9EEB;
             line-height: 1.3;
         }
 
@@ -1129,7 +1141,7 @@
 
         .heatmap-table td:hover:not(.heatmap-diagonal) {
             transform: scale(1.06);
-            box-shadow: 0 0 12px rgba(91, 155, 213, 0.35);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             z-index: 1;
         }
 
@@ -1146,12 +1158,12 @@
             align-items: center;
             margin-bottom: 1rem;
             padding-bottom: 0.6rem;
-            border-bottom: 1px solid rgba(91, 155, 213, 0.15);
+            border-bottom: 1px solid rgba(76, 158, 235, 0.15);
         }
 
         .heatmap-axis-label {
             font-size: 0.72rem;
-            color: rgba(91, 155, 213, 0.65);
+            color: rgba(76, 158, 235, 0.65);
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.08em;
@@ -1189,8 +1201,8 @@
         .breakdown-desc:last-of-type {
             margin-bottom: 1.5rem;
             padding: 0.75rem 1rem;
-            background: rgba(91, 155, 213, 0.1);
-            border-left: 3px solid rgba(91, 155, 213, 0.4);
+            background: rgba(76, 158, 235, 0.1);
+            border-left: 3px solid rgba(76, 158, 235, 0.4);
             border-radius: 4px;
             margin-left: 0;
             font-size: 0.85rem;
@@ -1199,7 +1211,7 @@
         .candidate-breakdown {
             margin-bottom: 0.75rem;
             background: rgba(0, 0, 0, 0.15);
-            border-left: 3px solid #5B9BD5;
+            border-left: 3px solid #4C9EEB;
             border-radius: 6px;
             overflow: hidden;
         }
@@ -1232,7 +1244,7 @@
 
         .breakdown-preview {
             font-size: 0.95rem;
-            color: #5B9BD5;
+            color: #4C9EEB;
             font-weight: 700;
             min-width: 60px;
             text-align: right;
@@ -1240,7 +1252,7 @@
 
         .breakdown-icon {
             font-size: 1.5rem;
-            color: #5B9BD5;
+            color: #4C9EEB;
             transition: transform 0.3s ease;
         }
 
@@ -1275,10 +1287,10 @@
         .breakdown-result {
             margin-top: 0.8rem;
             padding-top: 0.8rem;
-            border-top: 1px solid rgba(91, 155, 213, 0.25);
+            border-top: 1px solid rgba(76, 158, 235, 0.25);
             font-size: 0.95rem;
             font-weight: 600;
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         /* Market Sources */
@@ -1289,14 +1301,14 @@
         .additional-markets h2 {
             margin-bottom: 1rem;
             font-size: 2rem;
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
             font-weight: 600;
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .expandable-market {
             margin-bottom: 1rem;
-            border: 1px solid rgba(91, 155, 213, 0.25);
+            border: 1px solid rgba(76, 158, 235, 0.25);
             border-radius: 8px;
             overflow: hidden;
             background: rgba(18, 18, 22, 1);
@@ -1319,7 +1331,7 @@
         }
 
         .expand-toggle:hover {
-            background: rgba(91, 155, 213, 0.12);
+            background: rgba(76, 158, 235, 0.12);
         }
 
         .market-name {
@@ -1376,7 +1388,7 @@
 
         .expand-icon {
             font-size: 1.5rem;
-            color: #5B9BD5;
+            color: #4C9EEB;
             transition: transform 0.3s ease;
         }
 
@@ -1417,12 +1429,12 @@
             justify-content: space-between;
             align-items: center;
             padding-top: 1rem;
-            border-top: 1px solid rgba(91, 155, 213, 0.25);
+            border-top: 1px solid rgba(76, 158, 235, 0.25);
             margin-top: 0.5rem;
         }
 
         .market-link {
-            color: #5B9BD5;
+            color: #4C9EEB;
             text-decoration: underline;
             font-size: 0.9rem;
         }
@@ -1435,10 +1447,8 @@
         .download-data-section {
             padding: 2.5rem;
             background: rgba(26, 26, 26, 0.5);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid rgba(91, 155, 213, 0.35);
-            border-radius: 12px;
+            border: 2px solid rgba(76, 158, 235, 0.35);
+            border-radius: 8px;
             text-align: center;
             margin-bottom: 2rem;
         }
@@ -1446,9 +1456,9 @@
         .download-data-section h2 {
             margin-bottom: 0.5rem;
             font-size: 2rem;
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
             font-weight: 600;
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .download-description {
@@ -1469,7 +1479,7 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, #5B9BD5 0%, #4A7BA7 100%);
+            background: linear-gradient(135deg, #4C9EEB 0%, #4A7BA7 100%);
             color: white;
             text-decoration: none;
             border-radius: 6px;
@@ -1483,7 +1493,7 @@
         .download-button:hover {
             background: linear-gradient(135deg, #4A7BA7 0%, #3D5A80 100%);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(91, 155, 213, 0.35);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         .download-icon {
@@ -1491,26 +1501,24 @@
         }
 
         .download-button-secondary {
-            background: rgba(91, 155, 213, 0.12);
-            border: 2px solid #5B9BD5;
-            color: #5B9BD5;
+            background: rgba(76, 158, 235, 0.12);
+            border: 2px solid #4C9EEB;
+            color: #4C9EEB;
         }
 
         .download-button-secondary:hover {
-            background: rgba(91, 155, 213, 0.25);
+            background: rgba(76, 158, 235, 0.25);
             border-color: #4A7BA7;
             color: #4A7BA7;
-            box-shadow: 0 4px 12px rgba(91, 155, 213, 0.25);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
         }
 
         /* Email Alerts Section */
         .email-alerts-section {
             padding: 2.5rem;
             background: rgba(26, 26, 26, 0.5);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid rgba(91, 155, 213, 0.35);
-            border-radius: 12px;
+            border: 2px solid rgba(76, 158, 235, 0.35);
+            border-radius: 8px;
             text-align: center;
             margin-bottom: 2rem;
         }
@@ -1518,9 +1526,9 @@
         .email-alerts-section h2 {
             margin-bottom: 0.5rem;
             font-size: 2rem;
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
             font-weight: 600;
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .alerts-description {
@@ -1551,7 +1559,7 @@
         }
 
         .subscribe-input:focus {
-            border-color: #5B9BD5;
+            border-color: #4C9EEB;
         }
 
         .subscribe-input::placeholder {
@@ -1574,12 +1582,12 @@
         }
 
         .subscribe-threshold:focus {
-            border-color: #5B9BD5;
+            border-color: #4C9EEB;
         }
 
         .subscribe-button {
             padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, #5B9BD5 0%, #4A7BA7 100%);
+            background: linear-gradient(135deg, #4C9EEB 0%, #4A7BA7 100%);
             color: white;
             border: none;
             border-radius: 6px;
@@ -1593,7 +1601,7 @@
         .subscribe-button:hover {
             background: linear-gradient(135deg, #4A7BA7 0%, #3D5A80 100%);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(91, 155, 213, 0.35);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         .subscribe-button:disabled {
@@ -1639,8 +1647,6 @@
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
         }
 
         .email-modal-content {
@@ -1648,9 +1654,7 @@
             max-width: 500px;
             margin: 15% auto;
             background: rgba(26, 26, 26, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 2px solid rgba(91, 155, 213, 0.4);
+            border: 2px solid rgba(76, 158, 235, 0.4);
             border-radius: 16px;
             padding: 40px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -1691,15 +1695,15 @@
         }
 
         .email-modal-close:hover {
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .email-modal-content h2 {
             margin: 0 0 12px 0;
             font-size: 2rem;
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
             font-weight: 600;
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .email-modal-description {
@@ -1714,9 +1718,9 @@
         }
 
         .candidate-odds {
-            color: #5B9BD5;
+            color: #4C9EEB;
             font-weight: 600;
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
         }
     </style>
 
@@ -2142,8 +2146,8 @@ function renderHeatmap(candidates) {
         const t = maxVal > 0 ? val / maxVal : 0;
         // Interpolate from dark/transparent to vibrant blue
         const alpha = 0.05 + t * 0.6;
-        const borderGlow = isTop ? 'box-shadow: inset 0 0 0 1.5px rgba(91, 155, 213, 0.8);' : '';
-        return `background: rgba(91, 155, 213, ${alpha.toFixed(3)}); ${borderGlow}`;
+        const borderGlow = isTop ? 'box-shadow: inset 0 0 0 1.5px rgba(76, 158, 235, 0.8);' : '';
+        return `background: rgba(76, 158, 235, ${alpha.toFixed(3)}); ${borderGlow}`;
     }
 
     function textStyle(val) {
@@ -2163,9 +2167,9 @@ function renderHeatmap(candidates) {
     let html = '';
 
     // Most likely result callout
-    html += `<div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.4rem; padding: 0.75rem 1rem; background: rgba(91, 155, 213, 0.1); border-radius: 8px; border-left: 3px solid rgba(91, 155, 213, 0.5);">`;
+    html += `<div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.4rem; padding: 0.75rem 1rem; background: rgba(76, 158, 235, 0.1); border-radius: 8px; border-left: 3px solid rgba(76, 158, 235, 0.5);">`;
     html += `<span style="font-size: 0.78rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;">Most likely result</span>`;
-    html += `<span style="font-size: 0.95rem; color: #5B9BD5; font-weight: 600;">${lastName(sorted[topPair.i].name)} 1st, ${lastName(sorted[topPair.j].name)} 2nd</span>`;
+    html += `<span style="font-size: 0.95rem; color: #4C9EEB; font-weight: 600;">${lastName(sorted[topPair.i].name)} 1st, ${lastName(sorted[topPair.j].name)} 2nd</span>`;
     html += `<span style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">${topPair.val.toFixed(1)}%</span>`;
     html += `</div>`;
 
@@ -2380,12 +2384,12 @@ async function renderMarketTrendChart(candidates) {
 
     // FiveThirtyEight-inspired color palette
     const colors = [
-        '#008FD5',  // Blue
-        '#5B9BD5',  // Red/Orange
-        '#6D904F',  // Green
-        '#8B8B8B',  // Gray
-        '#E5AE38',  // Gold
-        '#810F7C'   // Purple
+        '#4C9EEB',  // Blue
+        '#22C55E',  // Green
+        '#EF4444',  // Red
+        '#9BA1A6',  // Gray
+        '#F59E0B',  // Amber
+        '#8B5CF6'   // Purple
     ];
 
     // Build datasets with {x, y} point format for time scale
@@ -2815,84 +2819,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
     </script>
 
-    <!-- GRID BACKGROUND -->
-    <script>
-        const canvas = document.getElementById('grid-canvas');
-        const ctx = canvas.getContext('2d');
-        const gridSize = 40;
-        let pointsState = null;
-        let scrollOffset = 0;
-        let initialOffset = -window.innerHeight * 3; // Start grid way above viewport
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            pointsState = null;
-            initialOffset = -window.innerHeight * 3; // Recalculate on resize
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // Scroll effect - grid moves down and left as you scroll
-        window.addEventListener('scroll', () => {
-            scrollOffset = window.scrollY;
-        });
-
-        function drawGrid() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-            ctx.lineWidth = 1;
-            // Make grid huge (4x normal size) so it never stops
-            const cols = Math.ceil(canvas.width / gridSize) * 4;
-            const rows = Math.ceil(canvas.height / gridSize) * 4;
-
-            if (!pointsState || pointsState.length !== rows + 1) {
-                pointsState = [];
-                for (let row = 0; row <= rows; row++) {
-                    pointsState[row] = [];
-                    for (let col = 0; col <= cols; col++) {
-                        pointsState[row][col] = { x: col * gridSize, y: row * gridSize };
-                    }
-                }
-            }
-
-            for (let row = 0; row <= rows; row++) {
-                for (let col = 0; col <= cols; col++) {
-                    // Base grid position offset by scroll amount (slower: 0.08 multiplier)
-                    const baseX = (col * gridSize) - (scrollOffset * 0.08);
-                    const baseY = (row * gridSize) + initialOffset + (scrollOffset * 0.08);
-
-                    pointsState[row][col].x = baseX;
-                    pointsState[row][col].y = baseY;
-                }
-            }
-
-            for (let row = 0; row <= rows; row++) {
-                ctx.beginPath();
-                ctx.moveTo(pointsState[row][0].x, pointsState[row][0].y);
-                for (let col = 1; col <= cols; col++) {
-                    const prev = pointsState[row][col - 1], curr = pointsState[row][col];
-                    ctx.quadraticCurveTo(prev.x, prev.y, (prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
-                }
-                ctx.stroke();
-            }
-
-            for (let col = 0; col <= cols; col++) {
-                ctx.beginPath();
-                ctx.moveTo(pointsState[0][col].x, pointsState[0][col].y);
-                for (let row = 1; row <= rows; row++) {
-                    const prev = pointsState[row - 1][col], curr = pointsState[row][col];
-                    ctx.quadraticCurveTo(prev.x, prev.y, (prev.x + curr.x) / 2, (prev.y + curr.y) / 2);
-                }
-                ctx.stroke();
-            }
-
-            requestAnimationFrame(drawGrid);
-        }
-
-        drawGrid();
-    </script>
     <script>
     function handleSubscribe(e) {
         e.preventDefault();
@@ -2982,15 +2908,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
     }
 
-    // Show email modal after 3 seconds if not previously dismissed
-    window.addEventListener('load', function() {
-        var dismissed = localStorage.getItem('emailModalDismissed');
-        if (!dismissed) {
-            setTimeout(function() {
-                document.getElementById('emailModal').classList.add('show');
-            }, 3000);
-        }
-    });
+    // Email modal auto-popup disabled for better UX
+    // Users can still manually trigger via inline subscribe form
 
     // Close modal on Escape key
     document.addEventListener('keydown', function(e) {

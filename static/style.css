@@ -1,19 +1,21 @@
 /* ==================== CSS Reset & Variables ==================== */
 
 :root {
-    --bg-primary: #0A0E27;
-    --bg-secondary: #141829;
-    --text-primary: #FFFFFF;
-    --text-secondary: #B0B8D4;
-    --accent: #0088FF;
-    --accent-hover: #0066DD;
-    --accent-cyan: #00D9FF;
-    --accent-green: #0088FF;
-    --accent-green-bright: #00BBFF;
-    --border: #2A2F4A;
+    --bg-primary: #131517;
+    --bg-secondary: #1C1E21;
+    --text-primary: #F0F0F0;
+    --text-secondary: #9BA1A6;
+    --accent: #4C9EEB;
+    --accent-blue: #4C9EEB;
+    --accent-hover: #3B8AD9;
+    --accent-cyan: #4C9EEB;
+    --accent-green: #22C55E;
+    --accent-green-bright: #22C55E;
+    --accent-red: #EF4444;
+    --border: rgba(255, 255, 255, 0.10);
 
-    --font-mono: 'Inconsolata', 'Courier New', monospace;
-    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 * {
@@ -31,6 +33,22 @@ body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
     line-height: 1.6;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        linear-gradient(rgba(76, 158, 235, 0.025) 1.5px, transparent 1.5px),
+        linear-gradient(90deg, rgba(76, 158, 235, 0.025) 1.5px, transparent 1.5px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: -1;
 }
 
 a {
@@ -1522,7 +1540,7 @@ p {
 .notice-card {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(0, 220, 255, 0.2);
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 2.5rem;
     text-align: center;
 }

@@ -367,7 +367,7 @@ Unsubscribe: {unsub_url}
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0a0a0a;">
             <tr>
                 <td align="center" style="padding: 40px 20px;">
-                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #1a1a1a; border: 2px solid #e67e22; border-radius: 12px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #1a1a1a; border: 2px solid #e67e22; border-radius: 8px;">
                         <!-- Header -->
                         <tr>
                             <td style="padding: 40px 40px 0 40px; text-align: center;">
@@ -533,7 +533,7 @@ View Live Markets: {request.host_url}markets
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0a0a0a;">
             <tr>
                 <td align="center" style="padding: 40px 20px;">
-                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #1a1a1a; border: 2px solid #e67e22; border-radius: 12px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #1a1a1a; border: 2px solid #e67e22; border-radius: 8px;">
                         <!-- Badge -->
                         <tr>
                             <td style="padding: 32px 40px 0 40px; text-align: center;">
@@ -688,7 +688,7 @@ View Live Markets: {request.host_url}markets
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0a0a0a;">
                 <tr>
                     <td align="center" style="padding: 40px 20px;">
-                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #1a1a1a; border: 2px solid #e67e22; border-radius: 12px;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #1a1a1a; border: 2px solid #e67e22; border-radius: 8px;">
                             <!-- Badge -->
                             <tr>
                                 <td style="padding: 32px 40px 0 40px; text-align: center;">

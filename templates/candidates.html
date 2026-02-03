@@ -8,7 +8,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
 
     <!-- Google Analytics -->
@@ -21,7 +21,7 @@
     </script>
 </head>
 <body class="dark-mode">
-    <canvas id="grid-canvas"></canvas>
+
 
     <div class="site-content">
         <header>
@@ -187,7 +187,7 @@
             background: rgba(26, 26, 26, 0.6);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(91, 155, 213, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.10);
             border-radius: 8px;
             padding: 0;
             overflow: hidden;
@@ -207,7 +207,7 @@
             display: flex;
             gap: 1.75rem;
             padding: 2.25rem 2rem;
-            background: linear-gradient(135deg, rgba(160, 160, 160, 0.05) 0%, rgba(91, 155, 213, 0.03) 100%);
+            background: linear-gradient(135deg, rgba(160, 160, 160, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%);
             border-bottom: 2px solid rgba(160, 160, 160, 0.18);
         }
 
@@ -222,7 +222,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 10px;
+            border-radius: 8px;
             border: 1px solid rgba(160, 160, 160, 0.3);
             box-shadow: none;
         }
@@ -234,7 +234,7 @@
             align-items: center;
             justify-content: center;
             background: rgba(30, 30, 35, 1);
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 2.8rem;
             font-weight: 600;
             color: #fff;
@@ -250,11 +250,11 @@
         }
 
         .candidate-info h2 {
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 2rem;
             font-weight: 600;
             margin: 0 0 0.4rem 0;
-            color: #5B9BD5;
+            color: #4C9EEB;
             letter-spacing: 0.5px;
         }
 
@@ -275,7 +275,7 @@
         .odds-value {
             font-family: 'Inter', sans-serif; font-weight: 600;
             font-size: 2.3rem;
-            color: #5B9BD5;
+            color: #4C9EEB;
             font-weight: 600;
             line-height: 1;
         }
@@ -294,7 +294,7 @@
         .candidate-bio p {
             margin: 0;
             line-height: 1.8;
-            color: #5B9BD5;
+            color: #4C9EEB;
             font-size: 0.95rem;
         }
 
@@ -304,11 +304,11 @@
         }
 
         .candidate-endorsements h3 {
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 1.3rem;
             font-weight: 600;
             margin: 0 0 1rem 0;
-            color: #5B9BD5;
+            color: #4C9EEB;
             letter-spacing: 0.3px;
         }
 
@@ -332,7 +332,7 @@
             content: "→";
             position: absolute;
             left: 0;
-            color: #5B9BD5;
+            color: #4C9EEB;
             font-size: 1.1rem;
         }
 
@@ -342,11 +342,11 @@
         }
 
         .candidate-issues h3 {
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 1.3rem;
             font-weight: 600;
             margin: 0 0 1rem 0;
-            color: #5B9BD5;
+            color: #4C9EEB;
             letter-spacing: 0.3px;
         }
 
@@ -358,11 +358,11 @@
 
         .issue-tag {
             background: rgba(160, 160, 160, 0.12);
-            border: 1px solid rgba(91, 155, 213, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.10);
             padding: 0.5rem 0.95rem;
             border-radius: 8px;
             font-size: 0.88rem;
-            color: #5B9BD5;
+            color: #4C9EEB;
             font-weight: 500;
             transition: all 0.2s ease;
         }
@@ -387,7 +387,7 @@
             justify-content: center;
             padding: 1.25rem 1.5rem;
             text-align: center;
-            color: #5B9BD5;
+            color: #4C9EEB;
             text-decoration: none;
             font-weight: 600;
             font-size: 0.9rem;
@@ -402,7 +402,7 @@
         .fundraising-link:hover,
         .campaign-link:hover {
             background: rgba(160, 160, 160, 0.12);
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         @media (max-width: 768px) {
@@ -417,45 +417,5 @@
         }
     </style>
 
-    <script>
-        // GRID BACKGROUND - Static, no mouse interaction
-        const canvas = document.getElementById('grid-canvas');
-        const ctx = canvas.getContext('2d');
-        const gridSize = 40;
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            drawGrid();
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        function drawGrid() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.055)';
-            ctx.lineWidth = 1;
-
-            // Draw horizontal lines
-            for (let y = 0; y < canvas.height; y += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.stroke();
-            }
-
-            // Draw vertical lines
-            for (let x = 0; x < canvas.width; x += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
-                ctx.stroke();
-            }
-        }
-
-        drawGrid();
-    </script>
 </body>
 </html>

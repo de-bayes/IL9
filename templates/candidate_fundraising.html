@@ -8,13 +8,11 @@
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="dark-mode">
-    <canvas id="grid-canvas"></canvas>
-
     <div class="site-content">
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
@@ -167,7 +165,7 @@
         }
 
         .back-link {
-            color: #5B9BD5;
+            color: #4C9EEB;
             text-decoration: none;
             font-weight: 500;
             font-size: 0.95rem;
@@ -196,11 +194,11 @@
 
         .fec-loading-section h2,
         .fec-error-section h2 {
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 2rem;
             font-weight: 600;
             margin-bottom: 1rem;
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .fec-error-section {
@@ -229,7 +227,7 @@
         }
 
         .finance-card h3 {
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 1.1rem;
             font-weight: 600;
             margin: 0 0 1rem 0;
@@ -241,7 +239,7 @@
             font-size: 2.5rem;
             font-weight: 600;
             margin: 0;
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .burn-rate-section,
@@ -257,11 +255,11 @@
 
         .burn-rate-section h2,
         .additional-metrics-section h2 {
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 2rem;
             font-weight: 600;
             margin: 0 0 0.5rem 0;
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .section-desc {
@@ -285,11 +283,11 @@
         }
 
         .burn-rate-card h3 {
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 1.2rem;
             font-weight: 600;
             margin: 0 0 1rem 0;
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .burn-rate-value {
@@ -297,7 +295,7 @@
             font-size: 2rem;
             font-weight: 600;
             margin: 0 0 0.5rem 0;
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .burn-rate-desc {
@@ -330,49 +328,12 @@
         .metric-value {
             font-family: 'Inter', sans-serif; font-weight: 600;
             font-size: 1.3rem;
-            color: #5B9BD5;
+            color: #4C9EEB;
             font-weight: 600;
         }
     </style>
 
     <script>
-        // GRID BACKGROUND
-        const canvas = document.getElementById('grid-canvas');
-        const ctx = canvas.getContext('2d');
-        const gridSize = 40;
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            drawGrid();
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        function drawGrid() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.055)';
-            ctx.lineWidth = 1;
-
-            for (let y = 0; y < canvas.height; y += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.stroke();
-            }
-
-            for (let x = 0; x < canvas.width; x += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
-                ctx.stroke();
-            }
-        }
-
-        drawGrid();
-
         // FEC DATA FETCHING
         (function() {
             const candidate = {{ candidate | tojson }};

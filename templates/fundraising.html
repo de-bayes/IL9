@@ -8,7 +8,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -22,8 +22,6 @@
     </script>
 </head>
 <body class="dark-mode">
-    <canvas id="grid-canvas"></canvas>
-
     <div class="site-content">
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
@@ -226,11 +224,11 @@
 
         .fec-loading-section h2,
         .fec-error-section h2 {
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 2rem;
             font-weight: 600;
             margin-bottom: 1rem;
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .fec-error-section {
@@ -242,7 +240,7 @@
             background: rgba(26, 26, 26, 0.5);
             backdrop-filter: blur(12px);
             border: 2px solid rgba(91, 155, 213, 0.4);
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 2.5rem;
             margin-bottom: 2rem;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
@@ -254,11 +252,11 @@
         }
 
         .ticker-header h2 {
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 2rem;
             font-weight: 600;
             margin: 0 0 0.5rem 0;
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .ticker-subtitle {
@@ -277,7 +275,7 @@
         .ticker-stat-card {
             background: rgba(0, 0, 0, 0.4);
             border: 2px solid rgba(91, 155, 213, 0.35);
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 2rem;
             text-align: center;
             transition: all 0.3s ease;
@@ -335,16 +333,16 @@
         }
 
         .ticker-value {
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 3rem;
             font-weight: 700;
-            color: #5B9BD5;
+            color: #4C9EEB;
             line-height: 1;
             letter-spacing: -0.02em;
         }
 
         .ticker-stat-primary .ticker-value {
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .ticker-stat-secondary .ticker-value {
@@ -352,7 +350,7 @@
         }
 
         .ticker-stat-live .ticker-value {
-            color: #5B9BD5;
+            color: #4C9EEB;
             font-weight: 700;
         }
 
@@ -387,7 +385,7 @@
             display: inline-block;
             width: 8px;
             height: 8px;
-            background: #5B9BD5;
+            background: #4C9EEB;
             border-radius: 50%;
             box-shadow: 0 0 8px rgba(91, 155, 213, 0.6);
             animation: pulse-dot 2s ease-in-out infinite;
@@ -421,11 +419,11 @@
         .comparison-table-section h2,
         .burn-rate-section h2,
         .candidate-links-section h2 {
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 2rem;
             font-weight: 600;
             margin: 0 0 0.5rem 0;
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .section-desc {
@@ -454,7 +452,7 @@
 
         .fec-table thead th {
             background: rgba(25, 25, 30, 1);
-            color: #5B9BD5;
+            color: #4C9EEB;
             font-weight: 600;
             padding: 1rem;
             text-align: left;
@@ -465,7 +463,7 @@
         .fec-table tbody td {
             padding: 0.9rem 1rem;
             border-bottom: 1px solid rgba(160, 160, 160, 0.08);
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .fec-table tbody tr:hover {
@@ -515,7 +513,7 @@
             border-radius: 8px;
             padding: 1.2rem 1.5rem;
             text-align: center;
-            color: #5B9BD5;
+            color: #4C9EEB;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
@@ -587,7 +585,7 @@
         @media (max-width: 480px) {
             .live-money-ticker {
                 padding: 1.25rem 0.75rem;
-                border-radius: 12px;
+                border-radius: 8px;
             }
 
             .ticker-header h2 {
@@ -622,43 +620,6 @@
     </style>
 
     <script>
-        // GRID BACKGROUND
-        const canvas = document.getElementById('grid-canvas');
-        const ctx = canvas.getContext('2d');
-        const gridSize = 40;
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            drawGrid();
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        function drawGrid() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.055)';
-            ctx.lineWidth = 1;
-
-            for (let y = 0; y < canvas.height; y += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.stroke();
-            }
-
-            for (let x = 0; x < canvas.width; x += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
-                ctx.stroke();
-            }
-        }
-
-        drawGrid();
-
         // FEC DATA FETCHING
         let spendingChart = null;
 
@@ -689,8 +650,8 @@
                         {
                             label: 'Total Raised ($)',
                             data: sorted.map(c => c.total_raised),
-                            backgroundColor: 'rgba(91, 155, 213, 0.6)',
-                            borderColor: 'rgba(91, 155, 213, 0.9)',
+                            backgroundColor: 'rgba(180, 215, 245, 0.7)',
+                            borderColor: 'rgba(180, 215, 245, 0.9)',
                             borderWidth: 1,
                             barPercentage: 0.95,  // Wider bars
                             categoryPercentage: 0.95,  // More space per candidate
@@ -701,8 +662,8 @@
                         {
                             label: 'Spent % of Raised',
                             data: sorted.map(c => c.spent_pct_of_raised),
-                            backgroundColor: 'rgba(91, 155, 213, 0.75)',
-                            borderColor: 'rgba(91, 155, 213, 1)',
+                            backgroundColor: 'rgba(20, 50, 90, 0.9)',
+                            borderColor: 'rgba(20, 50, 90, 1)',
                             borderWidth: 1,
                             barPercentage: 0.65,  // Wider nested bar
                             categoryPercentage: 0.95,  // More space per candidate
@@ -736,7 +697,7 @@
                         },
                         tooltip: {
                             backgroundColor: 'rgba(26, 26, 26, 0.95)',
-                            titleColor: '#5B9BD5',
+                            titleColor: '#4C9EEB',
                             bodyColor: '#e0e0e0',
                             borderColor: 'rgba(160, 160, 160, 0.3)',
                             borderWidth: 1,
@@ -782,7 +743,7 @@
                                 lineWidth: 1
                             },
                             ticks: {
-                                color: '#5B9BD5',
+                                color: '#4C9EEB',
                                 font: {
                                     size: 11
                                 },
@@ -793,7 +754,7 @@
                             title: {
                                 display: true,
                                 text: 'Total Raised ($)',
-                                color: '#5B9BD5',
+                                color: '#4C9EEB',
                                 font: {
                                     size: 13,
                                     weight: 'bold'
@@ -811,7 +772,7 @@
                                 drawOnChartArea: false
                             },
                             ticks: {
-                                color: '#5B9BD5',
+                                color: '#4C9EEB',
                                 font: {
                                     size: 11
                                 },
@@ -822,7 +783,7 @@
                             title: {
                                 display: true,
                                 text: 'Spent % of Raised',
-                                color: '#5B9BD5',
+                                color: '#4C9EEB',
                                 font: {
                                     size: 13,
                                     weight: 'bold'

@@ -8,7 +8,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
 
     <!-- Google Analytics -->
@@ -21,8 +21,6 @@
     </script>
 </head>
 <body class="dark-mode">
-    <canvas id="grid-canvas"></canvas>
-
     <div class="site-content">
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
@@ -152,11 +150,11 @@
         }
 
         .about-section h2 {
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 2rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .about-section p {
@@ -185,7 +183,7 @@
         }
 
         .contact-grid a {
-            color: #5B9BD5;
+            color: #4C9EEB;
             text-decoration: underline;
         }
 
@@ -211,7 +209,7 @@
             content: "→";
             position: absolute;
             left: 0;
-            color: #5B9BD5;
+            color: #4C9EEB;
         }
 
         .support-section {
@@ -225,7 +223,7 @@
             background: rgba(160, 160, 160, 0.18);
             border: 1px solid rgba(160, 160, 160, 0.25);
             border-radius: 8px;
-            color: #5B9BD5;
+            color: #4C9EEB;
             text-decoration: none;
             font-weight: 600;
             font-size: 1rem;
@@ -235,51 +233,11 @@
         .support-button:hover {
             background: rgba(160, 160, 160, 0.12);
             border-color: rgba(160, 160, 160, 0.6);
-            color: #5B9BD5;
+            color: #4C9EEB;
             transform: translateY(-2px);
             box-shadow: none;
         }
     </style>
 
-    <script>
-        // GRID BACKGROUND - Static, no mouse interaction
-        const canvas = document.getElementById('grid-canvas');
-        const ctx = canvas.getContext('2d');
-        const gridSize = 40;
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            drawGrid();
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        function drawGrid() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.055)';
-            ctx.lineWidth = 1;
-
-            // Draw horizontal lines
-            for (let y = 0; y < canvas.height; y += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.stroke();
-            }
-
-            // Draw vertical lines
-            for (let x = 0; x < canvas.width; x += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
-                ctx.stroke();
-            }
-        }
-
-        drawGrid();
-    </script>
 </body>
 </html>
