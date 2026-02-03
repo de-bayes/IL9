@@ -322,16 +322,16 @@ body.dark-mode .countdown-date {
     background: rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 2px solid rgba(230, 126, 34, 0.5);
+    border: 2px solid rgba(91, 155, 213, 0.5);
     border-radius: 16px;
     padding: 3rem 2.5rem;
-    box-shadow: 0 8px 32px rgba(230, 126, 34, 0.15);
+    box-shadow: 0 8px 32px rgba(91, 155, 213, 0.2);
 }
 
 body.dark-mode .features-callout {
     background: rgba(26, 26, 26, 0.6);
-    border: 2px solid rgba(230, 126, 34, 0.6);
-    box-shadow: 0 8px 32px rgba(230, 126, 34, 0.25);
+    border: 2px solid rgba(91, 155, 213, 0.6);
+    box-shadow: 0 8px 32px rgba(91, 155, 213, 0.3);
 }
 
 .features-title {
@@ -340,7 +340,7 @@ body.dark-mode .features-callout {
     font-weight: 600;
     text-align: center;
     margin-bottom: 2.5rem;
-    color: #e67e22;
+    color: #5B9BD5;
 }
 
 .features-grid {
@@ -359,7 +359,7 @@ body.dark-mode .features-callout {
     font-size: 1.4rem;
     font-weight: 600;
     margin-bottom: 0.75rem;
-    color: #e67e22;
+    color: #5B9BD5;
 }
 
 .feature-item p {
@@ -374,7 +374,7 @@ body.dark-mode .feature-item p {
 
 #snapshotCount {
     font-weight: 600;
-    color: #e67e22;
+    color: #5B9BD5;
     font-family: 'VT323', monospace;
     font-size: 1.1rem;
 }
@@ -413,8 +413,8 @@ body.dark-mode .feature-item p {
 }
 
 .forecast-card:hover {
-    border-color: #e67e22;
-    box-shadow: 0 8px 24px rgba(230, 126, 34, 0.15);
+    border-color: #5B9BD5;
+    box-shadow: 0 8px 24px rgba(91, 155, 213, 0.2);
     transform: translateY(-4px);
 }
 
@@ -424,8 +424,8 @@ body.dark-mode .forecast-card {
 }
 
 body.dark-mode .forecast-card:hover {
-    border-color: #e67e22;
-    box-shadow: 0 8px 24px rgba(230, 126, 34, 0.25);
+    border-color: #5B9BD5;
+    box-shadow: 0 8px 24px rgba(91, 155, 213, 0.3);
 }
 
 .forecast-header {
@@ -443,7 +443,7 @@ body.dark-mode .forecast-card:hover {
     display: inline-block;
     font-family: 'VT323', monospace;
     font-size: 0.85rem;
-    color: #e67e22;
+    color: #5B9BD5;
     letter-spacing: 0.05em;
 }
 
@@ -466,8 +466,8 @@ body.dark-mode .forecast-meta {
     font-family: 'Inter', sans-serif;
     font-size: 1rem;
     font-weight: 500;
-    border: 2px solid #e67e22;
-    background: #e67e22;
+    border: 2px solid #5B9BD5;
+    background: #5B9BD5;
     color: #ffffff;
     border-radius: 8px;
     cursor: pointer;
@@ -480,13 +480,13 @@ body.dark-mode .forecast-meta {
     background: #d67118;
     border-color: #d67118;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+    box-shadow: 0 4px 12px rgba(91, 155, 213, 0.35);
 }
 
 /* FOOTER */
 .site-footer {
     background: rgba(0, 0, 0, 0.3);
-    border-top: 2px solid rgba(230, 126, 34, 0.2);
+    border-top: 2px solid rgba(91, 155, 213, 0.25);
     margin-top: 4rem;
     padding: 3rem 2rem 1.5rem;
     color: #888888;
@@ -494,7 +494,7 @@ body.dark-mode .forecast-meta {
 
 body.dark-mode .site-footer {
     background: rgba(0, 0, 0, 0.5);
-    border-top-color: rgba(230, 126, 34, 0.3);
+    border-top-color: rgba(91, 155, 213, 0.35);
     color: #a0a0a0;
 }
 
@@ -509,7 +509,7 @@ body.dark-mode .site-footer {
 .footer-section h4 {
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 1.1rem;
-    color: #e67e22;
+    color: #5B9BD5;
     margin-bottom: 1rem;
     font-weight: 600;
 }
@@ -532,7 +532,7 @@ body.dark-mode .site-footer {
 }
 
 .footer-section a:hover {
-    color: #e67e22;
+    color: #5B9BD5;
 }
 
 body.dark-mode .footer-section a {
@@ -555,18 +555,18 @@ body.dark-mode .footer-section p {
     margin: 0 auto;
     text-align: center;
     padding-top: 2rem;
-    border-top: 1px solid rgba(230, 126, 34, 0.1);
+    border-top: 1px solid rgba(91, 155, 213, 0.12);
     font-size: 0.85rem;
     color: #666666;
 }
 
 body.dark-mode .footer-bottom {
     color: #777777;
-    border-top-color: rgba(230, 126, 34, 0.2);
+    border-top-color: rgba(91, 155, 213, 0.25);
 }
 
 .footer-support-link {
-    color: #e67e22;
+    color: #5B9BD5;
     text-decoration: none;
     font-weight: 500;
     transition: opacity 0.3s ease;
@@ -631,7 +631,7 @@ body.dark-mode .hamburger span {
     backdrop-filter: blur(12px);
     padding: 1.5rem 2rem;
     gap: 1rem;
-    border-bottom: 2px solid rgba(230, 126, 34, 0.2);
+    border-bottom: 2px solid rgba(91, 155, 213, 0.25);
     animation: slideDown 0.3s ease;
 }
 

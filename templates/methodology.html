@@ -156,7 +156,7 @@
 
                         <p><strong>Key assumption:</strong> This treats candidates as independent — it assumes that A winning doesn't change the relative ordering of the remaining candidates. In practice, ideologically similar candidates may cannibalize each other's support, which would make some 2nd-place finishes more or less likely than this model predicts. The heatmap is a first-order approximation, not a full correlated model.</p>
 
-                        <p><strong>Reading the heatmap:</strong> Rows represent the 1st-place finisher, columns represent the 2nd-place finisher. The diagonal is empty (a candidate can't finish both 1st and 2nd). Brighter orange cells indicate higher probability pairs. The most likely 1st/2nd combination is highlighted at the top.</p>
+                        <p><strong>Reading the heatmap:</strong> Rows represent the 1st-place finisher, columns represent the 2nd-place finisher. The diagonal is empty (a candidate can't finish both 1st and 2nd). Brighter blue cells indicate higher probability pairs. The most likely 1st/2nd combination is highlighted at the top.</p>
                     </div>
                 </div>
             </div>
@@ -264,10 +264,10 @@
                         <h3>Chart Visualization</h3>
                         <p>The fundraising chart uses a dual Y-axis approach to compare two fundamentally different metrics:</p>
                         <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                            <li><strong>Orange bars (left Y-axis):</strong> Total dollars raised, scaled in currency</li>
+                            <li><strong>Blue bars (left Y-axis):</strong> Total dollars raised, scaled in currency</li>
                             <li><strong>Blue bars (right Y-axis):</strong> Percentage of raised funds spent, scaled 0-100%</li>
                         </ul>
-                        <p>The blue bars are nested inside the orange bars (same X position, narrower width) to save horizontal space while keeping both metrics independently readable on their own scales. This nested-bar technique is implemented using Chart.js with <code>stack: 'combined'</code> and <code>stacked: false</code> to center both bars at the same position without summing their values.</p>
+                        <p>The spent percentage bars are nested inside the blue fundraising bars (same X position, narrower width) to save horizontal space while keeping both metrics independently readable on their own scales. This nested-bar technique is implemented using Chart.js with <code>stack: 'combined'</code> and <code>stacked: false</code> to center both bars at the same position without summing their values.</p>
 
                     </div>
                 </div>
