@@ -24,14 +24,22 @@
     <div class="site-content">
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
-            <nav>
-                <a href="/markets">Markets</a>                <a href="/candidates">Candidates</a>
+            <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav id="mobileNav">
+                <a href="/markets">Markets</a>
+                <a href="/candidates">Candidates</a>
                 <a href="/fundraising">Fundraising</a>
                 <a href="/methodology">Methodology</a>
                 <a href="/about" class="active">About</a>
+            </nav>
+            <div class="header-actions">
                 <a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer" class="github-link" title="View on GitHub">GitHub</a>
                 <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="donate-link" title="Support IL9Cast">Donate</a>
-            </nav>
+            </div>
         </header>
 
         <section class="hero">
@@ -238,6 +246,34 @@
             box-shadow: none;
         }
     </style>
+
+    <script>
+        // Mobile hamburger menu toggle
+        function toggleMobileMenu() {
+            const hamburger = document.getElementById('hamburger');
+            const mobileNav = document.getElementById('mobileNav');
+            hamburger.classList.toggle('active');
+            mobileNav.classList.toggle('active');
+        }
+
+        // Close mobile menu when a link is clicked
+        document.querySelectorAll('#mobileNav a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('hamburger').classList.remove('active');
+                document.getElementById('mobileNav').classList.remove('active');
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const hamburger = document.getElementById('hamburger');
+            const mobileNav = document.getElementById('mobileNav');
+            if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) {
+                hamburger.classList.remove('active');
+                mobileNav.classList.remove('active');
+            }
+        });
+    </script>
 
     <footer class="site-footer">
         <img src="{{ url_for('static', filename='flag-footer.svg') }}" alt="Decorative flag footer">
