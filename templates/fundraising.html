@@ -216,8 +216,8 @@
 
         .fec-loading-section,
         .fec-error-section {
-            background: rgba(26, 26, 26, 0.3);
-            border: 1px solid rgba(160, 160, 160, 0.15);
+            background: rgba(18, 18, 22, 1);
+            border: 1px solid rgba(91, 155, 213, 0.25);
             border-radius: 8px;
             padding: 3rem;
             text-align: center;
@@ -230,7 +230,7 @@
             font-size: 2rem;
             font-weight: 600;
             margin-bottom: 1rem;
-            color: #d0d0d0;
+            color: #5B9BD5;
         }
 
         .fec-error-section {
@@ -410,8 +410,8 @@
         .comparison-table-section,
         .burn-rate-section,
         .candidate-links-section {
-            background: rgba(26, 26, 26, 0.3);
-            border: 1px solid rgba(160, 160, 160, 0.12);
+            background: rgba(18, 18, 22, 1);
+            border: 1px solid rgba(91, 155, 213, 0.25);
             border-radius: 8px;
             padding: 2.5rem;
             margin-bottom: 2rem;
@@ -425,7 +425,7 @@
             font-size: 2rem;
             font-weight: 600;
             margin: 0 0 0.5rem 0;
-            color: #d0d0d0;
+            color: #5B9BD5;
         }
 
         .section-desc {
@@ -453,8 +453,8 @@
         }
 
         .fec-table thead th {
-            background: rgba(160, 160, 160, 0.08);
-            color: #d0d0d0;
+            background: rgba(25, 25, 30, 1);
+            color: #5B9BD5;
             font-weight: 600;
             padding: 1rem;
             text-align: left;
@@ -465,11 +465,11 @@
         .fec-table tbody td {
             padding: 0.9rem 1rem;
             border-bottom: 1px solid rgba(160, 160, 160, 0.08);
-            color: #d0d0d0;
+            color: #5B9BD5;
         }
 
         .fec-table tbody tr:hover {
-            background: rgba(160, 160, 160, 0.05);
+            background: rgba(91, 155, 213, 0.05);
         }
 
         .fec-table .candidate-name {
@@ -487,8 +487,8 @@
         .table-note {
             margin-top: 1.5rem;
             padding: 1rem 1.5rem;
-            background: rgba(160, 160, 160, 0.08);
-            border-left: 3px solid rgba(160, 160, 160, 0.3);
+            background: rgba(25, 25, 30, 1);
+            border-left: 3px solid rgba(91, 155, 213, 0.5);
             border-radius: 4px;
             font-size: 0.9rem;
             color: #c0c0c0;
@@ -510,20 +510,20 @@
 
         .candidate-link-item {
             display: block;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(160, 160, 160, 0.15);
+            background: rgba(18, 18, 22, 1);
+            border: 1px solid rgba(91, 155, 213, 0.25);
             border-radius: 8px;
             padding: 1.2rem 1.5rem;
             text-align: center;
-            color: #d0d0d0;
+            color: #5B9BD5;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
         }
 
         .candidate-link-item:hover {
-            background: rgba(160, 160, 160, 0.1);
-            border-color: rgba(160, 160, 160, 0.3);
+            background: rgba(91, 155, 213, 0.1);
+            border-color: rgba(91, 155, 213, 0.4);
             transform: translateY(-2px);
         }
 
@@ -689,8 +689,8 @@
                         {
                             label: 'Total Raised ($)',
                             data: sorted.map(c => c.total_raised),
-                            backgroundColor: 'rgba(180, 180, 180, 0.5)',
-                            borderColor: 'rgba(180, 180, 180, 0.8)',
+                            backgroundColor: 'rgba(91, 155, 213, 0.6)',
+                            borderColor: 'rgba(91, 155, 213, 0.9)',
                             borderWidth: 1,
                             barPercentage: 0.95,  // Wider bars
                             categoryPercentage: 0.95,  // More space per candidate
@@ -701,8 +701,8 @@
                         {
                             label: 'Spent % of Raised',
                             data: sorted.map(c => c.spent_pct_of_raised),
-                            backgroundColor: 'rgba(120, 160, 200, 0.75)',
-                            borderColor: 'rgba(120, 160, 200, 1)',
+                            backgroundColor: 'rgba(91, 155, 213, 0.75)',
+                            borderColor: 'rgba(91, 155, 213, 1)',
                             borderWidth: 1,
                             barPercentage: 0.65,  // Wider nested bar
                             categoryPercentage: 0.95,  // More space per candidate
@@ -736,7 +736,7 @@
                         },
                         tooltip: {
                             backgroundColor: 'rgba(26, 26, 26, 0.95)',
-                            titleColor: '#d0d0d0',
+                            titleColor: '#5B9BD5',
                             bodyColor: '#e0e0e0',
                             borderColor: 'rgba(160, 160, 160, 0.3)',
                             borderWidth: 1,
@@ -782,7 +782,7 @@
                                 lineWidth: 1
                             },
                             ticks: {
-                                color: '#b0b0b0',
+                                color: '#5B9BD5',
                                 font: {
                                     size: 11
                                 },
@@ -793,7 +793,7 @@
                             title: {
                                 display: true,
                                 text: 'Total Raised ($)',
-                                color: '#b0b0b0',
+                                color: '#5B9BD5',
                                 font: {
                                     size: 13,
                                     weight: 'bold'
@@ -811,7 +811,7 @@
                                 drawOnChartArea: false
                             },
                             ticks: {
-                                color: '#9090b0',
+                                color: '#5B9BD5',
                                 font: {
                                     size: 11
                                 },
@@ -822,7 +822,7 @@
                             title: {
                                 display: true,
                                 text: 'Spent % of Raised',
-                                color: '#9090b0',
+                                color: '#5B9BD5',
                                 font: {
                                     size: 13,
                                     weight: 'bold'

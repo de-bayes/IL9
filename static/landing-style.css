@@ -92,7 +92,7 @@ body.dark-mode header {
 }
 
 .logo span {
-    color: #999999;
+    color: #5B9BD5;
 }
 
 nav {
@@ -130,8 +130,8 @@ nav a.github-link {
 
 nav a.github-link:hover {
     color: #ffffff;
-    background: rgba(160, 160, 160, 0.25);
-    border-color: rgba(160, 160, 160, 0.5);
+    background: rgba(91, 155, 213, 0.15);
+    border-color: rgba(91, 155, 213, 0.5);
 }
 
 body.dark-mode nav a.github-link {
@@ -142,8 +142,8 @@ body.dark-mode nav a.github-link {
 
 body.dark-mode nav a.github-link:hover {
     color: #ffffff;
-    background: rgba(160, 160, 160, 0.25);
-    border-color: rgba(160, 160, 160, 0.5);
+    background: rgba(91, 155, 213, 0.15);
+    border-color: rgba(91, 155, 213, 0.5);
 }
 
 nav a.donate-link {
@@ -151,7 +151,7 @@ nav a.donate-link {
     text-decoration: none;
     font-size: 0.9rem;
     transition: color 0.2s ease, background-color 0.2s ease;
-    background: rgba(160, 160, 160, 0.18);
+    background: rgba(18, 18, 22, 1);
     padding: 0.5rem 0.85rem;
     border-radius: 8px;
     border: 1px solid rgba(160, 160, 160, 0.35);
@@ -161,20 +161,20 @@ nav a.donate-link {
 
 nav a.donate-link:hover {
     color: #fff;
-    background: rgba(160, 160, 160, 0.35);
-    border-color: rgba(160, 160, 160, 0.55);
+    background: rgba(91, 155, 213, 0.2);
+    border-color: rgba(91, 155, 213, 0.6);
 }
 
 body.dark-mode nav a.donate-link {
-    color: #d0d0d0;
-    background: rgba(160, 160, 160, 0.18);
-    border-color: rgba(160, 160, 160, 0.35);
+    color: #5B9BD5;
+    background: rgba(18, 18, 22, 1);
+    border-color: rgba(91, 155, 213, 0.4);
 }
 
 body.dark-mode nav a.donate-link:hover {
     color: #fff;
-    background: rgba(160, 160, 160, 0.35);
-    border-color: rgba(160, 160, 160, 0.55);
+    background: rgba(91, 155, 213, 0.2);
+    border-color: rgba(91, 155, 213, 0.6);
 }
 
 /* COUNTDOWN TIMER */
@@ -183,8 +183,8 @@ body.dark-mode nav a.donate-link:hover {
     margin: 2rem auto;
     padding: 2rem;
     text-align: center;
-    background: rgba(160, 160, 160, 0.04);
-    border: 1px solid rgba(160, 160, 160, 0.15);
+    background: rgba(18, 18, 22, 1);
+    border: 1px solid rgba(91, 155, 213, 0.25);
     border-radius: 12px;
 }
 
@@ -192,7 +192,7 @@ body.dark-mode nav a.donate-link:hover {
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 1.8rem;
     font-weight: 600;
-    color: #d0d0d0;
+    color: #5B9BD5;
     margin: 0 0 1.5rem 0;
 }
 
@@ -236,12 +236,12 @@ body.dark-mode nav a.donate-link:hover {
 }
 
 body.dark-mode .countdown-section {
-    background: rgba(160, 160, 160, 0.04);
+    background: rgba(18, 18, 22, 1);
     border-color: rgba(160, 160, 160, 0.15);
 }
 
 body.dark-mode .countdown-title {
-    color: #d0d0d0;
+    color: #5B9BD5;
 }
 
 body.dark-mode .countdown-value {
