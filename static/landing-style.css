@@ -25,7 +25,7 @@
     --accent-red:       #F25446;
     --accent-green:     #40B040;
     --accent-teal:      #31B686;
-    --grid-color:       rgba(0,0,0,0.035);
+    --grid-color:       rgba(0,0,0,0.06);
     --highlight-bg:     #F2C306;
     --highlight-text:   #1A1A1A;
     --header-border:    var(--text-primary);
@@ -52,7 +52,7 @@
     --accent-red:       #F25446;
     --accent-green:     #40B040;
     --accent-teal:      #31B686;
-    --grid-color:       rgba(255,255,255,0.03);
+    --grid-color:       rgba(255,255,255,0.05);
     --highlight-bg:     #F2C306;
     --highlight-text:   #1A1A1A;
     --header-border:    rgba(255,255,255,0.12);

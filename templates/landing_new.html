@@ -152,7 +152,7 @@
                 <div class="stat-box">
                     <div class="stat-label">Total Raised</div>
                     <div class="stat-value" id="totalRaised">--</div>
-                    <div class="stat-detail">All candidates, FEC Q4 2025</div>
+                    <div class="stat-detail">All candidates, est. to date</div>
                 </div>
             </div>
         </div>
@@ -331,20 +331,49 @@
             }
         }
 
-        // Fetch total raised from FEC data
+        // Fetch total raised from FEC data (extrapolated to current date)
         async function loadFundraisingTotal() {
             try {
                 const resp = await fetch('/api/fec/candidates');
                 const candidates = await resp.json();
                 if (Array.isArray(candidates)) {
-                    var total = 0;
+                    var totalRaised = 0;
                     for (var i = 0; i < candidates.length; i++) {
-                        total += candidates[i].total_raised || 0;
+                        totalRaised += candidates[i].total_raised || 0;
                     }
+
+                    // Extrapolate to current date using same logic as fundraising page
+                    var campaignStartDates = {
+                        "Daniel Biss": "2024-06-01",
+                        "Kat Abugazaleh": "2024-08-01",
+                        "Laura Fine": "2024-07-01",
+                        "Mike Simmons": "2025-01-01",
+                        "Phil Andrew": "2024-09-01",
+                        "Bushra Amiwala": "2024-05-01"
+                    };
+
+                    var totalVelocity = 0;
+                    for (var j = 0; j < candidates.length; j++) {
+                        var c = candidates[j];
+                        var startStr = campaignStartDates[c.name];
+                        if (startStr) {
+                            var start = new Date(startStr);
+                            var fecEnd = c.name === "Bushra Amiwala"
+                                ? new Date("2025-09-30")
+                                : new Date("2025-12-31");
+                            var daysActive = (fecEnd - start) / (1000 * 60 * 60 * 24);
+                            if (daysActive > 0) {
+                                totalVelocity += c.total_raised / daysActive;
+                            }
+                        }
+                    }
+
+                    var daysSinceFiling = (new Date() - new Date("2025-12-31")) / (1000 * 60 * 60 * 24);
+                    var estimatedTotal = totalRaised + (totalVelocity * daysSinceFiling);
+
                     var el = document.getElementById('totalRaised');
                     if (el) {
-                        // Format as $X.XM
-                        var millions = total / 1000000;
+                        var millions = estimatedTotal / 1000000;
                         el.textContent = '$' + millions.toFixed(1) + 'M';
                     }
                 }
