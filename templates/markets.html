@@ -27,7 +27,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
 
     <!-- Google Analytics -->
@@ -39,12 +39,31 @@
         gtag('config', 'G-WVTWQBBG8S');
     </script>
 </head>
-<body class="dark-mode">
+<script>
+    (function() {
+        var t = localStorage.getItem('il9-theme');
+        if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+</script>
+<body>
 
 
     <div class="site-content">
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
+            <nav class="desktop-nav">
+                <a href="/">Home</a>
+                <a href="/markets" class="active">Markets</a>
+                <a href="/candidates">Candidates</a>
+                <a href="/fundraising">Fundraising</a>
+                <a href="/updates">Updates</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/about">About</a>
+            </nav>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+                <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
             <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
                 <span></span>
                 <span></span>
@@ -55,10 +74,9 @@
                 <a href="/markets" class="active">Markets</a>
                 <a href="/candidates">Candidates</a>
                 <a href="/fundraising">Fundraising</a>
+                <a href="/updates">Updates</a>
                 <a href="/methodology">Methodology</a>
                 <a href="/about">About</a>
-                <a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer" class="github-link">GitHub</a>
-                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="donate-link">Donate</a>
             </nav>
         </header>
 
@@ -131,8 +149,8 @@
                         <span class="share-text">Share Current Standings</span>
                     </button>
                 </div>
-                <p style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(76, 158, 235, 0.25); font-size: 0.8rem; color: #808080; text-align: center;">
-                    For detailed aggregation methodology, see the <a href="/methodology#foldout-pm" style="color: #4C9EEB; text-decoration: underline;">Prediction Markets Aggregation section</a> on the Methodology page.
+                <p style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-default); font-size: 0.8rem; color: var(--text-tertiary); text-align: center;">
+                    For detailed aggregation methodology, see the <a href="/methodology#foldout-pm" style="color: var(--accent-blue); text-decoration: underline;">Prediction Markets Aggregation section</a> on the Methodology page.
                 </p>
             </section>
 
@@ -143,10 +161,10 @@
                 </div>
                 <div class="heatmap-callout-body">
                     <div id="heatmapContent">
-                        <p style="color: #a0a0a0;">Loading market data...</p>
+                        <p style="color: var(--text-secondary);">Loading market data...</p>
                     </div>
-                    <p style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(76, 158, 235, 0.25); font-size: 0.9rem; color: #a0a0a0;">
-                        For the full methodology details, see the <a href="/methodology#heatmap-methodology" style="color: #4C9EEB; text-decoration: underline;">Results Heatmap section</a> on the Methodology page.
+                    <p style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-default); font-size: 0.9rem; color: var(--text-secondary);">
+                        For the full methodology details, see the <a href="/methodology#heatmap-methodology" style="color: var(--accent-blue); text-decoration: underline;">Results Heatmap section</a> on the Methodology page.
                     </p>
                 </div>
             </section>
@@ -171,7 +189,7 @@
                 <div class="foldout-body" id="calc-foldout-body">
                     <div class="foldout-inner">
                         <div id="breakdownContent"></div>
-                        <p class="breakdown-desc" style="font-size: 0.85rem; color: #a0a0a0; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(76, 158, 235, 0.25);">
+                        <p class="breakdown-desc" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-default);">
                             <strong>*</strong> = No Kalshi market available. Uses 100% of Manifold probability. Probabilities are lightly normalized (30% strength) to prevent excessive drift while preserving raw market values for top candidates.
                         </p>
                     </div>
@@ -292,30 +310,34 @@
         </div>
 
         <footer class="site-footer">
+            <hr class="footer-rule">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>About</h4>
+                    <h4>Navigate</h4>
                     <ul>
-                        <li><a href="/about">About IL9Cast</a></li>
+                        <li><a href="/markets">Markets</a></li>
+                        <li><a href="/candidates">Candidates</a></li>
+                        <li><a href="/fundraising">Fundraising</a></li>
                         <li><a href="/methodology">Methodology</a></li>
-                        <li><a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                        <li><a href="/about">About</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>Markets</h4>
+                    <h4>Resources</h4>
                     <ul>
-                        <li><a href="/markets">Live Markets</a></li>
-                        <li><a href="/markets">Download Data</a></li>
-                        <li>Updated every 3 minutes</li>
+                        <li><a href="/api/download/snapshots">Download Data</a></li>
+                        <li><a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                        <li><a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer">Support This Project</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h4>Disclaimer</h4>
-                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data for informational purposes.</p>
+                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data for informational purposes only.</p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 IL9Cast. Built with open data. • Railway & AWS Storage: Live • <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a></p>
+                <span>&copy; 2026 IL9Cast. Built with open data.</span>
+                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a>
             </div>
         </footer>
         <div class="flag-footer-image">
@@ -324,44 +346,6 @@
     </div>
 
     <style>
-        :root {
-            --bg-primary: #131517;
-            --bg-surface: #1C1E21;
-            --bg-surface-hover: #242628;
-            --bg-elevated: #2A2D31;
-            --border-subtle: rgba(255,255,255,0.06);
-            --border-default: rgba(255,255,255,0.10);
-            --border-hover: rgba(255,255,255,0.18);
-            --text-primary: #F0F0F0;
-            --text-secondary: #9BA1A6;
-            --text-tertiary: #6B7280;
-            --accent-blue: #4C9EEB;
-            --grid-color: rgba(76, 158, 235, 0.025);
-        }
-
-        [data-theme="light"] {
-            --bg-primary: #E8E6E1;
-            --bg-surface: #F5F3F0;
-            --bg-surface-hover: #EEECE7;
-            --bg-elevated: #F0EDE8;
-            --border-subtle: rgba(0,0,0,0.08);
-            --border-default: rgba(0,0,0,0.12);
-            --border-hover: rgba(0,0,0,0.18);
-            --text-primary: #1A1A1A;
-            --text-secondary: #5A5A5A;
-            --text-tertiary: #8A8A8A;
-            --accent-blue: #3B8AD9;
-            --grid-color: rgba(76, 158, 235, 0.04);
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            min-height: 100vh;
-        }
 
         /* Animations */
         @keyframes fadeInUp {
@@ -389,20 +373,6 @@
             position: relative;
         }
 
-        .markets-content-page::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image:
-                linear-gradient(var(--grid-color, rgba(76, 158, 235, 0.025)) 1.5px, transparent 1.5px),
-                linear-gradient(90deg, var(--grid-color, rgba(76, 158, 235, 0.025)) 1.5px, transparent 1.5px);
-            background-size: 50px 50px;
-            pointer-events: none;
-            z-index: -1;
-        }
 
         /* Share Button */
         .share-button {
@@ -410,21 +380,18 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, #4C9EEB 0%, #4A7BA7 100%);
-            color: white;
+            background: var(--text-primary);
+            color: var(--bg-primary);
             border: none;
-            border-radius: 8px;
             font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
+            transition: opacity 0.15s ease;
+            font-family: var(--sans);
         }
 
         .share-button:hover {
-            background: linear-gradient(135deg, #4A7BA7 0%, #3D5A80 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            opacity: 0.8;
         }
 
         .share-button:active {
@@ -451,15 +418,13 @@
             display: flex;
             gap: 2rem;
             padding: 2.5rem;
-            background: rgba(18, 18, 22, 1);
-            border: 1px solid rgba(76, 158, 235, 0.25);
-            border-radius: 8px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
         }
 
         .leader-photo {
             width: 140px;
             height: 140px;
-            border-radius: 8px;
             object-fit: cover;
             flex-shrink: 0;
             opacity: 0.95;
@@ -476,16 +441,16 @@
             font-size: 0.8rem;
             font-weight: 600;
             letter-spacing: 0.15em;
-            color: #a0a0a0;
+            color: var(--text-secondary);
             text-transform: uppercase;
             margin-bottom: 0.5rem;
         }
 
         .leader-name {
             font-size: 2.5rem;
-            font-weight: 600;
-            color: #e0e0e0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: var(--serif);
             margin-bottom: 1rem;
         }
 
@@ -498,16 +463,16 @@
             font-size: 0.7rem;
             font-weight: 600;
             letter-spacing: 0.1em;
-            color: #a0a0a0;
+            color: var(--text-secondary);
             text-transform: uppercase;
             margin-bottom: 0.25rem;
         }
 
         .leader-main-value {
             font-size: 3.5rem;
-            font-weight: 600;
-            color: #4C9EEB;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
+            font-weight: 700;
+            color: var(--accent-blue);
+            font-family: var(--sans);
             line-height: 1;
             letter-spacing: -0.02em;
         }
@@ -515,7 +480,7 @@
         .leader-divider {
             width: 100%;
             height: 1px;
-            background: rgba(160, 160, 160, 0.15);
+            background: var(--border-subtle);
             margin: 1rem 0;
         }
 
@@ -534,7 +499,7 @@
             font-size: 0.6rem;
             font-weight: 600;
             letter-spacing: 0.08em;
-            color: #a0a0a0;
+            color: var(--text-secondary);
             text-transform: uppercase;
             margin-bottom: 0.2rem;
             opacity: 0.7;
@@ -542,9 +507,9 @@
 
         .leader-sub-value {
             font-size: 1.25rem;
-            font-weight: 600;
-            color: #c0c0c0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
+            font-weight: 700;
+            color: var(--text-secondary);
+            font-family: var(--sans);
             line-height: 1;
         }
 
@@ -700,7 +665,6 @@
 
             .big-odds-candidate {
                 padding: 1rem 0.4rem;
-                border-radius: 8px;
             }
 
             .big-percent {
@@ -715,7 +679,6 @@
             .market-chart-section {
                 padding: 1.25rem;
                 margin-bottom: 1.5rem;
-                border-radius: 8px;
             }
 
             .market-chart-section h2 {
@@ -837,16 +800,15 @@
             flex-direction: column;
             align-items: center;
             padding: 1.5rem 0.5rem;
-            background: rgba(18, 18, 22, 1);
-            border: 1px solid rgba(76, 158, 235, 0.25);
-            border-radius: 8px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
         }
 
         .big-percent {
             font-size: 3.5rem;
-            font-weight: 600;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
-            color: #4C9EEB;
+            font-weight: 700;
+            font-family: var(--sans);
+            color: var(--accent-blue);
             line-height: 1;
             margin-bottom: 0.5rem;
             letter-spacing: -0.02em;
@@ -854,7 +816,7 @@
 
         .big-name {
             font-size: 0.95rem;
-            color: #a0a0a0;
+            color: var(--text-secondary);
             font-weight: 500;
         }
 
@@ -876,16 +838,15 @@
         /* Chart Section */
         .market-chart-section {
             padding: 2rem;
-            background: rgba(18, 18, 22, 1);
-            border: 1px solid rgba(76, 158, 235, 0.25);
-            border-radius: 8px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
             margin-bottom: 2rem;
         }
 
         .chart-subtitle {
             margin-top: 1rem;
             font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--text-tertiary);
             font-style: italic;
             text-align: center;
         }
@@ -893,9 +854,9 @@
         .market-chart-section h2 {
             margin-bottom: 1.5rem;
             font-size: 1.6rem;
-            color: #4C9EEB;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
-            font-weight: 600;
+            color: var(--accent-blue);
+            font-family: var(--serif);
+            font-weight: 700;
         }
 
         .market-chart-section .chart-wrapper {
@@ -908,10 +869,9 @@
         .chart-toggle {
             display: flex;
             gap: 0.25rem;
-            background: rgba(0, 0, 0, 0.3);
+            background: var(--bg-elevated);
             padding: 4px;
-            border-radius: 8px;
-            border: 1px solid rgba(76, 158, 235, 0.25);
+            border: 1px solid var(--border-default);
             flex-wrap: wrap;
             justify-content: center;
             width: auto;
@@ -921,25 +881,25 @@
             padding: 0.5rem 1.25rem;
             background: transparent;
             border: none;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-tertiary);
             border-radius: 6px;
             white-space: nowrap;
             cursor: pointer;
             font-size: 0.85rem;
-            font-weight: 500;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
+            font-weight: 700;
+            font-family: var(--sans);
             transition: all 0.25s ease;
         }
 
         .toggle-btn:hover {
-            color: rgba(255, 255, 255, 0.8);
-            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            background: var(--bg-surface-hover);
         }
 
         .toggle-btn.active {
-            background: rgba(76, 158, 235, 0.25);
-            color: #4C9EEB;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border-default);
         }
 
         /* Methodology Foldout */
@@ -947,16 +907,16 @@
         .donation-section {
             text-align: center;
             padding: 1.5rem 2rem;
-            background: rgba(76, 158, 235, 0.1);
-            border: 1px solid rgba(76, 158, 235, 0.3);
-            border-radius: 8px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-left: 3px solid var(--accent-gold);
             margin-bottom: 2rem;
         }
 
         .donation-text {
             margin: 0;
             font-size: 0.95rem;
-            color: #c0c0c0;
+            color: var(--text-secondary);
             line-height: 1.6;
         }
 
@@ -964,34 +924,30 @@
             display: inline-block;
             margin-left: 0.75rem;
             padding: 0.5rem 1.25rem;
-            background: rgba(76, 158, 235, 0.25);
-            border: 1.5px solid rgba(76, 158, 235, 0.5);
-            border-radius: 6px;
-            color: #4C9EEB;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border: none;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: opacity 0.15s ease;
         }
 
         .donation-link:hover {
-            background: rgba(76, 158, 235, 0.35);
-            border-color: rgba(76, 158, 235, 0.7);
-            color: #4C9EEB;
-            transform: translateY(-1px);
+            opacity: 0.8;
+            color: var(--bg-primary);
         }
 
         /* ===== CALCULATION BREAKDOWN FOLDOUT ===== */
         .calculation-breakdown.method-foldout {
             background: var(--bg-surface);
-            border: 2px solid rgba(76, 158, 235, 0.35);
-            border-radius: 8px;
+            border: 2px solid var(--border-default);
             margin-bottom: 2rem;
             overflow: hidden;
             padding: 0;
         }
 
         .calculation-breakdown.method-foldout.active {
-            border-color: rgba(76, 158, 235, 0.5);
+            border-color: var(--border-hover);
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
@@ -1010,7 +966,7 @@
         }
 
         .calculation-breakdown .foldout-trigger:hover {
-            background: rgba(76, 158, 235, 0.08);
+            background: var(--bg-surface-hover);
         }
 
         .calculation-breakdown .foldout-trigger-left {
@@ -1022,24 +978,24 @@
         .calculation-breakdown .foldout-trigger h2 {
             margin-bottom: 0;
             font-size: 1.6rem;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
-            font-weight: 600;
-            color: #4C9EEB;
+            font-family: var(--serif);
+            font-weight: 700;
+            color: var(--accent-blue);
             line-height: 1.3;
         }
 
         .calculation-breakdown .foldout-desc {
             font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.45);
+            color: var(--text-tertiary);
             margin: 0.2rem 0 0 0;
             line-height: 1.4;
         }
 
         .calculation-breakdown .foldout-arrow {
-            font-family: 'Inter', sans-serif;
+            font-family: var(--sans);
             font-size: 1.6rem;
             font-weight: 300;
-            color: rgba(76, 158, 235, 0.6);
+            color: var(--accent-gold);
             transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             flex-shrink: 0;
             width: 30px;
@@ -1074,7 +1030,7 @@
         }
 
         .calculation-breakdown .foldout-body .foldout-inner {
-            border-top: 1px solid rgba(76, 158, 235, 0.25);
+            border-top: 1px solid var(--border-default);
             padding-top: 0;
             transition: padding-top 0.4s ease;
         }
@@ -1086,8 +1042,7 @@
         /* ===== RESULTS HEATMAP CALLOUT ===== */
         .heatmap-callout {
             background: var(--bg-surface);
-            border: 2px solid rgba(76, 158, 235, 0.35);
-            border-radius: 8px;
+            border: 2px solid var(--border-default);
             margin-bottom: 2rem;
             overflow: hidden;
         }
@@ -1099,15 +1054,15 @@
         .heatmap-callout-header h2 {
             margin: 0 0 0.2rem 0;
             font-size: 1.6rem;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
-            font-weight: 600;
-            color: #4C9EEB;
+            font-family: var(--serif);
+            font-weight: 700;
+            color: var(--accent-blue);
             line-height: 1.3;
         }
 
         .heatmap-callout-desc {
             font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.45);
+            color: var(--text-tertiary);
             margin: 0;
             line-height: 1.4;
         }
@@ -1127,7 +1082,7 @@
             border-spacing: 3px;
             width: 100%;
             min-width: 480px;
-            font-family: 'Inter', sans-serif;
+            font-family: var(--sans);
             font-size: 0.82rem;
         }
 
@@ -1135,7 +1090,7 @@
             padding: 0.6rem 0.5rem;
             font-weight: 600;
             font-size: 0.78rem;
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--text-secondary);
             text-align: center;
             white-space: nowrap;
         }
@@ -1157,7 +1112,7 @@
         .heatmap-table th.heatmap-row-header {
             text-align: right;
             padding-right: 0.9rem;
-            color: rgba(255, 255, 255, 0.85);
+            color: var(--text-primary);
             white-space: nowrap;
             font-size: 0.78rem;
             letter-spacing: 0.02em;
@@ -1181,8 +1136,8 @@
         }
 
         .heatmap-table td.heatmap-diagonal {
-            background: rgba(255, 255, 255, 0.015);
-            color: rgba(255, 255, 255, 0.1);
+            background: var(--bg-surface-hover);
+            color: var(--text-tertiary);
             font-size: 0.7rem;
             font-weight: 400;
         }
@@ -1193,16 +1148,16 @@
             align-items: center;
             margin-bottom: 1rem;
             padding-bottom: 0.6rem;
-            border-bottom: 1px solid rgba(76, 158, 235, 0.15);
+            border-bottom: 1px solid var(--border-subtle);
         }
 
         .heatmap-axis-label {
             font-size: 0.72rem;
-            color: rgba(76, 158, 235, 0.65);
+            color: var(--accent-blue);
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            font-family: 'Inter', sans-serif;
+            font-family: var(--sans);
         }
 
         @media (max-width: 600px) {
@@ -1227,7 +1182,7 @@
         }
 
         .breakdown-desc {
-            color: #a0a0a0;
+            color: var(--text-secondary);
             margin-bottom: 0.5rem;
             font-size: 0.9rem;
             line-height: 1.5;
@@ -1236,17 +1191,16 @@
         .breakdown-desc:last-of-type {
             margin-bottom: 1.5rem;
             padding: 0.75rem 1rem;
-            background: rgba(76, 158, 235, 0.1);
-            border-left: 3px solid rgba(76, 158, 235, 0.4);
-            border-radius: 4px;
+            background: var(--bg-elevated);
+            border-left: 3px solid var(--accent-gold);
             margin-left: 0;
             font-size: 0.85rem;
         }
 
         .candidate-breakdown {
             margin-bottom: 0.75rem;
-            background: rgba(0, 0, 0, 0.15);
-            border-left: 3px solid #4C9EEB;
+            background: var(--bg-elevated);
+            border-left: 3px solid var(--accent-blue);
             border-radius: 6px;
             overflow: hidden;
         }
@@ -1260,26 +1214,26 @@
             background: transparent;
             border: none;
             cursor: pointer;
-            color: #e0e0e0;
+            color: var(--text-primary);
             font-family: inherit;
             text-align: left;
             gap: 1rem;
         }
 
         .breakdown-toggle:hover {
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--bg-surface-hover);
         }
 
         .breakdown-header {
             font-size: 1rem;
             font-weight: 600;
-            color: #e0e0e0;
+            color: var(--text-primary);
             flex: 1;
         }
 
         .breakdown-preview {
             font-size: 0.95rem;
-            color: #4C9EEB;
+            color: var(--accent-blue);
             font-weight: 700;
             min-width: 60px;
             text-align: right;
@@ -1287,7 +1241,7 @@
 
         .breakdown-icon {
             font-size: 1.5rem;
-            color: #4C9EEB;
+            color: var(--accent-blue);
             transition: transform 0.3s ease;
         }
 
@@ -1310,22 +1264,22 @@
         .breakdown-line {
             font-size: 0.85rem;
             line-height: 1.6;
-            color: #a0a0a0;
+            color: var(--text-secondary);
             margin-bottom: 0.4rem;
         }
 
         .breakdown-line strong {
-            color: #e0e0e0;
+            color: var(--text-primary);
             font-weight: 600;
         }
 
         .breakdown-result {
             margin-top: 0.8rem;
             padding-top: 0.8rem;
-            border-top: 1px solid rgba(76, 158, 235, 0.25);
+            border-top: 1px solid var(--border-default);
             font-size: 0.95rem;
             font-weight: 600;
-            color: #4C9EEB;
+            color: var(--accent-blue);
         }
 
         /* Market Sources */
@@ -1336,17 +1290,16 @@
         .additional-markets h2 {
             margin-bottom: 1rem;
             font-size: 2rem;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
-            font-weight: 600;
-            color: #4C9EEB;
+            font-family: var(--serif);
+            font-weight: 700;
+            color: var(--accent-blue);
         }
 
         .expandable-market {
             margin-bottom: 1rem;
-            border: 1px solid rgba(76, 158, 235, 0.25);
-            border-radius: 8px;
+            border: 1px solid var(--border-default);
             overflow: hidden;
-            background: rgba(18, 18, 22, 1);
+            background: var(--bg-surface);
         }
 
         .expand-toggle {
@@ -1358,7 +1311,7 @@
             background: transparent;
             border: none;
             cursor: pointer;
-            color: #e0e0e0;
+            color: var(--text-primary);
             font-family: inherit;
             font-size: 1rem;
             transition: background 0.2s ease;
@@ -1366,7 +1319,7 @@
         }
 
         .expand-toggle:hover {
-            background: rgba(76, 158, 235, 0.12);
+            background: var(--bg-surface-hover);
         }
 
         .market-name {
@@ -1388,7 +1341,7 @@
             border-radius: 6px;
             font-size: 0.7rem;
             font-weight: 600;
-            color: #ef4444;
+            color: var(--accent-red);
             letter-spacing: 0.05em;
             text-transform: uppercase;
         }
@@ -1397,7 +1350,7 @@
             display: inline-block;
             width: 6px;
             height: 6px;
-            background: #ef4444;
+            background: var(--accent-red);
             border-radius: 50%;
             box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
             animation: pulse-live 2s ease-in-out infinite;
@@ -1415,7 +1368,7 @@
         }
 
         .market-preview {
-            color: #a0a0a0;
+            color: var(--text-secondary);
             font-size: 0.9rem;
             flex: 1;
             text-align: left;
@@ -1423,7 +1376,7 @@
 
         .expand-icon {
             font-size: 1.5rem;
-            color: #4C9EEB;
+            color: var(--accent-blue);
             transition: transform 0.3s ease;
         }
 
@@ -1441,7 +1394,7 @@
         .expandable-market.open .expand-content {
             max-height: 500px;
             padding: 1rem 1.5rem 1.5rem;
-            border-top: 1px solid rgba(160, 160, 160, 0.12);
+            border-top: 1px solid var(--border-subtle);
         }
 
         .expand-content .market-candidates {
@@ -1452,7 +1405,7 @@
             display: flex;
             justify-content: space-between;
             padding: 0.6rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--border-subtle);
         }
 
         .expand-content .market-candidate:last-child {
@@ -1464,12 +1417,12 @@
             justify-content: space-between;
             align-items: center;
             padding-top: 1rem;
-            border-top: 1px solid rgba(76, 158, 235, 0.25);
+            border-top: 1px solid var(--border-default);
             margin-top: 0.5rem;
         }
 
         .market-link {
-            color: #4C9EEB;
+            color: var(--accent-blue);
             text-decoration: underline;
             font-size: 0.9rem;
         }
@@ -1482,8 +1435,7 @@
         .download-data-section {
             padding: 2.5rem;
             background: var(--bg-surface);
-            border: 2px solid rgba(76, 158, 235, 0.35);
-            border-radius: 8px;
+            border: 2px solid var(--border-default);
             text-align: center;
             margin-bottom: 2rem;
         }
@@ -1491,14 +1443,14 @@
         .download-data-section h2 {
             margin-bottom: 0.5rem;
             font-size: 2rem;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
-            font-weight: 600;
-            color: #4C9EEB;
+            font-family: var(--serif);
+            font-weight: 700;
+            color: var(--accent-blue);
         }
 
         .download-description {
             margin-bottom: 1.5rem;
-            color: #a0a0a0;
+            color: var(--text-secondary);
             font-size: 0.95rem;
         }
 
@@ -1514,21 +1466,18 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, #4C9EEB 0%, #4A7BA7 100%);
-            color: white;
+            background: var(--text-primary);
+            color: var(--bg-primary);
             text-decoration: none;
-            border-radius: 6px;
             font-weight: 600;
             font-size: 1rem;
-            transition: all 0.3s ease;
+            transition: opacity 0.15s ease;
             border: none;
             cursor: pointer;
         }
 
         .download-button:hover {
-            background: linear-gradient(135deg, #4A7BA7 0%, #3D5A80 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            opacity: 0.8;
         }
 
         .download-icon {
@@ -1536,24 +1485,21 @@
         }
 
         .download-button-secondary {
-            background: rgba(76, 158, 235, 0.12);
-            border: 2px solid #4C9EEB;
-            color: #4C9EEB;
+            background: transparent;
+            border: 2px solid var(--text-primary);
+            color: var(--text-primary);
         }
 
         .download-button-secondary:hover {
-            background: rgba(76, 158, 235, 0.25);
-            border-color: #4A7BA7;
-            color: #4A7BA7;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            background: var(--bg-surface-hover);
+            opacity: 1;
         }
 
         /* Email Alerts Section */
         .email-alerts-section {
             padding: 2.5rem;
             background: var(--bg-surface);
-            border: 2px solid rgba(76, 158, 235, 0.35);
-            border-radius: 8px;
+            border: 2px solid var(--border-default);
             text-align: center;
             margin-bottom: 2rem;
         }
@@ -1561,14 +1507,14 @@
         .email-alerts-section h2 {
             margin-bottom: 0.5rem;
             font-size: 2rem;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
-            font-weight: 600;
-            color: #4C9EEB;
+            font-family: var(--serif);
+            font-weight: 700;
+            color: var(--accent-blue);
         }
 
         .alerts-description {
             margin-bottom: 1.5rem;
-            color: #a0a0a0;
+            color: var(--text-secondary);
             font-size: 0.95rem;
         }
 
@@ -1581,12 +1527,12 @@
 
         .subscribe-input {
             padding: 0.75rem 1rem;
-            border: 1px solid #444;
+            border: 1px solid var(--border-default);
             border-radius: 6px;
             background: var(--bg-elevated);
-            color: #e0e0e0;
+            color: var(--text-primary);
             font-size: 1rem;
-            font-family: 'Inter', sans-serif;
+            font-family: var(--sans);
             width: 280px;
             max-width: 100%;
             outline: none;
@@ -1594,21 +1540,21 @@
         }
 
         .subscribe-input:focus {
-            border-color: #4C9EEB;
+            border-color: var(--accent-blue);
         }
 
         .subscribe-input::placeholder {
-            color: #666;
+            color: var(--text-tertiary);
         }
 
         .subscribe-threshold {
             padding: 0.75rem 1rem;
-            border: 1px solid #444;
+            border: 1px solid var(--border-default);
             border-radius: 6px;
             background: var(--bg-elevated);
-            color: #e0e0e0;
+            color: var(--text-primary);
             font-size: 0.95rem;
-            font-family: 'Inter', sans-serif;
+            font-family: var(--sans);
             width: 200px;
             max-width: 100%;
             outline: none;
@@ -1617,26 +1563,23 @@
         }
 
         .subscribe-threshold:focus {
-            border-color: #4C9EEB;
+            border-color: var(--accent-blue);
         }
 
         .subscribe-button {
             padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, #4C9EEB 0%, #4A7BA7 100%);
-            color: white;
+            background: var(--text-primary);
+            color: var(--bg-primary);
             border: none;
-            border-radius: 6px;
             font-weight: 600;
             font-size: 1rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
+            transition: opacity 0.15s ease;
+            font-family: var(--sans);
         }
 
         .subscribe-button:hover {
-            background: linear-gradient(135deg, #4A7BA7 0%, #3D5A80 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            opacity: 0.8;
         }
 
         .subscribe-button:disabled {
@@ -1652,11 +1595,11 @@
         }
 
         .subscribe-message.success {
-            color: #27ae60;
+            color: var(--accent-green);
         }
 
         .subscribe-message.error {
-            color: #e74c3c;
+            color: var(--accent-red);
         }
 
         /* Email Subscribe Modal Popup */
@@ -1689,10 +1632,9 @@
             max-width: 500px;
             margin: 15% auto;
             background: var(--bg-surface);
-            border: 2px solid rgba(76, 158, 235, 0.4);
-            border-radius: 16px;
+            border: 2px solid var(--border-hover);
             padding: 40px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 32px var(--shadow-soft);
             animation: slideUp 0.4s ease-out;
             text-align: center;
         }
@@ -1719,7 +1661,7 @@
             right: 16px;
             background: transparent;
             border: none;
-            color: #a0a0a0;
+            color: var(--text-secondary);
             font-size: 32px;
             cursor: pointer;
             line-height: 1;
@@ -1730,38 +1672,49 @@
         }
 
         .email-modal-close:hover {
-            color: #4C9EEB;
+            color: var(--accent-blue);
         }
 
         .email-modal-content h2 {
             margin: 0 0 12px 0;
             font-size: 2rem;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
-            font-weight: 600;
-            color: #4C9EEB;
+            font-family: var(--serif);
+            font-weight: 700;
+            color: var(--accent-blue);
         }
 
         .email-modal-description {
             margin: 0 0 24px 0;
-            color: #a0a0a0;
+            color: var(--text-secondary);
             font-size: 0.95rem;
         }
 
         .last-updated {
-            color: #a0a0a0;
+            color: var(--text-secondary);
             font-size: 0.85rem;
         }
 
         .candidate-odds {
-            color: #4C9EEB;
-            font-weight: 600;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700;
+            color: var(--accent-blue);
+            font-weight: 700;
+            font-family: var(--sans);
         }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script>
+function toggleTheme() {
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('il9-theme', 'light');
+    } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('il9-theme', 'dark');
+    }
+}
+
 // Mobile hamburger menu toggle
 function toggleMobileMenu() {
     const hamburger = document.getElementById('hamburger');
@@ -2099,18 +2052,18 @@ function renderBreakdown(breakdowns) {
                     = ${b.manifoldContribution} + ${b.kalshiLastContribution} + ${b.kalshiMidContribution} + ${b.kalshiLiqContribution}
                 </div>
                 <div class="breakdown-result">= ${b.aggregate}%</div>
-                ${b.normalizedAggregate ? `<div class="breakdown-line" style="margin-top: 0.5rem; color: #a0a0a0;"><strong>Soft Normalized (30%):</strong> ${b.normalizedAggregate}%</div>` : ''}
+                ${b.normalizedAggregate ? `<div class="breakdown-line" style="margin-top: 0.5rem; color: var(--text-secondary);"><strong>Soft Normalized (30%):</strong> ${b.normalizedAggregate}%</div>` : ''}
             `;
         } else {
             calculationHTML = `
                 <div class="breakdown-line"><strong>Manifold:</strong> ${b.manifoldProb}%</div>
-                <div class="breakdown-line" style="color: #a0a0a0;"><strong>Kalshi:</strong> No market available</div>
+                <div class="breakdown-line" style="color: var(--text-secondary);"><strong>Kalshi:</strong> No market available</div>
                 <div class="breakdown-line" style="margin-top: 0.8rem;">
                     <strong>Calculation:</strong><br>
                     Using 100% of Manifold probability (no Kalshi data)<br>
                     = ${b.manifoldProb}%
                 </div>
-                ${b.normalizedAggregate ? `<div class="breakdown-line" style="margin-top: 0.5rem; color: #a0a0a0;"><strong>Soft Normalized (30%):</strong> ${b.normalizedAggregate}%<br><em style="font-size: 0.85em;">Light normalization applied to prevent drift while preserving market values.</em></div>` : ''}
+                ${b.normalizedAggregate ? `<div class="breakdown-line" style="margin-top: 0.5rem; color: var(--text-secondary);"><strong>Soft Normalized (30%):</strong> ${b.normalizedAggregate}%<br><em style="font-size: 0.85em;">Light normalization applied to prevent drift while preserving market values.</em></div>` : ''}
             `;
         }
 
@@ -2146,7 +2099,7 @@ function toggleCalcFoldout() {
 function renderHeatmap(candidates) {
     const container = document.getElementById('heatmapContent');
     if (!candidates || candidates.length < 2) {
-        container.innerHTML = '<p style="color: #a0a0a0;">Waiting for market data...</p>';
+        container.innerHTML = '<p style="color: var(--text-secondary);">Waiting for market data...</p>';
         return;
     }
 
@@ -2175,14 +2128,13 @@ function renderHeatmap(candidates) {
         }
     }
 
-    // Color ramp: low values get subtle tint, high values get strong blue
+    // Color ramp: low values get subtle tint, high values get strong teal
     function cellStyle(val, isTop) {
         if (val === null) return '';
         const t = maxVal > 0 ? val / maxVal : 0;
-        // Interpolate from dark/transparent to vibrant blue
         const alpha = 0.05 + t * 0.6;
-        const borderGlow = isTop ? 'box-shadow: inset 0 0 0 1.5px rgba(76, 158, 235, 0.8);' : '';
-        return `background: rgba(76, 158, 235, ${alpha.toFixed(3)}); ${borderGlow}`;
+        const borderGlow = isTop ? 'box-shadow: inset 0 0 0 1.5px rgba(49, 176, 181, 0.8);' : '';
+        return `background: rgba(49, 176, 181, ${alpha.toFixed(3)}); ${borderGlow}`;
     }
 
     function textStyle(val) {
@@ -2190,7 +2142,7 @@ function renderHeatmap(candidates) {
         const t = maxVal > 0 ? val / maxVal : 0;
         if (t > 0.6) return 'color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3);';
         if (t > 0.25) return 'color: rgba(255,255,255,0.9);';
-        return 'color: rgba(255,255,255,0.55);';
+        return 'color: var(--text-secondary);';
     }
 
     function lastName(name) {
@@ -2202,10 +2154,10 @@ function renderHeatmap(candidates) {
     let html = '';
 
     // Most likely result callout
-    html += `<div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.4rem; padding: 0.75rem 1rem; background: rgba(76, 158, 235, 0.1); border-radius: 8px; border-left: 3px solid rgba(76, 158, 235, 0.5);">`;
-    html += `<span style="font-size: 0.78rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;">Most likely result</span>`;
-    html += `<span style="font-size: 0.95rem; color: #4C9EEB; font-weight: 600;">${lastName(sorted[topPair.i].name)} 1st, ${lastName(sorted[topPair.j].name)} 2nd</span>`;
-    html += `<span style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">${topPair.val.toFixed(1)}%</span>`;
+    html += `<div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.4rem; padding: 0.75rem 1rem; background: var(--bg-elevated); border-left: 3px solid var(--accent-gold);">`;
+    html += `<span style="font-size: 0.78rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;">Most likely result</span>`;
+    html += `<span style="font-size: 0.95rem; color: var(--accent-blue); font-weight: 600;">${lastName(sorted[topPair.i].name)} 1st, ${lastName(sorted[topPair.j].name)} 2nd</span>`;
+    html += `<span style="font-size: 0.85rem; color: var(--text-secondary);">${topPair.val.toFixed(1)}%</span>`;
     html += `</div>`;
 
     // Axis labels
@@ -2293,7 +2245,7 @@ async function fetchManifoldData() {
 
     } catch (error) {
         console.error('Error fetching Manifold data:', error);
-        document.getElementById('bigOddsDisplay').innerHTML = '<p style="color: #a0a0a0;">Error loading market data</p>';
+        document.getElementById('bigOddsDisplay').innerHTML = '<p style="color: var(--text-secondary);">Error loading market data</p>';
     }
 }
 
@@ -2399,10 +2351,17 @@ async function renderMarketTrendChart(candidates) {
 
     console.log(`[Chart] Known gaps: ${knownGaps.length}`, knownGaps);
 
+    // Theme-aware chart colors
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const chartTextColor = isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)';
+    const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+    const chartLegendColor = isDark ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.7)';
+    const tooltipBg = isDark ? 'rgba(0,0,0,0.9)' : 'rgba(30,30,30,0.9)';
+
     if (snapshots.length < 2) {
         if (marketChart) marketChart.destroy();
         ctx.font = '14px Arial';
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.fillStyle = chartTextColor;
         ctx.textAlign = 'center';
         ctx.fillText('Collecting historical data... Check back soon for trend charts.', ctx.canvas.width / 2, ctx.canvas.height / 2);
         return;
@@ -2417,14 +2376,14 @@ async function renderMarketTrendChart(candidates) {
 
     console.log(`[Chart] Period: ${period}, Data points: ${parsedSnapshots.length}`);
 
-    // FiveThirtyEight-inspired color palette
+    // Editorial color palette
     const colors = [
-        '#4C9EEB',  // Blue
-        '#22C55E',  // Green
-        '#EF4444',  // Red
-        '#9BA1A6',  // Gray
-        '#F59E0B',  // Amber
-        '#8B5CF6'   // Purple
+        '#31B0B5',  // Teal
+        '#40B040',  // Green
+        '#F25446',  // Red
+        '#F2C306',  // Gold
+        '#8B5CF6',  // Purple
+        '#9BA1A6'   // Gray
     ];
 
     // Build datasets with {x, y} point format for time scale
@@ -2522,29 +2481,29 @@ async function renderMarketTrendChart(candidates) {
                         boxWidth: 12,
                         boxHeight: 12,
                         padding: 15,
-                        color: 'rgba(255, 255, 255, 0.8)',
+                        color: chartLegendColor,
                         font: {
-                            family: 'Arial, sans-serif',
+                            family: "'Source Sans 3', sans-serif",
                             size: 12,
                             weight: 'normal'
                         }
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    backgroundColor: tooltipBg,
                     titleColor: '#fff',
                     bodyColor: '#fff',
                     borderColor: 'rgba(255, 255, 255, 0.1)',
                     borderWidth: 1,
                     padding: 10,
-                    cornerRadius: 3,
+                    cornerRadius: 0,
                     titleFont: {
-                        family: 'Arial, sans-serif',
+                        family: "'Source Sans 3', sans-serif",
                         size: 12,
                         weight: 'bold'
                     },
                     bodyFont: {
-                        family: 'Arial, sans-serif',
+                        family: "'Source Sans 3', sans-serif",
                         size: 11
                     },
                     callbacks: {
@@ -2571,15 +2530,15 @@ async function renderMarketTrendChart(candidates) {
                     ticks: {
                         stepSize: 10,
                         callback: (value) => value + '%',
-                        color: 'rgba(255, 255, 255, 0.6)',
+                        color: chartTextColor,
                         font: {
-                            family: 'Arial, sans-serif',
+                            family: "'Source Sans 3', sans-serif",
                             size: 11
                         },
                         padding: 8
                     },
                     grid: {
-                        color: 'rgba(255, 255, 255, 0.08)',
+                        color: chartGridColor,
                         drawBorder: false,
                         lineWidth: 1
                     },
@@ -2600,11 +2559,11 @@ async function renderMarketTrendChart(candidates) {
                         }
                     },
                     ticks: {
-                        color: 'rgba(255, 255, 255, 0.6)',
+                        color: chartTextColor,
                         autoSkip: true,
                         maxTicksLimit: period === '1d' ? 12 : (period === '7d' ? 7 : 10),
                         font: {
-                            family: 'Arial, sans-serif',
+                            family: "'Source Sans 3', sans-serif",
                             size: 10
                         },
                         maxRotation: 0,
@@ -2621,7 +2580,7 @@ async function renderMarketTrendChart(candidates) {
                         }
                     },
                     grid: {
-                        color: 'rgba(255, 255, 255, 0.05)',
+                        color: chartGridColor,
                         drawBorder: false
                     },
                     border: {
@@ -2762,7 +2721,7 @@ async function fetchKalshiData() {
     } catch (error) {
         console.error('Error fetching Kalshi data:', error);
         document.getElementById('kalshiPreview').textContent = 'Error loading';
-        document.getElementById('kalshiCandidates').innerHTML = '<p style="color: #a0a0a0;">Error loading Kalshi data</p>';
+        document.getElementById('kalshiCandidates').innerHTML = '<p style="color: var(--text-secondary);">Error loading Kalshi data</p>';
     }
 }
 

@@ -8,7 +8,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
 
     <!-- Google Analytics -->
@@ -20,19 +20,44 @@
         gtag('config', 'G-WVTWQBBG8S');
     </script>
 </head>
-<body class="dark-mode">
+<script>
+    (function() {
+        var t = localStorage.getItem('il9-theme');
+        if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+</script>
+<body>
 
 
     <div class="site-content">
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
-            <nav>
-                <a href="/markets">Markets</a>                <a href="/candidates" class="active">Candidates</a>
+            <nav class="desktop-nav">
+                <a href="/">Home</a>
+                <a href="/markets">Markets</a>
+                <a href="/candidates" class="active">Candidates</a>
                 <a href="/fundraising">Fundraising</a>
+                <a href="/updates">Updates</a>
                 <a href="/methodology">Methodology</a>
                 <a href="/about">About</a>
-                <a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer" class="github-link" title="View on GitHub">GitHub</a>
-                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="donate-link" title="Support IL9Cast">Donate</a>
+            </nav>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+                <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="mobile-nav" id="mobileNav">
+                <a href="/">Home</a>
+                <a href="/markets">Markets</a>
+                <a href="/candidates" class="active">Candidates</a>
+                <a href="/fundraising">Fundraising</a>
+                <a href="/updates">Updates</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/about">About</a>
             </nav>
         </header>
 
@@ -102,39 +127,46 @@
         </section>
 
         <footer class="site-footer">
+            <hr class="footer-rule">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>About</h4>
+                    <h4>Navigate</h4>
                     <ul>
-                        <li><a href="/about">About IL9Cast</a></li>
+                        <li><a href="/markets">Markets</a></li>
+                        <li><a href="/candidates">Candidates</a></li>
+                        <li><a href="/fundraising">Fundraising</a></li>
                         <li><a href="/methodology">Methodology</a></li>
-                        <li><a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                        <li><a href="/about">About</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>Markets</h4>
+                    <h4>Resources</h4>
                     <ul>
-                        <li><a href="/markets">Live Markets</a></li>
-                        <li><a href="/markets">Download Data</a></li>
-                        <li>Updated every 3 minutes</li>
+                        <li><a href="/api/download/snapshots">Download Data</a></li>
+                        <li><a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                        <li><a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer">Support This Project</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h4>Disclaimer</h4>
-                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data for informational purposes.</p>
+                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data for informational purposes only.</p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 IL9Cast. Built with open data. • Railway & AWS Storage: Live • <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a></p>
+                <span>&copy; 2026 IL9Cast. Built with open data.</span>
+                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a>
             </div>
         </footer>
+    </div>
+    <div class="flag-footer-image">
+        <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer">
     </div>
 
     <style>
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #1a1a1a;
-            color: #e0e0e0;
+            font-family: var(--sans), -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             min-height: 100vh;
@@ -184,11 +216,10 @@
         }
 
         .candidate-card {
-            background: rgba(26, 26, 26, 0.6);
+            background: var(--bg-surface);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.10);
-            border-radius: 8px;
+            border: 1px solid var(--border-default);
             padding: 0;
             overflow: hidden;
             transition: all 0.3s ease;
@@ -222,7 +253,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 8px;
             border: 1px solid rgba(160, 160, 160, 0.3);
             box-shadow: none;
         }
@@ -233,8 +263,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(30, 30, 35, 1);
-            border-radius: 8px;
+            background: var(--bg-elevated);
             font-size: 2.8rem;
             font-weight: 600;
             color: #fff;
@@ -250,17 +279,17 @@
         }
 
         .candidate-info h2 {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: var(--serif), Georgia, serif;
             font-size: 2rem;
             font-weight: 600;
             margin: 0 0 0.4rem 0;
-            color: #4C9EEB;
+            color: var(--accent-blue);
             letter-spacing: 0.5px;
         }
 
         .candidate-title {
             font-size: 0.98rem;
-            color: #b0b0b0;
+            color: var(--text-secondary);
             margin: 0 0 1.2rem 0;
             font-weight: 500;
         }
@@ -273,42 +302,42 @@
         }
 
         .odds-value {
-            font-family: 'Inter', sans-serif; font-weight: 600;
+            font-family: var(--sans), sans-serif; font-weight: 600;
             font-size: 2.3rem;
-            color: #4C9EEB;
+            color: var(--accent-blue);
             font-weight: 600;
             line-height: 1;
         }
 
         .odds-label {
             font-size: 0.88rem;
-            color: #a8a8a8;
+            color: var(--text-secondary);
             font-weight: 500;
         }
 
         .candidate-bio {
             padding: 2rem 2rem;
-            border-bottom: 1px solid rgba(160, 160, 160, 0.08);
+            border-bottom: 1px solid var(--border-subtle);
         }
 
         .candidate-bio p {
             margin: 0;
             line-height: 1.8;
-            color: #4C9EEB;
+            color: var(--accent-blue);
             font-size: 0.95rem;
         }
 
         .candidate-endorsements {
             padding: 1.75rem 2rem;
-            border-bottom: 1px solid rgba(160, 160, 160, 0.08);
+            border-bottom: 1px solid var(--border-subtle);
         }
 
         .candidate-endorsements h3 {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: var(--serif), Georgia, serif;
             font-size: 1.3rem;
             font-weight: 600;
             margin: 0 0 1rem 0;
-            color: #4C9EEB;
+            color: var(--accent-blue);
             letter-spacing: 0.3px;
         }
 
@@ -323,30 +352,30 @@
         .candidate-endorsements li {
             padding: 0.5rem 0 0.5rem 1.5rem;
             position: relative;
-            color: #c8c8c8;
+            color: var(--text-secondary);
             font-size: 0.93rem;
             line-height: 1.5;
         }
 
         .candidate-endorsements li:before {
-            content: "→";
+            content: "\2192";
             position: absolute;
             left: 0;
-            color: #4C9EEB;
+            color: var(--accent-blue);
             font-size: 1.1rem;
         }
 
         .candidate-issues {
             padding: 1.75rem 2rem;
-            border-bottom: 1px solid rgba(160, 160, 160, 0.08);
+            border-bottom: 1px solid var(--border-subtle);
         }
 
         .candidate-issues h3 {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: var(--serif), Georgia, serif;
             font-size: 1.3rem;
             font-weight: 600;
             margin: 0 0 1rem 0;
-            color: #4C9EEB;
+            color: var(--accent-blue);
             letter-spacing: 0.3px;
         }
 
@@ -358,11 +387,10 @@
 
         .issue-tag {
             background: rgba(160, 160, 160, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.10);
+            border: 1px solid var(--border-default);
             padding: 0.5rem 0.95rem;
-            border-radius: 8px;
             font-size: 0.88rem;
-            color: #4C9EEB;
+            color: var(--accent-blue);
             font-weight: 500;
             transition: all 0.2s ease;
         }
@@ -376,7 +404,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0;
-            border-top: 1px solid rgba(160, 160, 160, 0.08);
+            border-top: 1px solid var(--border-subtle);
             margin-top: auto;
         }
 
@@ -387,7 +415,7 @@
             justify-content: center;
             padding: 1.25rem 1.5rem;
             text-align: center;
-            color: #4C9EEB;
+            color: var(--accent-blue);
             text-decoration: none;
             font-weight: 600;
             font-size: 0.9rem;
@@ -396,13 +424,13 @@
         }
 
         .fundraising-link {
-            border-right: 1px solid rgba(160, 160, 160, 0.08);
+            border-right: 1px solid var(--border-subtle);
         }
 
         .fundraising-link:hover,
         .campaign-link:hover {
             background: rgba(160, 160, 160, 0.12);
-            color: #4C9EEB;
+            color: var(--accent-blue);
         }
 
         @media (max-width: 768px) {
@@ -412,10 +440,23 @@
 
             .fundraising-link {
                 border-right: none;
-                border-bottom: 1px solid rgba(160, 160, 160, 0.08);
+                border-bottom: 1px solid var(--border-subtle);
             }
         }
     </style>
+
+    <script>
+        function toggleTheme() {
+            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('il9-theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('il9-theme', 'dark');
+            }
+        }
+    </script>
 
 </body>
 </html>

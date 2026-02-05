@@ -8,7 +8,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
 
     <!-- Google Analytics -->
@@ -20,26 +20,43 @@
         gtag('config', 'G-WVTWQBBG8S');
     </script>
 </head>
-<body class="dark-mode">
+<script>
+    (function() {
+        var t = localStorage.getItem('il9-theme');
+        if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+</script>
+<body>
     <div class="site-content">
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
+            <nav class="desktop-nav">
+                <a href="/">Home</a>
+                <a href="/markets">Markets</a>
+                <a href="/candidates">Candidates</a>
+                <a href="/fundraising">Fundraising</a>
+                <a href="/updates">Updates</a>
+                <a href="/methodology" class="active">Methodology</a>
+                <a href="/about">About</a>
+            </nav>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+                <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
             <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
-            <nav id="mobileNav">
+            <nav class="mobile-nav" id="mobileNav">
+                <a href="/">Home</a>
                 <a href="/markets">Markets</a>
                 <a href="/candidates">Candidates</a>
                 <a href="/fundraising">Fundraising</a>
+                <a href="/updates">Updates</a>
                 <a href="/methodology" class="active">Methodology</a>
                 <a href="/about">About</a>
             </nav>
-            <div class="header-actions">
-                <a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer" class="github-link" title="View on GitHub">GitHub</a>
-                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="donate-link" title="Support IL9Cast">Donate</a>
-            </div>
         </header>
 
         <section class="hero">
@@ -114,13 +131,13 @@
                             <li><strong>Why only Kalshi?</strong> Kalshi uses a traditional order book exchange where buyers and sellers post bids and asks. Manifold uses an Automated Market Maker (AMM) that algorithmically sets prices, so order book analysis doesn't apply</li>
                             <li><strong>How it works:</strong> Calculate position in spread = (Last Price - Bid) / (Ask - Bid). Position of 0.0 = traded at bid (sellers aggressive), 0.5 = at midpoint (balanced), 1.0 = at ask (buyers aggressive)</li>
                             <li><strong>Spread dampening:</strong> Wider spreads reduce the adjustment because they indicate less confidence. At 0pp spread: factor = 1.0 (full shift potential). At 10pp spread: factor = 0.2 (heavily dampened)</li>
-                            <li><strong>Example:</strong> Bid=60, Ask=68, Last=66, Mid=64, Spread=8. Position = (66-60)/8 = 0.75 (near ask). Offset = 0.75 - 0.5 = +0.25. Dampening = 1 - (8/10)×0.8 = 0.36. Shift = 0.25 × 6 × 0.36 = +0.54pp. Result = 64 + 0.54 = 64.5% (buyers showed aggression)</li>
-                            <li>Caps shift at ±3 percentage points to avoid overreaction</li>
+                            <li><strong>Example:</strong> Bid=60, Ask=68, Last=66, Mid=64, Spread=8. Position = (66-60)/8 = 0.75 (near ask). Offset = 0.75 - 0.5 = +0.25. Dampening = 1 - (8/10)&times;0.8 = 0.36. Shift = 0.25 &times; 6 &times; 0.36 = +0.54pp. Result = 64 + 0.54 = 64.5% (buyers showed aggression)</li>
+                            <li>Caps shift at &plusmn;3 percentage points to avoid overreaction</li>
                         </ul>
 
                         <h3>The Complete Formula</h3>
                         <div class="formula-box">
-                            Aggregate Probability = (0.40 × Manifold) + (0.42 × Kalshi Last Price) + (0.12 × Kalshi Midpoint) + (0.06 × Kalshi Liquidity-Weighted)
+                            Aggregate Probability = (0.40 &times; Manifold) + (0.42 &times; Kalshi Last Price) + (0.12 &times; Kalshi Midpoint) + (0.06 &times; Kalshi Liquidity-Weighted)
                         </div>
 
                         <h3>Soft Normalization (30% Strength)</h3>
@@ -135,7 +152,7 @@
                         <h3>Chart Smoothing</h3>
                         <p>To produce clean, readable trend lines, the chart pipeline applies multiple smoothing layers:</p>
                         <ul class="method-list">
-                            <li><strong>Spike dampening:</strong> Per-candidate probability changes are capped at ±3 percentage points per 3-minute collection interval, preventing sudden jumps from thin-market trades or API glitches</li>
+                            <li><strong>Spike dampening:</strong> Per-candidate probability changes are capped at &plusmn;3 percentage points per 3-minute collection interval, preventing sudden jumps from thin-market trades or API glitches</li>
                             <li><strong>Exponential Moving Average (EMA):</strong> Chart data is smoothed server-side with an EMA (alpha = 0.15) — each displayed point is 15% new value + 85% previous smoothed value</li>
                             <li><strong>RDP simplification:</strong> The Ramer-Douglas-Peucker algorithm reduces thousands of raw data points to ~200-400 visually significant points, removing redundant noise</li>
                             <li><strong>Monotone cubic interpolation:</strong> The frontend renders curves using monotone splines that prevent overshoot between data points</li>
@@ -219,16 +236,16 @@
                         </div>
                         <p>Each candidate is identified by their FEC candidate ID (format: <code>H6IL09XXX</code>). We map candidate names to their IDs and then query their principal campaign committee for financial data. For example:</p>
                         <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                            <li><strong>Daniel Biss</strong> → H6IL09228 → Committee C00855619</li>
-                            <li><strong>Kat Abughazaleh</strong> → H6IL09178 → Committee C00851154</li>
-                            <li><strong>Mike Simmons</strong> → H6IL09293 → Committee C00857847</li>
+                            <li><strong>Daniel Biss</strong> &rarr; H6IL09228 &rarr; Committee C00855619</li>
+                            <li><strong>Kat Abughazaleh</strong> &rarr; H6IL09178 &rarr; Committee C00851154</li>
+                            <li><strong>Mike Simmons</strong> &rarr; H6IL09293 &rarr; Committee C00857847</li>
                         </ul>
 
                         <h3>Small Dollar Donations</h3>
                         <p>The "Small $%" metric measures grassroots support by calculating what percentage of a candidate's individual contributions come from donations under $200. This is the FEC's standard definition of small-dollar/grassroots fundraising.</p>
                         <p><strong>Calculation formula:</strong></p>
                         <div class="formula-box">
-                            Small Dollar % = (individual_unitemized_contributions ÷ individual_contributions) × 100
+                            Small Dollar % = (individual_unitemized_contributions &divide; individual_contributions) &times; 100
                         </div>
                         <p>The FEC breaks down individual contributions into two categories:</p>
                         <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
@@ -241,16 +258,16 @@
                             Individual contributions (total): $2,702,469.35<br>
                             Unitemized (under $200): $1,898,015.77<br>
                             Itemized ($200+): $804,453.58<br><br>
-                            Small Dollar % = ($1,898,015.77 ÷ $2,702,469.35) × 100 = <strong>70.2%</strong>
+                            Small Dollar % = ($1,898,015.77 &divide; $2,702,469.35) &times; 100 = <strong>70.2%</strong>
                         </div>
                         <p>This means 70.2% of Kat's individual donations came from contributors giving less than $200 — a strong indicator of broad grassroots support.</p>
 
                         <h3>Burn Rate Projections</h3>
                         <p>Burn rate measures how quickly a campaign is spending money, projected forward to estimate monthly cash consumption. We calculate three different burn rate metrics using real disbursement data from FEC Schedule B filings:</p>
                         <div class="formula-box">
-                            <strong>2-Week Burn:</strong> Last 2 weeks expenditures × 2 = monthly rate<br>
+                            <strong>2-Week Burn:</strong> Last 2 weeks expenditures &times; 2 = monthly rate<br>
                             <strong>1-Month Burn:</strong> Last 1 month expenditures = monthly rate<br>
-                            <strong>1.5-Month Burn:</strong> Last 1.5 months expenditures × 0.66 = monthly rate
+                            <strong>1.5-Month Burn:</strong> Last 1.5 months expenditures &times; 0.66 = monthly rate
                         </div>
                         <p>For each candidate, we:</p>
                         <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
@@ -331,7 +348,7 @@
                             <li><strong>3. Normalize names</strong> — Manifold calls her "Kat Abughazaleh" and Kalshi calls her "Katheryn Abughazaleh." We strip prefixes, suffixes, and known variations to get a canonical key for matching.</li>
                             <li><strong>4. Aggregate</strong> — Apply the 40/42/12/6 weighted formula (see the Markets Aggregation section above).</li>
                             <li><strong>5. Soft normalize</strong> — Nudge probabilities 30% toward summing to 100%, so the chart doesn't show the race at 130% or 80% total.</li>
-                            <li><strong>6. Spike dampen</strong> — Compare to the previous snapshot. If any candidate moved more than ±3 percentage points, clamp the change. This prevents chart artifacts from thin-market Kalshi trades.</li>
+                            <li><strong>6. Spike dampen</strong> — Compare to the previous snapshot. If any candidate moved more than &plusmn;3 percentage points, clamp the change. This prevents chart artifacts from thin-market Kalshi trades.</li>
                             <li><strong>7. Save</strong> — Atomically append to the JSONL file.</li>
                         </ul>
                         <p>If <em>both</em> APIs fail (say Manifold is down and Kalshi returns an error), we skip the snapshot entirely. Bad data is worse than missing data — the chart just won't have a point for that 3-minute window, and the gap detection handles it gracefully.</p>
@@ -397,30 +414,34 @@
         </section>
 
         <footer class="site-footer">
+            <hr class="footer-rule">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>About</h4>
+                    <h4>Navigate</h4>
                     <ul>
-                        <li><a href="/about">About IL9Cast</a></li>
+                        <li><a href="/markets">Markets</a></li>
+                        <li><a href="/candidates">Candidates</a></li>
+                        <li><a href="/fundraising">Fundraising</a></li>
                         <li><a href="/methodology">Methodology</a></li>
-                        <li><a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                        <li><a href="/about">About</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>Markets</h4>
+                    <h4>Resources</h4>
                     <ul>
-                        <li><a href="/markets">Live Markets</a></li>
-                        <li><a href="/markets">Download Data</a></li>
-                        <li>Updated every 3 minutes</li>
+                        <li><a href="/api/download/snapshots">Download Data</a></li>
+                        <li><a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                        <li><a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer">Support This Project</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h4>Disclaimer</h4>
-                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data for informational purposes.</p>
+                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data for informational purposes only.</p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 IL9Cast. Built with open data. • Railway & AWS Storage: Live • <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a></p>
+                <span>&copy; 2026 IL9Cast. Built with open data.</span>
+                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a>
             </div>
         </footer>
         <div class="flag-footer-image">
@@ -429,15 +450,6 @@
     </div>
 
     <style>
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #1a1a1a;
-            color: #e0e0e0;
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            min-height: 100vh;
-        }
-
         .methodology-content-page {
             max-width: 900px;
             margin: 0 auto 4rem;
@@ -446,11 +458,8 @@
 
         /* ===== FOLDOUT STYLES ===== */
         .method-foldout {
-            background: rgba(18, 18, 22, 1);
-            
-            -webkit-
-            border: 1px solid rgba(91, 155, 213, 0.25);
-            border-radius: 8px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
             margin-bottom: 1.5rem;
             overflow: hidden;
         }
@@ -470,7 +479,7 @@
         }
 
         .foldout-trigger:hover {
-            background: rgba(91, 155, 213, 0.05);
+            background: var(--bg-elevated, rgba(0,0,0,0.03));
         }
 
         .foldout-trigger-left {
@@ -483,8 +492,8 @@
             width: 44px;
             height: 44px;
             border-radius: 8px;
-            background: rgba(25, 25, 30, 1);
-            border: 1px solid rgba(91, 155, 213, 0.25);
+            background: var(--bg-elevated, rgba(0,0,0,0.03));
+            border: 1px solid var(--border-default);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -492,26 +501,27 @@
         }
 
         .foldout-trigger h2 {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: var(--serif);
             font-size: 1.6rem;
-            font-weight: 600;
-            color: #4C9EEB;
+            font-weight: 700;
+            color: var(--text-primary);
             margin: 0;
             line-height: 1.3;
         }
 
         .foldout-desc {
+            font-family: var(--sans);
             font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.45);
+            color: var(--text-tertiary);
             margin: 0.2rem 0 0 0;
             line-height: 1.4;
         }
 
         .foldout-arrow {
-            font-family: 'Inter', sans-serif;
+            font-family: var(--sans);
             font-size: 1.6rem;
             font-weight: 300;
-            color: rgba(91, 155, 213, 0.5);
+            color: var(--text-tertiary);
             transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             flex-shrink: 0;
             width: 30px;
@@ -546,7 +556,7 @@
         }
 
         .foldout-body .foldout-inner {
-            border-top: 1px solid rgba(160, 160, 160, 0.12);
+            border-top: 1px solid var(--border-default);
             padding-top: 0;
             transition: padding-top 0.4s ease;
         }
@@ -557,8 +567,8 @@
 
         /* Active/open foldout border glow */
         .method-foldout.active {
-            border-color: rgba(91, 155, 213, 0.4);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
         }
 
         /* ===== COMING SOON BLOCK ===== */
@@ -575,43 +585,45 @@
         }
 
         .coming-soon-block h3 {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: var(--serif);
             font-size: 1.5rem;
             font-weight: 600;
-            color: rgba(91, 155, 213, 0.5);
+            color: var(--text-tertiary);
             margin-bottom: 0.8rem;
         }
 
         .coming-soon-block p {
-            color: rgba(255, 255, 255, 0.45);
+            font-family: var(--sans);
+            color: var(--text-tertiary);
             max-width: 550px;
             margin: 0 auto;
             line-height: 1.7;
         }
 
         .coming-soon-block a {
-            color: #4C9EEB;
+            color: var(--accent-blue);
             text-decoration: underline;
         }
 
         /* ===== INNER CONTENT STYLES ===== */
         .foldout-inner h3 {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: var(--serif);
             font-size: 1.4rem;
             font-weight: 600;
             margin-top: 2rem;
             margin-bottom: 1rem;
-            color: #4C9EEB;
+            color: var(--text-primary);
         }
 
         .foldout-inner p {
+            font-family: var(--sans);
             margin-bottom: 1rem;
             line-height: 1.8;
-            color: #c0c0c0;
+            color: var(--text-secondary);
         }
 
         .foldout-inner a {
-            color: #4C9EEB;
+            color: var(--accent-blue);
             text-decoration: underline;
         }
 
@@ -626,62 +638,62 @@
         }
 
         .method-list li {
+            font-family: var(--sans);
             margin-bottom: 0.8rem;
             padding-left: 1.5rem;
             position: relative;
             line-height: 1.6;
-            color: #c0c0c0;
+            color: var(--text-secondary);
         }
 
         .method-list li:before {
             content: "\2192";
             position: absolute;
             left: 0;
-            color: #4C9EEB;
+            color: var(--accent-gold);
         }
 
         .formula-box {
-            font-family: 'Inter', sans-serif; font-weight: 600;
-            background: rgba(25, 25, 30, 1);
-            border-left: 3px solid #4C9EEB;
+            font-family: var(--sans);
+            font-weight: 600;
+            background: var(--bg-elevated, rgba(0,0,0,0.03));
+            border-left: 3px solid var(--accent-gold);
             padding: 1.5rem;
-            border-radius: 4px;
             margin: 1.5rem 0;
             font-size: 1.1rem;
-            color: #e0e0e0;
+            color: var(--text-primary);
         }
 
         /* ===== CONTACT SECTION ===== */
         .method-section {
-            background: rgba(18, 18, 22, 1);
-            
-            -webkit-
-            border: 1px solid rgba(91, 155, 213, 0.25);
-            border-radius: 8px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
             padding: 2.5rem;
             margin-bottom: 2rem;
         }
 
         .method-section h2 {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: var(--serif);
             font-size: 2rem;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 1.5rem;
-            color: #4C9EEB;
+            color: var(--text-primary);
         }
 
         .method-section p {
+            font-family: var(--sans);
             margin-bottom: 1rem;
             line-height: 1.8;
-            color: #c0c0c0;
+            color: var(--text-secondary);
         }
 
         .contact-section {
-            border-color: rgba(91, 155, 213, 0.4);
+            border-left: 3px solid var(--accent-gold);
         }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 600px) {
+            .methodology-content-page { padding: 0 1.25rem; }
             .foldout-trigger {
                 padding: 1.2rem 1.4rem;
             }
@@ -702,18 +714,27 @@
     </style>
 
     <script>
+        function toggleTheme() {
+            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('il9-theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('il9-theme', 'dark');
+            }
+        }
+
         function toggleFoldout(id) {
             const body = document.getElementById('foldout-body-' + id);
             const arrow = document.getElementById('foldout-arrow-' + id);
             const foldout = document.getElementById('foldout-' + id);
-            const isOpen = body.classList.contains('open');
 
             body.classList.toggle('open');
             arrow.classList.toggle('open');
             foldout.classList.toggle('active');
         }
 
-        // Mobile hamburger menu toggle
         function toggleMobileMenu() {
             const hamburger = document.getElementById('hamburger');
             const mobileNav = document.getElementById('mobileNav');
@@ -721,7 +742,6 @@
             mobileNav.classList.toggle('active');
         }
 
-        // Close mobile menu when a link is clicked
         document.querySelectorAll('#mobileNav a').forEach(link => {
             link.addEventListener('click', () => {
                 document.getElementById('hamburger').classList.remove('active');
@@ -729,7 +749,6 @@
             });
         });
 
-        // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
             const hamburger = document.getElementById('hamburger');
             const mobileNav = document.getElementById('mobileNav');

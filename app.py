@@ -1124,6 +1124,10 @@ def markets():
 def fundraising():
     return render_template('fundraising.html')
 
+@app.route('/updates')
+def updates():
+    return render_template('updates.html')
+
 @app.route('/candidates')
 def candidates():
     """Show candidate profiles with live odds and individual charts"""

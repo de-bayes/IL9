@@ -28,8 +28,8 @@
             text-align: center;
         }
         h1 {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: #4C9EEB;
+            font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #31B0B5;
             font-size: 1.8rem;
             margin-bottom: 1rem;
         }
@@ -43,23 +43,26 @@
         a.home-link {
             display: inline-block;
             padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, #4C9EEB 0%, #4A7BA7 100%);
+            background: #1A1A1A;
             color: white;
             text-decoration: none;
-            border-radius: 6px;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: opacity 0.15s ease;
         }
         a.home-link:hover {
-            background: linear-gradient(135deg, #4A7BA7 0%, #3D5A80 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(91, 155, 213, 0.35);
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
     <div class="unsub-card">
         <h1>{% if success %}Unsubscribed{% else %}Error{% endif %}</h1>
+        <p class="message {% if success %}success{% else %}error{% endif %}">{{ message }}</p>
+        <a href="/" class="home-link">Back to IL9Cast</a>
+    </div>
+</body>
+</html>
+bscribed{% else %}Error{% endif %}</h1>
         <p class="message {% if success %}success{% else %}error{% endif %}">{{ message }}</p>
         <a href="/" class="home-link">Back to IL9Cast</a>
     </div>
