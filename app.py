@@ -1128,6 +1128,10 @@ def fundraising():
 def updates():
     return render_template('updates.html')
 
+@app.route('/case-study/bid-ask-spreads')
+def case_study_bid_ask():
+    return render_template('case_study_bid_ask.html')
+
 @app.route('/candidates')
 def candidates():
     """Show candidate profiles with live odds and individual charts"""
@@ -1779,6 +1783,8 @@ def collect_market_data():
                         'last_price': last_price,
                         'midpoint': midpoint,
                         'liquidity': liquidity_price,
+                        'yes_bid': yes_bid,
+                        'yes_ask': yes_ask,
                         'displayName': display_name
                     }
             kalshi_ok = True
@@ -1811,7 +1817,19 @@ def collect_market_data():
                 has_kalshi = kalshi_last > 0 or kalshi_mid > 0
 
                 if has_kalshi:
-                    aggregate = (0.40 * manifold_prob) + (0.42 * kalshi_last) + (0.12 * kalshi_mid) + (0.06 * kalshi_liq)
+                    kalshi_bid = kalshi_info.get('yes_bid', 0)
+                    kalshi_ask = kalshi_info.get('yes_ask', 0)
+                    last_outside_spread = (
+                        kalshi_bid > 0 and kalshi_ask > 0 and
+                        (kalshi_last > kalshi_ask or kalshi_last < kalshi_bid)
+                    )
+                    if last_outside_spread:
+                        # Throttled: reduce last_price weight, boost spread-based components
+                        aggregate = (0.40 * manifold_prob) + (0.20 * kalshi_last) + (0.28 * kalshi_mid) + (0.12 * kalshi_liq)
+                        print(f"  [Spread throttle] {candidate_key}: last={kalshi_last:.1f} outside [{kalshi_bid:.1f}, {kalshi_ask:.1f}]")
+                    else:
+                        # Normal weights
+                        aggregate = (0.40 * manifold_prob) + (0.42 * kalshi_last) + (0.12 * kalshi_mid) + (0.06 * kalshi_liq)
                 else:
                     aggregate = manifold_prob
 

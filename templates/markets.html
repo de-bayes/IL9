@@ -1931,16 +1931,24 @@ async function calculateAggregate() {
 
         let aggregate;
 
+        // Spread-based weight throttle
+        let isThrottled = false;
         if (hasKalshi) {
-            // Full weighted formula for candidates with Kalshi
-            // 40% Manifold + 60% Kalshi (70% last, 20% mid, 10% liquidity)
-            const manifoldContribution = 0.40 * manifoldProb;
-            const kalshiLastContribution = 0.42 * kalshiLast;
-            const kalshiMidContribution = 0.12 * kalshiMid;
-            const kalshiLiqContribution = 0.06 * kalshiLiquidity;
-            aggregate = manifoldContribution + kalshiLastContribution + kalshiMidContribution + kalshiLiqContribution;
+            const kalshiBid = kalshiInfo.yes_bid || 0;
+            const kalshiAsk = kalshiInfo.yes_ask || 0;
+            const lastOutsideSpread = (
+                kalshiBid > 0 && kalshiAsk > 0 &&
+                (kalshiLast > kalshiAsk || kalshiLast < kalshiBid)
+            );
+            if (lastOutsideSpread) {
+                // Throttled: reduce last_price weight, boost spread-based components
+                aggregate = (0.40 * manifoldProb) + (0.20 * kalshiLast) + (0.28 * kalshiMid) + (0.12 * kalshiLiquidity);
+                isThrottled = true;
+            } else {
+                // Normal weights
+                aggregate = (0.40 * manifoldProb) + (0.42 * kalshiLast) + (0.12 * kalshiMid) + (0.06 * kalshiLiquidity);
+            }
         } else {
-            // Use 100% of Manifold probability for candidates without Kalshi
             aggregate = manifoldProb;
         }
 
@@ -1955,11 +1963,11 @@ async function calculateAggregate() {
                 hasKalshi: hasKalshi
             });
 
-            // Store breakdown for display
-            const manifoldContribution = hasKalshi ? (0.40 * manifoldProb) : manifoldProb;
-            const kalshiLastContribution = 0.27 * kalshiLast;
-            const kalshiMidContribution = 0.27 * kalshiMid;
-            const kalshiLiqContribution = 0.06 * kalshiLiquidity;
+            // Store breakdown for display with correct weights
+            const wManifold = hasKalshi ? 0.40 : 1.0;
+            const wLast = isThrottled ? 0.20 : 0.42;
+            const wMid = isThrottled ? 0.28 : 0.12;
+            const wLiq = isThrottled ? 0.12 : 0.06;
 
             breakdowns.push({
                 name: cleanName,
@@ -1967,12 +1975,16 @@ async function calculateAggregate() {
                 kalshiLast: kalshiLast.toFixed(1),
                 kalshiMid: kalshiMid.toFixed(1),
                 kalshiLiq: kalshiLiquidity.toFixed(1),
-                manifoldContribution: manifoldContribution.toFixed(2),
-                kalshiLastContribution: kalshiLastContribution.toFixed(2),
-                kalshiMidContribution: kalshiMidContribution.toFixed(2),
-                kalshiLiqContribution: kalshiLiqContribution.toFixed(2),
+                manifoldContribution: (wManifold * manifoldProb).toFixed(2),
+                kalshiLastContribution: (wLast * kalshiLast).toFixed(2),
+                kalshiMidContribution: (wMid * kalshiMid).toFixed(2),
+                kalshiLiqContribution: (wLiq * kalshiLiquidity).toFixed(2),
                 aggregate: aggregate.toFixed(1),
-                hasKalshi: hasKalshi
+                hasKalshi: hasKalshi,
+                isThrottled: isThrottled,
+                wLast: wLast,
+                wMid: wMid,
+                wLiq: wLiq
             });
         }
     });
@@ -2042,14 +2054,16 @@ function renderBreakdown(breakdowns) {
 
         let calculationHTML;
         if (b.hasKalshi) {
+            const throttleNote = b.isThrottled ? `<div class="breakdown-line" style="margin-top: 0.4rem; color: var(--accent-color); font-size: 0.85em;"><em>Last price outside spread — weight throttled</em></div>` : '';
             calculationHTML = `
                 <div class="breakdown-line"><strong>Manifold:</strong> ${b.manifoldProb}%</div>
-                <div class="breakdown-line"><strong>Kalshi Last Price:</strong> ${b.kalshiLast}%</div>
+                <div class="breakdown-line"><strong>Kalshi Last Price:</strong> ${b.kalshiLast}%${b.isThrottled ? ' <span style="color: var(--accent-color); font-size: 0.85em;">(outside spread)</span>' : ''}</div>
                 <div class="breakdown-line"><strong>Kalshi Midpoint:</strong> ${b.kalshiMid}%</div>
                 <div class="breakdown-line"><strong>Kalshi Liquidity-Weighted:</strong> ${b.kalshiLiq}%</div>
+                ${throttleNote}
                 <div class="breakdown-line" style="margin-top: 0.8rem;">
                     <strong>Calculation:</strong><br>
-                    (0.40 × ${b.manifoldProb}) + (0.27 × ${b.kalshiLast}) + (0.27 × ${b.kalshiMid}) + (0.06 × ${b.kalshiLiq})<br>
+                    (0.40 × ${b.manifoldProb}) + (${b.wLast} × ${b.kalshiLast}) + (${b.wMid} × ${b.kalshiMid}) + (${b.wLiq} × ${b.kalshiLiq})<br>
                     = ${b.manifoldContribution} + ${b.kalshiLastContribution} + ${b.kalshiMidContribution} + ${b.kalshiLiqContribution}
                 </div>
                 <div class="breakdown-result">= ${b.aggregate}%</div>
@@ -2463,9 +2477,44 @@ async function renderMarketTrendChart(candidates) {
     const firstTime = parsedSnapshots[0].date.getTime();
     const nowTime = Date.now();
 
+    // Methodology update vertical line plugin
+    const methodologyLinePlugin = {
+        id: 'methodologyLine',
+        afterDraw(chart) {
+            const updateTimestamp = new Date('2026-02-06T03:30:00Z').getTime();
+            const xScale = chart.scales.x;
+            if (!xScale) return;
+            const xMin = xScale.min;
+            const xMax = xScale.max;
+            if (updateTimestamp < xMin || updateTimestamp > xMax) return;
+
+            const xPixel = xScale.getPixelForValue(updateTimestamp);
+            const chartArea = chart.chartArea;
+            const ctx2 = chart.ctx;
+            const isDarkNow = document.documentElement.getAttribute('data-theme') === 'dark';
+
+            ctx2.save();
+            ctx2.beginPath();
+            ctx2.setLineDash([6, 4]);
+            ctx2.strokeStyle = isDarkNow ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)';
+            ctx2.lineWidth = 1.5;
+            ctx2.moveTo(xPixel, chartArea.top);
+            ctx2.lineTo(xPixel, chartArea.bottom);
+            ctx2.stroke();
+
+            ctx2.setLineDash([]);
+            ctx2.font = "10px 'Source Sans 3', sans-serif";
+            ctx2.fillStyle = isDarkNow ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.45)';
+            ctx2.textAlign = 'center';
+            ctx2.fillText('Methodology update', xPixel, chartArea.top - 6);
+            ctx2.restore();
+        }
+    };
+
     marketChart = new Chart(ctx, {
         type: 'line',
         data: { datasets },
+        plugins: [methodologyLinePlugin],
         options: {
             responsive: true,
             maintainAspectRatio: false,

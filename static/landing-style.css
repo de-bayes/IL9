@@ -629,6 +629,87 @@ header {
 }
 
 /* ============================================
+   FEATURED CARD — Case study link on homepage
+   ============================================ */
+
+.featured-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--border-default);
+    border-top: 3px solid var(--accent-gold);
+    background: var(--bg-surface);
+    margin-top: 1.25rem;
+    transition: background 0.15s ease;
+}
+
+.featured-card:hover {
+    background: var(--bg-surface-hover);
+}
+
+.featured-card-inner {
+    padding: 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.featured-card-tag {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--bg-primary);
+    background: var(--accent-gold);
+    padding: 0.2em 0.6em;
+    align-self: flex-start;
+}
+
+.featured-card-title {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-primary);
+}
+
+.featured-card-desc {
+    font-family: var(--sans);
+    font-size: 0.925rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    max-width: 600px;
+}
+
+.featured-card-arrow {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+    transition: color 0.15s ease;
+}
+
+.featured-card:hover .featured-card-arrow {
+    color: var(--accent-blue);
+}
+
+@media (max-width: 600px) {
+    .featured-card-inner {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .featured-card-title {
+        font-size: 1.25rem;
+    }
+
+    .featured-card-desc {
+        font-size: 0.875rem;
+    }
+}
+
+/* ============================================
    FOOTER — Minimal editorial
    ============================================ */
 

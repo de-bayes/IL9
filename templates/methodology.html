@@ -140,6 +140,35 @@
                             Aggregate Probability = (0.40 &times; Manifold) + (0.42 &times; Kalshi Last Price) + (0.12 &times; Kalshi Midpoint) + (0.06 &times; Kalshi Liquidity-Weighted)
                         </div>
 
+                        <h3>Why Aggregation Beats Single-Source Data: The Laura Fine Example</h3>
+                        <p>A real incident during this race perfectly illustrates why IL9Cast's multi-source approach is more reliable than watching a single market.</p>
+
+                        <p><strong>What happened:</strong> A trader on Kalshi bought Laura Fine yes-contracts aggressively, pushing the <strong>last trade price all the way up to 30%</strong>. Then they stopped. The market maker immediately placed no-orders at 16%, while existing yes-orders sat unfilled at 14%. For quite a while, <strong>Kalshi's displayed probability showed 30%</strong> — based solely on that last executed trade.</p>
+
+                        <p><strong>The reality:</strong> The actual market consensus was a <strong>14-16% spread</strong>. No one was willing to buy above 14%, and no one was willing to sell below 16%. The 30% price was a single trade artifact, not a reflection of genuine market sentiment.</p>
+
+                        <p><strong>IL9Cast's response:</strong> Our aggregated probability showed the upward price movement <em>somewhat</em> — the trade did contain real information — but stayed grounded around the spread rather than jumping to 30%. Here's why:</p>
+                        <ul class="method-list">
+                            <li><strong>Manifold's 40% weight</strong> provided a stabilizing second opinion that didn't react to the thin Kalshi trade</li>
+                            <li><strong>Midpoint component (12%)</strong> used the 14-16% spread, reporting ~15% instead of 30%</li>
+                            <li><strong>Liquidity-weighted component (6%)</strong> also used spread-based pricing rather than the outlier trade</li>
+                            <li><strong>Spike dampening</strong> capped the change to ±3 percentage points per 3-minute interval, preventing wild single-trade swings</li>
+                        </ul>
+
+                        <p>The result: while Kalshi briefly showed Laura Fine at 30%, IL9Cast accurately reflected the true market state — modest upward movement constrained by the actual bid-ask reality. This is exactly the kind of thin-market artifact our aggregation approach is designed to filter out.</p>
+
+                        <p><strong>The takeaway:</strong> Single prediction markets can be misleading when liquidity is low or a single large trade occurs. By combining multiple price signals and applying dampening, IL9Cast gives you a clearer, more stable view of the race.</p>
+
+                        <h3>Spread-Based Weight Throttle <span style="font-weight: normal; font-size: 0.85em; color: var(--text-secondary);">(Feb 2026)</span></h3>
+                        <p>When a Kalshi last trade price falls <strong>outside the current bid-ask spread</strong>, its weight in the aggregate is automatically reduced. This prevents stale or outlier trades from disproportionately influencing the forecast.</p>
+                        <ul class="method-list">
+                            <li><strong>Normal weights</strong> (last price within spread): 40% Manifold, 42% Kalshi Last, 12% Midpoint, 6% Liquidity-Weighted</li>
+                            <li><strong>Throttled weights</strong> (last price outside spread): 40% Manifold, 20% Kalshi Last, 28% Midpoint, 12% Liquidity-Weighted</li>
+                            <li><strong>Why not zero:</strong> Even an outlier trade contains some price signal &mdash; a buyer was willing to pay that price &mdash; so we reduce its influence rather than ignoring it entirely</li>
+                            <li><strong>Thin markets unaffected:</strong> When <code>yes_bid = 0</code> (no buy-side orders), the throttle does not activate. These cases are already handled by the separate thin-market fallback that uses <code>last_price</code> directly</li>
+                        </ul>
+                        <p>Using the Laura Fine example above: with last_price at 30% but the spread at 14&ndash;16%, the throttle would shift weight toward the spread-based components (midpoint ~15%, liquidity-weighted ~15%), keeping the aggregate grounded near market consensus instead of being pulled toward the 30% outlier.</p>
+
                         <h3>Soft Normalization (30% Strength)</h3>
                         <p>Final probabilities are lightly normalized to prevent excessive drift while preserving raw market values:</p>
                         <ul class="method-list">

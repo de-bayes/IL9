@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bid-Ask Spreads Even Moses Can't Part - IL9Cast</title>
+    <meta name="description" content="How one outsized Kalshi trade exposed the flaw in raw prediction market data — and why IL9Cast didn't flinch.">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WVTWQBBG8S"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-WVTWQBBG8S');
+    </script>
+</head>
+<script>
+    (function() {
+        var t = localStorage.getItem('il9-theme');
+        if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+</script>
+<body>
+    <div class="site-content">
+        <header>
+            <a href="/" class="logo">IL9<span>Cast</span></a>
+            <nav class="desktop-nav">
+                <a href="/markets">Markets</a>
+                <a href="/candidates">Candidates</a>
+                <a href="/fundraising">Fundraising</a>
+                <a href="/odds">Model</a>
+                <a href="/updates">Updates</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/about">About</a>
+            </nav>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+                <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="mobile-nav" id="mobileNav">
+                <a href="/markets">Markets</a>
+                <a href="/candidates">Candidates</a>
+                <a href="/fundraising">Fundraising</a>
+                <a href="/odds">Model</a>
+                <a href="/updates">Updates</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/about">About</a>
+            </nav>
+        </header>
+
+        <article class="case-study-page">
+            <div class="case-study-meta">
+                <a href="/" class="case-study-back">&larr; Back to IL9Cast</a>
+                <div class="case-study-meta-row">
+                    <span class="case-study-tag">Analysis</span>
+                    <span class="case-study-date">February 2026</span>
+                </div>
+            </div>
+
+            <h1 class="case-study-headline">Bid-Ask Spreads Even Moses Can't Part</h1>
+            <p class="case-study-dek">How one outsized Kalshi trade exposed the flaw in raw prediction market data &mdash; and why IL9Cast didn't flinch.</p>
+
+            <div class="case-study-body">
+                <p class="case-study-lede">Moses parted the Red Sea and walked through on dry ground. Last week, a trader on Kalshi tried something similar &mdash; they parted right through Laura Fine's bid-ask spread and kept going.</p>
+
+                <p>Here's what happened. Laura Fine's Kalshi market had a <strong>bid-ask spread of 14&ndash;16%</strong>. That means the most any buyer was willing to pay was 14 cents, and the cheapest any seller would accept was 16 cents. That two-cent gap <em>is</em> the market's actual consensus &mdash; quiet, unglamorous, and real.</p>
+
+                <p>Then someone bought aggressively. They swept through every ask on the order book, pushing the last trade price all the way to <strong>30%</strong>. Kalshi's headline number &mdash; the one most people see &mdash; dutifully updated to 30%. To a casual observer, Laura Fine had just doubled her odds overnight.</p>
+
+                <p>But she hadn't. The moment that buyer stopped, the spread settled right back to 14&ndash;16%. No one else was willing to pay anywhere near 30%. The sea closed back in.</p>
+
+                <div class="case-study-callout">
+                    <div class="case-study-callout-label">The problem</div>
+                    <p>Most prediction market trackers would have shown you <strong>30%</strong>. That's the last trade price &mdash; the number Kalshi displays, the number APIs return, the number every aggregator blindly passes through. It's technically correct and practically useless.</p>
+                </div>
+
+                <p>Think of it this way: the last trade price is where Moses is standing &mdash; on dry ground in the middle of the sea. Impressive, temporary, and not where you'd want to build a house. The <strong>bid-ask spread</strong> is the walls of water on either side. It tells you where the sea actually is, and where it's about to return.</p>
+
+                <h2>What IL9Cast saw instead</h2>
+
+                <p>IL9Cast didn't show 30%. Not even close. Here's why, layer by layer:</p>
+
+                <div class="case-study-layers">
+                    <div class="case-study-layer">
+                        <div class="case-study-layer-name">Manifold Markets <span class="case-study-weight">40% weight</span></div>
+                        <div class="case-study-layer-desc">Manifold runs a completely separate market with its own traders. It never reacted to the Kalshi spike. This alone anchored 40% of our aggregate to reality.</div>
+                    </div>
+                    <div class="case-study-layer">
+                        <div class="case-study-layer-name">Kalshi Midpoint <span class="case-study-weight">12% &rarr; 28%</span></div>
+                        <div class="case-study-layer-desc">We calculate the midpoint of the <em>current</em> bid-ask spread: (14 + 16) / 2 = 15%. Not 30%. And because the last price was outside the spread, our new spread-based throttle boosted this component's weight from 12% to 28%.</div>
+                    </div>
+                    <div class="case-study-layer">
+                        <div class="case-study-layer-name">Kalshi Last Price <span class="case-study-weight">42% &rarr; 20%</span></div>
+                        <div class="case-study-layer-desc">The outlier trade <em>does</em> contain some signal &mdash; someone was willing to pay 30 cents. We don't ignore it. But our spread throttle detects that last price (30%) is above the ask (16%), and automatically cuts its weight from 42% down to 20%.</div>
+                    </div>
+                    <div class="case-study-layer">
+                        <div class="case-study-layer-name">Liquidity-Weighted <span class="case-study-weight">6% &rarr; 12%</span></div>
+                        <div class="case-study-layer-desc">This component uses the spread to calculate a volume-adjusted price, landing around 15%. Its weight doubles under the throttle, further anchoring the aggregate to the spread.</div>
+                    </div>
+                    <div class="case-study-layer">
+                        <div class="case-study-layer-name">Spike Dampening <span class="case-study-weight">&plusmn;3% cap</span></div>
+                        <div class="case-study-layer-desc">Even after all that weighting, the final change is capped at 3 percentage points per 3-minute interval. The outlier bleeds in slowly &mdash; and usually gets corrected before it matters.</div>
+                    </div>
+                </div>
+
+                <p>The result: while Kalshi's headline read 30%, IL9Cast showed Laura Fine around <strong>15&ndash;17%</strong> &mdash; almost exactly where the spread said the market actually was. No drama, no misleading spike, just the real number.</p>
+
+                <h2>Why not just ignore the outlier entirely?</h2>
+
+                <p>It's tempting to throw out the last trade price when it's clearly an outlier. But that would be throwing out real information. Someone <em>did</em> pay 30 cents for Laura Fine contracts. Maybe they know something. Maybe they're wrong. The market will sort it out.</p>
+
+                <p>Our approach is to <strong>listen but not defer</strong>. The outlier trade gets 20% weight instead of 42% &mdash; still a voice at the table, but no longer the loudest one. The spread-based components (midpoint and liquidity-weighted price) take up the slack, keeping the aggregate grounded in what the market is actually willing to trade at <em>right now</em>.</p>
+
+                <h2>The Moses test</h2>
+
+                <p>Here's a useful heuristic: if the last trade price is standing on dry ground that <em>should</em> be underwater, don't trust it. The sea will return.</p>
+
+                <p>Every prediction market has these moments &mdash; a big order sweeps the book, the headline number lurches, and a thousand dashboards parrot the spike as if it's gospel. The spread is still sitting there, quietly telling you the truth.</p>
+
+                <div class="case-study-callout case-study-callout-teal">
+                    <div class="case-study-callout-label">The takeaway</div>
+                    <p>Raw prediction market prices tell you what happened last. IL9Cast tells you what the market actually thinks <em>right now</em>. The difference matters most exactly when the stakes are highest &mdash; when a single trade is trying to part the sea.</p>
+                </div>
+
+                <div class="case-study-footer-nav">
+                    <a href="/methodology" class="btn-secondary">Read our full methodology &rarr;</a>
+                    <a href="/markets" class="btn-primary">View live markets &rarr;</a>
+                </div>
+            </div>
+        </article>
+
+        <footer class="site-footer">
+            <hr class="footer-rule">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Navigate</h4>
+                    <ul>
+                        <li><a href="/markets">Markets</a></li>
+                        <li><a href="/candidates">Candidates</a></li>
+                        <li><a href="/fundraising">Fundraising</a></li>
+                        <li><a href="/methodology">Methodology</a></li>
+                        <li><a href="/about">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="/api/download/snapshots">Download Data</a></li>
+                        <li><a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                        <li><a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer">Support This Project</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Disclaimer</h4>
+                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data for informational purposes only.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 IL9Cast. Built with open data.</span>
+                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a>
+            </div>
+        </footer>
+        <div class="flag-footer-image">
+            <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer">
+        </div>
+    </div>
+
+    <style>
+        .case-study-page {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 3rem 2rem 4rem;
+        }
+
+        .case-study-meta {
+            margin-bottom: 2rem;
+        }
+
+        .case-study-back {
+            font-family: var(--sans);
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        .case-study-back:hover {
+            color: var(--text-primary);
+        }
+
+        .case-study-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1.25rem;
+        }
+
+        .case-study-tag {
+            font-family: var(--sans);
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--bg-primary);
+            background: var(--accent-gold);
+            padding: 0.2em 0.6em;
+        }
+
+        .case-study-date {
+            font-family: var(--sans);
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+
+        .case-study-headline {
+            font-family: var(--serif);
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.15;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .case-study-dek {
+            font-family: var(--sans);
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .case-study-body p {
+            font-family: var(--sans);
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.85;
+            margin-bottom: 1.25rem;
+        }
+
+        .case-study-body p strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .case-study-lede {
+            font-size: 1.1rem !important;
+            color: var(--text-primary) !important;
+        }
+
+        .case-study-body h2 {
+            font-family: var(--serif);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 2.5rem 0 1.25rem;
+        }
+
+        .case-study-callout {
+            border-left: 3px solid var(--accent-gold);
+            background: var(--bg-elevated);
+            padding: 1.5rem 1.75rem;
+            margin: 2rem 0;
+        }
+
+        .case-study-callout-teal {
+            border-left-color: var(--accent-teal);
+        }
+
+        .case-study-callout-label {
+            font-family: var(--sans);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin-bottom: 0.6rem;
+        }
+
+        .case-study-callout p {
+            margin-bottom: 0 !important;
+            font-size: 0.95rem !important;
+        }
+
+        .case-study-layers {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            background: var(--border-default);
+            border: 1px solid var(--border-default);
+            margin: 1.5rem 0 2rem;
+        }
+
+        .case-study-layer {
+            background: var(--bg-surface);
+            padding: 1.25rem 1.5rem;
+        }
+
+        .case-study-layer-name {
+            font-family: var(--sans);
+            font-size: 0.925rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.4rem;
+        }
+
+        .case-study-weight {
+            font-weight: 500;
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+            margin-left: 0.5rem;
+        }
+
+        .case-study-layer-desc {
+            font-family: var(--sans);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.65;
+        }
+
+        .case-study-footer-nav {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-default);
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .case-study-page {
+                padding: 2rem 1.5rem 3rem;
+            }
+            .case-study-headline {
+                font-size: 2rem;
+            }
+            .case-study-dek {
+                font-size: 1.05rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .case-study-page {
+                padding: 1.5rem 1.25rem 2.5rem;
+            }
+            .case-study-headline {
+                font-size: 1.6rem;
+            }
+            .case-study-body p {
+                font-size: 0.925rem;
+            }
+            .case-study-body h2 {
+                font-size: 1.2rem;
+            }
+            .case-study-footer-nav {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .case-study-footer-nav .btn-primary,
+            .case-study-footer-nav .btn-secondary {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+
+    <script>
+        function toggleTheme() {
+            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('il9-theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('il9-theme', 'dark');
+            }
+        }
+
+        function toggleMobileMenu() {
+            const hamburger = document.getElementById('hamburger');
+            const mobileNav = document.getElementById('mobileNav');
+            hamburger.classList.toggle('active');
+            mobileNav.classList.toggle('active');
+        }
+
+        document.querySelectorAll('#mobileNav a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('hamburger').classList.remove('active');
+                document.getElementById('mobileNav').classList.remove('active');
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            const hamburger = document.getElementById('hamburger');
+            const mobileNav = document.getElementById('mobileNav');
+            if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) {
+                hamburger.classList.remove('active');
+                mobileNav.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
