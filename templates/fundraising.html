@@ -764,7 +764,7 @@
                                 lineWidth: 1
                             },
                             ticks: {
-                                color: chartTickMuted,
+                                color: isDark ? 'rgba(220, 220, 220, 0.85)' : chartTickMuted,
                                 font: {
                                     size: 11
                                 },
@@ -811,7 +811,7 @@
                                 drawOnChartArea: false
                             },
                             ticks: {
-                                color: 'rgba(180, 215, 245, 1)',
+                                color: isDark ? 'rgba(91, 184, 245, 1)' : 'rgba(15, 40, 100, 1)',
                                 font: {
                                     size: 11
                                 },
@@ -822,7 +822,7 @@
                             title: {
                                 display: true,
                                 text: 'Spent % of Raised',
-                                color: 'rgba(180, 215, 245, 1)',
+                                color: isDark ? 'rgba(91, 184, 245, 1)' : 'rgba(15, 40, 100, 1)',
                                 font: {
                                     size: 13,
                                     weight: 'bold'
