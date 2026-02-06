@@ -1776,8 +1776,10 @@ def collect_market_data():
                         position_in_spread = max(0, min(1, (last_price - yes_bid) / spread))
                         offset_from_mid = position_in_spread - 0.5
                         spread_factor = max(0.2, 1 - (spread / 10) * 0.8)
-                        price_shift = max(-3, min(3, offset_from_mid * 6 * spread_factor))
-                        liquidity_price = max(0, min(100, midpoint + price_shift))
+                        # Multiply by spread (not a fixed constant) so the shift is
+                        # proportional to the spread width and can never leave [bid, ask].
+                        price_shift = offset_from_mid * spread * spread_factor
+                        liquidity_price = max(yes_bid, min(yes_ask, midpoint + price_shift))
 
                     kalshi_data[name] = {
                         'last_price': last_price,
