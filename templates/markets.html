@@ -509,7 +509,7 @@
         .leader-sub-value {
             font-size: 1.25rem;
             font-weight: 700;
-            color: var(--text-secondary);
+            color: var(--accent-blue);
             font-family: var(--sans);
             line-height: 1;
         }
@@ -1713,6 +1713,10 @@ function toggleTheme() {
     } else {
         document.documentElement.setAttribute('data-theme', 'dark');
         localStorage.setItem('il9-theme', 'dark');
+    }
+    // Re-render chart with updated theme colors
+    if (candidatesData && candidatesData.length > 0) {
+        renderMarketTrendChart(candidatesData);
     }
 }
 
