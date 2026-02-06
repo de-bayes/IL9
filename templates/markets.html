@@ -2056,10 +2056,10 @@ function renderBreakdown(breakdowns) {
         if (b.hasKalshi) {
             const throttleNote = b.isThrottled ? `<div class="breakdown-line" style="margin-top: 0.4rem; color: var(--accent-color); font-size: 0.85em;"><em>Last price outside spread — weight throttled</em></div>` : '';
             calculationHTML = `
-                <div class="breakdown-line"><strong>Manifold:</strong> ${b.manifoldProb}%</div>
-                <div class="breakdown-line"><strong>Kalshi Last Price:</strong> ${b.kalshiLast}%${b.isThrottled ? ' <span style="color: var(--accent-color); font-size: 0.85em;">(outside spread)</span>' : ''}</div>
-                <div class="breakdown-line"><strong>Kalshi Midpoint:</strong> ${b.kalshiMid}%</div>
-                <div class="breakdown-line"><strong>Kalshi Liquidity-Weighted:</strong> ${b.kalshiLiq}%</div>
+                <div class="breakdown-line"><strong>Manifold:</strong> <span style="color: var(--accent-blue); font-weight: 600;">${b.manifoldProb}%</span></div>
+                <div class="breakdown-line"><strong>Kalshi Last Price:</strong> <span style="color: var(--accent-blue); font-weight: 600;">${b.kalshiLast}%</span>${b.isThrottled ? ' <span style="color: var(--accent-color); font-size: 0.85em;">(outside spread)</span>' : ''}</div>
+                <div class="breakdown-line"><strong>Kalshi Midpoint:</strong> <span style="color: var(--accent-blue); font-weight: 600;">${b.kalshiMid}%</span></div>
+                <div class="breakdown-line"><strong>Kalshi Liquidity-Weighted:</strong> <span style="color: var(--accent-blue); font-weight: 600;">${b.kalshiLiq}%</span></div>
                 ${throttleNote}
                 <div class="breakdown-line" style="margin-top: 0.8rem;">
                     <strong>Calculation:</strong><br>
@@ -2071,7 +2071,7 @@ function renderBreakdown(breakdowns) {
             `;
         } else {
             calculationHTML = `
-                <div class="breakdown-line"><strong>Manifold:</strong> ${b.manifoldProb}%</div>
+                <div class="breakdown-line"><strong>Manifold:</strong> <span style="color: var(--accent-blue); font-weight: 600;">${b.manifoldProb}%</span></div>
                 <div class="breakdown-line" style="color: var(--text-secondary);"><strong>Kalshi:</strong> No market available</div>
                 <div class="breakdown-line" style="margin-top: 0.8rem;">
                     <strong>Calculation:</strong><br>
@@ -2368,7 +2368,7 @@ async function renderMarketTrendChart(candidates) {
 
     // Theme-aware chart colors
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const chartTextColor = isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)';
+    const chartTextColor = isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.7)';
     const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
     const chartLegendColor = isDark ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.7)';
     const tooltipBg = isDark ? 'rgba(0,0,0,0.9)' : 'rgba(30,30,30,0.9)';
