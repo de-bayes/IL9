@@ -24,7 +24,7 @@
 <script>
     (function() {
         var t = localStorage.getItem('il9-theme');
-        if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        if (t !== 'light') document.documentElement.setAttribute('data-theme', 'dark');
     })();
 </script>
 <body>
@@ -32,10 +32,10 @@
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
             <nav class="desktop-nav">
-                <a href="/">Home</a>
                 <a href="/markets">Markets</a>
                 <a href="/candidates">Candidates</a>
                 <a href="/fundraising" class="active">Fundraising</a>
+                <a href="/odds">Model</a>
                 <a href="/updates">Updates</a>
                 <a href="/methodology">Methodology</a>
                 <a href="/about">About</a>
@@ -50,10 +50,10 @@
                 <span></span>
             </button>
             <nav class="mobile-nav" id="mobileNav">
-                <a href="/">Home</a>
                 <a href="/markets">Markets</a>
                 <a href="/candidates">Candidates</a>
                 <a href="/fundraising" class="active">Fundraising</a>
+                <a href="/odds">Model</a>
                 <a href="/updates">Updates</a>
                 <a href="/methodology">Methodology</a>
                 <a href="/about">About</a>
