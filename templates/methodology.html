@@ -735,6 +735,35 @@
             foldout.classList.toggle('active');
         }
 
+        function openFoldout(id) {
+            const body = document.getElementById('foldout-body-' + id);
+            const arrow = document.getElementById('foldout-arrow-' + id);
+            const foldout = document.getElementById('foldout-' + id);
+            if (body && !body.classList.contains('open')) {
+                body.classList.add('open');
+                arrow.classList.add('open');
+                foldout.classList.add('active');
+            }
+        }
+
+        // Auto-open foldout and scroll to target if URL has a hash fragment
+        window.addEventListener('DOMContentLoaded', function() {
+            var hash = window.location.hash;
+            if (!hash) return;
+            var target = document.querySelector(hash);
+            if (!target) return;
+
+            // Find which foldout contains this target
+            var foldout = target.closest('.method-foldout');
+            if (foldout) {
+                var foldoutId = foldout.id.replace('foldout-', '');
+                openFoldout(foldoutId);
+                setTimeout(function() {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+            }
+        });
+
         function toggleMobileMenu() {
             const hamburger = document.getElementById('hamburger');
             const mobileNav = document.getElementById('mobileNav');
