@@ -69,23 +69,23 @@
             </div>
 
             <h1 class="case-study-headline">Bid-Ask Spreads Even Moses Can't Part</h1>
-            <p class="case-study-dek">How one outsized Kalshi trade exposed the flaw in raw prediction market data &mdash; and why IL9Cast didn't flinch.</p>
+            <p class="case-study-dek">How one outsized Kalshi trade exposed the flaw in raw prediction market data, and why IL9Cast didn't flinch.</p>
 
             <div class="case-study-body">
-                <p class="case-study-lede">Moses parted the Red Sea and walked through on dry ground. Last week, a trader on Kalshi tried something similar &mdash; they parted right through Laura Fine's bid-ask spread and kept going.</p>
+                <p class="case-study-lede">Moses parted the Red Sea and walked through on dry ground. Last week, a trader on Kalshi tried something similar, parting right through Laura Fine's bid-ask spread and keeping going.</p>
 
-                <p>Here's what happened. Laura Fine's Kalshi market had a <strong>bid-ask spread of 14&ndash;16%</strong>. That means the most any buyer was willing to pay was 14 cents, and the cheapest any seller would accept was 16 cents. That two-cent gap <em>is</em> the market's actual consensus &mdash; quiet, unglamorous, and real.</p>
+                <p>Here's what happened. Laura Fine's Kalshi market had a <strong>bid-ask spread of 14&ndash;16%</strong>. That means the most any buyer was willing to pay was 14 cents, and the cheapest any seller would accept was 16 cents. That two-cent gap <em>is</em> the market's actual consensus: quiet, unglamorous, and real.</p>
 
-                <p>Then someone bought aggressively. They swept through every ask on the order book, pushing the last trade price all the way to <strong>30%</strong>. Kalshi's headline number &mdash; the one most people see &mdash; dutifully updated to 30%. To a casual observer, Laura Fine had just doubled her odds overnight.</p>
+                <p>Then someone bought aggressively. They swept through every ask on the order book, pushing the last trade price all the way to <strong>30%</strong>. Kalshi's headline number dutifully updated to 30%. To a casual observer, Laura Fine had just doubled her odds overnight.</p>
 
-                <p>But she hadn't. The moment that buyer stopped, the spread settled right back to 14&ndash;16%. No one else was willing to pay anywhere near 30%. The sea closed back in.</p>
+                <p>But she hadn't. The moment that buyer stopped, the spread settled right back to 14&ndash;16%. No one else was willing to pay anywhere near 30%.</p>
 
                 <div class="case-study-callout">
                     <div class="case-study-callout-label">The problem</div>
-                    <p>Most prediction market trackers would have shown you <strong>30%</strong>. That's the last trade price &mdash; the number Kalshi displays, the number APIs return, the number every aggregator blindly passes through. It's technically correct and practically useless.</p>
+                    <p>Most prediction market trackers would have shown you <strong>30%</strong>. That's the last trade price: the number Kalshi displays, the number APIs return, the number every aggregator blindly passes through. It's technically correct and practically useless.</p>
                 </div>
 
-                <p>Think of it this way: the last trade price is where Moses is standing &mdash; on dry ground in the middle of the sea. Impressive, temporary, and not where you'd want to build a house. The <strong>bid-ask spread</strong> is the walls of water on either side. It tells you where the sea actually is, and where it's about to return.</p>
+                <p>The last trade price tells you where a transaction <em>happened</em>. The bid-ask spread tells you where the market actually <em>is</em>. When those two diverge, you have to choose which one to trust. Most trackers don't even notice the difference.</p>
 
                 <h2>What IL9Cast saw instead</h2>
 
@@ -98,11 +98,11 @@
                     </div>
                     <div class="case-study-layer">
                         <div class="case-study-layer-name">Kalshi Midpoint <span class="case-study-weight">12% &rarr; 28%</span></div>
-                        <div class="case-study-layer-desc">We calculate the midpoint of the <em>current</em> bid-ask spread: (14 + 16) / 2 = 15%. Not 30%. And because the last price was outside the spread, our new spread-based throttle boosted this component's weight from 12% to 28%.</div>
+                        <div class="case-study-layer-desc">We calculate the midpoint of the <em>current</em> bid-ask spread: (14 + 16) / 2 = 15%. Not 30%. Because the last price was outside the spread, our spread-based throttle boosted this component's weight from 12% to 28%.</div>
                     </div>
                     <div class="case-study-layer">
                         <div class="case-study-layer-name">Kalshi Last Price <span class="case-study-weight">42% &rarr; 20%</span></div>
-                        <div class="case-study-layer-desc">The outlier trade <em>does</em> contain some signal &mdash; someone was willing to pay 30 cents. We don't ignore it. But our spread throttle detects that last price (30%) is above the ask (16%), and automatically cuts its weight from 42% down to 20%.</div>
+                        <div class="case-study-layer-desc">The outlier trade <em>does</em> contain some signal (someone was willing to pay 30 cents), so we don't ignore it. But our spread throttle detects that last price (30%) is above the ask (16%), and automatically cuts its weight from 42% down to 20%.</div>
                     </div>
                     <div class="case-study-layer">
                         <div class="case-study-layer-name">Liquidity-Weighted <span class="case-study-weight">6% &rarr; 12%</span></div>
@@ -110,27 +110,25 @@
                     </div>
                     <div class="case-study-layer">
                         <div class="case-study-layer-name">Spike Dampening <span class="case-study-weight">&plusmn;3% cap</span></div>
-                        <div class="case-study-layer-desc">Even after all that weighting, the final change is capped at 3 percentage points per 3-minute interval. The outlier bleeds in slowly &mdash; and usually gets corrected before it matters.</div>
+                        <div class="case-study-layer-desc">Even after all that weighting, the final change is capped at 3 percentage points per 3-minute interval. The outlier bleeds in slowly and usually gets corrected before it matters.</div>
                     </div>
                 </div>
 
-                <p>The result: while Kalshi's headline read 30%, IL9Cast showed Laura Fine around <strong>15&ndash;17%</strong> &mdash; almost exactly where the spread said the market actually was. No drama, no misleading spike, just the real number.</p>
+                <p>The result: while Kalshi's headline read 30%, IL9Cast showed Laura Fine around <strong>15&ndash;17%</strong>, almost exactly where the spread said the market actually was. No drama, no misleading spike, just the real number.</p>
 
                 <h2>Why not just ignore the outlier entirely?</h2>
 
                 <p>It's tempting to throw out the last trade price when it's clearly an outlier. But that would be throwing out real information. Someone <em>did</em> pay 30 cents for Laura Fine contracts. Maybe they know something. Maybe they're wrong. The market will sort it out.</p>
 
-                <p>Our approach is to <strong>listen but not defer</strong>. The outlier trade gets 20% weight instead of 42% &mdash; still a voice at the table, but no longer the loudest one. The spread-based components (midpoint and liquidity-weighted price) take up the slack, keeping the aggregate grounded in what the market is actually willing to trade at <em>right now</em>.</p>
+                <p>Our approach is to <strong>listen but not defer</strong>. The outlier trade gets 20% weight instead of 42%, still a voice at the table but no longer the loudest one. The spread-based components (midpoint and liquidity-weighted price) take up the slack, keeping the aggregate grounded in what the market is actually willing to trade at <em>right now</em>.</p>
 
-                <h2>The Moses test</h2>
+                <h2>The bottom line</h2>
 
-                <p>Here's a useful heuristic: if the last trade price is standing on dry ground that <em>should</em> be underwater, don't trust it. The sea will return.</p>
-
-                <p>Every prediction market has these moments &mdash; a big order sweeps the book, the headline number lurches, and a thousand dashboards parrot the spike as if it's gospel. The spread is still sitting there, quietly telling you the truth.</p>
+                <p>Every prediction market has these moments. A big order sweeps the book, the headline number lurches, and a thousand dashboards parrot the spike as if it's gospel. The spread is still sitting there, quietly telling you the truth.</p>
 
                 <div class="case-study-callout case-study-callout-teal">
                     <div class="case-study-callout-label">The takeaway</div>
-                    <p>Raw prediction market prices tell you what happened last. IL9Cast tells you what the market actually thinks <em>right now</em>. The difference matters most exactly when the stakes are highest &mdash; when a single trade is trying to part the sea.</p>
+                    <p>Raw prediction market prices tell you what happened last. IL9Cast tells you what the market actually thinks <em>right now</em>. The difference matters most exactly when the stakes are highest &mdash; when a single trade tries to part the sea.</p>
                 </div>
 
                 <div class="case-study-footer-nav">
