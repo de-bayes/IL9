@@ -11,9 +11,9 @@
 :root {
     /* Light editorial palette (default) */
     --bg-primary:       #F5F0E8;
-    --bg-surface:       #ECE7DD;
-    --bg-surface-hover: #E5E0D6;
-    --bg-elevated:      #E0DACF;
+    --bg-surface:       #E3DDD2;
+    --bg-surface-hover: #DBD5C9;
+    --bg-elevated:      #D4CEC2;
     --border-subtle:    rgba(0,0,0,0.06);
     --border-default:   rgba(0,0,0,0.10);
     --border-hover:     rgba(0,0,0,0.18);
