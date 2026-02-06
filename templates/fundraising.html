@@ -118,6 +118,7 @@
                 <article class="chart-section">
                     <h2>Fundraising & Spending Comparison</h2>
                     <p class="section-desc">Dual-axis chart: Wide bars = total raised (left $-axis), Narrow bars nested inside = spent % of raised (right %-axis).</p>
+                    <p class="legend-hint">Click a legend item to toggle it on or off</p>
                     <div class="chart-container-large">
                         <canvas id="spendingChart"></canvas>
                     </div>
@@ -437,6 +438,13 @@
             margin-bottom: 2rem;
         }
 
+        .legend-hint {
+            color: var(--text-tertiary);
+            font-size: 0.8rem;
+            font-style: italic;
+            margin: -1rem 0 1rem;
+        }
+
         .chart-container-large {
             position: relative;
             height: 450px;
@@ -653,6 +661,10 @@
 
         function createSpendingChart(candidates) {
             const ctx = document.getElementById('spendingChart').getContext('2d');
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const chartTextColor = isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)';
+            const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+            const chartTickMuted = isDark ? '#a0a0a0' : '#666666';
 
             // Sort by total raised descending
             const sorted = [...candidates].sort((a, b) => b.total_raised - a.total_raised);
@@ -700,21 +712,29 @@
                             display: true,
                             position: 'top',
                             labels: {
-                                color: '#e0e0e0',
+                                color: chartTextColor,
                                 font: {
                                     size: 13,
-                                    family: "'Inter', sans-serif"
+                                    family: "'Source Sans 3', sans-serif"
                                 },
                                 padding: 15,
                                 usePointStyle: true,
-                                pointStyle: 'rect'
+                                pointStyle: 'rect',
+                                generateLabels: function(chart) {
+                                    const original = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                                    return original.map(label => {
+                                        const visible = !label.hidden;
+                                        label.text = (visible ? '\u2717  ' : '    ') + label.text;
+                                        return label;
+                                    });
+                                }
                             }
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(26, 26, 26, 0.95)',
+                            backgroundColor: isDark ? 'rgba(26, 26, 26, 0.95)' : 'rgba(255, 255, 255, 0.95)',
                             titleColor: '#31B0B5',
-                            bodyColor: '#e0e0e0',
-                            borderColor: 'rgba(160, 160, 160, 0.3)',
+                            bodyColor: chartTextColor,
+                            borderColor: isDark ? 'rgba(160, 160, 160, 0.3)' : 'rgba(0, 0, 0, 0.15)',
                             borderWidth: 1,
                             padding: 12,
                             displayColors: true,
@@ -736,11 +756,11 @@
                         x: {
                             stacked: false,
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.05)',
+                                color: chartGridColor,
                                 lineWidth: 1
                             },
                             ticks: {
-                                color: '#a0a0a0',
+                                color: chartTickMuted,
                                 font: {
                                     size: 11
                                 },
@@ -754,7 +774,7 @@
                             position: 'left',
                             stacked: false,
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.05)',
+                                color: chartGridColor,
                                 lineWidth: 1
                             },
                             ticks: {
