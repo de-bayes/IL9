@@ -131,8 +131,8 @@
                             <li><strong>Why only Kalshi?</strong> Kalshi uses a traditional order book exchange where buyers and sellers post bids and asks. Manifold uses an Automated Market Maker (AMM) that algorithmically sets prices, so order book analysis doesn't apply</li>
                             <li><strong>How it works:</strong> Calculate position in spread = (Last Price - Bid) / (Ask - Bid). Position of 0.0 = traded at bid (sellers aggressive), 0.5 = at midpoint (balanced), 1.0 = at ask (buyers aggressive)</li>
                             <li><strong>Spread dampening:</strong> Wider spreads reduce the adjustment because they indicate less confidence. At 0pp spread: factor = 1.0 (full shift potential). At 10pp spread: factor = 0.2 (heavily dampened)</li>
-                            <li><strong>Example:</strong> Bid=60, Ask=68, Last=66, Mid=64, Spread=8. Position = (66-60)/8 = 0.75 (near ask). Offset = 0.75 - 0.5 = +0.25. Dampening = 1 - (8/10)&times;0.8 = 0.36. Shift = 0.25 &times; 6 &times; 0.36 = +0.54pp. Result = 64 + 0.54 = 64.5% (buyers showed aggression)</li>
-                            <li>Caps shift at &plusmn;3 percentage points to avoid overreaction</li>
+                            <li><strong>Example:</strong> Bid=60, Ask=68, Last=66, Mid=64, Spread=8. Position = (66-60)/8 = 0.75 (near ask). Offset = 0.75 - 0.5 = +0.25. Dampening = 1 - (8/10)&times;0.8 = 0.36. Shift = 0.25 &times; 8 &times; 0.36 = +0.72pp. Result = 64 + 0.72 = 64.7% (buyers showed aggression)</li>
+                            <li>Shift is proportional to the spread width, so the result always stays within the bid-ask range</li>
                         </ul>
 
                         <h3>The Complete Formula</h3>
