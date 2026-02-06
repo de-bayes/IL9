@@ -680,8 +680,10 @@
                             backgroundColor: 'rgba(255, 140, 0, 0.8)',
                             borderColor: 'rgba(255, 140, 0, 1)',
                             borderWidth: 1,
-                            barPercentage: 0.95,  // Wider bars
-                            categoryPercentage: 0.95,  // More space per candidate
+                            borderRadius: { topLeft: 4, topRight: 4 },
+                            borderSkipped: 'bottom',
+                            barPercentage: 0.95,
+                            categoryPercentage: 0.95,
                             yAxisID: 'y-left',
                             order: 2,
                             stack: 'combined'
@@ -689,11 +691,13 @@
                         {
                             label: 'Spent % of Raised - Right Axis',
                             data: sorted.map(c => c.spent_pct_of_raised),
-                            backgroundColor: 'rgba(180, 215, 245, 0.9)',
-                            borderColor: 'rgba(180, 215, 245, 1)',
+                            backgroundColor: isDark ? 'rgba(91, 184, 245, 0.85)' : 'rgba(15, 40, 100, 0.8)',
+                            borderColor: isDark ? 'rgba(91, 184, 245, 1)' : 'rgba(15, 40, 100, 1)',
                             borderWidth: 1,
-                            barPercentage: 0.65,  // Wider nested bar
-                            categoryPercentage: 0.95,  // More space per candidate
+                            borderRadius: { topLeft: 4, topRight: 4 },
+                            borderSkipped: 'bottom',
+                            barPercentage: 0.65,
+                            categoryPercentage: 0.95,
                             yAxisID: 'y-right',
                             order: 1,
                             stack: 'combined'
