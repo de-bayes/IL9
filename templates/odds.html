@@ -31,10 +31,10 @@
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
             <nav class="desktop-nav">
-                <a href="/">Home</a>
                 <a href="/markets">Markets</a>
                 <a href="/candidates">Candidates</a>
                 <a href="/fundraising">Fundraising</a>
+                <a href="/odds" class="active">Model</a>
                 <a href="/updates">Updates</a>
                 <a href="/methodology">Methodology</a>
                 <a href="/about">About</a>
@@ -49,10 +49,10 @@
                 <span></span>
             </button>
             <nav class="mobile-nav" id="mobileNav">
-                <a href="/">Home</a>
                 <a href="/markets">Markets</a>
                 <a href="/candidates">Candidates</a>
                 <a href="/fundraising">Fundraising</a>
+                <a href="/odds" class="active">Model</a>
                 <a href="/updates">Updates</a>
                 <a href="/methodology">Methodology</a>
                 <a href="/about">About</a>
@@ -65,7 +65,9 @@
 
         <section class="model-content-page">
             <article class="model-statement-section">
-                <p class="model-statement">Because this district is like...super...super uncompetitive and boring, it's really hard to find data to build a model, but i'm working on it.</p>
+                <h2 class="model-status-heading">Model In Progress</h2>
+                <p class="model-statement">We are actively building a statistical forecasting model for the IL-9 Democratic primary. Due to the limited polling data and unique dynamics of this race, developing a reliable model takes time. Check back for updates as the model takes shape.</p>
+                <p class="model-statement" style="margin-top: 1rem;">In the meantime, visit the <a href="/markets" style="color: var(--accent-blue); text-decoration: underline;">Markets page</a> for real-time prediction market aggregation.</p>
             </article>
 
             <!-- Methodology Section -->
@@ -170,13 +172,24 @@
             text-align: center;
         }
 
+        .model-status-heading {
+            font-family: var(--serif);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 1rem;
+        }
+
         .model-statement {
             font-family: var(--sans);
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             line-height: 1.8;
             color: var(--text-secondary);
             font-weight: 400;
             margin: 0;
+            max-width: 560px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .methodology-section-model {
