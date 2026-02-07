@@ -43,6 +43,7 @@ RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
 RESEND_FROM_EMAIL = os.environ.get('RESEND_FROM_EMAIL', 'alerts@il9.org')
 RESEND_FROM = f"IL9Cast <{RESEND_FROM_EMAIL}>"  # Display name + email
 EMAIL_SECRET_SALT = os.environ.get('EMAIL_SECRET_SALT', 'il9cast-change-me')
+SITE_BASE_URL = os.environ.get('SITE_BASE_URL', 'https://il9.org/')
 SWING_THRESHOLD = 5.0  # percentage points to trigger alert
 _swing_debounce = {}  # candidate_name -> last_alert_time (UTC timestamp)
 _daily_summary_sent = None  # date string of last sent daily summary
@@ -335,7 +336,7 @@ def send_email(to, subject, html, text=None):
 def send_welcome_email(email, threshold=5.0):
     """Send welcome email to new subscriber."""
     token = make_unsub_token(email)
-    unsub_url = f"{request.host_url}unsubscribe?email={email}&token={token}"
+    unsub_url = f"{SITE_BASE_URL}unsubscribe?email={email}&token={token}"
 
     # Plain text version
     text = f"""
@@ -349,7 +350,7 @@ Get notified immediately when any candidate moves {threshold:.1f}%+ in the predi
 📊 Daily Summary
 Every morning at 8 AM CT: current standings and 24-hour changes
 
-View Live Markets: {request.host_url}markets
+View Live Markets: {SITE_BASE_URL}markets
 
 ---
 Unsubscribe: {unsub_url}
@@ -409,7 +410,7 @@ Unsubscribe: {unsub_url}
                         <!-- CTA Button -->
                         <tr>
                             <td style="padding: 32px 40px; text-align: center;">
-                                <a href="{request.host_url}markets" style="display: inline-block; background-color: #e67e22; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">View Live Markets →</a>
+                                <a href="{SITE_BASE_URL}markets" style="display: inline-block; background-color: #e67e22; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">View Live Markets →</a>
                             </td>
                         </tr>
 
@@ -496,7 +497,7 @@ IL9Cast Big Swing Alert!
 
 {chr(10).join(text_rows)}
 
-View Live Markets: {request.host_url}markets
+View Live Markets: {SITE_BASE_URL}markets
     """
 
     # Build HTML rows
@@ -520,7 +521,7 @@ View Live Markets: {request.host_url}markets
         subject = f"⚡ IL9Cast Alert: {len(swings)} candidates moved significantly"
 
     token = make_unsub_token(email)
-    unsub_url = f"{request.host_url}unsubscribe?email={email}&token={token}"
+    unsub_url = f"{SITE_BASE_URL}unsubscribe?email={email}&token={token}"
 
     html = f"""
     <!DOCTYPE html>
@@ -572,7 +573,7 @@ View Live Markets: {request.host_url}markets
                         <!-- CTA Button -->
                         <tr>
                             <td style="padding: 0 40px 32px 40px; text-align: center;">
-                                <a href="{request.host_url}markets" style="display: inline-block; background-color: #e67e22; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">View Live Markets →</a>
+                                <a href="{SITE_BASE_URL}markets" style="display: inline-block; background-color: #e67e22; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">View Live Markets →</a>
                             </td>
                         </tr>
 
@@ -669,13 +670,13 @@ IL9Cast Daily Summary - {date_str}
 
 {chr(10).join(text_rows)}
 
-View Live Markets: {request.host_url}markets
+View Live Markets: {SITE_BASE_URL}markets
     """
 
     for sub in subscribers:
         email = sub['email']
         token = make_unsub_token(email)
-        unsub_url = f"{request.host_url}unsubscribe?email={email}&token={token}"
+        unsub_url = f"{SITE_BASE_URL}unsubscribe?email={email}&token={token}"
 
         html = f"""
         <!DOCTYPE html>
@@ -727,7 +728,7 @@ View Live Markets: {request.host_url}markets
                             <!-- CTA Button -->
                             <tr>
                                 <td style="padding: 0 40px 32px 40px; text-align: center;">
-                                    <a href="{request.host_url}markets" style="display: inline-block; background-color: #e67e22; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">View Live Markets →</a>
+                                    <a href="{SITE_BASE_URL}markets" style="display: inline-block; background-color: #e67e22; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">View Live Markets →</a>
                                 </td>
                             </tr>
 
@@ -1957,9 +1958,10 @@ else:
             except Exception as e:
                 print(f"Error in scheduler thread: {e}")
 
-            # Check if it's time for daily summary (8 AM CT = 14:00 UTC)
+            # Check if it's time for daily summary (8 AM Central Time)
             try:
-                ct_now = datetime.now(timezone.utc) + timedelta(hours=-6)
+                from zoneinfo import ZoneInfo
+                ct_now = datetime.now(ZoneInfo('America/Chicago'))
                 if ct_now.hour == 8 and ct_now.minute < 3:
                     send_daily_summary()
             except Exception as e:
