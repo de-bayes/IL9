@@ -1053,7 +1053,6 @@ CANDIDATE_PROFILES = [
         "campaign_url": "https://www.laurafineforcongress.org/",
         "bio": "Illinois State Senator and champion for families. Recently passed laws banning prior authorization for mental health services and requiring insurance coverage for neonatal intensive care.",
         "endorsements": [
-            "Personal PAC",
             "Planned Parenthood"
         ],
         "key_issues": ["Mental health access", "Insurance reform", "Family healthcare", "Toxic metal testing in baby food"]
