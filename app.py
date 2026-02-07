@@ -1025,7 +1025,7 @@ CANDIDATE_PROFILES = [
             "Sen. Elizabeth Warren",
             "Illinois AFL-CIO",
             "SEIU Illinois State Council",
-            "Chicago Teachers Union",
+            "Illinois Federation of Teachers",
             "Congressional Progressive Caucus PAC"
         ],
         "key_issues": ["Medicare for All", "Wealth tax on billionaires", "Ban on mass deportations", "Cease-fire in Gaza"]
@@ -1051,10 +1051,8 @@ CANDIDATE_PROFILES = [
         "title": "State Senator",
         "photo": "images/candidates/fine.png",
         "campaign_url": "https://www.laurafineforcongress.org/",
-        "bio": "Illinois State Senator and champion for families. Recently passed laws banning prior authorization for mental health services and requiring insurance coverage for neonatal intensive care.",
-        "endorsements": [
-            "Planned Parenthood"
-        ],
+        "bio": "Illinois State Senator and champion for families. Recently passed laws banning prior authorization for mental health services, requiring insurance coverage for emergency neonatal intensive care, and mandating toxic metal testing in baby food.",
+        "endorsements": [],
         "key_issues": ["Mental health access", "Insurance reform", "Family healthcare", "Toxic metal testing in baby food"]
     },
     {
@@ -1063,7 +1061,7 @@ CANDIDATE_PROFILES = [
         "title": "State Senator",
         "photo": "images/candidates/simmons.jpg",
         "campaign_url": "https://www.mikesimmons.org/",
-        "bio": "First openly LGBTQ+ and Ethiopian-American Illinois State Senator. Leader on bold systemic change, passing the Jett Hawkins Act banning hair discrimination and protecting gender-affirming care.",
+        "bio": "First openly LGBTQ+ and Ethiopian-American Illinois State Senator. Passed the Jett Hawkins Act banning hair discrimination and championed the Patient and Provider Protection Act protecting gender-affirming care.",
         "endorsements": [
             "Equality PAC",
             "LGBTQ+ Victory Fund"
@@ -1076,7 +1074,7 @@ CANDIDATE_PROFILES = [
         "title": "Former FBI Agent",
         "photo": "images/candidates/philandrew.png",
         "campaign_url": "https://www.philandrewforcongress.com/",
-        "bio": "Crisis-tested leader with background in law enforcement and hostage negotiation. Gun violence survivor advocating for evidence-based community safety strategies. Pledged to serve only 3-5 terms.",
+        "bio": "Former FBI special agent and hostage negotiator with 21 years of service. Gun violence survivor shot by Laurie Dann in 1988, advocating for evidence-based community safety strategies.",
         "endorsements": [
             "Brady PAC"
         ],
@@ -1091,7 +1089,6 @@ CANDIDATE_PROFILES = [
         "bio": "Youngest Muslim elected official in the United States. School board member and education advocate focused on tuition-free public college and student debt cancellation.",
         "endorsements": [
             "Former Rep. Marie Newman",
-            "Muslim Civic Coalition",
             "Northside Democracy for America"
         ],
         "key_issues": ["Tuition-free college", "Student debt cancellation", "Medicare for All", "Domestic infrastructure over foreign aid"]
