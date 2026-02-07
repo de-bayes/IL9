@@ -2683,3 +2683,181 @@ p {
         margin-top: 2rem;
     }
 }
+
+/* ==================== Fundraising Callout Popup ==================== */
+
+.fundraising-callout-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.fundraising-callout-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.fundraising-callout {
+    background: var(--bg-surface, #1a1f2e);
+    border: 2px solid var(--accent-blue, #31B0B5);
+    max-width: 500px;
+    width: 90%;
+    padding: 3rem 2.5rem;
+    position: relative;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6);
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fundraising-callout-overlay.show .fundraising-callout {
+    transform: translateY(0) scale(1);
+}
+
+.callout-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    color: var(--text-secondary, #a0a0a0);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0.25rem 0.5rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+    opacity: 0.6;
+}
+
+.callout-close:hover {
+    color: var(--text-primary, #e0e0e0);
+    transform: rotate(90deg);
+    opacity: 1;
+}
+
+.callout-content {
+    text-align: center;
+}
+
+.callout-headline {
+    font-family: var(--serif, Georgia, serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-secondary, #a0a0a0);
+    margin: 0 0 1rem 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.95rem;
+}
+
+.callout-big-number {
+    font-family: var(--sans, sans-serif);
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--accent-blue, #31B0B5);
+    margin: 0 0 1.5rem 0;
+    line-height: 1;
+    text-shadow: 0 2px 10px rgba(49, 176, 181, 0.3);
+}
+
+.callout-divider {
+    width: 80px;
+    height: 2px;
+    background: var(--accent-blue, #31B0B5);
+    margin: 0 auto 1.5rem;
+    opacity: 0.5;
+}
+
+.callout-message {
+    font-size: 1.1rem;
+    color: var(--text-primary, #e0e0e0);
+    margin: 0 0 1rem 0;
+    line-height: 1.6;
+}
+
+.callout-message strong {
+    color: var(--accent-blue, #31B0B5);
+    font-weight: 700;
+}
+
+.callout-pitch {
+    font-size: 0.95rem;
+    color: var(--text-secondary, #a0a0a0);
+    margin: 0 0 2rem 0;
+    line-height: 1.6;
+}
+
+.callout-donate-btn {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: var(--accent-blue, #31B0B5);
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(49, 176, 181, 0.3);
+    margin-bottom: 1rem;
+}
+
+.callout-donate-btn:hover {
+    background: var(--accent-teal, #28a0a5);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(49, 176, 181, 0.4);
+}
+
+.callout-skip {
+    display: block;
+    background: none;
+    border: none;
+    color: var(--text-tertiary, #606060);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.2s ease;
+}
+
+.callout-skip:hover {
+    color: var(--text-secondary, #a0a0a0);
+    text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+    .fundraising-callout {
+        padding: 2.5rem 2rem;
+        width: 92%;
+    }
+
+    .callout-headline {
+        font-size: 0.85rem;
+    }
+
+    .callout-big-number {
+        font-size: 2.75rem;
+    }
+
+    .callout-message {
+        font-size: 1rem;
+    }
+
+    .callout-pitch {
+        font-size: 0.9rem;
+    }
+
+    .callout-donate-btn {
+        width: 100%;
+        padding: 1rem 2rem;
+    }
+}

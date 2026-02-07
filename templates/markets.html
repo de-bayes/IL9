@@ -47,6 +47,30 @@
 </script>
 <body>
 
+    <!-- Fundraising Callout Popup -->
+    <div class="fundraising-callout-overlay" id="fundraisingCallout">
+        <div class="fundraising-callout">
+            <button class="callout-close" id="closeCallout" aria-label="Close">&times;</button>
+            <div class="callout-content">
+                <div class="callout-two-boxes">
+                    <div class="callout-box-left">
+                        <div class="callout-box-label">Total Raised by IL-9 Candidates</div>
+                        <div class="callout-box-value" id="candidatesTotal">$0.00</div>
+                        <div class="callout-box-asterisk">* Extrapolated from FEC filings</div>
+                    </div>
+                    <div class="callout-box-right">
+                        <div class="callout-box-label">Total Raised by IL9Cast</div>
+                        <div class="callout-box-value">$17.20</div>
+                    </div>
+                </div>
+                <p class="callout-pitch">Help us continue providing free, independent election data and analysis.</p>
+                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="callout-donate-btn">
+                    Chip In to Support IL9Cast
+                </a>
+                <button class="callout-skip" id="skipCallout">Maybe Later</button>
+            </div>
+        </div>
+    </div>
 
     <div class="site-content">
         <header>
@@ -2963,6 +2987,113 @@ document.addEventListener('DOMContentLoaded', () => {
             closeEmailModal();
         }
     });
+
+    // Fundraising callout popup
+    async function initFundraisingCallout() {
+        const callout = document.getElementById('fundraisingCallout');
+        const closeBtn = document.getElementById('closeCallout');
+
+        // Don't show on homepage
+        if (window.location.pathname === '/' || window.location.pathname === '') {
+            return;
+        }
+
+        // Check if already dismissed this session
+        if (localStorage.getItem('il9-callout-dismissed') === 'true') {
+            return;
+        }
+
+        // Fetch and calculate extrapolated total
+        try {
+            const resp = await fetch('/api/fec/candidates');
+            const data = await resp.json();
+            const candidates = data.candidates || data;
+
+            if (!Array.isArray(candidates)) return;
+
+            let totalRaised = 0;
+            for (let i = 0; i < candidates.length; i++) {
+                totalRaised += candidates[i].total_raised || 0;
+            }
+
+            // Extrapolate to current date
+            const campaignStartDates = {
+                "Daniel Biss": "2024-06-01",
+                "Kat Abugazaleh": "2024-08-01",
+                "Laura Fine": "2024-07-01",
+                "Mike Simmons": "2025-01-01",
+                "Phil Andrew": "2024-09-01",
+                "Bushra Amiwala": "2024-05-01"
+            };
+
+            let totalVelocity = 0;
+            for (let j = 0; j < candidates.length; j++) {
+                const c = candidates[j];
+                const startStr = campaignStartDates[c.name];
+                if (startStr) {
+                    const start = new Date(startStr);
+                    const fecEnd = c.name === "Bushra Amiwala"
+                        ? new Date("2025-09-30")
+                        : new Date("2025-12-31");
+                    const daysActive = (fecEnd - start) / (1000 * 60 * 60 * 24);
+                    if (daysActive > 0) {
+                        totalVelocity += c.total_raised / daysActive;
+                    }
+                }
+            }
+
+            const daysSinceFiling = (new Date() - new Date("2025-12-31")) / (1000 * 60 * 60 * 24);
+            const estimatedTotal = totalRaised + (totalVelocity * daysSinceFiling);
+
+            // Format with all zeros and cents
+            const formatted = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(estimatedTotal);
+
+            document.getElementById('candidatesTotal').textContent = formatted;
+
+            // Show popup after a short delay
+            setTimeout(() => {
+                callout.classList.add('show');
+            }, 800);
+
+        } catch (e) {
+            console.error('Failed to load fundraising data:', e);
+        }
+
+        // Close button handler
+        closeBtn.addEventListener('click', () => {
+            callout.classList.remove('show');
+            localStorage.setItem('il9-callout-dismissed', 'true');
+        });
+
+        // Skip/Maybe Later button
+        const skipBtn = document.getElementById('skipCallout');
+        if (skipBtn) {
+            skipBtn.addEventListener('click', () => {
+                callout.classList.remove('show');
+                localStorage.setItem('il9-callout-dismissed', 'true');
+            });
+        }
+
+        // Close on overlay click
+        callout.addEventListener('click', (e) => {
+            if (e.target === callout) {
+                callout.classList.remove('show');
+                localStorage.setItem('il9-callout-dismissed', 'true');
+            }
+        });
+    }
+
+    // Initialize fundraising callout on page load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFundraisingCallout);
+    } else {
+        initFundraisingCallout();
+    }
     </script>
 </body>
 </html>
