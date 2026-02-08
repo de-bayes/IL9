@@ -1044,6 +1044,11 @@ def landing():
 def odds():
     return render_template('odds.html')
 
+@app.route('/model/methodology')
+def model_methodology():
+    pdf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'model', 'methodology.pdf')
+    return send_file(pdf_path, mimetype='application/pdf')
+
 @app.route('/methodology')
 def methodology():
     return render_template('methodology.html')

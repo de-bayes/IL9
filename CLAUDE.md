@@ -56,11 +56,11 @@ railway logs
 - Production: Gunicorn with `--preload` flag to ensure single scheduler instance
 - Includes spike dampening (±3% per interval), EMA smoothing, RDP simplification, gap detection
 
-**Frontend:** Server-side Jinja2 templates + Chart.js visualization
+**Frontend:** Server-side Jinja2 templates + Chart.js + Leaflet.js visualization
 - `templates/landing_new.html` - Homepage hero section
 - `templates/markets.html` - Live prediction market aggregation with Central Time display
 - `templates/methodology.html` - Technical documentation with animated foldouts (4 sections)
-- `templates/odds.html` - Model visualization page (in development)
+- `templates/odds.html` - Precinct Model page with interactive Leaflet map, Monte Carlo results, data tables
 - `templates/fundraising.html` - Fundraising data page (in development)
 - `templates/about.html` - About page
 - `static/style.css` (~2500 lines) - Complete styling with dark mode toggle
@@ -166,10 +166,11 @@ Applied to:
 **Page Routes**
 - `GET /` - Landing page (landing_new.html)
 - `GET /markets` - Live markets aggregation (markets.html)
-- `GET /odds` - Model page (odds.html, in development)
+- `GET /odds` - Precinct Model with interactive map & simulation results (odds.html)
 - `GET /fundraising` - Fundraising data (fundraising.html, in development)
 - `GET /methodology` - Technical methodology with 4 foldout sections (methodology.html)
 - `GET /about` - About page (about.html)
+- `GET /model/methodology` - Serves model methodology PDF (static/model/methodology.pdf)
 
 ## Deployment Configuration
 
@@ -261,24 +262,42 @@ No NumPy, Pandas, or heavyweight libraries. EMA, RDP, and aggregation are hand-w
 
 ## UI & Documentation
 
+### Precinct Model Page (`/odds`)
+
+Interactive precinct-level Monte Carlo simulation model:
+- **Headline cards**: Win probabilities (Biss ~60%, Fine ~30%, Abughazaleh ~10%) with colored accents
+- **Average vote share bars**: Horizontal bars for all 7 candidates
+- **Interactive Leaflet map**: 436 matched precincts from GeoJSON, dark CARTO tiles
+  - 6 layer modes: Winner, Margin, Competitiveness, Biss/Fine/Abughazaleh heat maps
+  - Rich hover tooltips with mini bar charts for all candidates
+  - Click-to-select info panel with full precinct details
+  - Layer switching controls and dynamic legends
+  - `isolation: isolate` on `.map-container` prevents z-index overlap with sticky header
+- **Model Visualizations**: 6 PNG graphs in single-column layout (92% max-width)
+- **Detailed Precinct Data** (collapsible):
+  - Competitiveness breakdown grid (5 buckets)
+  - Top 10 Battleground Precincts table
+  - Full sortable/filterable table of all 436 precincts with search and winner filter
+- **Methodology section**: Links to PDF at `/model/methodology` with note that paper was drafted by Claude and reviewed/edited by the user
+- **Mobile note**: Banner suggesting desktop viewing for best map experience
+- **Data**: GeoJSON and PNGs served from `static/model/`, hardcoded summary stats (updated manually when model reruns)
+
 ### Methodology Page (4 Animated Foldouts)
 
 Each foldout uses CSS `grid-template-rows: 0fr → 1fr` animation with cubic-bezier easing:
 
 1. **Prediction Markets Aggregation** — Weights, formulas, thin-market fallback, Simmons example, chart smoothing explanation
-2. **Forecast Model** — Coming soon (links to `/odds`)
+2. **Precinct Model** — Links to model page (`/odds`) and methodology PDF (`/model/methodology`)
 3. **Fundraising Analysis** — Coming soon (links to `/fundraising`)
 4. **Infrastructure & Technical Stack** — Railway, persistent volumes, JSONL, schedulers, chart pipeline, frontend rendering, failure modes
 
-### Navigation Updates
+### Navigation
 
-All templates now include "Fundraising" link:
-- landing_new.html
-- markets.html
-- odds.html
-- about.html
-- methodology.html
-- fundraising.html
+All templates use consistent nav order: Markets | Candidates | Fundraising | Updates | Methodology | About | **Model** (rightmost, signifying primary feature)
+
+Templates with navigation:
+- landing_new.html, markets.html, odds.html, about.html, methodology.html, fundraising.html, candidates.html, candidate_fundraising.html, case_study_bid_ask.html, updates.html
+- base.html (different `<li>` structure with dropdown for Developing section)
 
 ### Chart Footer Notes
 
@@ -299,8 +318,12 @@ All templates now include "Fundraising" link:
   - `rdp_simplify()` (line 156) — Ramer-Douglas-Peucker algorithm
   - `_dampen_spikes()` (line 662) — Cap per-candidate change
 
+- `templates/odds.html` — Precinct Model page with Leaflet map, data tables, graph gallery
 - `templates/methodology.html` — 4-section foldout UI with infrastructure docs
 - `templates/markets.html` — Markets page with Central Time formatting
+- `static/model/il9_precinct_model.geojson` — GeoJSON with 436 matched + 109 unmatched precincts (4.6MB)
+- `static/model/methodology.pdf` — Model methodology paper
+- `static/model/*.png` — Model visualization graphs (6 files)
 - `Procfile` — Railway start command
 - `railway.toml` — Railway config (volume mount, health check, restart policy)
 - `requirements.txt` — Python dependencies
@@ -376,4 +399,11 @@ ls -lh /app/data/
 8. **Methodology Foldouts** — 4-section interactive documentation on `/methodology` page
 9. **Infrastructure Docs** — Deep-dive on Railway, JSONL, schedulers, chart pipeline
 10. **Fundraising Nav** — Added Fundraising link to all page navs
+
+## Recent Major Changes (Feb 2026)
+
+1. **Precinct Model Page** — Interactive Leaflet.js map with 436 precincts, Monte Carlo simulation results (100K sims), 6 layer modes, rich tooltips, sortable data tables, and PNG graph gallery
+2. **Model Methodology PDF** — Served at `/model/methodology` via Flask `send_file` route
+3. **Nav Reorder** — "Model" link moved to rightmost position across all templates to signify primary feature
+4. **Methodology Foldout Updated** — Section 2 changed from "Forecast Model (Coming Soon)" to "Precinct Model" with links to model page and methodology PDF
 
