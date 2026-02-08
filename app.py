@@ -1606,6 +1606,77 @@ def test_swing_alert():
 
     return jsonify({'success': True, 'message': f'Test swing alert sent to {count} subscriber(s)'})
 
+@app.route('/api/broadcast', methods=['POST'])
+def broadcast_email():
+    """Send a one-time broadcast email to all subscribers. Requires secret key."""
+    data = request.get_json(force=True) if request.data else {}
+    secret = data.get('secret', '')
+    if secret != EMAIL_SECRET_SALT:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    subscribers = read_subscribers()
+    if not subscribers:
+        return jsonify({'success': True, 'message': 'No subscribers'})
+
+    count = 0
+    for sub in subscribers:
+        email = sub['email']
+        token = make_unsub_token(email)
+        unsub_url = f"{SITE_BASE_URL}unsubscribe?email={email}&token={token}"
+
+        text = """
+Thanks for subscribing to IL9Cast!
+
+We're working on some exciting new features, including the possibility of building a precinct-by-precinct model for the IL-9 primary.
+
+Stay tuned - more updates coming soon.
+
+View Live Markets: """ + SITE_BASE_URL + """markets
+"""
+
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+        <body style="margin: 0; padding: 0; background-color: #1A1A1E; font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #1A1A1E;">
+                <tr><td align="center" style="padding: 40px 20px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #232328; border: 1px solid #31B0B5;">
+                        <!-- Logo -->
+                        <tr><td style="padding: 32px 40px 0 40px; text-align: center; border-bottom: 1px solid #2a2a30;">
+                            <h1 style="margin: 0 0 6px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; letter-spacing: 1px;">
+                                <span style="color: #F0EFEB;">IL9</span><span style="color: #31B0B5;">Cast</span>
+                            </h1>
+                            <p style="margin: 0 0 20px 0; color: #888; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;">A Quick Update</p>
+                        </td></tr>
+
+                        <!-- Message -->
+                        <tr><td style="padding: 32px 40px;">
+                            <p style="margin: 0 0 16px 0; color: #F0EFEB; font-size: 16px; line-height: 1.7;">Thanks for subscribing to IL9Cast.</p>
+                            <p style="margin: 0 0 16px 0; color: #ccc; font-size: 15px; line-height: 1.7;">We're working on some new things behind the scenes, including the possibility of building a <strong style="color: #31B0B5;">precinct-by-precinct model</strong> for the IL-9 primary.</p>
+                            <p style="margin: 0; color: #ccc; font-size: 15px; line-height: 1.7;">Stay tuned &mdash; more updates coming soon.</p>
+                        </td></tr>
+
+                        <!-- CTA -->
+                        <tr><td style="padding: 0 40px 32px 40px; text-align: center;">
+                            <a href="{SITE_BASE_URL}markets" style="display: inline-block; background-color: #31B0B5; color: #ffffff; text-decoration: none; padding: 12px 32px; font-weight: 600; font-size: 15px;">View Live Markets</a>
+                        </td></tr>
+
+                        <!-- Footer -->
+                        <tr><td style="padding: 20px 40px; text-align: center; border-top: 1px solid #2a2a30;">
+                            <p style="margin: 0; color: #555; font-size: 11px;"><a href="{unsub_url}" style="color: #555; text-decoration: underline;">Unsubscribe</a></p>
+                        </td></tr>
+                    </table>
+                </td></tr>
+            </table>
+        </body>
+        </html>
+        """
+        if send_email(email, 'IL9Cast - New Things Coming', html, text):
+            count += 1
+
+    return jsonify({'success': True, 'message': f'Broadcast sent to {count} subscriber(s)'})
+
 
 # Background task to collect data every 3 minutes
 # Reduces over-sampling and ensures clean 3-minute intervals
