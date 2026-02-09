@@ -1226,11 +1226,18 @@ def get_manifold():
 
 @app.route('/api/kalshi')
 def get_kalshi():
-    """Proxy Kalshi API to avoid CORS"""
+    """Proxy Kalshi API to avoid CORS — uses /events endpoint (public, no auth required)"""
     try:
-        response = requests.get('https://api.elections.kalshi.com/trade-api/v2/markets?series_ticker=KXIL9D&status=open')
+        response = requests.get('https://api.elections.kalshi.com/trade-api/v2/events/KXIL9D-26')
         response.raise_for_status()
-        result = jsonify(response.json())
+        data = response.json()
+        # Reshape to match the old /markets response format the frontend expects
+        markets = data.get('markets', [])
+        for m in markets:
+            # The old API had candidate name in 'subtitle'; new API uses yes_sub_title
+            if not m.get('subtitle'):
+                m['subtitle'] = m.get('yes_sub_title') or m.get('custom_strike', {}).get('Candidate', '')
+        result = jsonify({"markets": markets})
         result.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
         result.headers['Pragma'] = 'no-cache'
         result.headers['Expires'] = '0'
@@ -1760,12 +1767,12 @@ def collect_market_data():
         kalshi_data = {}
         kalshi_ok = False
         try:
-            kalshi_response = requests.get('https://api.elections.kalshi.com/trade-api/v2/markets?series_ticker=KXIL9D&status=open', timeout=10)
+            kalshi_response = requests.get('https://api.elections.kalshi.com/trade-api/v2/events/KXIL9D-26', timeout=10)
             kalshi_response.raise_for_status()
             kalshi_markets = kalshi_response.json().get('markets', [])
 
             for market in kalshi_markets:
-                display_name = market.get('subtitle') or market.get('title', '')
+                display_name = market.get('yes_sub_title') or market.get('subtitle') or market.get('title', '')
                 if 'schakowsky' not in display_name.lower():
                     name = normalize_candidate_name(display_name)
                     last_price = market.get('last_price', 0)
