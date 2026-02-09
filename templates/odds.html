@@ -72,27 +72,27 @@
 
             <!-- Headline Win Probabilities -->
             <div class="model-headline">
-                <div class="headline-meta">100,000 simulations &middot; 436 precincts &middot; Updated February 8, 2026</div>
+                <div class="headline-meta">100,000 simulations &middot; 436 precincts &middot; Updated February 9, 2026</div>
                 <div class="win-prob-cards">
                     <div class="win-prob-card">
-                        <div class="prob-bar" style="background: #ef4444; width: 60%;"></div>
+                        <div class="prob-bar" style="background: #ef4444; width: 46.3%;"></div>
                         <div class="prob-info">
                             <span class="prob-name" style="color: #ef4444;">Biss</span>
-                            <span class="prob-pct">~60%</span>
+                            <span class="prob-pct">~46%</span>
                         </div>
                     </div>
                     <div class="win-prob-card">
-                        <div class="prob-bar" style="background: #3b82f6; width: 30%;"></div>
+                        <div class="prob-bar" style="background: #3b82f6; width: 36.6%;"></div>
                         <div class="prob-info">
                             <span class="prob-name" style="color: #3b82f6;">Fine</span>
-                            <span class="prob-pct">~30%</span>
+                            <span class="prob-pct">~37%</span>
                         </div>
                     </div>
                     <div class="win-prob-card">
-                        <div class="prob-bar" style="background: #10b981; width: 10%;"></div>
+                        <div class="prob-bar" style="background: #10b981; width: 17.1%;"></div>
                         <div class="prob-info">
                             <span class="prob-name" style="color: #10b981;">Abughazaleh</span>
-                            <span class="prob-pct">~10%</span>
+                            <span class="prob-pct">~17%</span>
                         </div>
                     </div>
                 </div>
@@ -104,32 +104,32 @@
                 <div class="vote-share-bars">
                     <div class="vs-row">
                         <span class="vs-name">Biss</span>
-                        <div class="vs-track"><div class="vs-fill" style="width: 61.0%; background: #ef4444;"></div></div>
-                        <span class="vs-val">30.5%</span>
+                        <div class="vs-track"><div class="vs-fill" style="width: 58.0%; background: #ef4444;"></div></div>
+                        <span class="vs-val">29.0%</span>
                     </div>
                     <div class="vs-row">
                         <span class="vs-name">Fine</span>
-                        <div class="vs-track"><div class="vs-fill" style="width: 48.9%; background: #3b82f6;"></div></div>
-                        <span class="vs-val">24.4%</span>
+                        <div class="vs-track"><div class="vs-fill" style="width: 51.0%; background: #3b82f6;"></div></div>
+                        <span class="vs-val">25.5%</span>
                     </div>
                     <div class="vs-row">
                         <span class="vs-name">Abughazaleh</span>
-                        <div class="vs-track"><div class="vs-fill" style="width: 40.0%; background: #10b981;"></div></div>
-                        <span class="vs-val">20.0%</span>
+                        <div class="vs-track"><div class="vs-fill" style="width: 40.6%; background: #10b981;"></div></div>
+                        <span class="vs-val">20.3%</span>
                     </div>
                     <div class="vs-row">
                         <span class="vs-name">Simmons</span>
-                        <div class="vs-track"><div class="vs-fill" style="width: 17.8%; background: #f59e0b;"></div></div>
-                        <span class="vs-val">8.9%</span>
+                        <div class="vs-track"><div class="vs-fill" style="width: 18.0%; background: #f59e0b;"></div></div>
+                        <span class="vs-val">9.0%</span>
                     </div>
                     <div class="vs-row">
                         <span class="vs-name">Andrew</span>
-                        <div class="vs-track"><div class="vs-fill" style="width: 16.5%; background: #6366f1;"></div></div>
+                        <div class="vs-track"><div class="vs-fill" style="width: 16.6%; background: #6366f1;"></div></div>
                         <span class="vs-val">8.3%</span>
                     </div>
                     <div class="vs-row">
                         <span class="vs-name">Amiwala</span>
-                        <div class="vs-track"><div class="vs-fill" style="width: 9.7%; background: #a855f7;"></div></div>
+                        <div class="vs-track"><div class="vs-fill" style="width: 9.8%; background: #a855f7;"></div></div>
                         <span class="vs-val">4.9%</span>
                     </div>
                     <div class="vs-row">
@@ -259,13 +259,13 @@
                 <h2 class="model-section-heading">Model Visualizations</h2>
                 <p class="model-section-desc">Key outputs from the simulation. Click any chart to view full size.</p>
                 <div class="graph-grid">
-                    <a href="{{ url_for('static', filename='model/voteshare_distributions.png') }}" target="_blank" class="graph-card">
-                        <img src="{{ url_for('static', filename='model/voteshare_distributions.png') }}" alt="Vote Share Distributions" loading="lazy">
-                        <div class="graph-caption">Vote Share Distributions</div>
+                    <a href="{{ url_for('static', filename='model/voteshare_density.png') }}" target="_blank" class="graph-card">
+                        <img src="{{ url_for('static', filename='model/voteshare_density.png') }}" alt="Vote Share Density" loading="lazy">
+                        <div class="graph-caption">Vote Share Density</div>
                     </a>
-                    <a href="{{ url_for('static', filename='model/regional_competitiveness.png') }}" target="_blank" class="graph-card">
-                        <img src="{{ url_for('static', filename='model/regional_competitiveness.png') }}" alt="Regional Competitiveness" loading="lazy">
-                        <div class="graph-caption">Regional Competitiveness</div>
+                    <a href="{{ url_for('static', filename='model/margin_histogram.png') }}" target="_blank" class="graph-card">
+                        <img src="{{ url_for('static', filename='model/margin_histogram.png') }}" alt="Margin Histogram" loading="lazy">
+                        <div class="graph-caption">Win Margin Histogram</div>
                     </a>
                     <a href="{{ url_for('static', filename='model/precinct_boxplot.png') }}" target="_blank" class="graph-card">
                         <img src="{{ url_for('static', filename='model/precinct_boxplot.png') }}" alt="Precinct Vote Share Boxplot" loading="lazy">
@@ -278,6 +278,14 @@
                     <a href="{{ url_for('static', filename='model/kat_youth_scatter.png') }}" target="_blank" class="graph-card">
                         <img src="{{ url_for('static', filename='model/kat_youth_scatter.png') }}" alt="Abughazaleh &amp; Youth Vote Scatter" loading="lazy">
                         <div class="graph-caption">Abughazaleh &amp; Youth Vote</div>
+                    </a>
+                    <a href="{{ url_for('static', filename='model/fine_geography.png') }}" target="_blank" class="graph-card">
+                        <img src="{{ url_for('static', filename='model/fine_geography.png') }}" alt="Fine Geographic Strength" loading="lazy">
+                        <div class="graph-caption">Fine Geographic Strength</div>
+                    </a>
+                    <a href="{{ url_for('static', filename='model/turnout_vs_voteshare.png') }}" target="_blank" class="graph-card">
+                        <img src="{{ url_for('static', filename='model/turnout_vs_voteshare.png') }}" alt="Turnout vs Vote Share" loading="lazy">
+                        <div class="graph-caption">Turnout vs. Vote Share</div>
                     </a>
                     <a href="{{ url_for('static', filename='model/county_winrates.png') }}" target="_blank" class="graph-card">
                         <img src="{{ url_for('static', filename='model/county_winrates.png') }}" alt="County Win Rates" loading="lazy">
@@ -296,7 +304,7 @@
                     </div>
                 </div>
                 <div class="meta-row meta-update-note">
-                    This model is updated periodically as new polling and data become available. Last run: February 8, 2026.
+                    This model is updated periodically as new polling and data become available. Last run: February 9, 2026.
                 </div>
             </div>
 
