@@ -1277,6 +1277,81 @@ def get_kalshi_history(ticker):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/admin/fix-kalshi-gap', methods=['POST'])
+def fix_kalshi_gap():
+    """One-time fix: remove last 40 min of Manifold-only data and interpolate to current values."""
+    try:
+        snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
+        if not snapshots:
+            return jsonify({"error": "no snapshots"}), 400
+
+        now = datetime.now(timezone.utc)
+        cutoff = now - timedelta(minutes=40)
+
+        # Split into good (before cutoff) and bad (after cutoff)
+        good = []
+        bad = []
+        for s in snapshots:
+            ts = parse_snapshot_timestamp(s.get('timestamp', ''))
+            if ts and ts < cutoff:
+                good.append(s)
+            else:
+                bad.append(s)
+
+        if not good:
+            return jsonify({"error": "no good snapshots before cutoff"}), 400
+
+        # Get the last good snapshot and the most recent bad one (current reality)
+        last_good = good[-1]
+        current = bad[-1] if bad else last_good
+
+        # Build candidate lookup for start and end values
+        start_vals = {c['name']: c['probability'] for c in last_good.get('candidates', [])}
+        end_vals = {c['name']: c['probability'] for c in current.get('candidates', [])}
+        all_names = list(start_vals.keys())
+
+        # Generate interpolated snapshots every 3 minutes from cutoff to now
+        interpolated = []
+        total_seconds = (now - cutoff).total_seconds()
+        step = 180  # 3 minutes
+        elapsed = step
+        while elapsed < total_seconds:
+            t = elapsed / total_seconds  # 0 to 1
+            ts = cutoff + timedelta(seconds=elapsed)
+            candidates = []
+            for name in all_names:
+                sv = start_vals.get(name, 0)
+                ev = end_vals.get(name, sv)
+                prob = round(sv + (ev - sv) * t, 1)
+                candidates.append({
+                    'name': name,
+                    'probability': prob,
+                    'hasKalshi': True
+                })
+            interpolated.append({
+                'candidates': candidates,
+                'timestamp': ts.isoformat().replace('+00:00', 'Z')
+            })
+            elapsed += step
+
+        # Write good + interpolated
+        final = good + interpolated
+        import tempfile
+        temp_path = HISTORICAL_DATA_PATH + '.fix_tmp'
+        with open(temp_path, 'w') as f:
+            for s in final:
+                f.write(json.dumps(s) + '\n')
+        os.replace(temp_path, HISTORICAL_DATA_PATH)
+
+        return jsonify({
+            "success": True,
+            "removed": len(bad),
+            "interpolated": len(interpolated),
+            "total": len(final)
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/api/snapshot', methods=['POST'])
 def save_snapshot():
     """Save a historical snapshot of aggregated probabilities (JSONL format)"""
