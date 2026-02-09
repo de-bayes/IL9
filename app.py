@@ -992,7 +992,15 @@ CANDIDATE_PROFILES = [
         "photo": "images/candidates/fine.png",
         "campaign_url": "https://www.laurafineforcongress.org/",
         "bio": "Illinois State Senator and champion for families. Recently passed laws banning prior authorization for mental health services, requiring insurance coverage for emergency neonatal intensive care, and mandating toxic metal testing in baby food.",
-        "endorsements": [],
+        "endorsements": [
+            "Rep. Brad Schneider (IL-10)",
+            "Rep. Lois Frankel (FL-22)",
+            "Rep. Norma Torres (CA-25)",
+            "State Rep. Tracy Katz Muhl (IL-57)",
+            "State Sen. Laura Murphy (IL-28)",
+            "Chicago Tribune",
+            "Maine Township Democrats"
+        ],
         "key_issues": ["Mental health access", "Insurance reform", "Family healthcare", "Toxic metal testing in baby food"]
     },
     {
