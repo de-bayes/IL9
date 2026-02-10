@@ -111,6 +111,7 @@
                             <p class="burn-rate-desc">Last 1.5 months × 0.67</p>
                         </div>
                     </div>
+                    <p class="section-desc">Burn rates are currently displayed as $0/mo while the FEC categorizes Schedule B records. The API cannot return reliable burn-rate inputs until that categorization is complete.</p>
                 </article>
 
                 <!-- Additional Metrics -->
@@ -398,9 +399,9 @@
                 const burn1mo = candidate.burn_1month || 0;
                 const burn1_5mo = candidate.burn_1_5month || 0;
 
-                document.getElementById('burnRate2Week').textContent = burn2wk > 0 ? formatCurrency(burn2wk) + '/mo' : 'N/A';
-                document.getElementById('burnRate1Month').textContent = burn1mo > 0 ? formatCurrency(burn1mo) + '/mo' : 'N/A';
-                document.getElementById('burnRate1_5Month').textContent = burn1_5mo > 0 ? formatCurrency(burn1_5mo) + '/mo' : 'N/A';
+                document.getElementById('burnRate2Week').textContent = formatCurrency(burn2wk) + '/mo';
+                document.getElementById('burnRate1Month').textContent = formatCurrency(burn1mo) + '/mo';
+                document.getElementById('burnRate1_5Month').textContent = formatCurrency(burn1_5mo) + '/mo';
 
                 // Additional metrics
                 document.getElementById('avgContribution').textContent = formatCurrency(candidate.avg_contribution || 0);
