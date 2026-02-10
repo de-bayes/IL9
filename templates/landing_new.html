@@ -7,7 +7,7 @@
     <!-- Primary Meta Tags -->
     <title>IL9Cast - Illinois 9th District Democratic Primary 2026 Forecast</title>
     <meta name="title" content="IL9Cast - Illinois 9th District Democratic Primary 2026 Forecast">
-    <meta name="description" content="Live prediction market aggregation for Illinois 9th District Democratic Primary election on March 17, 2026. Real-time odds from Manifold Markets and Kalshi, updated every 3 minutes.">
+    <meta name="description" content="Live prediction market aggregation and precinct model forecasts for Illinois 9th District Democratic Primary election on March 17, 2026. Real-time odds from Manifold Markets and Kalshi, updated every 3 minutes.">
     <meta name="keywords" content="IL9Cast, Illinois 9th District, Democratic Primary, primary election 2026, prediction markets, Manifold Markets, Kalshi, election forecast, Daniel Biss, Jan Schakowsky">
     <link rel="canonical" href="https://il9.org/">
 
@@ -15,14 +15,14 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://il9.org/">
     <meta property="og:title" content="IL9Cast - Illinois 9th District Democratic Primary 2026 Forecast">
-    <meta property="og:description" content="Live prediction market aggregation for Illinois 9th District Democratic Primary. Real-time odds updated every 3 minutes from Manifold Markets and Kalshi.">
+    <meta property="og:description" content="Live prediction market aggregation and precinct model forecasts for Illinois 9th District Democratic Primary. Real-time odds updated every 3 minutes from Manifold Markets and Kalshi.">
     <meta property="og:site_name" content="IL9Cast">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://il9.org/">
     <meta property="twitter:title" content="IL9Cast - Illinois 9th District Democratic Primary 2026 Forecast">
-    <meta property="twitter:description" content="Live prediction market aggregation for Illinois 9th District Democratic Primary. Real-time odds updated every 3 minutes.">
+    <meta property="twitter:description" content="Live prediction market aggregation and precinct model forecasts for Illinois 9th District Democratic Primary. Real-time odds updated every 3 minutes.">
 
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,7 +46,7 @@
         "@type": "WebSite",
         "name": "IL9Cast",
         "url": "https://il9.org",
-        "description": "Live prediction market aggregation for Illinois 9th District Democratic Primary election on March 17, 2026",
+        "description": "Live prediction market aggregation and precinct model forecasts for Illinois 9th District Democratic Primary election on March 17, 2026",
         "potentialAction": {
             "@type": "SearchAction",
             "target": "https://il9.org/?q={search_term_string}",
@@ -123,7 +123,7 @@
                 Live data &mdash; Updated every 3 minutes
             </div>
             <h1>Illinois 9th District,<br><em>Democratic Primary Forecast</em></h1>
-            <p class="hero-subtitle">Aggregating prediction market data from Manifold Markets and Kalshi for the March 17, 2026 primary election.</p>
+            <p class="hero-subtitle">Aggregating prediction market data from Manifold Markets and Kalshi and publishing precinct-level model projections for the March 17, 2026 primary election.</p>
             <p class="hero-countdown"><span id="countdownCompact">--</span> until polls close &mdash; March 17, 2026 at 7:00 PM CT</p>
         </section>
 
@@ -198,7 +198,7 @@
             <div class="section-label">About this project</div>
             <div class="about-block">
                 <div class="about-block-text">
-                    <strong>IL9Cast</strong> is an independent forecast aggregator for the Illinois 9th District Democratic Primary. We combine prediction market data from multiple platforms using a weighted formula, apply multi-layer smoothing for clean visualizations, and store every data point for full transparency.
+                    <strong>IL9Cast</strong> is an independent forecasting platform for the Illinois 9th District Democratic Primary. We combine prediction market data from multiple platforms using a weighted formula and pair it with our precinct-level election model, while applying multi-layer smoothing for clean visualizations and storing every data point for full transparency.
                 </div>
                 <ul class="about-block-list">
                     <li>
@@ -210,6 +210,10 @@
                         60% weight (last price, midpoint, liquidity-adjusted)
                     </li>
                     <li>
+                        <strong>Precinct-Level Model</strong>
+                        100,000 simulation runs with district-level outputs and scenario layering (<a href="/odds" style="color: var(--accent-blue); text-decoration: underline;">view model</a>)
+                    </li>
+                    <li>
                         <strong>Open Data</strong>
                         Full historical dataset available for download
                     </li>
@@ -218,6 +222,7 @@
 
             <div class="cta-row">
                 <a href="/markets" class="btn-primary">View Live Markets</a>
+                <a href="/odds" class="btn-secondary">View Model</a>
                 <a href="/api/download/snapshots" class="btn-secondary">Download Data</a>
             </div>
         </section>
@@ -246,7 +251,7 @@
                 </div>
                 <div class="footer-section">
                     <h4>Disclaimer</h4>
-                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data for informational purposes only.</p>
+                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data and presents model-based projections for informational purposes only.</p>
                 </div>
             </div>
             <div class="footer-bottom">
