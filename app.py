@@ -1054,7 +1054,8 @@ def odds():
 
 @app.route('/model/methodology')
 def model_methodology():
-    pdf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'model', 'methodology.pdf')
+    # Serve the corrected methodology source file directly to avoid binary asset swaps in PRs.
+    pdf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'IL9Cast_Methodology_CORRECTED.pdf')
     return send_file(pdf_path, mimetype='application/pdf')
 
 @app.route('/methodology')
