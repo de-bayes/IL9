@@ -1,12 +1,12 @@
-# Python bytecode & build artifacts
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-*.egg
-*.egg-info/
-.installed.cfg
 .Python
+env/
+venv/
+ENV/
 build/
 develop-eggs/
 dist/
@@ -19,42 +19,35 @@ parts/
 sdist/
 var/
 wheels/
-
-# Virtual environments
-env/
-venv/
-ENV/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # Flask
 instance/
 .webassets-cache
 
-# Runtime data files
+# Data files
 # historical_snapshots.jsonl is runtime data (in Railway's persistent volume)
 # historical_snapshots.json is legacy format (being migrated to JSONL)
 # seed_snapshots.json is the git-tracked backup for initializing Railway
 data/historical_snapshots.json
 data/historical_snapshots.jsonl
+data/email_subscribers.jsonl
+data/fec_cache.json
+data/.purge_*
 data/*.backup.*
 data/*.pre-*
-data/*.lock
-
-# Deployment markers (runtime-specific, not source)
-data/.timezone_reset*
-data/.csv_recovery_done
-data/.purge_pre_jan30_done
 
 # Environment variables
 .env
 .env.local
 
-# IDE & editors
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# OS files
 .DS_Store
 
 # Logs
@@ -64,5 +57,12 @@ data/.purge_pre_jan30_done
 .claude/
 
 # Screenshots (local debugging only)
-SCREENSHOTS/
+SCREENHSHOTS/
 Screenshot*.png
+
+# Local design scratch folders
+final homescreen inspiration/
+hompage img/
+
+# Timezone reset markers (deployment-specific)
+data/.timezone_reset*
