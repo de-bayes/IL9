@@ -1880,11 +1880,17 @@ def collect_market_data():
                 kalshi_mid = kalshi_info.get('midpoint', 0)
                 kalshi_liq = kalshi_info.get('liquidity', kalshi_mid)
 
-                has_kalshi = kalshi_last > 0 or kalshi_mid > 0
+                kalshi_bid = kalshi_info.get('yes_bid', 0)
+                kalshi_ask = kalshi_info.get('yes_ask', 0)
+                has_two_sided_book = kalshi_bid > 0 and kalshi_ask > 0
+                has_unlocked_spread = kalshi_ask > kalshi_bid
+
+                # Treat Kalshi as inactive unless there is an actionable two-sided book.
+                # A one-sided or locked book (bid == ask) often reflects stale/thin
+                # pricing and can otherwise overstate fringe candidates.
+                has_kalshi = has_two_sided_book and has_unlocked_spread and (kalshi_last > 0 or kalshi_mid > 0)
 
                 if has_kalshi:
-                    kalshi_bid = kalshi_info.get('yes_bid', 0)
-                    kalshi_ask = kalshi_info.get('yes_ask', 0)
                     last_outside_spread = (
                         kalshi_bid > 0 and kalshi_ask > 0 and
                         (kalshi_last > kalshi_ask or kalshi_last < kalshi_bid)
@@ -1897,6 +1903,12 @@ def collect_market_data():
                         # Normal weights
                         aggregate = (0.40 * manifold_prob) + (0.42 * kalshi_last) + (0.12 * kalshi_mid) + (0.06 * kalshi_liq)
                 else:
+                    if (kalshi_last > 0 or kalshi_mid > 0) and (not has_two_sided_book or not has_unlocked_spread):
+                        state = 'one-sided' if not has_two_sided_book else 'locked'
+                        print(
+                            f"  [Kalshi ignored] {candidate_key}: {state} book "
+                            f"bid={kalshi_bid:.1f}, ask={kalshi_ask:.1f}, last={kalshi_last:.1f}"
+                        )
                     aggregate = manifold_prob
 
                 if aggregate > 0 or manifold_prob > 0:
