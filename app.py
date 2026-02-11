@@ -70,12 +70,59 @@ def read_snapshots_jsonl(filepath):
                     snapshot = json.loads(line)
                     snapshots.append(snapshot)
                 except json.JSONDecodeError as e:
-                    print(f"[{datetime.now().isoformat()}] Error parsing line {line_num}: {e}")
+                    preview = line[:120]
+                    print(
+                        f"[{datetime.now().isoformat()}] Error parsing line {line_num}: {e}. "
+                        f"Skipping malformed JSONL row (preview={preview!r})"
+                    )
                     continue
     except (IOError, OSError) as e:
         print(f"[{datetime.now().isoformat()}] Error reading JSONL file: {e}")
 
     return snapshots
+
+def repair_snapshots_jsonl(filepath):
+    """
+    Remove malformed JSONL lines from snapshots file.
+    Returns dict with total/kept/removed counts.
+    """
+    stats = {'total': 0, 'kept': 0, 'removed': 0}
+    if not os.path.exists(filepath):
+        return stats
+
+    temp_path = filepath + '.repair.tmp'
+    try:
+        with open(filepath, 'r') as src, open(temp_path, 'w') as dst:
+            for line in src:
+                stripped = line.strip()
+                if not stripped:
+                    continue
+                stats['total'] += 1
+                try:
+                    json.loads(stripped)
+                    dst.write(stripped + '\n')
+                    stats['kept'] += 1
+                except json.JSONDecodeError:
+                    stats['removed'] += 1
+
+        if stats['removed'] > 0:
+            os.replace(temp_path, filepath)
+            print(
+                f"[{datetime.now().isoformat()}] Repaired JSONL snapshots: "
+                f"removed {stats['removed']} malformed line(s), kept {stats['kept']}"
+            )
+        else:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+    except (IOError, OSError) as e:
+        if os.path.exists(temp_path):
+            try:
+                os.remove(temp_path)
+            except OSError:
+                pass
+        print(f"[{datetime.now().isoformat()}] Error repairing JSONL file: {e}")
+
+    return stats
 
 def append_snapshot_jsonl(filepath, snapshot):
     """
@@ -940,6 +987,7 @@ def purge_old_data():
 # Initialize data on module load
 initialize_data()
 purge_old_data()
+repair_snapshots_jsonl(HISTORICAL_DATA_PATH)
 
 # Mock candidate data
 CANDIDATES = [
