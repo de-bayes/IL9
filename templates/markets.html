@@ -1948,8 +1948,13 @@ async function calculateAggregate() {
         const kalshiLast = kalshiInfo.last_price || 0;
         const kalshiMid = kalshiInfo.midpoint || 0;
 
-        // Check if this candidate has Kalshi market
-        const hasKalshi = kalshiLast > 0 || kalshiMid > 0;
+        const kalshiBid = kalshiInfo.yes_bid || 0;
+        const kalshiAsk = kalshiInfo.yes_ask || 0;
+        const hasTwoSidedBook = kalshiBid > 0 && kalshiAsk > 0;
+        const hasUnlockedSpread = kalshiAsk > kalshiBid;
+
+        // Treat Kalshi as active only when order book is actionable.
+        const hasKalshi = hasTwoSidedBook && hasUnlockedSpread && (kalshiLast > 0 || kalshiMid > 0);
 
         // Calculate liquidity-weighted price
         // Use pre-calculated liquidity-weighted probability from fetchKalshiData
@@ -1960,8 +1965,6 @@ async function calculateAggregate() {
         // Spread-based weight throttle
         let isThrottled = false;
         if (hasKalshi) {
-            const kalshiBid = kalshiInfo.yes_bid || 0;
-            const kalshiAsk = kalshiInfo.yes_ask || 0;
             const lastOutsideSpread = (
                 kalshiBid > 0 && kalshiAsk > 0 &&
                 (kalshiLast > kalshiAsk || kalshiLast < kalshiBid)
@@ -1991,9 +1994,9 @@ async function calculateAggregate() {
 
             // Store breakdown for display with correct weights
             const wManifold = hasKalshi ? 0.40 : 1.0;
-            const wLast = isThrottled ? 0.20 : 0.42;
-            const wMid = isThrottled ? 0.28 : 0.12;
-            const wLiq = isThrottled ? 0.12 : 0.06;
+            const wLast = hasKalshi ? (isThrottled ? 0.20 : 0.42) : 0;
+            const wMid = hasKalshi ? (isThrottled ? 0.28 : 0.12) : 0;
+            const wLiq = hasKalshi ? (isThrottled ? 0.12 : 0.06) : 0;
 
             breakdowns.push({
                 name: cleanName,
