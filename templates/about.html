@@ -77,9 +77,16 @@
             <article class="about-section">
                 <h2>Press</h2>
                 <div class="tweet-embed">
-                    <blockquote class="twitter-tweet" data-theme="light"><p lang="en" dir="ltr">Evanston Township High School student Ryan McComb (<a href="https://twitter.com/bayes_pr?ref_src=twsrc%5Etfw">@bayes_pr</a>) built a really cool real-time aggregator site that collects data points on prediction markets, fundraising data and a bunch of other stuff for <a href="https://twitter.com/hashtag/IL09?src=hash&amp;ref_src=twsrc%5Etfw">#IL09</a> <br><br>&#128071;&#127996; Super cool stuff<a href="https://t.co/RytKDvVfbf">https://t.co/RytKDvVfbf</a></p>&mdash; Matthew Eadie (@mattheweadie22) <a href="https://twitter.com/mattheweadie22/status/2019934482942586970?ref_src=twsrc%5Etfw">February 7, 2026</a></blockquote>
-                    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                    <iframe
+                        src="https://platform.twitter.com/embed/Tweet.html?id=2019934482942586970"
+                        title="Tweet from Matthew Eadie about IL9Cast"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        allowfullscreen>
+                    </iframe>
                 </div>
+                <p class="press-note">We were also featured in the <strong>Capitol Fax</strong> newsletter.</p>
+                <p class="press-note">Read Evanston RoundTable's coverage: <a href="https://evanstonroundtable.com/2026/02/10/eths-student-aims-to-forecast-9th-district-congressional-race-using-betting-market-data/" target="_blank" rel="noopener noreferrer">"ETHS student aims to forecast 9th District congressional race using betting market data"</a>.</p>
             </article>
 
             <article class="about-section contact-section">
@@ -241,7 +248,30 @@
 
         .tweet-embed {
             max-width: 550px;
-            margin: 0 auto;
+            margin: 0 auto 1.25rem;
+        }
+
+        .tweet-embed iframe {
+            width: 100%;
+            min-height: 420px;
+            border: 0;
+        }
+
+        .press-note {
+            margin-bottom: 0.75rem !important;
+        }
+
+        .press-note:last-child {
+            margin-bottom: 0 !important;
+        }
+
+        .press-note a {
+            color: #7C2D12;
+            text-decoration: underline;
+        }
+
+        .press-note a:hover {
+            opacity: 0.85;
         }
 
         .support-section {
