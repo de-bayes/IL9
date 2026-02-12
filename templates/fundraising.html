@@ -437,7 +437,7 @@
         }
 
         .legend-hint {
-            color: var(--text-tertiary);
+            color: var(--text-secondary);
             font-size: 0.8rem;
             font-style: italic;
             margin: -1rem 0 1rem;
@@ -639,10 +639,13 @@
                 document.documentElement.setAttribute('data-theme', 'dark');
                 localStorage.setItem('il9-theme', 'dark');
             }
+
+            refreshSpendingChartTheme();
         }
 
         // FEC DATA FETCHING
         let spendingChart = null;
+        let latestCandidates = [];
 
         function formatCurrency(amount) {
             if (amount >= 1000000) {
@@ -660,9 +663,15 @@
         function createSpendingChart(candidates) {
             const ctx = document.getElementById('spendingChart').getContext('2d');
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const chartTextColor = isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)';
+            const chartTextColor = isDark ? 'rgba(245, 247, 250, 0.9)' : 'rgba(20, 24, 32, 0.9)';
             const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
-            const chartTickMuted = isDark ? '#a0a0a0' : '#666666';
+            const chartTickMuted = isDark ? 'rgba(220, 224, 232, 0.9)' : 'rgba(35, 42, 58, 0.85)';
+
+            latestCandidates = [...candidates];
+
+            if (spendingChart) {
+                spendingChart.destroy();
+            }
 
             // Sort by total raised descending
             const sorted = [...candidates].sort((a, b) => b.total_raised - a.total_raised);
@@ -722,14 +731,8 @@
                                 padding: 15,
                                 usePointStyle: true,
                                 pointStyle: 'rect',
-                                generateLabels: function(chart) {
-                                    const original = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-                                    return original.map(label => {
-                                        const visible = !label.hidden;
-                                        label.text = (visible ? '\u2717  ' : '    ') + label.text;
-                                        return label;
-                                    });
-                                }
+                                boxWidth: 18,
+                                boxHeight: 12
                             }
                         },
                         tooltip: {
@@ -762,7 +765,7 @@
                                 lineWidth: 1
                             },
                             ticks: {
-                                color: isDark ? 'rgba(220, 220, 220, 0.85)' : chartTickMuted,
+                                color: chartTickMuted,
                                 font: {
                                     size: 11
                                 },
@@ -830,6 +833,14 @@
                     }
                 }
             });
+        }
+
+        function refreshSpendingChartTheme() {
+            if (!latestCandidates.length) {
+                return;
+            }
+
+            createSpendingChart(latestCandidates);
         }
 
         function populateComparisonTable(candidates) {
