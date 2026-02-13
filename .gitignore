@@ -58,5 +58,7 @@ data/*.lock
 SCREENHSHOTS/
 Screenshot*.png
 
-# Timezone reset markers (deployment-specific)
+# Deployment markers (runtime-specific, not source)
 data/.timezone_reset*
+data/.csv_recovery_done
+data/.purge_pre_jan30_done
