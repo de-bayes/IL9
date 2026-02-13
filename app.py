@@ -19,9 +19,25 @@ app = Flask(__name__)
 def resolve_data_path(filename='historical_snapshots.jsonl'):
     """
     Resolve the correct data directory, checking Railway persistent volume first.
-    Priority: /data/ -> /app/data/ -> local data/
+    Priority:
+      1) DATA_DIR env override
+      2) existing file in /app/data or /data
+      3) writable /app/data then /data
+      4) local repo data/
     """
-    for candidate_dir in ['/data', '/app/data']:
+    env_dir = os.environ.get('DATA_DIR', '').strip()
+    if env_dir:
+        return os.path.join(env_dir, filename)
+
+    # Prefer the directory that already has the target file.
+    # This prevents accidental "switching" between volume paths across deploys.
+    for candidate_dir in ['/app/data', '/data']:
+        candidate_path = os.path.join(candidate_dir, filename)
+        if os.path.exists(candidate_path):
+            return candidate_path
+
+    # Fall back to first available persistent-like directory.
+    for candidate_dir in ['/app/data', '/data']:
         candidate_path = os.path.join(candidate_dir, filename)
         if os.path.exists(candidate_dir):
             return candidate_path
@@ -37,6 +53,7 @@ SEED_DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'seed_snapshots
 
 # Legacy JSON path for migration
 LEGACY_JSON_PATH = os.path.join(os.path.dirname(__file__), 'data', 'historical_snapshots.json')
+REPO_CSV_PATH = os.path.join(os.path.dirname(__file__), 'il9cast_historical_data.csv')
 
 # ===== EMAIL ALERT CONFIGURATION =====
 SUBSCRIBERS_PATH = resolve_data_path('email_subscribers.jsonl')
@@ -66,6 +83,233 @@ def _release_file_lock(lock_file):
         fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
     finally:
         lock_file.close()
+
+
+def backup_file(filepath, reason='manual'):
+    """Create a timestamped backup copy of filepath if it exists."""
+    if not os.path.exists(filepath):
+        return None
+    ts = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+    backup_path = f"{filepath}.backup.{reason}.{ts}"
+    shutil.copy2(filepath, backup_path)
+    print(f"[{datetime.now().isoformat()}] Backup created: {backup_path}")
+    return backup_path
+
+
+
+
+def _parse_bool(value):
+    """Parse common truthy/falsy values to bool."""
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    return str(value).strip().lower() in {'1', 'true', 'yes', 'y'}
+
+
+def _safe_float(value, default=0.0):
+    """Best-effort numeric coercion for probabilities coming from mixed data sources."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def load_snapshots_from_csv(csv_path):
+    """Load wide historical CSV (timestamp,candidate,probability,hasKalshi) into snapshot JSON objects."""
+    import csv
+
+    if not os.path.exists(csv_path):
+        raise FileNotFoundError(f"CSV not found: {csv_path}")
+
+    grouped = {}
+    with open(csv_path, 'r', newline='') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            ts = (row.get('timestamp') or '').strip()
+            name = (row.get('candidate') or '').strip()
+            if not ts or not name:
+                continue
+            try:
+                prob = float(row.get('probability', 0) or 0)
+            except (TypeError, ValueError):
+                prob = 0.0
+            grouped.setdefault(ts, []).append({
+                'name': name,
+                'probability': prob,
+                'hasKalshi': _parse_bool(row.get('hasKalshi'))
+            })
+
+    snapshots = [
+        {'timestamp': ts, 'candidates': candidates}
+        for ts, candidates in grouped.items()
+    ]
+
+    snapshots.sort(key=lambda s: parse_snapshot_timestamp(s.get('timestamp')) or datetime.min.replace(tzinfo=timezone.utc))
+    return snapshots
+
+
+def _interpolate_snapshots(start_snapshot, end_snapshot, step_count):
+    """Linearly interpolate snapshots between two timestamped snapshots (exclusive endpoints)."""
+    if step_count <= 0:
+        return []
+
+    start_dt = parse_snapshot_timestamp(start_snapshot.get('timestamp'))
+    end_dt = parse_snapshot_timestamp(end_snapshot.get('timestamp'))
+    if not start_dt or not end_dt or end_dt <= start_dt:
+        return []
+
+    start_map = {c.get('name'): c for c in start_snapshot.get('candidates', [])}
+    end_map = {c.get('name'): c for c in end_snapshot.get('candidates', [])}
+    names = sorted(set(start_map.keys()) | set(end_map.keys()))
+
+    out = []
+    total_seconds = (end_dt - start_dt).total_seconds()
+    for step in range(1, step_count + 1):
+        ratio = step / (step_count + 1)
+        ts = start_dt + timedelta(seconds=total_seconds * ratio)
+        candidates = []
+        for name in names:
+            start_prob = float(start_map.get(name, {}).get('probability', 0) or 0)
+            end_prob = float(end_map.get(name, {}).get('probability', 0) or 0)
+            interp_prob = start_prob + ((end_prob - start_prob) * ratio)
+            has_kalshi = bool(start_map.get(name, {}).get('hasKalshi', False) or end_map.get(name, {}).get('hasKalshi', False))
+            candidates.append({
+                'name': name,
+                'probability': round(interp_prob, 1),
+                'hasKalshi': has_kalshi
+            })
+        out.append({
+            'timestamp': ts.isoformat().replace('+00:00', 'Z'),
+            'candidates': candidates
+        })
+    return out
+
+
+def recover_snapshots_from_csv_and_current(csv_path, current_path, output_path, bridge_interval_minutes=3, max_bridge_hours=72, dry_run=True, csv_only=False):
+    """Rebuild timeline by stitching CSV history with current JSONL snapshots and optional interpolation bridge."""
+    csv_snapshots = load_snapshots_from_csv(csv_path)
+    if not csv_snapshots:
+        raise ValueError('No snapshots found in CSV source')
+
+    csv_snapshots = [s for s in csv_snapshots if parse_snapshot_timestamp(s.get('timestamp'))]
+    csv_snapshots.sort(key=lambda s: parse_snapshot_timestamp(s.get('timestamp')))
+
+    current_snapshots = [] if csv_only else read_snapshots_jsonl(current_path)
+    current_snapshots = [s for s in current_snapshots if parse_snapshot_timestamp(s.get('timestamp'))]
+    current_snapshots.sort(key=lambda s: parse_snapshot_timestamp(s.get('timestamp')))
+
+    base = []
+    bridge = []
+    mode = 'csv_only'
+
+    if current_snapshots:
+        first_current_dt = parse_snapshot_timestamp(current_snapshots[0].get('timestamp'))
+        base = [s for s in csv_snapshots if parse_snapshot_timestamp(s.get('timestamp')) < first_current_dt]
+
+        if base:
+            last_base = base[-1]
+            first_current = current_snapshots[0]
+            last_base_dt = parse_snapshot_timestamp(last_base.get('timestamp'))
+            gap_hours = (first_current_dt - last_base_dt).total_seconds() / 3600.0
+            if gap_hours > 0 and gap_hours <= max_bridge_hours:
+                step_count = int((first_current_dt - last_base_dt).total_seconds() // (bridge_interval_minutes * 60)) - 1
+                step_count = max(0, min(step_count, 5000))
+                bridge = _interpolate_snapshots(last_base, first_current, step_count)
+
+        mode = 'csv_plus_current'
+        candidate_stream = base + bridge + current_snapshots
+    else:
+        candidate_stream = csv_snapshots
+
+    merged = []
+    seen = set()
+    for snap in candidate_stream:
+        ts = snap.get('timestamp')
+        if not ts or ts in seen:
+            continue
+        seen.add(ts)
+        merged.append(snap)
+
+    if not merged:
+        raise ValueError('No merged snapshots produced from available sources')
+
+    stats = {
+        'mode': mode,
+        'csv_snapshots': len(csv_snapshots),
+        'current_snapshots': len(current_snapshots),
+        'base_used': len(base),
+        'bridge_created': len(bridge),
+        'merged_total': len(merged),
+        'first_timestamp': merged[0]['timestamp'] if merged else None,
+        'last_timestamp': merged[-1]['timestamp'] if merged else None,
+        'dry_run': dry_run
+    }
+
+    if dry_run:
+        return stats
+
+    lock_path = output_path + '.lock'
+    lock_file = _acquire_file_lock(lock_path)
+    temp_path = output_path + '.recover_tmp'
+    try:
+        backup_path = backup_file(output_path, reason='recovery')
+        with open(temp_path, 'w') as f:
+            for snap in merged:
+                f.write(json.dumps(snap, separators=(',', ':')) + '\n')
+        os.replace(temp_path, output_path)
+        stats['backup_path'] = backup_path
+    finally:
+        if os.path.exists(temp_path):
+            try:
+                os.remove(temp_path)
+            except OSError:
+                pass
+        _release_file_lock(lock_file)
+
+    return stats
+
+
+
+
+def write_snapshots_jsonl(filepath, snapshots):
+    """Safely rewrite snapshots JSONL with lock + temp file + atomic replace."""
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    lock_path = filepath + '.lock'
+    lock_file = _acquire_file_lock(lock_path)
+    temp_path = filepath + '.write_tmp'
+    try:
+        with open(temp_path, 'w') as f:
+            for snap in snapshots:
+                f.write(json.dumps(snap, separators=(',', ':')) + '\n')
+        os.replace(temp_path, filepath)
+    finally:
+        if os.path.exists(temp_path):
+            try:
+                os.remove(temp_path)
+            except OSError:
+                pass
+        _release_file_lock(lock_file)
+
+
+def import_repo_csv_to_volume_if_needed():
+    """Initialize historical JSONL from repo CSV when volume data is empty/missing."""
+    if not os.path.exists(REPO_CSV_PATH):
+        return {'imported': False, 'reason': 'repo_csv_missing'}
+
+    needs_import = (not os.path.exists(HISTORICAL_DATA_PATH)) or (count_snapshots_jsonl(HISTORICAL_DATA_PATH) == 0)
+    if not needs_import:
+        return {'imported': False, 'reason': 'volume_has_data'}
+
+    snapshots = load_snapshots_from_csv(REPO_CSV_PATH)
+    if not snapshots:
+        return {'imported': False, 'reason': 'repo_csv_empty'}
+
+    if os.path.exists(HISTORICAL_DATA_PATH):
+        backup_file(HISTORICAL_DATA_PATH, reason='pre-csv-import')
+
+    write_snapshots_jsonl(HISTORICAL_DATA_PATH, snapshots)
+    return {'imported': True, 'snapshots': len(snapshots), 'path': HISTORICAL_DATA_PATH}
 
 
 def read_snapshots_jsonl(filepath):
@@ -936,6 +1180,14 @@ def initialize_data():
         except Exception as e:
             print(f"[{datetime.now().isoformat()}] Error seeding data: {e}")
 
+    # If volume is empty/missing but repo CSV exists, import it directly (no API calls).
+    try:
+        csv_import = import_repo_csv_to_volume_if_needed()
+        if csv_import.get('imported'):
+            print(f"[{datetime.now().isoformat()}] Imported {csv_import.get('snapshots')} snapshots from repo CSV to {csv_import.get('path')}")
+    except Exception as e:
+        print(f"[{datetime.now().isoformat()}] Error importing repo CSV to volume: {e}")
+
 def purge_old_data():
     """
     Optional one-time purge: remove snapshots before Jan 30, 2026.
@@ -963,8 +1215,12 @@ def purge_old_data():
     cutoff = datetime(2026, 1, 30, 0, 0, 0, tzinfo=timezone.utc)
     kept = []
     total = 0
+    lock_path = HISTORICAL_DATA_PATH + '.lock'
+    lock_file = None
 
     try:
+        lock_file = _acquire_file_lock(lock_path)
+
         with open(HISTORICAL_DATA_PATH, 'r') as f:
             for line in f:
                 line = line.strip()
@@ -979,6 +1235,9 @@ def purge_old_data():
                 except json.JSONDecodeError:
                     continue
 
+        # Keep a safety backup before destructive rewrite
+        backup_file(HISTORICAL_DATA_PATH, reason='purge-pre-jan30')
+
         # Rewrite file with only kept snapshots
         with open(HISTORICAL_DATA_PATH, 'w') as f:
             for line in kept:
@@ -988,6 +1247,9 @@ def purge_old_data():
 
     except Exception as e:
         print(f"[{datetime.now().isoformat()}] Error during purge: {e}")
+    finally:
+        if lock_file is not None:
+            _release_file_lock(lock_file)
 
     # Also delete any legacy JSON files on Railway volume
     for pattern_dir in ['/data', '/app/data', os.path.join(os.path.dirname(__file__), 'data')]:
@@ -1368,32 +1630,70 @@ def repair_snapshots_admin():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+@app.route('/api/admin/recover-snapshots', methods=['POST'])
+def recover_snapshots_admin():
+    """Rebuild snapshots by stitching a CSV history source with current volume JSONL data."""
+    try:
+        csv_path = request.args.get('csv_path') or os.path.join(os.path.dirname(__file__), 'il9cast_historical_data.csv')
+        bridge_interval_minutes = int(request.args.get('bridge_minutes', 3))
+        max_bridge_hours = int(request.args.get('max_bridge_hours', 72))
+        apply_changes = (request.args.get('apply', '0').strip().lower() in {'1', 'true', 'yes'})
+        csv_only = (request.args.get('csv_only', '0').strip().lower() in {'1', 'true', 'yes'})
+
+        stats = recover_snapshots_from_csv_and_current(
+            csv_path=csv_path,
+            current_path=HISTORICAL_DATA_PATH,
+            output_path=HISTORICAL_DATA_PATH,
+            bridge_interval_minutes=bridge_interval_minutes,
+            max_bridge_hours=max_bridge_hours,
+            dry_run=not apply_changes,
+            csv_only=csv_only
+        )
+        return jsonify({
+            'success': True,
+            'csv_path': csv_path,
+            'historical_data_path': HISTORICAL_DATA_PATH,
+            'applied': apply_changes,
+            'stats': stats
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/api/admin/fix-kalshi-gap', methods=['POST'])
 def fix_kalshi_gap():
     """One-time fix: remove last N min of Manifold-only data. Default 50 min."""
     try:
         minutes = int(request.args.get('minutes', 50))
-        snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
-        if not snapshots:
-            return jsonify({"error": "no snapshots"}), 400
+        lock_path = HISTORICAL_DATA_PATH + '.lock'
+        lock_file = _acquire_file_lock(lock_path)
+        try:
+            snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
+            if not snapshots:
+                return jsonify({"error": "no snapshots"}), 400
 
-        now = datetime.now(timezone.utc)
-        cutoff = now - timedelta(minutes=minutes)
+            now = datetime.now(timezone.utc)
+            cutoff = now - timedelta(minutes=minutes)
 
-        good = []
-        removed = 0
-        for s in snapshots:
-            ts = parse_snapshot_timestamp(s.get('timestamp', ''))
-            if ts and ts < cutoff:
-                good.append(s)
-            else:
-                removed += 1
+            good = []
+            removed = 0
+            for s in snapshots:
+                ts = parse_snapshot_timestamp(s.get('timestamp', ''))
+                if ts and ts < cutoff:
+                    good.append(s)
+                else:
+                    removed += 1
 
-        temp_path = HISTORICAL_DATA_PATH + '.fix_tmp'
-        with open(temp_path, 'w') as f:
-            for s in good:
-                f.write(json.dumps(s) + '\n')
-        os.replace(temp_path, HISTORICAL_DATA_PATH)
+            backup_file(HISTORICAL_DATA_PATH, reason='fix-kalshi-gap')
+
+            temp_path = HISTORICAL_DATA_PATH + '.fix_tmp'
+            with open(temp_path, 'w') as f:
+                for s in good:
+                    f.write(json.dumps(s) + '\n')
+            os.replace(temp_path, HISTORICAL_DATA_PATH)
+        finally:
+            _release_file_lock(lock_file)
 
         return jsonify({
             "success": True,
@@ -1519,15 +1819,19 @@ def get_snapshots_chart():
         all_candidates = set()
         for _, snap in parsed:
             for c in snap.get('candidates', []):
-                all_candidates.add(c['name'])
+                cand_name = c.get('name')
+                if cand_name:
+                    all_candidates.add(cand_name)
 
         # Track EMA state per candidate
         ema_state = {}  # candidate_name -> current smoothed value
 
         for i, (dt, snap) in enumerate(parsed):
             for c in snap.get('candidates', []):
-                name = c['name']
-                raw = c.get('probability', 0)
+                name = c.get('name')
+                if not name:
+                    continue
+                raw = _safe_float(c.get('probability', 0), 0.0)
                 if name not in ema_state:
                     ema_state[name] = raw  # First value: no smoothing
                 else:
@@ -1546,9 +1850,9 @@ def get_snapshots_chart():
             index_map = []  # maps polyline index -> parsed index
             for i, (dt, snap) in enumerate(parsed):
                 for c in snap.get('candidates', []):
-                    if c['name'] == cand_name:
+                    if c.get('name') == cand_name:
                         x = ((dt.timestamp() - t_first) / t_range) * 100.0
-                        y = c.get('probability', 0)
+                        y = _safe_float(c.get('probability', 0), 0.0)
                         points.append((x, y))
                         index_map.append(i)
                         break
@@ -1650,31 +1954,29 @@ def download_snapshots():
 
 @app.route('/api/download/snapshots/csv')
 def download_snapshots_csv():
-    """Download all historical snapshot data as CSV file"""
+    """Download all historical snapshot data as CSV file."""
     try:
         snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
         if not snapshots:
             return jsonify({"error": "No data available"}), 404
 
-        # Build CSV content
         import io
+        import csv
         output = io.StringIO()
-        output.write('timestamp,candidate,probability,hasKalshi\n')
+        writer = csv.writer(output)
+        writer.writerow(['timestamp', 'candidate', 'probability', 'hasKalshi'])
 
         for snapshot in snapshots:
             timestamp = snapshot.get('timestamp', '')
             for candidate in snapshot.get('candidates', []):
                 name = candidate.get('name', '')
-                prob = candidate.get('probability', 0)
+                prob = _safe_float(candidate.get('probability', 0), 0.0)
                 has_kalshi = 'true' if candidate.get('hasKalshi', False) else 'false'
-                # Escape candidate name if it contains commas or quotes
-                name_escaped = f'"{name}"' if ',' in name or '"' in name else name
-                output.write(f'{timestamp},{name_escaped},{prob:.1f},{has_kalshi}\n')
+                writer.writerow([timestamp, name, f"{prob:.1f}", has_kalshi])
 
         csv_content = output.getvalue()
         output.close()
 
-        # Create response
         from flask import Response
         response = Response(csv_content, mimetype='text/csv')
         response.headers['Content-Disposition'] = 'attachment; filename=il9cast_historical_data.csv'
@@ -1682,6 +1984,7 @@ def download_snapshots_csv():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/api/subscribe', methods=['POST'])
 def subscribe():
