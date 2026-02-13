@@ -35,6 +35,7 @@ data/historical_snapshots.json
 data/historical_snapshots.jsonl
 data/*.backup.*
 data/*.pre-*
+data/*.lock
 
 # Environment variables
 .env
