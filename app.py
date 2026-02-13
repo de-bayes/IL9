@@ -8,6 +8,7 @@ import json
 import os
 import time as _time
 import atexit
+import shutil
 from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
@@ -50,6 +51,23 @@ _daily_summary_sent = None  # date string of last sent daily summary
 
 # ===== JSONL HELPER FUNCTIONS =====
 
+def _acquire_file_lock(lock_path):
+    """Acquire an exclusive inter-process file lock and return the lock file handle."""
+    import fcntl
+    lock_file = open(lock_path, 'a+')
+    fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+    return lock_file
+
+
+def _release_file_lock(lock_file):
+    """Release an inter-process file lock."""
+    import fcntl
+    try:
+        fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+    finally:
+        lock_file.close()
+
+
 def read_snapshots_jsonl(filepath):
     """
     Read snapshots from JSONL file.
@@ -66,6 +84,13 @@ def read_snapshots_jsonl(filepath):
                 line = line.strip()
                 if not line:
                     continue
+                if '\x00' in line:
+                    preview = line[:120]
+                    print(
+                        f"[{datetime.now().isoformat()}] Corrupt NUL bytes at line {line_num}. "
+                        f"Skipping malformed JSONL row (preview={preview!r})"
+                    )
+                    continue
                 try:
                     snapshot = json.loads(line)
                     snapshots.append(snapshot)
@@ -81,23 +106,30 @@ def read_snapshots_jsonl(filepath):
 
     return snapshots
 
+
 def repair_snapshots_jsonl(filepath):
     """
     Remove malformed JSONL lines from snapshots file.
-    Returns dict with total/kept/removed counts.
+    Returns dict with total/kept/removed counts and optional backup_path.
     """
-    stats = {'total': 0, 'kept': 0, 'removed': 0}
+    stats = {'total': 0, 'kept': 0, 'removed': 0, 'backup_path': None}
     if not os.path.exists(filepath):
         return stats
 
     temp_path = filepath + '.repair.tmp'
+    lock_path = filepath + '.lock'
+    lock_file = None
     try:
+        lock_file = _acquire_file_lock(lock_path)
         with open(filepath, 'r') as src, open(temp_path, 'w') as dst:
             for line in src:
                 stripped = line.strip()
                 if not stripped:
                     continue
                 stats['total'] += 1
+                if '\x00' in stripped:
+                    stats['removed'] += 1
+                    continue
                 try:
                     json.loads(stripped)
                     dst.write(stripped + '\n')
@@ -106,14 +138,17 @@ def repair_snapshots_jsonl(filepath):
                     stats['removed'] += 1
 
         if stats['removed'] > 0:
+            backup_path = filepath + f".backup.{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
+            shutil.copy2(filepath, backup_path)
+            stats['backup_path'] = backup_path
             os.replace(temp_path, filepath)
             print(
                 f"[{datetime.now().isoformat()}] Repaired JSONL snapshots: "
-                f"removed {stats['removed']} malformed line(s), kept {stats['kept']}"
+                f"removed {stats['removed']} malformed line(s), kept {stats['kept']}, "
+                f"backup saved to {backup_path}"
             )
-        else:
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
+        elif os.path.exists(temp_path):
+            os.remove(temp_path)
     except (IOError, OSError) as e:
         if os.path.exists(temp_path):
             try:
@@ -121,59 +156,49 @@ def repair_snapshots_jsonl(filepath):
             except OSError:
                 pass
         print(f"[{datetime.now().isoformat()}] Error repairing JSONL file: {e}")
+    finally:
+        if lock_file is not None:
+            _release_file_lock(lock_file)
 
     return stats
 
+
 def append_snapshot_jsonl(filepath, snapshot):
     """
-    Append a single snapshot to JSONL file.
-    Atomic operation: writes to temp file then renames.
+    Append a single snapshot to JSONL file safely.
+    Uses a file lock + append + fsync to prevent inter-process corruption.
     """
-    # Ensure directory exists
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
 
-    # Write to temp file first
-    temp_path = filepath + '.tmp'
+    lock_path = filepath + '.lock'
+    lock_file = None
     try:
-        with open(temp_path, 'w') as f:
-            f.write(json.dumps(snapshot) + '\n')
-
-        # Atomic append: create new file with old content + new line
-        if os.path.exists(filepath):
-            # Read existing content
-            with open(filepath, 'r') as existing:
-                existing_content = existing.read()
-
-            # Write existing + new to temp
-            with open(temp_path, 'w') as f:
-                f.write(existing_content)
-                if existing_content and not existing_content.endswith('\n'):
-                    f.write('\n')
-                f.write(json.dumps(snapshot) + '\n')
-
-        # Atomic replace
-        os.replace(temp_path, filepath)
+        lock_file = _acquire_file_lock(lock_path)
+        line = json.dumps(snapshot, separators=(',', ':')) + '\n'
+        with open(filepath, 'a') as f:
+            f.write(line)
+            f.flush()
+            os.fsync(f.fileno())
         return True
 
     except Exception as e:
         print(f"[{datetime.now().isoformat()}] Error appending to JSONL: {e}")
-        # Clean up temp file
-        if os.path.exists(temp_path):
-            try:
-                os.remove(temp_path)
-            except:
-                pass
         raise
+    finally:
+        if lock_file is not None:
+            _release_file_lock(lock_file)
+
 
 def count_snapshots_jsonl(filepath):
-    """Count total snapshots in JSONL file without loading all into memory"""
+    """Count total valid snapshots in JSONL file without loading all into memory"""
     if not os.path.exists(filepath):
         return 0
 
     count = 0
     with open(filepath, 'r') as f:
         for line in f:
-            if line.strip():
+            stripped = line.strip()
+            if stripped and '\x00' not in stripped:
                 count += 1
     return count
 
@@ -890,7 +915,6 @@ def initialize_data():
                 # Backup legacy file
                 backup_path = LEGACY_JSON_PATH + '.pre-jsonl-backup'
                 if not os.path.exists(backup_path):
-                    import shutil
                     shutil.copy2(LEGACY_JSON_PATH, backup_path)
                     print(f"[{datetime.now().isoformat()}] Legacy JSON backed up to {backup_path}")
         except Exception as e:
@@ -1333,6 +1357,20 @@ def get_kalshi_history(ticker):
         return jsonify(response.json())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/admin/repair-snapshots', methods=['POST'])
+def repair_snapshots_admin():
+    """Run JSONL repair on demand and return recovery metadata."""
+    try:
+        stats = repair_snapshots_jsonl(HISTORICAL_DATA_PATH)
+        return jsonify({
+            'success': True,
+            'stats': stats,
+            'historical_data_path': HISTORICAL_DATA_PATH
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/admin/fix-kalshi-gap', methods=['POST'])
 def fix_kalshi_gap():
@@ -2068,9 +2106,26 @@ if 'gunicorn' not in sys.argv[0]:
     atexit.register(lambda: scheduler.shutdown())
 else:
     # Running under gunicorn - only start scheduler in the main process
-    # Use gunicorn's preload mode with a single background thread
+    # Use an inter-process file lock so only one worker runs the scheduler.
     from threading import Thread
     import time
+    import fcntl
+    import os
+
+    _scheduler_lock_file = None
+
+    def _acquire_scheduler_lock():
+        """Acquire an exclusive lock; return True only for the elected worker."""
+        global _scheduler_lock_file
+        lock_path = os.environ.get('IL9_SCHEDULER_LOCK_PATH', '/tmp/il9_scheduler.lock')
+        _scheduler_lock_file = open(lock_path, 'w')
+        try:
+            fcntl.flock(_scheduler_lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            _scheduler_lock_file.write(str(os.getpid()))
+            _scheduler_lock_file.flush()
+            return True
+        except BlockingIOError:
+            return False
 
     def scheduler_thread():
         """Background thread for data collection when running under gunicorn"""
@@ -2094,9 +2149,13 @@ else:
             except Exception as e:
                 print(f"Error sending daily summary: {e}")
 
-    # Start scheduler thread
-    thread = Thread(target=scheduler_thread, daemon=True)
-    thread.start()
+    # Start scheduler thread only in the elected worker.
+    if _acquire_scheduler_lock():
+        print(f"[{datetime.now().isoformat()}] Scheduler lock acquired in pid={os.getpid()}")
+        thread = Thread(target=scheduler_thread, daemon=True)
+        thread.start()
+    else:
+        print(f"[{datetime.now().isoformat()}] Scheduler disabled in pid={os.getpid()} (lock held by another worker)")
 
 if __name__ == '__main__':
     # Use debug mode only for local development
