@@ -178,6 +178,67 @@ def _interpolate_snapshots(start_snapshot, end_snapshot, step_count):
     return out
 
 
+def bridge_to_present(filepath, interval_minutes=3, max_bridge_hours=72):
+    """Append flat-interpolated snapshots from the last snapshot in the file up to now.
+
+    Uses the last snapshot's values as both start and end so the bridge is a flat line.
+    Returns a stats dict.
+    """
+    snapshots = read_snapshots_jsonl(filepath)
+    if not snapshots:
+        return {'bridged': False, 'reason': 'no_data'}
+
+    last = snapshots[-1]
+    last_dt = parse_snapshot_timestamp(last.get('timestamp'))
+    now = datetime.now(timezone.utc)
+
+    if not last_dt:
+        return {'bridged': False, 'reason': 'no_timestamp'}
+
+    gap_seconds = (now - last_dt).total_seconds()
+    gap_hours = gap_seconds / 3600.0
+
+    if gap_seconds <= interval_minutes * 60:
+        return {'bridged': False, 'reason': 'no_gap', 'gap_hours': round(gap_hours, 2)}
+
+    if gap_hours > max_bridge_hours:
+        return {'bridged': False, 'reason': 'gap_too_large', 'gap_hours': round(gap_hours, 2)}
+
+    # Create a "now" endpoint with same values (flat bridge)
+    end_snapshot = {
+        'candidates': last.get('candidates', []),
+        'timestamp': now.isoformat().replace('+00:00', 'Z')
+    }
+
+    step_count = int(gap_seconds // (interval_minutes * 60)) - 1
+    step_count = max(0, min(step_count, 5000))
+
+    bridge = _interpolate_snapshots(last, end_snapshot, step_count)
+
+    if not bridge:
+        return {'bridged': False, 'reason': 'no_bridge_steps'}
+
+    # Bulk append bridge snapshots with a single lock acquire
+    lock_path = filepath + '.lock'
+    lock_file = _acquire_file_lock(lock_path)
+    try:
+        with open(filepath, 'a') as f:
+            for snap in bridge:
+                f.write(json.dumps(snap, separators=(',', ':')) + '\n')
+            f.flush()
+            os.fsync(f.fileno())
+    finally:
+        _release_file_lock(lock_file)
+
+    return {
+        'bridged': True,
+        'snapshots_added': len(bridge),
+        'gap_hours': round(gap_hours, 2),
+        'from': last.get('timestamp'),
+        'to': end_snapshot['timestamp']
+    }
+
+
 def recover_snapshots_from_csv_and_current(csv_path, current_path, output_path, bridge_interval_minutes=3, max_bridge_hours=72, dry_run=True, csv_only=False):
     """Rebuild timeline by stitching CSV history with current JSONL snapshots and optional interpolation bridge."""
     csv_snapshots = load_snapshots_from_csv(csv_path)
@@ -1127,43 +1188,97 @@ def initialize_data():
 
 
 def import_repo_csv_to_volume_if_needed(csv_path=REPO_CSV_PATH, output_path=HISTORICAL_DATA_PATH):
-    """One-time bootstrap from repo CSV into JSONL output when output file is missing/empty."""
+    """Bootstrap from repo CSV into JSONL, with volume-wipe detection via marker file.
+
+    Uses a '.csv_recovery_done' marker on the persistent volume.  When the volume
+    is wiped the marker disappears too, so the next restart triggers a full recovery
+    (CSV import + bridge interpolation to surviving data + bridge to present).
+    """
+    marker = os.path.join(os.path.dirname(output_path), '.csv_recovery_done')
+
     if not os.path.exists(csv_path):
         return {'imported': False, 'reason': 'csv_missing', 'csv_path': csv_path, 'output_path': output_path}
 
-    if os.path.exists(output_path):
-        existing = read_snapshots_jsonl(output_path)
-        if existing:
-            return {'imported': False, 'reason': 'output_has_data', 'csv_path': csv_path, 'output_path': output_path, 'existing_snapshots': len(existing)}
+    # Marker present → volume is healthy, skip
+    if os.path.exists(marker):
+        return {'imported': False, 'reason': 'already_recovered', 'csv_path': csv_path, 'output_path': output_path}
 
-    snapshots = load_snapshots_from_csv(csv_path)
-    if not snapshots:
+    csv_snapshots = load_snapshots_from_csv(csv_path)
+    if not csv_snapshots:
         return {'imported': False, 'reason': 'csv_empty', 'csv_path': csv_path, 'output_path': output_path}
 
-    lock_path = output_path + '.lock'
-    lock_file = _acquire_file_lock(lock_path)
-    tmp_path = output_path + '.import_tmp'
-    try:
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        with open(tmp_path, 'w') as f:
-            for snap in snapshots:
-                f.write(json.dumps(snap, separators=(',', ':')) + '\n')
-        os.replace(tmp_path, output_path)
-    finally:
-        if os.path.exists(tmp_path):
-            try:
-                os.remove(tmp_path)
-            except OSError:
-                pass
-        _release_file_lock(lock_file)
+    csv_count = len(csv_snapshots)
+    existing_count = count_snapshots_jsonl(output_path) if os.path.exists(output_path) else 0
 
-    return {
-        'imported': True,
-        'reason': 'imported',
-        'csv_path': csv_path,
-        'output_path': output_path,
-        'snapshots_written': len(snapshots)
-    }
+    # If JSONL already has more data than CSV and is healthy, just create marker
+    if existing_count >= csv_count:
+        os.makedirs(os.path.dirname(marker), exist_ok=True)
+        with open(marker, 'w') as f:
+            f.write(f"healthy volume detected at {datetime.now(timezone.utc).isoformat()}\n")
+        print(f"[{datetime.now().isoformat()}] Volume healthy ({existing_count} snapshots >= {csv_count} CSV). Created recovery marker.")
+        return {'imported': False, 'reason': 'output_has_sufficient_data', 'existing_snapshots': existing_count}
+
+    # ---- Recovery needed ----
+    print(f"[{datetime.now().isoformat()}] Recovery needed: JSONL has {existing_count} snapshots, CSV has {csv_count}")
+    stats = {}
+
+    if existing_count > 0:
+        # Volume wipe with some surviving post-wipe data → stitch CSV + bridge + surviving
+        try:
+            stats = recover_snapshots_from_csv_and_current(
+                csv_path=csv_path,
+                current_path=output_path,
+                output_path=output_path,
+                bridge_interval_minutes=3,
+                max_bridge_hours=72,
+                dry_run=False,
+                csv_only=False
+            )
+            stats['reason'] = 'volume_wipe_recovery'
+            print(f"[{datetime.now().isoformat()}] Stitched recovery: {stats.get('merged_total', 0)} total snapshots "
+                  f"(CSV base={stats.get('base_used', 0)}, bridge={stats.get('bridge_created', 0)}, "
+                  f"surviving={stats.get('current_snapshots', 0)})")
+        except Exception as e:
+            print(f"[{datetime.now().isoformat()}] Stitched recovery failed ({e}). Falling through to CSV-only import.")
+            existing_count = 0  # Force CSV-only path below
+
+    if existing_count == 0:
+        # No surviving data (or stitched recovery failed) → fresh CSV import
+        lock_path = output_path + '.lock'
+        lock_file = _acquire_file_lock(lock_path)
+        tmp_path = output_path + '.import_tmp'
+        try:
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            with open(tmp_path, 'w') as f:
+                for snap in csv_snapshots:
+                    f.write(json.dumps(snap, separators=(',', ':')) + '\n')
+            os.replace(tmp_path, output_path)
+        finally:
+            if os.path.exists(tmp_path):
+                try:
+                    os.remove(tmp_path)
+                except OSError:
+                    pass
+            _release_file_lock(lock_file)
+        stats = {'reason': 'csv_only_import', 'snapshots_written': csv_count}
+        print(f"[{datetime.now().isoformat()}] CSV-only import: wrote {csv_count} snapshots")
+
+    # Bridge from last snapshot to present (fills gap with flat interpolated data)
+    bridge_stats = bridge_to_present(output_path)
+    stats['bridge_to_present'] = bridge_stats
+    if bridge_stats.get('bridged'):
+        print(f"[{datetime.now().isoformat()}] Bridged {bridge_stats['snapshots_added']} snapshots to present "
+              f"(gap was {bridge_stats['gap_hours']}h)")
+
+    # Create recovery marker so we don't re-run on next restart
+    os.makedirs(os.path.dirname(marker), exist_ok=True)
+    with open(marker, 'w') as f:
+        f.write(f"recovered at {datetime.now(timezone.utc).isoformat()}\n")
+
+    final_count = count_snapshots_jsonl(output_path)
+    stats['imported'] = True
+    stats['final_snapshot_count'] = final_count
+    return stats
 
 def purge_old_data():
     """
@@ -1250,7 +1365,13 @@ else:
     initialize_data()
     import_result = import_repo_csv_to_volume_if_needed()
     if import_result.get('imported'):
-        print(f"[{datetime.now().isoformat()}] Imported {import_result.get('snapshots_written', 0)} snapshots from repo CSV")
+        reason = import_result.get('reason', 'unknown')
+        final = import_result.get('final_snapshot_count', '?')
+        bridge_info = import_result.get('bridge_to_present', {})
+        bridge_msg = f", bridged {bridge_info.get('snapshots_added', 0)} to present" if bridge_info.get('bridged') else ""
+        print(f"[{datetime.now().isoformat()}] CSV recovery complete ({reason}): {final} total snapshots{bridge_msg}")
+    else:
+        print(f"[{datetime.now().isoformat()}] CSV import skipped: {import_result.get('reason', 'unknown')}")
     purge_old_data()
     repair_snapshots_jsonl(HISTORICAL_DATA_PATH)
 
@@ -1633,12 +1754,51 @@ def recover_snapshots_admin():
             dry_run=not apply_changes,
             csv_only=csv_only
         )
+        # Optionally bridge to present after recovery
+        bridge_stats = None
+        if apply_changes and request.args.get('bridge', '0').strip().lower() in {'1', 'true', 'yes'}:
+            bridge_stats = bridge_to_present(HISTORICAL_DATA_PATH)
+
         return jsonify({
             'success': True,
             'csv_path': csv_path,
             'historical_data_path': HISTORICAL_DATA_PATH,
             'applied': apply_changes,
             'csv_only': csv_only,
+            'stats': stats,
+            'bridge_to_present': bridge_stats
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/admin/bridge-to-present', methods=['POST'])
+def bridge_to_present_admin():
+    """Fill the gap from the last snapshot to now with flat-interpolated data."""
+    try:
+        stats = bridge_to_present(HISTORICAL_DATA_PATH)
+        return jsonify({
+            'success': True,
+            'historical_data_path': HISTORICAL_DATA_PATH,
+            'stats': stats
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/admin/force-csv-recovery', methods=['POST'])
+def force_csv_recovery_admin():
+    """Force a full CSV recovery regardless of marker state. Removes marker, re-imports, bridges to present."""
+    try:
+        marker = os.path.join(os.path.dirname(HISTORICAL_DATA_PATH), '.csv_recovery_done')
+        if os.path.exists(marker):
+            os.remove(marker)
+            print(f"[{datetime.now().isoformat()}] Removed recovery marker for forced recovery")
+
+        stats = import_repo_csv_to_volume_if_needed()
+        return jsonify({
+            'success': True,
+            'historical_data_path': HISTORICAL_DATA_PATH,
             'stats': stats
         })
     except Exception as e:
