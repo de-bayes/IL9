@@ -21,10 +21,18 @@ def resolve_data_path(filename='historical_snapshots.jsonl'):
     Resolve the correct data directory, checking Railway persistent volume first.
     Priority: /data/ -> /app/data/ -> local data/
     """
-    for candidate_dir in ['/data', '/app/data']:
+    configured_dir = os.environ.get('DATA_DIR', '').strip()
+    if configured_dir:
+        return os.path.join(configured_dir, filename)
+
+    for candidate_dir in ['/app/data', '/data']:
         candidate_path = os.path.join(candidate_dir, filename)
-        if os.path.exists(candidate_dir):
+        if os.path.exists(candidate_path):
             return candidate_path
+
+    for candidate_dir in ['/app/data', '/data']:
+        if os.path.exists(candidate_dir):
+            return os.path.join(candidate_dir, filename)
     # Fallback to local data/ directory
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', filename)
 
@@ -37,6 +45,7 @@ SEED_DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'seed_snapshots
 
 # Legacy JSON path for migration
 LEGACY_JSON_PATH = os.path.join(os.path.dirname(__file__), 'data', 'historical_snapshots.json')
+REPO_CSV_PATH = os.path.join(os.path.dirname(__file__), 'il9cast_historical_data.csv')
 
 # ===== EMAIL ALERT CONFIGURATION =====
 SUBSCRIBERS_PATH = resolve_data_path('email_subscribers.jsonl')
@@ -169,14 +178,14 @@ def _interpolate_snapshots(start_snapshot, end_snapshot, step_count):
     return out
 
 
-def recover_snapshots_from_csv_and_current(csv_path, current_path, output_path, bridge_interval_minutes=3, max_bridge_hours=72, dry_run=True):
+def recover_snapshots_from_csv_and_current(csv_path, current_path, output_path, bridge_interval_minutes=3, max_bridge_hours=72, dry_run=True, csv_only=False):
     """Rebuild timeline by stitching CSV history with current JSONL snapshots and optional interpolation bridge."""
     csv_snapshots = load_snapshots_from_csv(csv_path)
     current_snapshots = read_snapshots_jsonl(current_path)
 
     if not csv_snapshots:
         raise ValueError('No snapshots found in CSV source')
-    if not current_snapshots:
+    if not csv_only and not current_snapshots:
         raise ValueError('No snapshots found in current JSONL source')
 
     current_snapshots = [s for s in current_snapshots if parse_snapshot_timestamp(s.get('timestamp'))]
@@ -185,11 +194,15 @@ def recover_snapshots_from_csv_and_current(csv_path, current_path, output_path, 
     current_snapshots.sort(key=lambda s: parse_snapshot_timestamp(s.get('timestamp')))
     csv_snapshots.sort(key=lambda s: parse_snapshot_timestamp(s.get('timestamp')))
 
-    first_current_dt = parse_snapshot_timestamp(current_snapshots[0].get('timestamp'))
-    base = [s for s in csv_snapshots if parse_snapshot_timestamp(s.get('timestamp')) < first_current_dt]
+    base = []
+    if csv_only:
+        base = csv_snapshots
+    else:
+        first_current_dt = parse_snapshot_timestamp(current_snapshots[0].get('timestamp'))
+        base = [s for s in csv_snapshots if parse_snapshot_timestamp(s.get('timestamp')) < first_current_dt]
 
     bridge = []
-    if base:
+    if base and not csv_only:
         last_base = base[-1]
         first_current = current_snapshots[0]
         last_base_dt = parse_snapshot_timestamp(last_base.get('timestamp'))
@@ -201,7 +214,8 @@ def recover_snapshots_from_csv_and_current(csv_path, current_path, output_path, 
 
     merged = []
     seen = set()
-    for snap in (base + bridge + current_snapshots):
+    merge_stream = base if csv_only else (base + bridge + current_snapshots)
+    for snap in merge_stream:
         ts = snap.get('timestamp')
         if not ts or ts in seen:
             continue
@@ -1111,6 +1125,46 @@ def initialize_data():
         except Exception as e:
             print(f"[{datetime.now().isoformat()}] Error seeding data: {e}")
 
+
+def import_repo_csv_to_volume_if_needed(csv_path=REPO_CSV_PATH, output_path=HISTORICAL_DATA_PATH):
+    """One-time bootstrap from repo CSV into JSONL output when output file is missing/empty."""
+    if not os.path.exists(csv_path):
+        return {'imported': False, 'reason': 'csv_missing', 'csv_path': csv_path, 'output_path': output_path}
+
+    if os.path.exists(output_path):
+        existing = read_snapshots_jsonl(output_path)
+        if existing:
+            return {'imported': False, 'reason': 'output_has_data', 'csv_path': csv_path, 'output_path': output_path, 'existing_snapshots': len(existing)}
+
+    snapshots = load_snapshots_from_csv(csv_path)
+    if not snapshots:
+        return {'imported': False, 'reason': 'csv_empty', 'csv_path': csv_path, 'output_path': output_path}
+
+    lock_path = output_path + '.lock'
+    lock_file = _acquire_file_lock(lock_path)
+    tmp_path = output_path + '.import_tmp'
+    try:
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        with open(tmp_path, 'w') as f:
+            for snap in snapshots:
+                f.write(json.dumps(snap, separators=(',', ':')) + '\n')
+        os.replace(tmp_path, output_path)
+    finally:
+        if os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                pass
+        _release_file_lock(lock_file)
+
+    return {
+        'imported': True,
+        'reason': 'imported',
+        'csv_path': csv_path,
+        'output_path': output_path,
+        'snapshots_written': len(snapshots)
+    }
+
 def purge_old_data():
     """
     Optional one-time purge: remove snapshots before Jan 30, 2026.
@@ -1189,10 +1243,16 @@ def purge_old_data():
         f.write('done')
 
 # Initialize data on module load
-print(f"[{datetime.now().isoformat()}] Using historical data path: {HISTORICAL_DATA_PATH}")
-initialize_data()
-purge_old_data()
-repair_snapshots_jsonl(HISTORICAL_DATA_PATH)
+if os.environ.get('IL9_SKIP_STARTUP_TASKS', '').strip().lower() in {'1', 'true', 'yes'}:
+    print(f"[{datetime.now().isoformat()}] Startup data tasks skipped via IL9_SKIP_STARTUP_TASKS")
+else:
+    print(f"[{datetime.now().isoformat()}] Using historical data path: {HISTORICAL_DATA_PATH}")
+    initialize_data()
+    import_result = import_repo_csv_to_volume_if_needed()
+    if import_result.get('imported'):
+        print(f"[{datetime.now().isoformat()}] Imported {import_result.get('snapshots_written', 0)} snapshots from repo CSV")
+    purge_old_data()
+    repair_snapshots_jsonl(HISTORICAL_DATA_PATH)
 
 # Mock candidate data
 CANDIDATES = [
@@ -1558,10 +1618,11 @@ def repair_snapshots_admin():
 def recover_snapshots_admin():
     """Rebuild snapshots by stitching a CSV history source with current volume JSONL data."""
     try:
-        csv_path = request.args.get('csv_path') or os.path.join(os.path.dirname(__file__), 'il9cast_historical_data.csv')
+        csv_path = request.args.get('csv_path') or REPO_CSV_PATH
         bridge_interval_minutes = int(request.args.get('bridge_minutes', 3))
         max_bridge_hours = int(request.args.get('max_bridge_hours', 72))
         apply_changes = (request.args.get('apply', '0').strip().lower() in {'1', 'true', 'yes'})
+        csv_only = (request.args.get('csv_only', '0').strip().lower() in {'1', 'true', 'yes'})
 
         stats = recover_snapshots_from_csv_and_current(
             csv_path=csv_path,
@@ -1569,13 +1630,15 @@ def recover_snapshots_admin():
             output_path=HISTORICAL_DATA_PATH,
             bridge_interval_minutes=bridge_interval_minutes,
             max_bridge_hours=max_bridge_hours,
-            dry_run=not apply_changes
+            dry_run=not apply_changes,
+            csv_only=csv_only
         )
         return jsonify({
             'success': True,
             'csv_path': csv_path,
             'historical_data_path': HISTORICAL_DATA_PATH,
             'applied': apply_changes,
+            'csv_only': csv_only,
             'stats': stats
         })
     except Exception as e:
@@ -1690,7 +1753,7 @@ def get_snapshots_chart():
         # Read all snapshots
         all_snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
         if not all_snapshots:
-            return jsonify([])
+            return jsonify({'snapshots': [], 'gaps': []})
 
         # Parse timestamps and filter bad ones
         parsed = []
@@ -1701,7 +1764,7 @@ def get_snapshots_chart():
         parsed.sort(key=lambda x: x[0])
 
         if not parsed:
-            return jsonify([])
+            return jsonify({'snapshots': [], 'gaps': []})
 
         # Filter by period
         now_utc = datetime.now(timezone.utc)
@@ -1714,7 +1777,7 @@ def get_snapshots_chart():
         # 'all' keeps everything
 
         if not parsed:
-            return jsonify([])
+            return jsonify({'snapshots': [], 'gaps': []})
 
         # Normalize time axis to 0-100 for RDP (same scale as probability 0-100)
         t_first = parsed[0][0].timestamp()
@@ -1883,18 +1946,18 @@ def download_snapshots_csv():
 
         # Build CSV content
         import io
+        import csv
         output = io.StringIO()
-        output.write('timestamp,candidate,probability,hasKalshi\n')
+        writer = csv.writer(output)
+        writer.writerow(['timestamp', 'candidate', 'probability', 'hasKalshi'])
 
         for snapshot in snapshots:
             timestamp = snapshot.get('timestamp', '')
             for candidate in snapshot.get('candidates', []):
                 name = candidate.get('name', '')
-                prob = candidate.get('probability', 0)
+                prob = _safe_float(candidate.get('probability', 0), 0.0)
                 has_kalshi = 'true' if candidate.get('hasKalshi', False) else 'false'
-                # Escape candidate name if it contains commas or quotes
-                name_escaped = f'"{name}"' if ',' in name or '"' in name else name
-                output.write(f'{timestamp},{name_escaped},{prob:.1f},{has_kalshi}\n')
+                writer.writerow([timestamp, name, f'{prob:.1f}', has_kalshi])
 
         csv_content = output.getvalue()
         output.close()
@@ -2312,7 +2375,10 @@ def clean_candidate_name(name):
 # Set up background scheduler only if not running under gunicorn workers
 # This prevents duplicate schedulers when gunicorn spawns multiple workers
 import sys
-if 'gunicorn' not in sys.argv[0]:
+_disable_scheduler = os.environ.get('IL9_DISABLE_SCHEDULER', '').strip().lower() in {'1', 'true', 'yes'}
+if _disable_scheduler:
+    print(f"[{datetime.now().isoformat()}] Scheduler disabled via IL9_DISABLE_SCHEDULER")
+elif 'gunicorn' not in sys.argv[0]:
     # Running locally or in single-process mode
     from apscheduler.triggers.cron import CronTrigger
     scheduler = BackgroundScheduler()
