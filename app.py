@@ -938,10 +938,15 @@ def initialize_data():
 
 def purge_old_data():
     """
-    One-time purge: remove all snapshots before Jan 30, 2026.
-    Clean start - old data from Jan 15-29 is discarded.
-    Marker file prevents re-running on every restart.
+    Optional one-time purge: remove snapshots before Jan 30, 2026.
+    Disabled by default to preserve historical volume data.
+    Set ENABLE_PRE_JAN30_PURGE=true to run this migration.
     """
+    purge_enabled = os.environ.get('ENABLE_PRE_JAN30_PURGE', '').strip().lower() in {'1', 'true', 'yes'}
+    if not purge_enabled:
+        print(f"[{datetime.now().isoformat()}] Pre-Jan30 purge disabled; preserving historical snapshots")
+        return
+
     data_dir = os.path.dirname(HISTORICAL_DATA_PATH)
     marker = os.path.join(data_dir, '.purge_pre_jan30_done')
     if os.path.exists(marker):
@@ -994,21 +999,12 @@ def purge_old_data():
                     print(f"  Deleted legacy file: {fpath}")
                 except Exception:
                     pass
-        # Delete backup files
-        if os.path.isdir(pattern_dir):
-            for fname in os.listdir(pattern_dir):
-                if '.backup.' in fname or '.pre-' in fname:
-                    fpath = os.path.join(pattern_dir, fname)
-                    try:
-                        os.remove(fpath)
-                        print(f"  Deleted backup file: {fpath}")
-                    except Exception:
-                        pass
 
     with open(marker, 'w') as f:
         f.write('done')
 
 # Initialize data on module load
+print(f"[{datetime.now().isoformat()}] Using historical data path: {HISTORICAL_DATA_PATH}")
 initialize_data()
 purge_old_data()
 repair_snapshots_jsonl(HISTORICAL_DATA_PATH)
