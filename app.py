@@ -90,6 +90,14 @@ def _parse_bool(value):
     return str(value).strip().lower() in {'1', 'true', 'yes', 'y'}
 
 
+def _safe_float(value, default=0.0):
+    """Best-effort numeric coercion for probabilities coming from mixed data sources."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def load_snapshots_from_csv(csv_path):
     """Load wide historical CSV (timestamp,candidate,probability,hasKalshi) into snapshot JSON objects."""
     import csv
@@ -1732,15 +1740,19 @@ def get_snapshots_chart():
         all_candidates = set()
         for _, snap in parsed:
             for c in snap.get('candidates', []):
-                all_candidates.add(c['name'])
+                cand_name = c.get('name')
+                if cand_name:
+                    all_candidates.add(cand_name)
 
         # Track EMA state per candidate
         ema_state = {}  # candidate_name -> current smoothed value
 
         for i, (dt, snap) in enumerate(parsed):
             for c in snap.get('candidates', []):
-                name = c['name']
-                raw = c.get('probability', 0)
+                name = c.get('name')
+                if not name:
+                    continue
+                raw = _safe_float(c.get('probability', 0), 0.0)
                 if name not in ema_state:
                     ema_state[name] = raw  # First value: no smoothing
                 else:
@@ -1759,9 +1771,9 @@ def get_snapshots_chart():
             index_map = []  # maps polyline index -> parsed index
             for i, (dt, snap) in enumerate(parsed):
                 for c in snap.get('candidates', []):
-                    if c['name'] == cand_name:
+                    if c.get('name') == cand_name:
                         x = ((dt.timestamp() - t_first) / t_range) * 100.0
-                        y = c.get('probability', 0)
+                        y = _safe_float(c.get('probability', 0), 0.0)
                         points.append((x, y))
                         index_map.append(i)
                         break
