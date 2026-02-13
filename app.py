@@ -141,8 +141,13 @@ def load_snapshots_from_csv(csv_path):
     return snapshots
 
 
-def _interpolate_snapshots(start_snapshot, end_snapshot, step_count):
-    """Linearly interpolate snapshots between two timestamped snapshots (exclusive endpoints)."""
+def _interpolate_snapshots(start_snapshot, end_snapshot, step_count, add_noise=False):
+    """Linearly interpolate snapshots between two timestamped snapshots (exclusive endpoints).
+
+    If add_noise=True, adds small random-walk fluctuations around the trend line
+    to make interpolated data look like natural market movement. Each snapshot is
+    also flagged with 'interpolated': True.
+    """
     if step_count <= 0:
         return []
 
@@ -155,6 +160,11 @@ def _interpolate_snapshots(start_snapshot, end_snapshot, step_count):
     end_map = {c.get('name'): c for c in end_snapshot.get('candidates', [])}
     names = sorted(set(start_map.keys()) | set(end_map.keys()))
 
+    # For noise: track per-candidate random walk offset
+    noise_state = {name: 0.0 for name in names}
+    # Use a seeded RNG so interpolated data is deterministic for same inputs
+    rng = random.Random(hash(str(start_snapshot.get('timestamp', '')) + str(end_snapshot.get('timestamp', ''))))
+
     out = []
     total_seconds = (end_dt - start_dt).total_seconds()
     for step in range(1, step_count + 1):
@@ -165,16 +175,34 @@ def _interpolate_snapshots(start_snapshot, end_snapshot, step_count):
             start_prob = float(start_map.get(name, {}).get('probability', 0) or 0)
             end_prob = float(end_map.get(name, {}).get('probability', 0) or 0)
             interp_prob = start_prob + ((end_prob - start_prob) * ratio)
+
+            if add_noise and step_count > 2:
+                # Random walk with mean-reversion toward the trend line
+                # Noise magnitude scales with candidate's probability level
+                magnitude = max(0.05, min(0.4, interp_prob * 0.006))
+                noise_state[name] += rng.gauss(0, magnitude)
+                # Mean-revert: pull noise back toward zero
+                noise_state[name] *= 0.92
+                # Dampen noise near endpoints so it connects smoothly
+                edge_dampen = min(ratio, 1.0 - ratio) * 4.0
+                edge_dampen = min(1.0, edge_dampen)
+                interp_prob += noise_state[name] * edge_dampen
+                # Clamp to valid range
+                interp_prob = max(0.0, min(100.0, interp_prob))
+
             has_kalshi = bool(start_map.get(name, {}).get('hasKalshi', False) or end_map.get(name, {}).get('hasKalshi', False))
             candidates.append({
                 'name': name,
                 'probability': round(interp_prob, 1),
                 'hasKalshi': has_kalshi
             })
-        out.append({
+        snap = {
             'timestamp': ts.isoformat().replace('+00:00', 'Z'),
             'candidates': candidates
-        })
+        }
+        if add_noise:
+            snap['interpolated'] = True
+        out.append(snap)
     return out
 
 
@@ -213,7 +241,7 @@ def bridge_to_present(filepath, interval_minutes=3, max_bridge_hours=72):
     step_count = int(gap_seconds // (interval_minutes * 60)) - 1
     step_count = max(0, min(step_count, 5000))
 
-    bridge = _interpolate_snapshots(last, end_snapshot, step_count)
+    bridge = _interpolate_snapshots(last, end_snapshot, step_count, add_noise=True)
 
     if not bridge:
         return {'bridged': False, 'reason': 'no_bridge_steps'}
@@ -271,7 +299,7 @@ def recover_snapshots_from_csv_and_current(csv_path, current_path, output_path, 
         if gap_hours > 0 and gap_hours <= max_bridge_hours:
             step_count = int((first_current_dt - last_base_dt).total_seconds() // (bridge_interval_minutes * 60)) - 1
             step_count = max(0, min(step_count, 5000))
-            bridge = _interpolate_snapshots(last_base, first_current, step_count)
+            bridge = _interpolate_snapshots(last_base, first_current, step_count, add_noise=True)
 
     merged = []
     seen = set()
@@ -1955,6 +1983,26 @@ def get_snapshots_chart():
                     'end': parsed[i][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ')
                 })
 
+        # Detect contiguous interpolated ranges (snapshots flagged by bridge/recovery)
+        interpolated_ranges = []
+        interp_start = None
+        for i, (dt, snap) in enumerate(parsed):
+            is_interp = snap.get('interpolated', False)
+            if is_interp and interp_start is None:
+                interp_start = dt
+            elif not is_interp and interp_start is not None:
+                interpolated_ranges.append({
+                    'start': interp_start.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+                    'end': parsed[i - 1][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+                })
+                interp_start = None
+        # Close any range that extends to the end
+        if interp_start is not None:
+            interpolated_ranges.append({
+                'start': interp_start.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+                'end': parsed[-1][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            })
+
         # ===== EMA SMOOTHING PASS =====
         # Apply exponential moving average per candidate to eliminate jitter.
         # alpha controls responsiveness: lower = smoother (0.15 is very smooth)
@@ -2040,7 +2088,8 @@ def get_snapshots_chart():
 
         result = {
             'snapshots': result_snapshots,
-            'gaps': gaps
+            'gaps': gaps,
+            'interpolated_ranges': interpolated_ranges
         }
 
         # Cache and return
