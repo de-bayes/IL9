@@ -2361,6 +2361,8 @@ function renderManifoldExpanded(candidates) {
 
 // Known gap ranges (populated from API response)
 let knownGaps = [];
+// Interpolated/estimated data ranges (populated from API response)
+let interpolatedRanges = [];
 
 function isInGap(t0, t1) {
     // Check if the segment between t0 and t1 crosses a known data gap
@@ -2392,8 +2394,14 @@ async function renderMarketTrendChart(candidates) {
         start: new Date(g.start).getTime(),
         end: new Date(g.end).getTime()
     }));
+    // Parse interpolated/estimated data ranges
+    interpolatedRanges = (chartData.interpolated_ranges || []).map(r => ({
+        start: new Date(r.start).getTime(),
+        end: new Date(r.end).getTime()
+    }));
 
     console.log(`[Chart] Known gaps: ${knownGaps.length}`, knownGaps);
+    console.log(`[Chart] Interpolated ranges: ${interpolatedRanges.length}`, interpolatedRanges);
 
     // Theme-aware chart colors
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -2506,6 +2514,62 @@ async function renderMarketTrendChart(candidates) {
     const firstTime = parsedSnapshots[0].date.getTime();
     const nowTime = Date.now();
 
+    // Interpolated data shaded region plugin
+    const interpolatedRegionPlugin = {
+        id: 'interpolatedRegion',
+        beforeDraw(chart) {
+            if (!interpolatedRanges.length) return;
+            const xScale = chart.scales.x;
+            if (!xScale) return;
+            const chartArea = chart.chartArea;
+            const ctx2 = chart.ctx;
+            const isDarkNow = document.documentElement.getAttribute('data-theme') === 'dark';
+
+            for (const range of interpolatedRanges) {
+                // Skip ranges outside visible area
+                if (range.end < xScale.min || range.start > xScale.max) continue;
+
+                const xStart = xScale.getPixelForValue(Math.max(range.start, xScale.min));
+                const xEnd = xScale.getPixelForValue(Math.min(range.end, xScale.max));
+                const width = xEnd - xStart;
+                if (width < 1) continue;
+
+                ctx2.save();
+
+                // Subtle shaded background
+                ctx2.fillStyle = isDarkNow
+                    ? 'rgba(255, 255, 255, 0.03)'
+                    : 'rgba(0, 0, 0, 0.03)';
+                ctx2.fillRect(xStart, chartArea.top, width, chartArea.bottom - chartArea.top);
+
+                // Subtle border lines at edges
+                ctx2.strokeStyle = isDarkNow
+                    ? 'rgba(255, 255, 255, 0.12)'
+                    : 'rgba(0, 0, 0, 0.10)';
+                ctx2.lineWidth = 1;
+                ctx2.setLineDash([4, 4]);
+                ctx2.beginPath();
+                ctx2.moveTo(xStart, chartArea.top);
+                ctx2.lineTo(xStart, chartArea.bottom);
+                ctx2.moveTo(xEnd, chartArea.top);
+                ctx2.lineTo(xEnd, chartArea.bottom);
+                ctx2.stroke();
+
+                // Label below the chart area
+                ctx2.setLineDash([]);
+                ctx2.font = "9px 'Source Sans 3', sans-serif";
+                ctx2.fillStyle = isDarkNow
+                    ? 'rgba(255, 255, 255, 0.40)'
+                    : 'rgba(0, 0, 0, 0.35)';
+                ctx2.textAlign = 'center';
+                const centerX = xStart + width / 2;
+                ctx2.fillText('This data may not be fully accurate', centerX, chartArea.bottom + 30);
+
+                ctx2.restore();
+            }
+        }
+    };
+
     // Methodology update vertical line plugin
     const methodologyLinePlugin = {
         id: 'methodologyLine',
@@ -2543,10 +2607,15 @@ async function renderMarketTrendChart(candidates) {
     marketChart = new Chart(ctx, {
         type: 'line',
         data: { datasets },
-        plugins: [methodologyLinePlugin],
+        plugins: [interpolatedRegionPlugin, methodologyLinePlugin],
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    bottom: interpolatedRanges.length > 0 ? 18 : 0
+                }
+            },
             interaction: {
                 mode: 'nearest',
                 axis: 'x',
