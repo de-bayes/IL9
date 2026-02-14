@@ -283,39 +283,69 @@ def recover_snapshots_from_csv_and_current(csv_path, current_path, output_path, 
     current_snapshots.sort(key=lambda s: parse_snapshot_timestamp(s.get('timestamp')))
     csv_snapshots.sort(key=lambda s: parse_snapshot_timestamp(s.get('timestamp')))
 
-    base = []
     if csv_only:
-        base = csv_snapshots
+        merged = []
+        seen = set()
+        for snap in csv_snapshots:
+            ts = snap.get('timestamp')
+            if not ts or ts in seen:
+                continue
+            seen.add(ts)
+            merged.append(snap)
     else:
-        first_current_dt = parse_snapshot_timestamp(current_snapshots[0].get('timestamp'))
-        base = [s for s in csv_snapshots if parse_snapshot_timestamp(s.get('timestamp')) < first_current_dt]
+        # Full merge: combine ALL CSV and current snapshots, dedup by timestamp,
+        # preferring current (live) data over CSV when timestamps collide.
+        by_ts = {}
+        for snap in csv_snapshots:
+            ts = snap.get('timestamp')
+            if ts:
+                by_ts[ts] = snap
+        for snap in current_snapshots:
+            ts = snap.get('timestamp')
+            if ts:
+                by_ts[ts] = snap  # current overwrites CSV for same timestamp
+        merged = sorted(by_ts.values(), key=lambda s: parse_snapshot_timestamp(s.get('timestamp')))
 
-    bridge = []
-    if base and not csv_only:
-        last_base = base[-1]
-        first_current = current_snapshots[0]
-        last_base_dt = parse_snapshot_timestamp(last_base.get('timestamp'))
-        gap_hours = (first_current_dt - last_base_dt).total_seconds() / 3600.0
-        if gap_hours > 0 and gap_hours <= max_bridge_hours:
-            step_count = int((first_current_dt - last_base_dt).total_seconds() // (bridge_interval_minutes * 60)) - 1
-            step_count = max(0, min(step_count, 5000))
-            bridge = _interpolate_snapshots(last_base, first_current, step_count, add_noise=True)
+        # Bridge any remaining gap between CSV end and first post-CSV current data
+        if merged:
+            csv_timestamps = {s.get('timestamp') for s in csv_snapshots if s.get('timestamp')}
+            current_timestamps = {s.get('timestamp') for s in current_snapshots if s.get('timestamp')}
+            # Find the last CSV-only timestamp and first current-only timestamp
+            last_csv_dt = None
+            first_current_dt = None
+            for snap in merged:
+                ts = snap.get('timestamp')
+                if ts in csv_timestamps and ts not in current_timestamps:
+                    last_csv_dt = parse_snapshot_timestamp(ts)
+                    last_csv_snap = snap
+            for snap in merged:
+                ts = snap.get('timestamp')
+                dt = parse_snapshot_timestamp(ts)
+                if ts in current_timestamps and ts not in csv_timestamps:
+                    if last_csv_dt and dt > last_csv_dt:
+                        first_current_dt = dt
+                        first_current_snap = snap
+                        break
 
-    merged = []
-    seen = set()
-    merge_stream = base if csv_only else (base + bridge + current_snapshots)
-    for snap in merge_stream:
-        ts = snap.get('timestamp')
-        if not ts or ts in seen:
-            continue
-        seen.add(ts)
-        merged.append(snap)
+            if last_csv_dt and first_current_dt:
+                gap_hours = (first_current_dt - last_csv_dt).total_seconds() / 3600.0
+                if gap_hours > 0 and gap_hours <= max_bridge_hours:
+                    step_count = int((first_current_dt - last_csv_dt).total_seconds() // (bridge_interval_minutes * 60)) - 1
+                    step_count = max(0, min(step_count, 5000))
+                    bridge = _interpolate_snapshots(last_csv_snap, first_current_snap, step_count, add_noise=True)
+                    # Insert bridge snapshots
+                    bridge_ts = set()
+                    for snap in bridge:
+                        ts = snap.get('timestamp')
+                        if ts and ts not in by_ts:
+                            by_ts[ts] = snap
+                            bridge_ts.add(ts)
+                    if bridge_ts:
+                        merged = sorted(by_ts.values(), key=lambda s: parse_snapshot_timestamp(s.get('timestamp')))
 
     stats = {
         'csv_snapshots': len(csv_snapshots),
         'current_snapshots': len(current_snapshots),
-        'base_used': len(base),
-        'bridge_created': len(bridge),
         'merged_total': len(merged),
         'first_timestamp': merged[0]['timestamp'] if merged else None,
         'last_timestamp': merged[-1]['timestamp'] if merged else None,
@@ -1264,8 +1294,7 @@ def import_repo_csv_to_volume_if_needed(csv_path=REPO_CSV_PATH, output_path=HIST
             )
             stats['reason'] = 'volume_wipe_recovery'
             print(f"[{datetime.now().isoformat()}] Stitched recovery: {stats.get('merged_total', 0)} total snapshots "
-                  f"(CSV base={stats.get('base_used', 0)}, bridge={stats.get('bridge_created', 0)}, "
-                  f"surviving={stats.get('current_snapshots', 0)})")
+                  f"(CSV={stats.get('csv_snapshots', 0)}, current={stats.get('current_snapshots', 0)})")
         except Exception as e:
             print(f"[{datetime.now().isoformat()}] Stitched recovery failed ({e}). Falling through to CSV-only import.")
             existing_count = 0  # Force CSV-only path below
@@ -1816,14 +1845,42 @@ def bridge_to_present_admin():
 
 @app.route('/api/admin/force-csv-recovery', methods=['POST'])
 def force_csv_recovery_admin():
-    """Force a full CSV recovery regardless of marker state. Removes marker, re-imports, bridges to present."""
+    """Force a full CSV recovery regardless of marker state or snapshot counts.
+    Directly calls recover function to merge CSV + current JSONL, bypassing all guards."""
     try:
         marker = os.path.join(os.path.dirname(HISTORICAL_DATA_PATH), '.csv_recovery_done')
         if os.path.exists(marker):
             os.remove(marker)
             print(f"[{datetime.now().isoformat()}] Removed recovery marker for forced recovery")
 
-        stats = import_repo_csv_to_volume_if_needed()
+        csv_path = REPO_CSV_PATH
+        if not os.path.exists(csv_path):
+            return jsonify({'error': f'CSV not found at {csv_path}'}), 404
+
+        # Directly call recover — bypasses count check in import_repo_csv_to_volume_if_needed
+        stats = recover_snapshots_from_csv_and_current(
+            csv_path=csv_path,
+            current_path=HISTORICAL_DATA_PATH,
+            output_path=HISTORICAL_DATA_PATH,
+            bridge_interval_minutes=3,
+            max_bridge_hours=72,
+            dry_run=False,
+            csv_only=not os.path.exists(HISTORICAL_DATA_PATH)
+        )
+        stats['reason'] = 'forced_full_merge'
+
+        # Bridge to present if needed
+        bridge_stats = bridge_to_present(HISTORICAL_DATA_PATH)
+        stats['bridge_to_present'] = bridge_stats
+
+        # Re-create marker
+        os.makedirs(os.path.dirname(marker), exist_ok=True)
+        with open(marker, 'w') as f:
+            f.write(f"force-recovered at {datetime.now(timezone.utc).isoformat()}\n")
+
+        final_count = count_snapshots_jsonl(HISTORICAL_DATA_PATH)
+        stats['final_snapshot_count'] = final_count
+
         return jsonify({
             'success': True,
             'historical_data_path': HISTORICAL_DATA_PATH,
