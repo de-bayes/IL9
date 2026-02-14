@@ -55,7 +55,7 @@ data/*.lock
 .claude/
 
 # Screenshots (local debugging only)
-SCREENHSHOTS/
+SCREENSHOTS/
 Screenshot*.png
 
 # Deployment markers (runtime-specific, not source)
