@@ -727,6 +727,81 @@ def send_email(to, subject, html, text=None):
         print(f"[{datetime.now().isoformat()}] Email error: {e}")
         return False
 
+BACKUP_EMAIL = os.environ.get('BACKUP_EMAIL', 'rymccomb1@icloud.com')
+
+def send_csv_backup_email():
+    """Send CSV backup of all historical data via Resend with attachment."""
+    import io, csv, base64
+    try:
+        snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
+        if not snapshots:
+            print(f"[{datetime.now().isoformat()}] CSV backup skipped: no data")
+            return False
+
+        # Build CSV
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(['timestamp', 'candidate', 'probability', 'hasKalshi'])
+        for snapshot in snapshots:
+            timestamp = snapshot.get('timestamp', '')
+            for candidate in snapshot.get('candidates', []):
+                name = candidate.get('name', '')
+                prob = _safe_float(candidate.get('probability', 0), 0.0)
+                has_kalshi = 'true' if candidate.get('hasKalshi', False) else 'false'
+                writer.writerow([timestamp, name, f'{prob:.1f}', has_kalshi])
+        csv_content = output.getvalue()
+        output.close()
+
+        snap_count = len(snapshots)
+        first_ts = snapshots[0].get('timestamp', 'unknown') if snapshots else 'none'
+        last_ts = snapshots[-1].get('timestamp', 'unknown') if snapshots else 'none'
+        now_str = datetime.now(timezone.utc).strftime('%Y-%m-%d_%H%M')
+
+        # Resend attachment: base64-encoded CSV
+        csv_b64 = base64.b64encode(csv_content.encode('utf-8')).decode('utf-8')
+
+        if not RESEND_API_KEY:
+            print(f"[{datetime.now().isoformat()}] CSV backup email skipped (no RESEND_API_KEY)")
+            return False
+
+        payload = {
+            'from': RESEND_FROM,
+            'to': [BACKUP_EMAIL],
+            'subject': f'IL9Cast Data Backup - {now_str} ({snap_count} snapshots)',
+            'html': (
+                f'<h3>IL9Cast Automated Data Backup</h3>'
+                f'<p><strong>Snapshots:</strong> {snap_count}</p>'
+                f'<p><strong>Range:</strong> {first_ts} → {last_ts}</p>'
+                f'<p><strong>CSV Size:</strong> {len(csv_content):,} bytes</p>'
+                f'<p>Attached: <code>il9cast_backup_{now_str}.csv</code></p>'
+                f'<hr><p style="color:#888;font-size:12px">Sent automatically every 4 hours from IL9Cast</p>'
+            ),
+            'attachments': [{
+                'filename': f'il9cast_backup_{now_str}.csv',
+                'content': csv_b64
+            }]
+        }
+
+        resp = requests.post(
+            'https://api.resend.com/emails',
+            headers={
+                'Authorization': f'Bearer {RESEND_API_KEY}',
+                'Content-Type': 'application/json'
+            },
+            json=payload,
+            timeout=30
+        )
+        if resp.status_code in (200, 201):
+            print(f"[{datetime.now().isoformat()}] CSV backup sent to {BACKUP_EMAIL} ({snap_count} snapshots, {len(csv_content):,} bytes)")
+            return True
+        else:
+            print(f"[{datetime.now().isoformat()}] CSV backup email failed ({resp.status_code}): {resp.text}")
+            return False
+    except Exception as e:
+        print(f"[{datetime.now().isoformat()}] CSV backup email error: {e}")
+        return False
+
+
 def send_welcome_email(email, threshold=5.0):
     """Send welcome email to new subscriber."""
     token = make_unsub_token(email)
@@ -1904,6 +1979,16 @@ def force_csv_recovery_admin():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/admin/send-csv-backup', methods=['POST'])
+def send_csv_backup_admin():
+    """Manually trigger a CSV backup email."""
+    try:
+        success = send_csv_backup_email()
+        return jsonify({'success': success})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/api/admin/fix-kalshi-gap', methods=['POST'])
 def fix_kalshi_gap():
     """One-time fix: remove last N min of Manifold-only data. Default 50 min."""
@@ -2664,6 +2749,7 @@ elif 'gunicorn' not in sys.argv[0]:
     scheduler = BackgroundScheduler()
     scheduler.add_job(func=collect_market_data, trigger="interval", minutes=3)
     scheduler.add_job(func=send_daily_summary, trigger=CronTrigger(hour=8, minute=0, timezone='America/Chicago'))
+    scheduler.add_job(func=send_csv_backup_email, trigger="interval", hours=4)
     scheduler.start()
 
     # Run initial data collection on startup
@@ -2715,6 +2801,15 @@ else:
                     send_daily_summary()
             except Exception as e:
                 print(f"Error sending daily summary: {e}")
+
+            # CSV backup every 4 hours (runs on 3-min cycle, fires when minute < 3 at target hours)
+            try:
+                from zoneinfo import ZoneInfo
+                ct_now = datetime.now(ZoneInfo('America/Chicago'))
+                if ct_now.hour % 4 == 0 and ct_now.minute < 3:
+                    send_csv_backup_email()
+            except Exception as e:
+                print(f"Error sending CSV backup: {e}")
 
     # Start scheduler thread only in the elected worker.
     if _acquire_scheduler_lock():
