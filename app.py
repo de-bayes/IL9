@@ -295,6 +295,13 @@ def recover_snapshots_from_csv_and_current(csv_path, current_path, output_path, 
     else:
         # Full merge: combine ALL CSV and current snapshots, dedup by timestamp,
         # preferring current (live) data over CSV when timestamps collide.
+        # Also: drop old interpolated (bridge) snapshots that fall within the CSV's
+        # time range, since real data now covers that period.
+        csv_timestamps = {s.get('timestamp') for s in csv_snapshots if s.get('timestamp')}
+        csv_dts = [parse_snapshot_timestamp(ts) for ts in csv_timestamps if parse_snapshot_timestamp(ts)]
+        csv_min_dt = min(csv_dts) if csv_dts else None
+        csv_max_dt = max(csv_dts) if csv_dts else None
+
         by_ts = {}
         for snap in csv_snapshots:
             ts = snap.get('timestamp')
@@ -303,12 +310,17 @@ def recover_snapshots_from_csv_and_current(csv_path, current_path, output_path, 
         for snap in current_snapshots:
             ts = snap.get('timestamp')
             if ts:
+                # Drop old interpolated data that falls within the CSV coverage window
+                if snap.get('interpolated') and csv_min_dt and csv_max_dt:
+                    snap_dt = parse_snapshot_timestamp(ts)
+                    if snap_dt and csv_min_dt <= snap_dt <= csv_max_dt:
+                        continue  # real CSV data supersedes interpolated bridge data
                 by_ts[ts] = snap  # current overwrites CSV for same timestamp
         merged = sorted(by_ts.values(), key=lambda s: parse_snapshot_timestamp(s.get('timestamp')))
+        dropped_interp = len(current_snapshots) - sum(1 for s in current_snapshots if s.get('timestamp') in by_ts or s.get('timestamp') in csv_timestamps)
 
         # Bridge any remaining gap between CSV end and first post-CSV current data
         if merged:
-            csv_timestamps = {s.get('timestamp') for s in csv_snapshots if s.get('timestamp')}
             current_timestamps = {s.get('timestamp') for s in current_snapshots if s.get('timestamp')}
             # Find the last CSV-only timestamp and first current-only timestamp
             last_csv_dt = None
