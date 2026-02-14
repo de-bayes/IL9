@@ -293,67 +293,69 @@ def recover_snapshots_from_csv_and_current(csv_path, current_path, output_path, 
             seen.add(ts)
             merged.append(snap)
     else:
-        # Full merge: combine ALL CSV and current snapshots, dedup by timestamp,
-        # preferring current (live) data over CSV when timestamps collide.
-        # Also: drop old interpolated (bridge) snapshots that fall within the CSV's
-        # time range, since real data now covers that period.
-        csv_timestamps = {s.get('timestamp') for s in csv_snapshots if s.get('timestamp')}
-        csv_dts = [parse_snapshot_timestamp(ts) for ts in csv_timestamps if parse_snapshot_timestamp(ts)]
+        # CSV is authoritative for its time range. Within [csv_min, csv_max],
+        # use ONLY CSV data. Outside that range, keep current JSONL data.
+        # This cleanly replaces any bridge/interpolated/stale data without
+        # relying on an 'interpolated' flag that may have been lost.
+        csv_dts = [parse_snapshot_timestamp(s.get('timestamp')) for s in csv_snapshots
+                   if parse_snapshot_timestamp(s.get('timestamp'))]
         csv_min_dt = min(csv_dts) if csv_dts else None
         csv_max_dt = max(csv_dts) if csv_dts else None
 
         by_ts = {}
+        # First: add all CSV data (authoritative for its range)
         for snap in csv_snapshots:
             ts = snap.get('timestamp')
             if ts:
                 by_ts[ts] = snap
+        # Second: add current JSONL data ONLY for timestamps outside CSV range
         for snap in current_snapshots:
             ts = snap.get('timestamp')
-            if ts:
-                # Drop old interpolated data that falls within the CSV coverage window
-                if snap.get('interpolated') and csv_min_dt and csv_max_dt:
-                    snap_dt = parse_snapshot_timestamp(ts)
-                    if snap_dt and csv_min_dt <= snap_dt <= csv_max_dt:
-                        continue  # real CSV data supersedes interpolated bridge data
-                by_ts[ts] = snap  # current overwrites CSV for same timestamp
+            if not ts:
+                continue
+            snap_dt = parse_snapshot_timestamp(ts)
+            if not snap_dt:
+                continue
+            if csv_min_dt and csv_max_dt and csv_min_dt <= snap_dt <= csv_max_dt:
+                # Within CSV range: only keep if CSV already has this exact timestamp
+                # (CSV version is already in by_ts, don't overwrite it)
+                if ts not in by_ts:
+                    continue  # drop non-CSV data within CSV range
+            else:
+                # Outside CSV range: keep current data
+                by_ts[ts] = snap
         merged = sorted(by_ts.values(), key=lambda s: parse_snapshot_timestamp(s.get('timestamp')))
-        dropped_interp = len(current_snapshots) - sum(1 for s in current_snapshots if s.get('timestamp') in by_ts or s.get('timestamp') in csv_timestamps)
 
-        # Bridge any remaining gap between CSV end and first post-CSV current data
-        if merged:
-            current_timestamps = {s.get('timestamp') for s in current_snapshots if s.get('timestamp')}
-            # Find the last CSV-only timestamp and first current-only timestamp
-            last_csv_dt = None
-            first_current_dt = None
+        # Bridge the gap between CSV end and first post-CSV current data
+        if merged and csv_max_dt:
+            # Find first snapshot after CSV range
+            first_post_csv = None
             for snap in merged:
-                ts = snap.get('timestamp')
-                if ts in csv_timestamps and ts not in current_timestamps:
-                    last_csv_dt = parse_snapshot_timestamp(ts)
+                snap_dt = parse_snapshot_timestamp(snap.get('timestamp'))
+                if snap_dt and snap_dt > csv_max_dt:
+                    first_post_csv = snap
+                    first_post_csv_dt = snap_dt
+                    break
+            # Find last CSV snapshot
+            last_csv_snap = None
+            for snap in reversed(merged):
+                snap_dt = parse_snapshot_timestamp(snap.get('timestamp'))
+                if snap_dt and snap_dt <= csv_max_dt:
                     last_csv_snap = snap
-            for snap in merged:
-                ts = snap.get('timestamp')
-                dt = parse_snapshot_timestamp(ts)
-                if ts in current_timestamps and ts not in csv_timestamps:
-                    if last_csv_dt and dt > last_csv_dt:
-                        first_current_dt = dt
-                        first_current_snap = snap
-                        break
+                    break
 
-            if last_csv_dt and first_current_dt:
-                gap_hours = (first_current_dt - last_csv_dt).total_seconds() / 3600.0
+            if last_csv_snap and first_post_csv:
+                last_csv_dt = parse_snapshot_timestamp(last_csv_snap.get('timestamp'))
+                gap_hours = (first_post_csv_dt - last_csv_dt).total_seconds() / 3600.0
                 if gap_hours > 0 and gap_hours <= max_bridge_hours:
-                    step_count = int((first_current_dt - last_csv_dt).total_seconds() // (bridge_interval_minutes * 60)) - 1
+                    step_count = int((first_post_csv_dt - last_csv_dt).total_seconds() // (bridge_interval_minutes * 60)) - 1
                     step_count = max(0, min(step_count, 5000))
-                    bridge = _interpolate_snapshots(last_csv_snap, first_current_snap, step_count, add_noise=True)
-                    # Insert bridge snapshots
-                    bridge_ts = set()
+                    bridge = _interpolate_snapshots(last_csv_snap, first_post_csv, step_count, add_noise=True)
                     for snap in bridge:
                         ts = snap.get('timestamp')
                         if ts and ts not in by_ts:
                             by_ts[ts] = snap
-                            bridge_ts.add(ts)
-                    if bridge_ts:
-                        merged = sorted(by_ts.values(), key=lambda s: parse_snapshot_timestamp(s.get('timestamp')))
+                    merged = sorted(by_ts.values(), key=lambda s: parse_snapshot_timestamp(s.get('timestamp')))
 
     stats = {
         'csv_snapshots': len(csv_snapshots),
