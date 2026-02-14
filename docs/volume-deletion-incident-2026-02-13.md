@@ -4,21 +4,15 @@
 
 Railway deleted the persistent volume overnight, wiping **20,000+ historical snapshots** down to just 3 post-wipe scraper entries. The existing recovery code (`import_repo_csv_to_volume_if_needed()`) was designed only for fresh deployments — it skipped recovery if the JSONL file had *any* data at all, so the 3 surviving post-wipe snapshots prevented the CSV re-import from ever triggering.
 
-## Critical Design Principle: Never Overwrite Real Data
+## Critical Design Principle: CSV Is Authoritative for Its Time Range
 
-After the volume wipe (~5:05 GMT), the scraper immediately started collecting **real, live market data** again. When we recover older history from the CSV export, the recovery **must not overwrite** any of that real post-wipe data.
+The recovery function (`recover_snapshots_from_csv_and_current()`) uses a clean merge strategy:
 
-The recovery function (`recover_snapshots_from_csv_and_current()`) enforces this at `app.py:291`:
+1. **Within the CSV's time range** `[csv_min_dt, csv_max_dt]`: **ONLY CSV data is used.** Any JSONL data in this window (including old bridge/interpolated points) is dropped and replaced by the CSV.
+2. **Outside the CSV range:** JSONL data is kept as-is (live post-wipe data).
+3. **Gap between CSV end and live data start:** Bridged with interpolated snapshots (realistic noise, flagged `interpolated: true`).
 
-```python
-base = [s for s in csv_snapshots if parse_snapshot_timestamp(s.get('timestamp')) < first_current_dt]
-```
-
-1. **CSV data only fills the gap before real data starts.** Any CSV snapshot whose timestamp overlaps with or comes after the first surviving real snapshot is **discarded**.
-2. **Interpolated bridge fills the time gap.** Between the last CSV snapshot and the first real post-wipe snapshot, interpolated data with realistic noise bridges the gap.
-3. **Real post-wipe data is appended last, untouched.** Merge order is always: `csv_history + interpolated_bridge + real_surviving_data`.
-
-So if you later update the CSV with more recent data (e.g., data up to Feb 12), recovery will still **only use CSV data for timestamps before the first real snapshot** on the volume. The real data collected live after the wipe always wins.
+This approach was adopted after discovering that the `interpolated` flag could be lost during successive recovery cycles, making it impossible to identify stale bridge data. The timestamp-range approach requires no flags — the CSV simply wins for its entire range.
 
 ## What Was Fixed (4 commits, PRs #53 and #54)
 
@@ -86,7 +80,43 @@ So if you later update the CSV with more recent data (e.g., data up to Feb 12), 
 3. Force recovery: `curl -X POST https://il9.org/api/admin/force-csv-recovery`
 4. CSV fills history, bridge fills the gap, real data stays untouched
 
+## Bugs Found During Recovery (PRs #58-59)
+
+### 5. Merge Logic Was Prepend-Only
+
+**Problem:** `recover_snapshots_from_csv_and_current()` only used CSV data from *before* the first JSONL timestamp. After the first recovery, JSONL started at Jan 30 (same as CSV), so updating the CSV with Feb 12 data had zero effect — the new data was silently skipped.
+
+**Fix:** Full merge/dedup. All CSV + JSONL timestamps merged, deduplicated, sorted. `force_csv_recovery_admin()` bypasses the count-based guard that also blocked re-recovery.
+
+### 6. Bridge Data Interleaved with Real Data (Chart Shakiness)
+
+**Problem:** The first recovery created interpolated bridge points for the Feb 11–13 gap. When re-recovering with updated CSV (through Feb 12), bridge points were kept alongside real CSV data — smooth synthetic values alternating with real noisy values every ~1.5 min. EMA (alpha=0.15) couldn't smooth it out.
+
+**Fix:** The `interpolated: true` flag was getting lost during recovery cycles. Instead of relying on flags, the merge now treats the CSV as **authoritative for its entire time range**. Within `[csv_min, csv_max]`, only CSV data is used. All other data in that window is dropped.
+
+### 7. Automated CSV Backup Emails
+
+**Purpose:** Ensure data survives future volume deletions without manual CSV export.
+
+**Implementation:** `send_csv_backup_email()` runs every 4 hours via the background scheduler:
+- Builds CSV in-memory from JSONL
+- Base64-encodes and attaches to Resend email
+- Sends to `rymccomb1@icloud.com` with snapshot count, time range, and file size
+- Manual trigger: `POST /api/admin/send-csv-backup`
+
+## Data Protection Layers (as of Feb 14, 2026)
+
+| Layer | What | Frequency | Survives Volume Wipe? |
+|-------|------|-----------|----------------------|
+| **JSONL on volume** | Primary data store | Every 3 min | No |
+| **CSV in git repo** | Manual export in repo root | Manual updates | Yes |
+| **Email backup** | CSV attachment via Resend | Every 4 hours | Yes |
+| **Auto-recovery** | Import from CSV on startup | On restart | N/A (restores data) |
+| **Force-recovery** | Admin endpoint for manual fix | On demand | N/A (restores data) |
+
 ## Related PRs
 
 - [PR #53](https://github.com/de-bayes/IL9/pull/53) — Volume wipe recovery, bridge interpolation, admin endpoints, marker-based detection
 - [PR #54](https://github.com/de-bayes/IL9/pull/54) — Realistic noise for interpolated data, visual chart indicator, gitignore cleanup
+- [PR #58](https://github.com/de-bayes/IL9/pull/58) — Update historical CSV with data through Feb 12
+- [PR #59](https://github.com/de-bayes/IL9/pull/59) — Fix merge logic (full dedup, CSV-authoritative, drop bridge data, automated email backups)
