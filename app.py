@@ -108,13 +108,14 @@ def _safe_float(value, default=0.0):
 
 
 def load_snapshots_from_csv(csv_path):
-    """Load wide historical CSV (timestamp,candidate,probability,hasKalshi) into snapshot JSON objects."""
+    """Load wide historical CSV (timestamp,candidate,probability,hasKalshi[,interpolated]) into snapshot JSON objects."""
     import csv
 
     if not os.path.exists(csv_path):
         raise FileNotFoundError(f"CSV not found: {csv_path}")
 
     grouped = {}
+    interpolated_flags = {}
     with open(csv_path, 'r', newline='') as f:
         reader = csv.DictReader(f)
         for row in reader:
@@ -131,11 +132,15 @@ def load_snapshots_from_csv(csv_path):
                 'probability': prob,
                 'hasKalshi': _parse_bool(row.get('hasKalshi'))
             })
+            if _parse_bool(row.get('interpolated')):
+                interpolated_flags[ts] = True
 
-    snapshots = [
-        {'timestamp': ts, 'candidates': candidates}
-        for ts, candidates in grouped.items()
-    ]
+    snapshots = []
+    for ts, candidates in grouped.items():
+        snap = {'timestamp': ts, 'candidates': candidates}
+        if interpolated_flags.get(ts):
+            snap['interpolated'] = True
+        snapshots.append(snap)
 
     snapshots.sort(key=lambda s: parse_snapshot_timestamp(s.get('timestamp')) or datetime.min.replace(tzinfo=timezone.utc))
     return snapshots
@@ -741,14 +746,15 @@ def send_csv_backup_email():
         # Build CSV
         output = io.StringIO()
         writer = csv.writer(output)
-        writer.writerow(['timestamp', 'candidate', 'probability', 'hasKalshi'])
+        writer.writerow(['timestamp', 'candidate', 'probability', 'hasKalshi', 'interpolated'])
         for snapshot in snapshots:
             timestamp = snapshot.get('timestamp', '')
+            is_interpolated = 'true' if snapshot.get('interpolated', False) else 'false'
             for candidate in snapshot.get('candidates', []):
                 name = candidate.get('name', '')
                 prob = _safe_float(candidate.get('probability', 0), 0.0)
                 has_kalshi = 'true' if candidate.get('hasKalshi', False) else 'false'
-                writer.writerow([timestamp, name, f'{prob:.1f}', has_kalshi])
+                writer.writerow([timestamp, name, f'{prob:.1f}', has_kalshi, is_interpolated])
         csv_content = output.getvalue()
         output.close()
 
@@ -2314,15 +2320,16 @@ def download_snapshots_csv():
         import csv
         output = io.StringIO()
         writer = csv.writer(output)
-        writer.writerow(['timestamp', 'candidate', 'probability', 'hasKalshi'])
+        writer.writerow(['timestamp', 'candidate', 'probability', 'hasKalshi', 'interpolated'])
 
         for snapshot in snapshots:
             timestamp = snapshot.get('timestamp', '')
+            is_interpolated = 'true' if snapshot.get('interpolated', False) else 'false'
             for candidate in snapshot.get('candidates', []):
                 name = candidate.get('name', '')
                 prob = _safe_float(candidate.get('probability', 0), 0.0)
                 has_kalshi = 'true' if candidate.get('hasKalshi', False) else 'false'
-                writer.writerow([timestamp, name, f'{prob:.1f}', has_kalshi])
+                writer.writerow([timestamp, name, f'{prob:.1f}', has_kalshi, is_interpolated])
 
         csv_content = output.getvalue()
         output.close()
