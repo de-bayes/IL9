@@ -58,7 +58,7 @@ Railway has deleted the persistent volume before (Feb 13, 2026 incident). Follow
 - il9cast_historical_data.csv: authoritative CSV backup in repo root
 - data/historical_snapshots.jsonl: live data (on Railway persistent volume)
 - data/.csv_recovery_done: marker preventing re-recovery (disappears on volume wipe)
-- docs/volume-deletion-incident-2026-02-13.md: full incident report
+- docs/VOLUME_DELETION_INCIDENT_2026_02_13.md: full incident report
 
 If you are unsure whether a change could affect data integrity, ASK THE USER FIRST.
 ```
