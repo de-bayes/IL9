@@ -45,7 +45,7 @@ SEED_DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'seed_snapshots
 
 # Legacy JSON path for migration
 LEGACY_JSON_PATH = os.path.join(os.path.dirname(__file__), 'data', 'historical_snapshots.json')
-REPO_CSV_PATH = os.path.join(os.path.dirname(__file__), 'data', 'il9cast_historical_data.csv')
+REPO_CSV_PATH = os.path.join(os.path.dirname(__file__), 'il9cast_historical_data.csv')
 
 # ===== EMAIL ALERT CONFIGURATION =====
 SUBSCRIBERS_PATH = resolve_data_path('email_subscribers.jsonl')

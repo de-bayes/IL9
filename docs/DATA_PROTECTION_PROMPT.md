@@ -29,7 +29,7 @@ Railway has deleted the persistent volume before (Feb 13, 2026 incident). Follow
 1. ALWAYS use backup_file() before any destructive JSONL operation
 2. ALWAYS use file locking (_acquire_file_lock/_release_file_lock) for JSONL writes
 3. ALWAYS use the atomic write pattern: write to temp file, then os.replace() into place
-4. ALWAYS preserve the CSV recovery system (data/il9cast_historical_data.csv)
+4. ALWAYS preserve the CSV recovery system (il9cast_historical_data.csv in repo root)
 5. ALWAYS keep the automated email backup (send_csv_backup_email, every 4 hours, to rymccomb1@icloud.com via Resend)
 6. ALWAYS test recovery logic changes with dry_run=True before writing
 7. ALWAYS ensure the merge logic treats CSV as authoritative within its time range [csv_min_dt, csv_max_dt]
@@ -48,14 +48,14 @@ Railway has deleted the persistent volume before (Feb 13, 2026 incident). Follow
 === DATA BACKUP LAYERS ===
 
 1. JSONL on Railway volume (primary, lost on volume wipe)
-2. CSV in git repo data/ directory (manual update, survives wipe)
+2. CSV in git repo root (manual update, survives wipe)
 3. Email backup every 4 hours via Resend (survives wipe)
 4. Auto-recovery on startup from CSV (restores after wipe)
 
 === KEY FILES ===
 
 - app.py: recover_snapshots_from_csv_and_current(), import_repo_csv_to_volume_if_needed(), send_csv_backup_email(), bridge_to_present()
-- data/il9cast_historical_data.csv: authoritative CSV backup
+- il9cast_historical_data.csv: authoritative CSV backup in repo root
 - data/historical_snapshots.jsonl: live data (on Railway persistent volume)
 - data/.csv_recovery_done: marker preventing re-recovery (disappears on volume wipe)
 - docs/VOLUME_DELETION_INCIDENT_2026_02_13.md: full incident report

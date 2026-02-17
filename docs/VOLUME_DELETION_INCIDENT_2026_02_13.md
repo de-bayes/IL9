@@ -75,7 +75,7 @@ This approach was adopted after discovering that the `interpolated` flag could b
 4. Real post-wipe snapshots are **always preserved**
 
 **Manual (with updated CSV):**
-1. Replace `data/il9cast_historical_data.csv` with newer export
+1. Replace `il9cast_historical_data.csv` in repo root with newer export
 2. Push to main
 3. Force recovery: `curl -X POST https://il9.org/api/admin/force-csv-recovery`
 4. CSV fills history, bridge fills the gap, real data stays untouched
