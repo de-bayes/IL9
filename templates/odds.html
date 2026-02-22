@@ -26,10 +26,15 @@
     (function() {
         var t = localStorage.getItem('il9-theme');
         if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        var p = new URLSearchParams(window.location.search);
+        var d = new Date();
+        if ((d.getFullYear()===2026 && d.getMonth()===2 && d.getDate()===17) || p.has('election-night'))
+            document.documentElement.setAttribute('data-election-night', '');
     })();
 </script>
 <body>
     <div class="site-content">
+        <div class="en-banner"><span class="en-live-dot"></span> Election Night &mdash; March 17, 2026</div>
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
             <nav class="desktop-nav">
@@ -63,12 +68,26 @@
             <h1>Precinct Model</h1>
         </section>
 
-        <div class="mobile-note">
+        <!-- Model Update Banner -->
+        <div id="modelUpdateBanner" style="max-width: 720px; margin: 2rem auto; padding: 2rem 2.5rem; background: var(--bg-card, #fff); border: 1px solid var(--border, #e2e2e2); border-radius: 12px; text-align: center;">
+            <h2 style="font-family: 'Libre Baskerville', serif; font-size: 1.5rem; margin: 0 0 0.75rem;">Model Update in Progress</h2>
+            <p style="font-family: 'Source Sans 3', sans-serif; font-size: 1.05rem; color: var(--text-secondary, #666); line-height: 1.6; margin: 0 0 1.5rem;">
+                We are currently updating the model with new data and polling. Check back soon for the latest projections.
+            </p>
+            <button onclick="document.getElementById('modelUpdateBanner').style.display='none'; document.getElementById('oldModelContent').style.display='block'; document.getElementById('oldModelMobileNote').style.display='';"
+                style="font-family: 'Source Sans 3', sans-serif; font-size: 0.95rem; font-weight: 600; padding: 0.6rem 1.5rem; background: transparent; border: 1px solid var(--border, #ccc); border-radius: 8px; color: var(--text-secondary, #666); cursor: pointer; transition: background 0.15s, color 0.15s;"
+                onmouseover="this.style.background='var(--bg-hover, #f5f5f5)'"
+                onmouseout="this.style.background='transparent'">
+                View Previous Model
+            </button>
+        </div>
+
+        <div class="mobile-note" id="oldModelMobileNote" style="display: none;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
             This interactive map is best viewed on a desktop or tablet.
         </div>
 
-        <section class="model-page">
+        <section class="model-page" id="oldModelContent" style="display: none;">
 
             <!-- Headline Win Probabilities -->
             <div class="model-headline">
