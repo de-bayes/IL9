@@ -2861,3 +2861,176 @@ p {
         padding: 1rem 2rem;
     }
 }
+
+/* ============================================
+   ELECTION NIGHT THEME (Inner Pages)
+   Activated via data-election-night attribute on <html>
+   ============================================ */
+
+[data-election-night] {
+    --bg-primary: #0a1628;
+    --bg-secondary: #0f2044;
+    --text-primary: #f0f4f8;
+    --text-secondary: #94a3b8;
+    --accent: #3b82f6;
+    --accent-blue: #3b82f6;
+    --accent-hover: #2563eb;
+    --accent-cyan: #3b82f6;
+    --accent-green: #22c55e;
+    --accent-green-bright: #22c55e;
+    --accent-red: #ef4444;
+    --border: rgba(59, 130, 246, 0.12);
+    --grid-color: rgba(59, 130, 246, 0.025);
+}
+
+/* Inner page backgrounds */
+[data-election-night] .inner-page {
+    background: #0a1628;
+}
+
+[data-election-night] .inner-page::before {
+    background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.15) 20%, rgba(30, 58, 110, 0.08) 40%, transparent 70%);
+}
+
+[data-election-night] .inner-page::after {
+    background: radial-gradient(ellipse at center, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.08) 20%, transparent 55%);
+}
+
+/* Navbar: blue glow border */
+[data-election-night] .navbar {
+    background-color: rgba(10, 22, 40, 0.95);
+    border-bottom-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 2px 20px rgba(59, 130, 246, 0.08);
+}
+
+[data-election-night] .nav-brand {
+    color: #3b82f6;
+}
+
+/* Cards + tables: 3D box shadows */
+[data-election-night] .market-card,
+[data-election-night] .stat-card,
+[data-election-night] .donor-card,
+[data-election-night] .odds-table-container,
+[data-election-night] .viz-container,
+[data-election-night] .aggregate-table,
+[data-election-night] .fundraising-table {
+    background: rgba(15, 32, 68, 0.6);
+    border-color: rgba(59, 130, 246, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(59, 130, 246, 0.05);
+}
+
+[data-election-night] .market-card:hover,
+[data-election-night] .stat-card:hover,
+[data-election-night] .donor-card:hover {
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Status badges */
+[data-election-night] .market-status.live {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+/* Cyan accents become blue */
+[data-election-night] .inner-page .odds-table thead th,
+[data-election-night] .inner-page .prob-fill,
+[data-election-night] .aggregate-row.header {
+    color: #60a5fa;
+}
+
+[data-election-night] .inner-page .prob-fill {
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.8), rgba(96, 165, 250, 0.9));
+}
+
+/* Stat card values: alternating red/blue */
+[data-election-night] .stat-card:nth-child(odd) .stat-value {
+    color: #60a5fa;
+}
+
+[data-election-night] .stat-card:nth-child(even) .stat-value {
+    color: #f87171;
+}
+
+/* Inner page nav links */
+[data-election-night] .inner-nav-links a {
+    color: rgba(148, 163, 184, 0.8);
+}
+
+[data-election-night] .inner-nav-links a:hover,
+[data-election-night] .inner-nav-links a.active {
+    color: #f0f4f8;
+}
+
+/* CTA buttons */
+[data-election-night] .market-cta-button {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+[data-election-night] .market-cta-button:hover {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+}
+
+/* Grid background */
+[data-election-night] body::before {
+    background-image:
+        linear-gradient(rgba(59, 130, 246, 0.02) 1.5px, transparent 1.5px),
+        linear-gradient(90deg, rgba(59, 130, 246, 0.02) 1.5px, transparent 1.5px);
+}
+
+/* Live badge turns red */
+[data-election-night] .nav-link-live {
+    color: rgba(239, 68, 68, 0.9);
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+[data-election-night] .nav-link-live:hover {
+    color: rgba(239, 68, 68, 1);
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.6);
+}
+
+[data-election-night] .live-badge-nav {
+    background: #ef4444;
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.9);
+}
+
+/* Election Night Banner (inner pages) */
+[data-election-night] .en-banner {
+    display: flex;
+}
+
+.en-banner {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: linear-gradient(90deg, #1e3a6e 0%, #dc2626 50%, #1e3a6e 100%);
+    padding: 0.5rem 1rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.en-banner .en-live-dot {
+    width: 8px;
+    height: 8px;
+    background: #ffffff;
+    border-radius: 50%;
+    animation: en-pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+@keyframes en-pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(255, 255, 255, 0.8); }
+    50% { opacity: 0.4; box-shadow: 0 0 12px rgba(255, 255, 255, 1); }
+}

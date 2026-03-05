@@ -1660,6 +1660,11 @@ def markets():
 def fundraising():
     return render_template('fundraising.html')
 
+@app.route('/outside-money')
+def outside_money():
+    return render_template('outside_money.html')
+
+
 @app.route('/updates')
 def updates():
     return render_template('updates.html')

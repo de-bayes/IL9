@@ -81,11 +81,24 @@
     (function() {
         var t = localStorage.getItem('il9-theme');
         if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        // Election night mode: auto on March 17 2026, or via ?election-night URL param
+        var params = new URLSearchParams(window.location.search);
+        var now = new Date();
+        var isElectionDay = (now.getFullYear() === 2026 && now.getMonth() === 2 && now.getDate() === 17);
+        if (isElectionDay || params.has('election-night')) {
+            document.documentElement.setAttribute('data-election-night', '');
+        }
     })();
 </script>
 <body>
 
     <div class="site-content">
+        <!-- Election Night Banner (hidden by default, shown when data-election-night is set) -->
+        <div class="en-banner">
+            <span class="en-live-dot"></span>
+            Election Night &mdash; March 17, 2026
+        </div>
+
         <!-- HEADER -->
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>

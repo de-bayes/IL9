@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="IL9Cast - Outside Money Tracker for the IL-9 2026 Democratic Primary">
+    <title>Outside Money - IL9Cast</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WVTWQBBG8S"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-WVTWQBBG8S');
+    </script>
+</head>
+<script>
+    (function() {
+        var t = localStorage.getItem('il9-theme');
+        if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        var p = new URLSearchParams(window.location.search);
+        var d = new Date();
+        if ((d.getFullYear()===2026 && d.getMonth()===2 && d.getDate()===17) || p.has('election-night'))
+            document.documentElement.setAttribute('data-election-night', '');
+    })();
+</script>
+<body>
+    <div class="site-content">
+        <div class="en-banner"><span class="en-live-dot"></span> Election Night &mdash; March 17, 2026</div>
+        <header>
+            <a href="/" class="logo">IL9<span>Cast</span></a>
+            <nav class="desktop-nav">
+                <a href="/odds">Model</a>
+                <a href="/markets">Markets</a>
+                <a href="/candidates">Candidates</a>
+                <a href="/fundraising">Fundraising</a>
+                <a href="/outside-money" class="active">Outside Money</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/about">About</a>
+            </nav>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+                <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="mobile-nav" id="mobileNav">
+                <a href="/odds">Model</a>
+                <a href="/markets">Markets</a>
+                <a href="/candidates">Candidates</a>
+                <a href="/fundraising">Fundraising</a>
+                <a href="/outside-money" class="active">Outside Money</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/about">About</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <h1>Outside Money</h1>
+            <p class="subtitle">Tracking independent expenditures and Super PAC spending in the IL-9 primary</p>
+        </section>
+
+        <section class="om-content">
+
+            <!-- The Big Picture -->
+            <div class="om-section">
+                <div class="om-comparison">
+                    <div class="om-box om-box-outside">
+                        <div class="om-box-label">Outside Spending</div>
+                        <div class="om-box-value">$--</div>
+                        <div class="om-box-note">Independent expenditures from Super PACs</div>
+                    </div>
+                    <div class="om-vs">vs.</div>
+                    <div class="om-box om-box-candidate">
+                        <div class="om-box-label">Candidate-Raised</div>
+                        <div class="om-box-value">$--</div>
+                        <div class="om-box-note">Total raised by all declared candidates</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Groups -->
+            <div class="om-section">
+                <h2 class="om-heading">Active Groups</h2>
+                <p class="om-desc">Super PACs and outside organizations spending in the IL-9 primary.</p>
+
+                <div class="om-group-cards">
+                    <div class="om-group-card">
+                        <div class="om-group-header">
+                            <div class="om-group-name">Add group name</div>
+                            <div class="om-group-type">Super PAC</div>
+                        </div>
+                        <div class="om-group-body">
+                            <div class="om-group-row">
+                                <span class="om-group-label">Total Spent</span>
+                                <span class="om-group-val">$--</span>
+                            </div>
+                            <div class="om-group-row">
+                                <span class="om-group-label">Supporting</span>
+                                <span class="om-group-val">--</span>
+                            </div>
+                            <div class="om-group-row">
+                                <span class="om-group-label">Formed</span>
+                                <span class="om-group-val">--</span>
+                            </div>
+                            <div class="om-group-row">
+                                <span class="om-group-label">FEC Filing</span>
+                                <span class="om-group-val"><a href="#" target="_blank" class="om-link">View filing &rarr;</a></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="om-placeholder-note">Add your PAC data here. Each group gets a card with total spent, who they support, when they formed, and FEC links.</p>
+            </div>
+
+            <!-- Ad Tracker -->
+            <div class="om-section">
+                <h2 class="om-heading">Ad Spending Timeline</h2>
+                <p class="om-desc">Independent expenditure ad buys tracked via AdImpact and FEC filings.</p>
+                <div class="om-placeholder">
+                    <p>Add AdImpact data, ad buy screenshots, or spending timeline here.</p>
+                </div>
+            </div>
+
+            <!-- The Receipts -->
+            <div class="om-section">
+                <h2 class="om-heading">The Receipts</h2>
+                <p class="om-desc">Screenshots of mailers, digital ads, and FEC filings. Click to enlarge.</p>
+                <div class="om-gallery">
+                    <div class="om-gallery-placeholder">
+                        <p>Drop screenshots into <code>static/outside-money/</code> and add them here.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campaign Redbox History -->
+            <div class="om-section">
+                <h2 class="om-heading">Campaign Redbox History</h2>
+                <p class="om-desc">Historical Redbox screenshots for each campaign in the IL-9 primary.</p>
+
+                <div class="om-redbox-campaigns">
+                    <div class="om-redbox-campaign">
+                        <button class="om-redbox-toggle" onclick="toggleRedbox(this)">
+                            <span class="om-redbox-name">Daniel Biss</span>
+                            <span class="om-redbox-arrow">+</span>
+                        </button>
+                        <div class="om-redbox-content">
+                            <div class="om-gallery">
+                                <div class="om-gallery-placeholder"><p>Add Biss Redbox screenshots here</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="om-redbox-campaign">
+                        <button class="om-redbox-toggle" onclick="toggleRedbox(this)">
+                            <span class="om-redbox-name">Laura Fine</span>
+                            <span class="om-redbox-arrow">+</span>
+                        </button>
+                        <div class="om-redbox-content">
+                            <div class="om-gallery">
+                                <div class="om-gallery-placeholder"><p>Add Fine Redbox screenshots here</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="om-redbox-campaign">
+                        <button class="om-redbox-toggle" onclick="toggleRedbox(this)">
+                            <span class="om-redbox-name">Kat Abughazaleh</span>
+                            <span class="om-redbox-arrow">+</span>
+                        </button>
+                        <div class="om-redbox-content">
+                            <div class="om-gallery">
+                                <div class="om-gallery-placeholder"><p>Add Abughazaleh Redbox screenshots here</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="om-redbox-campaign">
+                        <button class="om-redbox-toggle" onclick="toggleRedbox(this)">
+                            <span class="om-redbox-name">Mike Simmons</span>
+                            <span class="om-redbox-arrow">+</span>
+                        </button>
+                        <div class="om-redbox-content">
+                            <div class="om-gallery">
+                                <div class="om-gallery-placeholder"><p>Add Simmons Redbox screenshots here</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="om-redbox-campaign">
+                        <button class="om-redbox-toggle" onclick="toggleRedbox(this)">
+                            <span class="om-redbox-name">Phil Andrew</span>
+                            <span class="om-redbox-arrow">+</span>
+                        </button>
+                        <div class="om-redbox-content">
+                            <div class="om-gallery">
+                                <div class="om-gallery-placeholder"><p>Add Andrew Redbox screenshots here</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="om-redbox-campaign">
+                        <button class="om-redbox-toggle" onclick="toggleRedbox(this)">
+                            <span class="om-redbox-name">Bushra Amiwala</span>
+                            <span class="om-redbox-arrow">+</span>
+                        </button>
+                        <div class="om-redbox-content">
+                            <div class="om-gallery">
+                                <div class="om-gallery-placeholder"><p>Add Amiwala Redbox screenshots here</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Sources -->
+            <div class="om-section om-sources">
+                <h2 class="om-heading">Data Sources</h2>
+                <div class="om-source-list">
+                    <div class="om-source-item">
+                        <span class="om-source-name">FEC Independent Expenditures</span>
+                        <span class="om-source-link"><a href="https://www.fec.gov/data/independent-expenditures/" target="_blank" rel="noopener noreferrer">fec.gov &rarr;</a></span>
+                    </div>
+                    <div class="om-source-item">
+                        <span class="om-source-name">OpenSecrets</span>
+                        <span class="om-source-link"><a href="https://www.opensecrets.org/" target="_blank" rel="noopener noreferrer">opensecrets.org &rarr;</a></span>
+                    </div>
+                    <div class="om-source-item">
+                        <span class="om-source-name">AdImpact</span>
+                        <span class="om-source-link"><a href="https://adimpact.com/" target="_blank" rel="noopener noreferrer">adimpact.com &rarr;</a></span>
+                    </div>
+                </div>
+                <p class="om-updated">Last updated: February 9, 2026</p>
+            </div>
+
+        </section>
+
+        <footer class="site-footer">
+            <hr class="footer-rule">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Navigate</h4>
+                    <ul>
+                        <li><a href="/markets">Markets</a></li>
+                        <li><a href="/candidates">Candidates</a></li>
+                        <li><a href="/fundraising">Fundraising</a></li>
+                        <li><a href="/outside-money">Outside Money</a></li>
+                        <li><a href="/methodology">Methodology</a></li>
+                        <li><a href="/about">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="/api/download/snapshots">Download Data</a></li>
+                        <li><a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                        <li><a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer">Support This Project</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Disclaimer</h4>
+                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data for informational purposes only.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 IL9Cast. Built with open data.</span>
+                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a>
+            </div>
+        </footer>
+        <div class="flag-footer-image">
+            <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer">
+        </div>
+    </div>
+
+    <style>
+        .om-content {
+            max-width: 800px;
+            margin: 0 auto 4rem;
+            padding: 0 2rem;
+        }
+
+        .om-section {
+            margin-bottom: 3rem;
+        }
+
+        .om-heading {
+            font-family: var(--serif);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 0.5rem;
+        }
+
+        .om-desc {
+            font-family: var(--sans);
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0 0 1.5rem;
+        }
+
+        /* Big Picture comparison */
+        .om-comparison {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .om-box {
+            flex: 1;
+            padding: 2rem 1.5rem;
+            border: 1px solid var(--border-default);
+            background: var(--bg-surface);
+            text-align: center;
+        }
+
+        .om-box-outside {
+            border-left: 4px solid #ef4444;
+        }
+
+        .om-box-candidate {
+            border-left: 4px solid #10b981;
+        }
+
+        .om-box-label {
+            font-family: var(--sans);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-tertiary);
+            margin-bottom: 0.5rem;
+        }
+
+        .om-box-value {
+            font-family: var(--serif);
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .om-box-note {
+            font-family: var(--sans);
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+        }
+
+        .om-vs {
+            font-family: var(--serif);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            flex-shrink: 0;
+        }
+
+        /* Group Cards */
+        .om-group-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .om-group-card {
+            border: 1px solid var(--border-default);
+            background: var(--bg-surface);
+        }
+
+        .om-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .om-group-name {
+            font-family: var(--serif);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .om-group-type {
+            font-family: var(--sans);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.08);
+            padding: 0.25rem 0.6rem;
+        }
+
+        .om-group-body {
+            padding: 0;
+        }
+
+        .om-group-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid var(--border-subtle, var(--border-default));
+        }
+
+        .om-group-row:last-child {
+            border-bottom: none;
+        }
+
+        .om-group-label {
+            font-family: var(--sans);
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+        }
+
+        .om-group-val {
+            font-family: var(--sans);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .om-link {
+            color: var(--accent-blue, #4a90d9);
+            text-decoration: underline;
+        }
+
+        /* Placeholder */
+        .om-placeholder, .om-gallery-placeholder {
+            padding: 2rem;
+            border: 2px dashed var(--border-default);
+            text-align: center;
+            color: var(--text-tertiary);
+            font-family: var(--sans);
+            font-size: 0.9rem;
+        }
+
+        .om-placeholder-note {
+            font-family: var(--sans);
+            font-size: 0.82rem;
+            color: var(--text-tertiary);
+            font-style: italic;
+            margin-top: 1rem;
+        }
+
+        .om-gallery-placeholder code {
+            background: var(--bg-surface);
+            padding: 0.15rem 0.4rem;
+            font-size: 0.8rem;
+            border: 1px solid var(--border-default);
+        }
+
+        /* Screenshot Gallery */
+        .om-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .om-gallery-item {
+            border: 1px solid var(--border-default);
+            background: var(--bg-surface);
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .om-gallery-item img {
+            width: 100%;
+            display: block;
+        }
+
+        .om-gallery-item .om-gallery-caption {
+            padding: 0.6rem 0.8rem;
+            font-family: var(--sans);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-default);
+        }
+
+        /* Redbox Campaigns */
+        .om-redbox-campaigns {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            border: 1px solid var(--border-default);
+            background: var(--border-default);
+        }
+
+        .om-redbox-campaign {
+            background: var(--bg-surface);
+        }
+
+        .om-redbox-toggle {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-family: var(--sans);
+        }
+
+        .om-redbox-toggle:hover {
+            background: var(--bg-hover, rgba(0,0,0,0.02));
+        }
+
+        .om-redbox-name {
+            font-family: var(--serif);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .om-redbox-arrow {
+            font-size: 1.2rem;
+            color: var(--text-tertiary);
+            transition: transform 0.2s ease;
+        }
+
+        .om-redbox-content {
+            display: none;
+            padding: 1rem 1.5rem 1.5rem;
+            border-top: 1px solid var(--border-default);
+        }
+
+        .om-redbox-campaign.open .om-redbox-content {
+            display: block;
+        }
+
+        .om-redbox-campaign.open .om-redbox-arrow {
+            transform: rotate(45deg);
+        }
+
+        /* Sources */
+        .om-sources {
+            border-top: 1px solid var(--border-default);
+            padding-top: 2rem;
+        }
+
+        .om-source-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            border: 1px solid var(--border-default);
+            background: var(--border-default);
+            margin-bottom: 1rem;
+        }
+
+        .om-source-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            background: var(--bg-surface);
+        }
+
+        .om-source-name {
+            font-family: var(--sans);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .om-source-link a {
+            font-family: var(--sans);
+            font-size: 0.85rem;
+            color: var(--accent-blue, #4a90d9);
+            text-decoration: underline;
+        }
+
+        .om-updated {
+            font-family: var(--sans);
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            font-style: italic;
+        }
+
+        /* Lightbox */
+        .om-lightbox {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .om-lightbox.active {
+            display: flex;
+        }
+
+        .om-lightbox img {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+
+        @media (max-width: 600px) {
+            .om-content { padding: 0 1.25rem; }
+            .om-comparison { flex-direction: column; gap: 0.75rem; }
+            .om-vs { display: none; }
+            .om-box-value { font-size: 1.8rem; }
+            .om-gallery { grid-template-columns: 1fr; }
+        }
+    </style>
+
+    <!-- Lightbox for screenshots -->
+    <div class="om-lightbox" id="omLightbox" onclick="closeLightbox()">
+        <img id="omLightboxImg" src="" alt="Enlarged screenshot">
+    </div>
+
+    <script>
+        function toggleTheme() {
+            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('il9-theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('il9-theme', 'dark');
+            }
+        }
+
+        function toggleMobileMenu() {
+            const hamburger = document.getElementById('hamburger');
+            const mobileNav = document.getElementById('mobileNav');
+            hamburger.classList.toggle('active');
+            mobileNav.classList.toggle('active');
+        }
+
+        document.querySelectorAll('#mobileNav a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('hamburger').classList.remove('active');
+                document.getElementById('mobileNav').classList.remove('active');
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            const hamburger = document.getElementById('hamburger');
+            const mobileNav = document.getElementById('mobileNav');
+            if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) {
+                hamburger.classList.remove('active');
+                mobileNav.classList.remove('active');
+            }
+        });
+
+        function toggleRedbox(btn) {
+            btn.closest('.om-redbox-campaign').classList.toggle('open');
+        }
+
+        function openLightbox(src) {
+            document.getElementById('omLightboxImg').src = src;
+            document.getElementById('omLightbox').classList.add('active');
+        }
+
+        function closeLightbox() {
+            document.getElementById('omLightbox').classList.remove('active');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+</body>
+</html>

@@ -11,6 +11,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
+<script>
+    (function() {
+        var p = new URLSearchParams(window.location.search);
+        var d = new Date();
+        if ((d.getFullYear()===2026 && d.getMonth()===2 && d.getDate()===17) || p.has('election-night'))
+            document.documentElement.setAttribute('data-election-night', '');
+    })();
+</script>
 <body>
     <nav class="navbar">
         <div class="nav-container">

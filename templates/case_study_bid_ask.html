@@ -24,10 +24,15 @@
     (function() {
         var t = localStorage.getItem('il9-theme');
         if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        var p = new URLSearchParams(window.location.search);
+        var d = new Date();
+        if ((d.getFullYear()===2026 && d.getMonth()===2 && d.getDate()===17) || p.has('election-night'))
+            document.documentElement.setAttribute('data-election-night', '');
     })();
 </script>
 <body>
     <div class="site-content">
+        <div class="en-banner"><span class="en-live-dot"></span> Election Night &mdash; March 17, 2026</div>
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
             <nav class="desktop-nav">

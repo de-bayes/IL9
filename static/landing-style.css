@@ -1206,3 +1206,193 @@ header {
         padding: 0.9rem 2rem;
     }
 }
+
+/* ============================================
+   ELECTION NIGHT THEME
+   Activated via data-election-night attribute on <html>
+   Adds blue/red broadcast styling over existing layout
+   ============================================ */
+
+[data-election-night] {
+    --bg-primary:       #0a1628;
+    --bg-surface:       #0f2044;
+    --bg-surface-hover: #152a54;
+    --bg-elevated:      #1a3a6e;
+    --border-subtle:    rgba(59, 130, 246, 0.08);
+    --border-default:   rgba(59, 130, 246, 0.15);
+    --border-hover:     rgba(59, 130, 246, 0.3);
+    --text-primary:     #f0f4f8;
+    --text-secondary:   #94a3b8;
+    --text-tertiary:    #64748b;
+    --accent-gold:      #ef4444;
+    --accent-blue:      #3b82f6;
+    --accent-red:       #ef4444;
+    --accent-green:     #22c55e;
+    --accent-teal:      #3b82f6;
+    --grid-color:       rgba(59, 130, 246, 0.03);
+    --highlight-bg:     #dc2626;
+    --highlight-text:   #ffffff;
+    --header-border:    rgba(59, 130, 246, 0.3);
+    --shadow-soft:      rgba(0, 0, 0, 0.5);
+}
+
+/* Header glow */
+[data-election-night] header {
+    border-bottom: 2px solid rgba(59, 130, 246, 0.4);
+    box-shadow: 0 2px 20px rgba(59, 130, 246, 0.1);
+}
+
+/* Logo highlight turns red */
+[data-election-night] .logo span {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+/* Hero highlight in red */
+[data-election-night] .hero h1 em {
+    background: #dc2626;
+    color: #ffffff;
+    box-shadow: 4px 0 0 #dc2626, -4px 0 0 #dc2626;
+}
+
+/* Dateline dot pulses blue */
+[data-election-night] .hero-dateline .dot {
+    background: #3b82f6;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+}
+
+/* Stat boxes: alternating red/blue accents with subtle 3D */
+[data-election-night] .stat-box {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-election-night] .stat-box:nth-child(1) { border-left-color: #3b82f6; }
+[data-election-night] .stat-box:nth-child(2) { border-left-color: #ef4444; }
+[data-election-night] .stat-box:nth-child(3) { border-left-color: #3b82f6; }
+[data-election-night] .stat-box:nth-child(4) { border-left-color: #ef4444; }
+
+[data-election-night] .stat-grid {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+/* Nav cards: red/blue top accents + 3D shadow */
+[data-election-night] .nav-card:nth-child(1) { border-top-color: #3b82f6; }
+[data-election-night] .nav-card:nth-child(2) { border-top-color: #ef4444; }
+[data-election-night] .nav-card:nth-child(3) { border-top-color: #3b82f6; }
+
+[data-election-night] .nav-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    transition: background 0.15s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+[data-election-night] .nav-card:hover {
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+    transform: translateY(-2px);
+}
+
+[data-election-night] .nav-cards {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+/* Featured card: red accent */
+[data-election-night] .featured-card {
+    border-top-color: #ef4444;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+[data-election-night] .featured-card-tag {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+/* About block list: red/blue */
+[data-election-night] .about-block-list li:nth-child(1) { border-left-color: #3b82f6; }
+[data-election-night] .about-block-list li:nth-child(2) { border-left-color: #ef4444; }
+[data-election-night] .about-block-list li:nth-child(3) { border-left-color: #3b82f6; }
+
+[data-election-night] .about-block {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Buttons: blue primary, red outline */
+[data-election-night] .btn-primary {
+    background: #3b82f6;
+    color: #ffffff;
+    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+}
+
+[data-election-night] .btn-primary:hover {
+    opacity: 1;
+    background: #2563eb;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+}
+
+[data-election-night] .btn-secondary {
+    color: #ef4444;
+    border-color: #ef4444;
+}
+
+[data-election-night] .btn-secondary:hover {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+/* Footer */
+[data-election-night] .footer-rule {
+    border-top-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Grid background: faint blue */
+[data-election-night] body::before {
+    background-image:
+        linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+}
+
+/* Election Night Banner */
+[data-election-night] .en-banner {
+    display: flex;
+}
+
+.en-banner {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: linear-gradient(90deg, #1e3a6e 0%, #dc2626 50%, #1e3a6e 100%);
+    padding: 0.5rem 1rem;
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.en-banner .en-live-dot {
+    width: 8px;
+    height: 8px;
+    background: #ffffff;
+    border-radius: 50%;
+    animation: en-pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+@keyframes en-pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(255, 255, 255, 0.8); }
+    50% { opacity: 0.4; box-shadow: 0 0 12px rgba(255, 255, 255, 1); }
+}
+
+/* Theme toggle icon override for election night */
+[data-election-night] .theme-toggle {
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #94a3b8;
+}
+
+[data-election-night] .theme-toggle:hover {
+    border-color: rgba(59, 130, 246, 0.5);
+    color: #f0f4f8;
+}
