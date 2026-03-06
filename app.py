@@ -1171,32 +1171,35 @@ View Live Markets: {SITE_BASE_URL}markets
 def fetch_all_fec_data():
     """
     Returns hardcoded FEC data for all IL-09 2026 candidates with profiles.
-    Data is static until new FEC reports are filed (expected April 2026).
-    Source: FEC filings as of Dec 31, 2025 (retrieved Feb 1, 2026).
+    Source:
+      - Pre-Primary filings (through Feb 25, 2026) for Biss, Simmons, Andrew.
+        Filed March 5, 2026. Retrieved March 6, 2026.
+      - Year-End filings (through Dec 31, 2025) for Abugazaleh, Fine.
+        Filed Jan 30-31, 2026.
 
-    Burn rate formulas (corrected):
-    - 2-week burn: last 2 weeks expenditures × 2 = monthly
-    - 1-month burn: last 1 month expenditures = monthly
-    - 1.5-month burn: last 1.5 months expenditures × 0.66 = monthly
+    Burn rates calculated from most recent filing period:
+      - Pre-primary: Jan 1 – Feb 25, 2026 (56 days)
+      - Year-end Q4: Oct 1 – Dec 31, 2025 (92 days)
+      - Monthly rate = period_amount / (period_days / 30.44)
     """
     return [
         {
             "name": "Daniel Biss",
-            "total_raised": 1984528.24,
-            "total_spent": 608223.67,
-            "cash_on_hand": 1376304.57,
+            "total_raised": 2539961.32,
+            "total_spent": 1894041.97,
+            "cash_on_hand": 645919.35,
             "total_donors": 5590,
-            "small_dollar_amount": 97977.94,
-            "individual_total": 1913366.89,
-            "coverage_end_date": "2025-12-31T00:00:00",
+            "small_dollar_amount": 127957.89,
+            "individual_total": 2425950.53,
+            "coverage_end_date": "2026-02-25T00:00:00",
             "committee_id": "C00905307",
-            "burn_2week": 0,
-            "burn_1month": 0,
-            "burn_1_5month": 0.0,
-            "cash_runway_months": 0,
-            "spent_pct_of_raised": 30.648274876652803,
-            "avg_contribution": 355.01399642218246,
-            "small_dollar_pct": 5.120708449177775
+            "burn_rate_monthly": 698917,
+            "raise_rate_monthly": 301912,
+            "cash_runway_months": 0.9,
+            "burn_period_label": "Jan 1 – Feb 25, 2026",
+            "spent_pct_of_raised": 74.57,
+            "avg_contribution": 454.38,
+            "small_dollar_pct": 5.04
         },
         {
             "name": "Kat Abugazaleh",
@@ -1208,13 +1211,13 @@ def fetch_all_fec_data():
             "individual_total": 2702469.35,
             "coverage_end_date": "2025-12-31T00:00:00",
             "committee_id": "C00900449",
-            "burn_2week": 0,
-            "burn_1month": 0,
-            "burn_1_5month": 0.0,
-            "cash_runway_months": 0,
-            "spent_pct_of_raised": 70.02216828306754,
-            "avg_contribution": 68.36603578558973,
-            "small_dollar_pct": 70.23264741189386
+            "burn_rate_monthly": 457198,
+            "raise_rate_monthly": 390580,
+            "cash_runway_months": 1.8,
+            "burn_period_label": "Oct 1 – Dec 31, 2025",
+            "spent_pct_of_raised": 70.02,
+            "avg_contribution": 68.37,
+            "small_dollar_pct": 70.23
         },
         {
             "name": "Laura Fine",
@@ -1226,67 +1229,49 @@ def fetch_all_fec_data():
             "individual_total": 1899148.18,
             "coverage_end_date": "2025-12-31T00:00:00",
             "committee_id": "C00904326",
-            "burn_2week": 0,
-            "burn_1month": 0,
-            "burn_1_5month": 0.0,
-            "cash_runway_months": 0,
-            "spent_pct_of_raised": 25.056799015667274,
-            "avg_contribution": 394.21734509643005,
-            "small_dollar_pct": 3.147108299890533
+            "burn_rate_monthly": 99233,
+            "raise_rate_monthly": 417114,
+            "cash_runway_months": 14.5,
+            "burn_period_label": "Oct 1 – Dec 31, 2025",
+            "spent_pct_of_raised": 25.06,
+            "avg_contribution": 394.22,
+            "small_dollar_pct": 3.11
         },
         {
             "name": "Mike Simmons",
-            "total_raised": 324880.07,
-            "total_spent": 189728.52,
-            "cash_on_hand": 135151.55,
+            "total_raised": 414048.31,
+            "total_spent": 278898.27,
+            "cash_on_hand": 135150.04,
             "total_donors": 1384,
-            "small_dollar_amount": 42440.7,
-            "individual_total": 310380.07,
-            "coverage_end_date": "2025-12-31T00:00:00",
+            "small_dollar_amount": 60601.58,
+            "individual_total": 393748.31,
+            "coverage_end_date": "2026-02-25T00:00:00",
             "committee_id": "C00910976",
-            "burn_2week": 0,
-            "burn_1month": 0,
-            "burn_1_5month": 0.0,
-            "cash_runway_months": 0,
-            "spent_pct_of_raised": 58.399556488645175,
-            "avg_contribution": 234.73993497109828,
-            "small_dollar_pct": 13.673783886961555
+            "burn_rate_monthly": 48470,
+            "raise_rate_monthly": 48469,
+            "cash_runway_months": 2.8,
+            "burn_period_label": "Jan 1 – Feb 25, 2026",
+            "spent_pct_of_raised": 67.36,
+            "avg_contribution": 299.31,
+            "small_dollar_pct": 14.64
         },
         {
             "name": "Phil Andrew",
-            "total_raised": 1210786.43,
-            "total_spent": 249372.83,
-            "cash_on_hand": 961413.6,
+            "total_raised": 1339123.10,
+            "total_spent": 1166047.75,
+            "cash_on_hand": 173075.35,
             "total_donors": 2367,
-            "small_dollar_amount": 42544.0,
-            "individual_total": 800978.51,
-            "coverage_end_date": "2025-12-31T00:00:00",
+            "small_dollar_amount": 65993.06,
+            "individual_total": 926762.57,
+            "coverage_end_date": "2026-02-25T00:00:00",
             "committee_id": "C00911024",
-            "burn_2week": 0,
-            "burn_1month": 0,
-            "burn_1_5month": 0.0,
-            "cash_runway_months": 0,
-            "spent_pct_of_raised": 20.595938624782903,
-            "avg_contribution": 511.5278538234051,
-            "small_dollar_pct": 5.311503301131013
-        },
-        {
-            "name": "Bushra Amiwala",
-            "total_raised": 663802.8,
-            "total_spent": 185643.0,
-            "cash_on_hand": 478159.8,
-            "total_donors": 4356,
-            "small_dollar_amount": 168958.8,
-            "individual_total": 657402.8,
-            "coverage_end_date": "2025-09-30T00:00:00",
-            "committee_id": "C00906842",
-            "burn_2week": 0,
-            "burn_1month": 0,
-            "burn_1_5month": 0,
-            "cash_runway_months": 0,
-            "spent_pct_of_raised": 27.966588872478393,
-            "avg_contribution": 152.38815426997246,
-            "small_dollar_pct": 25.70095533514612
+            "burn_rate_monthly": 498266,
+            "raise_rate_monthly": 69759,
+            "cash_runway_months": 0.3,
+            "burn_period_label": "Jan 1 – Feb 25, 2026",
+            "spent_pct_of_raised": 87.08,
+            "avg_contribution": 565.66,
+            "small_dollar_pct": 4.93
         }
     ]
 
@@ -1614,19 +1599,7 @@ CANDIDATE_PROFILES = [
         ],
         "key_issues": ["Gun violence prevention", "Community safety", "Political independence", "Refusing PAC money"]
     },
-    {
-        "name": "Bushra Amiwala",
-        "slug": "bushra-amiwala",
-        "title": "Skokie School Board Member",
-        "photo": "images/candidates/bushra.png",
-        "campaign_url": "https://www.bushraforcongress.com/",
-        "bio": "Youngest Muslim elected official in the United States. School board member and education advocate focused on tuition-free public college and student debt cancellation.",
-        "endorsements": [
-            "Former Rep. Marie Newman",
-            "Northside Democracy for America"
-        ],
-        "key_issues": ["Tuition-free college", "Student debt cancellation", "Medicare for All", "Domestic infrastructure over foreign aid"]
-    }
+    # Bushra Amiwala removed — no pre-primary filing available
 ]
 
 # Routes
