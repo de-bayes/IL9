@@ -924,6 +924,10 @@
             background: var(--bg-surface-hover);
         }
 
+        .toggle-btn:active {
+            transform: scale(0.96);
+        }
+
         .toggle-btn.active {
             background: var(--bg-surface);
             color: var(--text-primary);
@@ -2947,16 +2951,27 @@ function setupPolling() {
 
 document.addEventListener('DOMContentLoaded', () => {
     // Set up chart toggle buttons
+    var _chartLoading = false;
     document.querySelectorAll('.toggle-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
-            // Update button states
+            if (_chartLoading) return; // debounce
+            var clicked = e.target.closest('.toggle-btn');
+            if (!clicked || clicked.classList.contains('active')) return;
+
+            // Update button states immediately
             document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
+            clicked.classList.add('active');
+            clicked.style.opacity = '0.6';
 
-            currentChartPeriod = e.target.dataset.period;
+            currentChartPeriod = clicked.dataset.period;
+            _chartLoading = true;
 
-            // Render chart with the selected period (handles both 30d and 1h)
-            await renderMarketTrendChart(candidatesData);
+            try {
+                await renderMarketTrendChart(candidatesData);
+            } finally {
+                _chartLoading = false;
+                clicked.style.opacity = '';
+            }
         });
     });
 

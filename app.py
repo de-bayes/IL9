@@ -612,7 +612,7 @@ def rdp_simplify(points, epsilon):
 
 
 # ===== CHART DATA CACHE =====
-_chart_cache = {'data': None, 'time': 0, 'key': None}
+_chart_cache = {'data': None, 'time': 0, 'key': None, 'file_size': 0}
 
 
 # ===== EMAIL ALERT FUNCTIONS =====
@@ -2100,9 +2100,15 @@ def get_snapshots_chart():
         epsilon = float(request.args.get('epsilon', '0.5'))
         cache_key = f'{period}:{epsilon}'
 
-        # 60-second cache
+        # Cache: serve cached result if same params AND file hasn't grown
         now = _time.time()
-        if _chart_cache['key'] == cache_key and _chart_cache['data'] and (now - _chart_cache['time']) < 60:
+        try:
+            current_file_size = os.path.getsize(HISTORICAL_DATA_PATH)
+        except OSError:
+            current_file_size = 0
+        if (_chart_cache['key'] == cache_key and _chart_cache['data']
+                and _chart_cache['file_size'] == current_file_size
+                and (now - _chart_cache['time']) < 300):
             return jsonify(_chart_cache['data'])
 
         # Read all snapshots
@@ -2260,7 +2266,7 @@ def get_snapshots_chart():
         }
 
         # Cache and return
-        _chart_cache = {'data': result, 'time': now, 'key': cache_key}
+        _chart_cache = {'data': result, 'time': now, 'key': cache_key, 'file_size': current_file_size}
 
         resp = jsonify(result)
         resp.headers['Cache-Control'] = 'public, max-age=30'
