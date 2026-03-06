@@ -33,6 +33,7 @@ instance/
 # seed_snapshots.json is the git-tracked backup for initializing Railway
 data/historical_snapshots.json
 data/historical_snapshots.jsonl
+data/historical_snapshots.jsonl.lock
 data/email_subscribers.jsonl
 data/fec_cache.json
 data/.purge_*

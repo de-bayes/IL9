@@ -307,11 +307,11 @@
                         </ol>
                         <p>This gives us three perspectives on spending velocity: recent (2-week), medium-term (1-month), and longer-term (1.5-month). Campaigns often ramp up spending closer to election day, so the 2-week burn tends to be highest.</p>
                         <p><strong>Implementation:</strong> The system first finds the most recent disbursement within the last 60 days of the reporting period. If found, it uses that date as the anchor point and calculates backwards. If no recent disbursements exist, burn rates show as $0/mo.</p>
-                        <p><strong>Note:</strong> Many campaigns show $0/mo burn rates because they had no expenditures in the final weeks of the Dec 31, 2025 reporting period. This is normal for campaigns between quarterly filing deadlines.</p>
+                        <p><strong>Note:</strong> Burn rates are calculated from the Jan 1 &ndash; Feb 25, 2026 pre-primary filing period (56 days). All five candidates now have pre-primary data available.</p>
 
                         <h3>Data Source & Updates</h3>
-                        <p>The fundraising data is currently <strong>hardcoded</strong> into the application using FEC filings as of December 31, 2025 (retrieved February 1, 2026). Since campaigns won't file new quarterly reports until April 2026, the data is static and doesn't require live API calls.</p>
-                        <p>This approach provides instant page loads (no 2-3 second API delays) while ensuring the displayed data remains accurate. When new FEC reports are filed in April, the hardcoded data will be updated to reflect the latest filings.</p>
+                        <p>The fundraising data is currently <strong>hardcoded</strong> into the application using Pre-Primary FEC filings through February 25, 2026 (filed March 5, retrieved March 6, 2026). The data is static and doesn't require live API calls.</p>
+                        <p>This approach provides instant page loads (no 2-3 second API delays) while ensuring the displayed data remains accurate.</p>
 
                         <h3>Chart Visualization</h3>
                         <p>The fundraising chart uses a dual Y-axis approach to compare two fundamentally different metrics:</p>

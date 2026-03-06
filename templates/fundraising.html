@@ -73,7 +73,7 @@
             <article class="live-money-ticker hidden" id="liveMoneyTicker">
                 <div class="ticker-header">
                     <h2>Live Campaign Finance Tracker</h2>
-                    <p class="ticker-subtitle">Extrapolated from FEC data (Dec 31, 2025) using actual campaign velocities</p>
+                    <p class="ticker-subtitle">Updated from FEC filings as of March 5, 2026. Pre-Primary data (through Feb 25) for all candidates.</p>
                 </div>
 
                 <div class="ticker-stats-grid">
@@ -109,7 +109,7 @@
             <!-- Error/Not Available State -->
             <article class="fec-error-section hidden" id="errorSection">
                 <h2>Data Not Yet Available</h2>
-                <p id="errorMessage">FEC fundraising data will be available after the January 31st, 2026 filing deadline. Check back soon!</p>
+                <p id="errorMessage">FEC fundraising data is temporarily unavailable. Please try again shortly.</p>
                 <div style="margin-top: 1.5rem;">
                     <a href="/markets" class="btn">View Live Market Data</a>
                 </div>
@@ -157,17 +157,17 @@
 
                 <!-- Burn Rate Analysis -->
                 <article class="burn-rate-section">
-                    <h2>Burn Rate Projections</h2>
-                    <p class="section-desc">Estimated monthly spending rates based on recent expenditure patterns</p>
+                    <h2>Burn Rate Analysis</h2>
+                    <p class="section-desc">Monthly spending and fundraising rates calculated from most recent FEC filing period</p>
                     <div class="table-responsive">
                         <table class="fec-table" id="burnRateTable">
                             <thead>
                                 <tr>
                                     <th>Candidate</th>
-                                    <th>2-Week Burn</th>
-                                    <th>1-Month Burn</th>
-                                    <th>1.5-Month Burn</th>
+                                    <th>Burn Rate</th>
+                                    <th>Raise Rate</th>
                                     <th>Cash Runway</th>
+                                    <th>Period</th>
                                 </tr>
                             </thead>
                             <tbody id="burnRateTableBody">
@@ -176,7 +176,7 @@
                         </table>
                     </div>
                     <div class="table-note">
-                        <strong>Note:</strong> Burn rates are temporarily shown as $0/mo for all campaigns. The FEC is currently categorizing Schedule B expenditure data, and the API cannot reliably return burn-rate inputs until records are correctly categorized.
+                        <strong>Note:</strong> Burn and raise rates are calculated as total period disbursements/receipts divided by the number of days in the filing period, annualized to a monthly figure. Cash runway = cash on hand &divide; monthly burn rate.
                     </div>
                 </article>
 
@@ -877,12 +877,16 @@
 
             candidates.forEach(candidate => {
                 const row = document.createElement('tr');
+                const burnRate = candidate.burn_rate_monthly || 0;
+                const raiseRate = candidate.raise_rate_monthly || 0;
+                const runway = candidate.cash_runway_months || 0;
+                const period = candidate.burn_period_label || 'N/A';
                 row.innerHTML = `
                     <td><strong>${candidate.name}</strong></td>
-                    <td>${formatCurrency(candidate.burn_2week)}/mo</td>
-                    <td>${formatCurrency(candidate.burn_1month)}/mo</td>
-                    <td>${formatCurrency(candidate.burn_1_5month)}/mo</td>
-                    <td>${candidate.cash_runway_months > 0 ? candidate.cash_runway_months.toFixed(1) + ' months' : 'N/A'}</td>
+                    <td>${formatCurrency(burnRate)}/mo</td>
+                    <td>${formatCurrency(raiseRate)}/mo</td>
+                    <td>${runway > 0 ? runway.toFixed(1) + ' months' : 'N/A'}</td>
+                    <td style="font-size: 0.85em; opacity: 0.8;">${period}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -910,72 +914,38 @@
         let velocityPerSecond = 0;
 
         function startLiveCounter(totalRaised, totalSpent, candidates) {
-            // Calculate accurate velocity based on real FEC data and campaign start dates
-
-            // FEC data shows fundraising through Dec 31, 2025 for most candidates
-            // Estimate campaign start dates based on typical IL primary timelines:
-            const campaignStartDates = {
-                "Daniel Biss": "2024-06-01",        // Incumbent, early start
-                "Kat Abugazaleh": "2024-08-01",     // Strong challenger, mid-year start
-                "Laura Fine": "2024-07-01",         // Incumbent state rep, summer start
-                "Mike Simmons": "2025-01-01",       // Late entry
-                "Phil Andrew": "2024-09-01",        // Fall start
-                "Bushra Amiwala": "2024-05-01"      // Early start (had Q3 data by Sept 30)
-            };
-
-            // Calculate weighted average velocity across all candidates
-            let totalVelocity = 0;
-            let validCandidates = 0;
+            // Use raise_rate_monthly from FEC data (calculated from actual filing periods)
+            let totalDailyVelocity = 0;
+            let totalDailySpendRate = 0;
 
             candidates.forEach(candidate => {
-                const startDate = campaignStartDates[candidate.name];
-                if (startDate) {
-                    // FEC data is through Dec 31, 2025 (or Sept 30 for Bushra)
-                    const start = new Date(startDate);
-                    const fecEndDate = candidate.name === "Bushra Amiwala"
-                        ? new Date("2025-09-30")
-                        : new Date("2025-12-31");
-
-                    // Days from campaign start to last FEC report
-                    const daysActive = (fecEndDate - start) / (1000 * 60 * 60 * 24);
-
-                    if (daysActive > 0) {
-                        // Calculate this candidate's daily velocity
-                        const dailyVelocity = candidate.total_raised / daysActive;
-                        totalVelocity += dailyVelocity;
-                        validCandidates++;
-
-                        console.log(`${candidate.name}: $${candidate.total_raised.toLocaleString()} over ${Math.round(daysActive)} days = $${Math.round(dailyVelocity)}/day`);
-                    }
-                }
+                const raiseRate = candidate.raise_rate_monthly || 0;
+                const burnRate = candidate.burn_rate_monthly || 0;
+                // Convert monthly to daily (30.44 days/month)
+                totalDailyVelocity += raiseRate / 30.44;
+                totalDailySpendRate += burnRate / 30.44;
             });
 
-            // Average daily velocity across all campaigns
-            const avgDailyVelocity = totalVelocity;  // Sum of all daily rates
-            const velocityPerHour = avgDailyVelocity / 24;
+            const velocityPerHour = totalDailyVelocity / 24;
             velocityPerSecond = velocityPerHour / 3600;
 
-            console.log(`Combined velocity: $${Math.round(avgDailyVelocity)}/day = $${Math.round(velocityPerHour)}/hour = $${velocityPerSecond.toFixed(2)}/second`);
+            console.log(`Combined velocity: $${Math.round(totalDailyVelocity)}/day = $${Math.round(velocityPerHour)}/hour`);
 
-            // Extrapolate current totals (FEC data is from Dec 31, 2025, today is Feb 2, 2026)
-            const fecDataDate = new Date("2025-12-31");
+            // Extrapolate from each candidate's coverage_end_date to today
             const today = new Date();
-            const daysSinceFiling = (today - fecDataDate) / (1000 * 60 * 60 * 24);
+            let estimatedCurrentTotal = 0;
+            let estimatedCurrentSpent = 0;
 
-            // Estimate additional fundraising since last FEC report
-            const estimatedAdditional = avgDailyVelocity * daysSinceFiling;
-            const estimatedCurrentTotal = totalRaised + estimatedAdditional;
+            candidates.forEach(candidate => {
+                const coverageEnd = new Date(candidate.coverage_end_date);
+                const daysSince = Math.max(0, (today - coverageEnd) / (1000 * 60 * 60 * 24));
+                const dailyRaise = (candidate.raise_rate_monthly || 0) / 30.44;
+                const dailyBurn = (candidate.burn_rate_monthly || 0) / 30.44;
+                estimatedCurrentTotal += candidate.total_raised + (dailyRaise * daysSince);
+                estimatedCurrentSpent += candidate.total_spent + (dailyBurn * daysSince);
+            });
 
-            // Assume spending continues at ~40% of fundraising rate
-            const estimatedSpendingRate = avgDailyVelocity * 0.4;
-            const estimatedAdditionalSpent = estimatedSpendingRate * daysSinceFiling;
-            const estimatedCurrentSpent = totalSpent + estimatedAdditionalSpent;
-
-            console.log(`Days since FEC filing (Dec 31): ${Math.round(daysSinceFiling)}`);
-            console.log(`Estimated additional raised: $${Math.round(estimatedAdditional).toLocaleString()}`);
-            console.log(`Estimated current total: $${Math.round(estimatedCurrentTotal).toLocaleString()}`);
-
-            // Display extrapolated totals (note text indicates estimation)
+            // Display extrapolated totals
             document.getElementById('totalRaisedDisplay').textContent = formatCurrency(estimatedCurrentTotal);
             document.getElementById('totalSpentDisplay').textContent = formatCurrency(estimatedCurrentSpent);
             document.getElementById('velocityDisplay').textContent = Math.round(velocityPerHour).toLocaleString();
@@ -1017,7 +987,7 @@
                     // Show error/not available message
                     document.getElementById('errorSection').classList.remove('hidden');
                     document.getElementById('errorMessage').textContent =
-                        data.message || 'FEC data will be available after the January 31st filing deadline. Check back soon!';
+                        data.message || 'FEC fundraising data is temporarily unavailable. Please try again shortly.';
                 } else {
                     // Calculate totals
                     const totalRaised = data.candidates.reduce((sum, c) => sum + c.total_raised, 0);
