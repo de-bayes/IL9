@@ -1172,14 +1172,11 @@ def fetch_all_fec_data():
     """
     Returns hardcoded FEC data for all IL-09 2026 candidates with profiles.
     Source:
-      - Pre-Primary filings (through Feb 25, 2026) for Biss, Simmons, Andrew.
+      - Pre-Primary filings (through Feb 25, 2026) for all candidates.
         Filed March 5, 2026. Retrieved March 6, 2026.
-      - Year-End filings (through Dec 31, 2025) for Abugazaleh, Fine.
-        Filed Jan 30-31, 2026.
 
-    Burn rates calculated from most recent filing period:
-      - Pre-primary: Jan 1 – Feb 25, 2026 (56 days)
-      - Year-end Q4: Oct 1 – Dec 31, 2025 (92 days)
+    Burn rates calculated from pre-primary filing period:
+      - Jan 1 – Feb 25, 2026 (56 days)
       - Monthly rate = period_amount / (period_days / 30.44)
     """
     return [
@@ -1203,39 +1200,39 @@ def fetch_all_fec_data():
         },
         {
             "name": "Kat Abugazaleh",
-            "total_raised": 2705175.67,
-            "total_spent": 1894222.66,
-            "cash_on_hand": 810953.01,
-            "total_donors": 39569,
-            "small_dollar_amount": 1898015.77,
-            "individual_total": 2702469.35,
-            "coverage_end_date": "2025-12-31T00:00:00",
+            "total_raised": 3359172.06,
+            "total_spent": 2977254.36,
+            "cash_on_hand": 382621.26,
+            "total_donors": 49100,
+            "small_dollar_amount": 2247721.60,
+            "individual_total": 3356755.42,
+            "coverage_end_date": "2026-02-25T00:00:00",
             "committee_id": "C00900449",
-            "burn_rate_monthly": 457198,
-            "raise_rate_monthly": 390580,
-            "cash_runway_months": 1.8,
-            "burn_period_label": "Oct 1 – Dec 31, 2025",
-            "spent_pct_of_raised": 70.02,
+            "burn_rate_monthly": 588811,
+            "raise_rate_monthly": 355958,
+            "cash_runway_months": 0.6,
+            "burn_period_label": "Jan 1 – Feb 25, 2026",
+            "spent_pct_of_raised": 88.63,
             "avg_contribution": 68.37,
-            "small_dollar_pct": 70.23
+            "small_dollar_pct": 66.96
         },
         {
             "name": "Laura Fine",
-            "total_raised": 1921415.34,
-            "total_spent": 481445.18,
-            "cash_on_hand": 1439970.16,
-            "total_donors": 4874,
-            "small_dollar_amount": 59768.25,
-            "individual_total": 1899148.18,
-            "coverage_end_date": "2025-12-31T00:00:00",
+            "total_raised": 2555781.35,
+            "total_spent": 2095128.95,
+            "cash_on_hand": 461679.43,
+            "total_donors": 6443,
+            "small_dollar_amount": 76381.76,
+            "individual_total": 2517581.35,
+            "coverage_end_date": "2026-02-25T00:00:00",
             "committee_id": "C00904326",
-            "burn_rate_monthly": 99233,
-            "raise_rate_monthly": 417114,
-            "cash_runway_months": 14.5,
-            "burn_period_label": "Oct 1 – Dec 31, 2025",
-            "spent_pct_of_raised": 25.06,
-            "avg_contribution": 394.22,
-            "small_dollar_pct": 3.11
+            "burn_rate_monthly": 877360,
+            "raise_rate_monthly": 345467,
+            "cash_runway_months": 0.5,
+            "burn_period_label": "Jan 1 – Feb 25, 2026",
+            "spent_pct_of_raised": 81.98,
+            "avg_contribution": 390.73,
+            "small_dollar_pct": 3.03
         },
         {
             "name": "Mike Simmons",
