@@ -38,6 +38,13 @@
         gtag('js', new Date());
         gtag('config', 'G-WVTWQBBG8S');
     </script>
+
+    <!-- Prefetch chart data immediately (before DOM loads) -->
+    <script>
+        window._prefetchedChart = fetch('/api/snapshots/chart?period=all&epsilon=0.5')
+            .then(function(r) { return r.json(); })
+            .catch(function() { return null; });
+    </script>
 </head>
 <script>
     (function() {
@@ -2388,11 +2395,22 @@ async function renderMarketTrendChart(candidates) {
     const ctx = document.getElementById('marketTrendChart').getContext('2d');
     const period = currentChartPeriod || '7d';
 
-    // Fetch RDP-simplified data from backend
+    // Use prefetched data on first load (period=all), otherwise fetch fresh
     let chartData = {};
     try {
-        const response = await fetch(`/api/snapshots/chart?period=${period}&epsilon=0.5`);
-        chartData = await response.json();
+        if (window._prefetchedChart && period === 'all') {
+            const prefetched = await window._prefetchedChart;
+            window._prefetchedChart = null; // Use only once
+            if (prefetched) {
+                chartData = prefetched;
+            } else {
+                const response = await fetch(`/api/snapshots/chart?period=${period}&epsilon=0.5`);
+                chartData = await response.json();
+            }
+        } else {
+            const response = await fetch(`/api/snapshots/chart?period=${period}&epsilon=0.5`);
+            chartData = await response.json();
+        }
     } catch (error) {
         console.error('Error fetching chart data:', error);
     }
@@ -2613,13 +2631,43 @@ async function renderMarketTrendChart(candidates) {
         }
     };
 
+    // Left-to-right reveal animation plugin
+    const revealPlugin = {
+        id: 'revealAnimation',
+        _progress: 0,
+        _startTime: null,
+        _duration: 2000,
+        beforeDraw(chart) {
+            if (this._progress >= 1) return;
+            if (!this._startTime) this._startTime = Date.now();
+            const elapsed = Date.now() - this._startTime;
+            // Ease-out cubic for smooth deceleration
+            const t = Math.min(elapsed / this._duration, 1);
+            this._progress = 1 - Math.pow(1 - t, 3);
+            const { ctx: c, chartArea } = chart;
+            const clipWidth = chartArea.left + (chartArea.right - chartArea.left) * this._progress;
+            c.save();
+            c.beginPath();
+            c.rect(chartArea.left, chartArea.top - 10, clipWidth - chartArea.left, chartArea.bottom - chartArea.top + 30);
+            c.clip();
+        },
+        afterDraw(chart) {
+            if (this._progress >= 1) return;
+            chart.ctx.restore();
+            if (this._progress < 1) {
+                requestAnimationFrame(() => chart.draw());
+            }
+        }
+    };
+
     marketChart = new Chart(ctx, {
         type: 'line',
         data: { datasets },
-        plugins: [interpolatedRegionPlugin, methodologyLinePlugin],
+        plugins: [revealPlugin, interpolatedRegionPlugin, methodologyLinePlugin],
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: false,
             layout: {
                 padding: {
                     bottom: interpolatedRanges.length > 0 ? 18 : 0
