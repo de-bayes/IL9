@@ -1195,8 +1195,8 @@ def fetch_all_fec_data():
             "cash_runway_months": 0.9,
             "burn_period_label": "Jan 1 – Feb 25, 2026",
             "spent_pct_of_raised": 74.57,
-            "avg_contribution": 454.38,
-            "small_dollar_pct": 5.04
+            "avg_contribution": 433.98,
+            "small_dollar_pct": 5.27
         },
         {
             "name": "Kat Abugazaleh",
@@ -1231,7 +1231,7 @@ def fetch_all_fec_data():
             "cash_runway_months": 0.5,
             "burn_period_label": "Jan 1 – Feb 25, 2026",
             "spent_pct_of_raised": 81.98,
-            "avg_contribution": 390.73,
+            "avg_contribution": 390.75,
             "small_dollar_pct": 3.03
         },
         {
@@ -1249,8 +1249,8 @@ def fetch_all_fec_data():
             "cash_runway_months": 2.8,
             "burn_period_label": "Jan 1 – Feb 25, 2026",
             "spent_pct_of_raised": 67.36,
-            "avg_contribution": 299.31,
-            "small_dollar_pct": 14.64
+            "avg_contribution": 284.50,
+            "small_dollar_pct": 15.39
         },
         {
             "name": "Phil Andrew",
@@ -1267,8 +1267,8 @@ def fetch_all_fec_data():
             "cash_runway_months": 0.3,
             "burn_period_label": "Jan 1 – Feb 25, 2026",
             "spent_pct_of_raised": 87.08,
-            "avg_contribution": 565.66,
-            "small_dollar_pct": 4.93
+            "avg_contribution": 391.53,
+            "small_dollar_pct": 7.12
         }
     ]
 
