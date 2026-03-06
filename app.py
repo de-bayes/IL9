@@ -1527,6 +1527,33 @@ else:
     purge_old_data()
     repair_snapshots_jsonl(HISTORICAL_DATA_PATH)
 
+    # One-time model update broadcast (March 5, 2026)
+    _broadcast_marker = os.path.join(DATA_DIR, '.broadcast_model_v31_done')
+    if not os.path.exists(_broadcast_marker):
+        try:
+            import threading
+            def _send_model_broadcast():
+                import time
+                time.sleep(30)  # Wait for app to fully start
+                subscribers = read_subscribers()
+                count = 0
+                for sub in subscribers:
+                    email = sub['email']
+                    token = make_unsub_token(email)
+                    unsub_url = f"{SITE_BASE_URL}unsubscribe?email={email}&token={token}"
+                    text = "IL9Cast Model Update - March 5, 2026\n\nWIN PROBABILITIES:\n  Biss: 77.2% (was 80.9%)\n  Abughazaleh: 15.6% (was 12.8%)\n  Fine: 7.2% (was 6.3%)\n\nView the full model: " + SITE_BASE_URL + "odds"
+                    html = f"""<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0;padding:0;background-color:#1A1A1E;font-family:'Source Sans 3',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#1A1A1E;"><tr><td align="center" style="padding:40px 20px;"><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;background-color:#232328;border:1px solid #a50034;"><tr><td style="padding:32px 40px 0 40px;text-align:center;border-bottom:1px solid #2a2a30;"><h1 style="margin:0 0 6px 0;font-family:Georgia,'Times New Roman',serif;font-size:28px;font-weight:400;letter-spacing:1px;"><span style="color:#F0EFEB;">IL9</span><span style="color:#31B0B5;">Cast</span></h1><p style="margin:0 0 20px 0;color:#31B0B5;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;">Model Update &mdash; March 5, 2026</p></td></tr><tr><td style="padding:28px 40px 0 40px;"><p style="margin:0 0 6px 0;color:#888;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;">100,000 simulations &middot; 436 precincts &middot; v3.1</p></td></tr><tr><td style="padding:16px 40px 8px 40px;"><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td style="padding:14px 16px;background-color:#1A1A1E;border-left:4px solid #a50034;width:33%;"><p style="margin:0;color:#a50034;font-size:13px;font-weight:700;">Biss</p><p style="margin:4px 0 0 0;color:#F0EFEB;font-size:26px;font-weight:700;line-height:1;">77.2%</p><p style="margin:4px 0 0 0;color:#666;font-size:11px;">was 80.9%</p></td><td style="width:8px;"></td><td style="padding:14px 16px;background-color:#1A1A1E;border-left:4px solid #228B22;width:33%;"><p style="margin:0;color:#228B22;font-size:13px;font-weight:700;">Kat</p><p style="margin:4px 0 0 0;color:#F0EFEB;font-size:26px;font-weight:700;line-height:1;">15.6%</p><p style="margin:4px 0 0 0;color:#666;font-size:11px;">was 12.8%</p></td><td style="width:8px;"></td><td style="padding:14px 16px;background-color:#1A1A1E;border-left:4px solid #00008B;width:33%;"><p style="margin:0;color:#6688cc;font-size:13px;font-weight:700;">Fine</p><p style="margin:4px 0 0 0;color:#F0EFEB;font-size:26px;font-weight:700;line-height:1;">7.2%</p><p style="margin:4px 0 0 0;color:#666;font-size:11px;">was 6.3%</p></td></tr></table></td></tr><tr><td style="padding:24px 40px;"><p style="margin:0 0 12px 0;color:#F0EFEB;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">What changed</p><p style="margin:0 0 8px 0;color:#ccc;font-size:14px;line-height:1.7;">&bull; Schakowsky endorsement bump <strong style="color:#F0EFEB;">removed</strong> -- already priced into polls</p><p style="margin:0 0 8px 0;color:#ccc;font-size:14px;line-height:1.7;">&bull; Kat's progressive lane loading <strong style="color:#228B22;">increased</strong> -- PPP poll confirms she's the progressive champion</p><p style="margin:0 0 8px 0;color:#ccc;font-size:14px;line-height:1.7;">&bull; Polling uncertainty widened (sigma 8, up from 7)</p><p style="margin:0;color:#ccc;font-size:14px;line-height:1.7;">&bull; <strong style="color:#31B0B5;">13 new visualizations</strong> including head-to-head margins and precinct competitiveness</p></td></tr><tr><td style="padding:0 40px 24px 40px;"><p style="margin:0;padding:16px;background-color:#1A1A1E;border-left:3px solid #31B0B5;color:#ccc;font-size:14px;line-height:1.7;font-style:italic;">Biss is the clear frontrunner, but the variance in this race remains high. With a large undecided electorate, election day could still surprise.</p></td></tr><tr><td style="padding:0 40px 32px 40px;text-align:center;"><a href="{SITE_BASE_URL}odds" style="display:inline-block;background-color:#31B0B5;color:#ffffff;text-decoration:none;padding:14px 36px;font-weight:700;font-size:15px;letter-spacing:0.5px;">View Full Model</a></td></tr><tr><td style="padding:20px 40px;text-align:center;border-top:1px solid #2a2a30;"><p style="margin:0 0 8px 0;color:#555;font-size:11px;">IL9Cast &middot; il9.org</p><p style="margin:0;color:#555;font-size:11px;"><a href="{unsub_url}" style="color:#555;text-decoration:underline;">Unsubscribe</a></p></td></tr></table></td></tr></table></body></html>"""
+                    if send_email(email, '📊 IL9Cast Model Update -- Biss 77.2%, Kat 15.6%, Fine 7.2%', html, text):
+                        count += 1
+                # Write marker so it never sends again
+                with open(_broadcast_marker, 'w') as mf:
+                    mf.write(f'sent to {count} subscribers')
+                print(f"[{datetime.now().isoformat()}] Model v3.1 broadcast sent to {count} subscriber(s)")
+            threading.Thread(target=_send_model_broadcast, daemon=True).start()
+            print(f"[{datetime.now().isoformat()}] Model v3.1 broadcast scheduled (30s delay)")
+        except Exception as e:
+            print(f"[{datetime.now().isoformat()}] Broadcast setup error: {e}")
+
 # Mock candidate data
 CANDIDATES = [
     {"id": 1, "name": "Maria Garcia", "party_role": "State Rep", "color": "#FF6B6B"},
@@ -2429,13 +2456,24 @@ def broadcast_email():
         unsub_url = f"{SITE_BASE_URL}unsubscribe?email={email}&token={token}"
 
         text = """
-Thanks for subscribing to IL9Cast!
+IL9Cast Model Update - March 5, 2026
 
-We're working on some exciting new features, including the possibility of building a precinct-by-precinct model for the IL-9 primary.
+The precinct model has been updated to v3.1 with new polling data and methodology changes.
 
-Stay tuned - more updates coming soon.
+WIN PROBABILITIES:
+  Biss: 77.2% (was 80.9%)
+  Abughazaleh: 15.6% (was 12.8%)
+  Fine: 7.2% (was 6.3%)
 
-View Live Markets: """ + SITE_BASE_URL + """markets
+WHAT CHANGED:
+- Schakowsky endorsement bump removed (already priced into polls)
+- Kat's progressive lane loading increased -- PPP poll confirms she's the clear progressive champion
+- Wider polling uncertainty (sigma 8, up from 7)
+- 13 new model visualizations (was 8)
+
+Biss is still the clear frontrunner, but the variance in this race is high.
+
+View the full model: """ + SITE_BASE_URL + """odds
 """
 
         html = f"""
@@ -2445,29 +2483,67 @@ View Live Markets: """ + SITE_BASE_URL + """markets
         <body style="margin: 0; padding: 0; background-color: #1A1A1E; font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #1A1A1E;">
                 <tr><td align="center" style="padding: 40px 20px;">
-                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #232328; border: 1px solid #31B0B5;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #232328; border: 1px solid #a50034;">
                         <!-- Logo -->
                         <tr><td style="padding: 32px 40px 0 40px; text-align: center; border-bottom: 1px solid #2a2a30;">
                             <h1 style="margin: 0 0 6px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; letter-spacing: 1px;">
                                 <span style="color: #F0EFEB;">IL9</span><span style="color: #31B0B5;">Cast</span>
                             </h1>
-                            <p style="margin: 0 0 20px 0; color: #888; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;">A Quick Update</p>
+                            <p style="margin: 0 0 20px 0; color: #31B0B5; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700;">Model Update &mdash; March 5, 2026</p>
                         </td></tr>
 
-                        <!-- Message -->
-                        <tr><td style="padding: 32px 40px;">
-                            <p style="margin: 0 0 16px 0; color: #F0EFEB; font-size: 16px; line-height: 1.7;">Thanks for subscribing to IL9Cast.</p>
-                            <p style="margin: 0 0 16px 0; color: #ccc; font-size: 15px; line-height: 1.7;">We're working on some new things behind the scenes, including the possibility of building a <strong style="color: #31B0B5;">precinct-by-precinct model</strong> for the IL-9 primary.</p>
-                            <p style="margin: 0; color: #ccc; font-size: 15px; line-height: 1.7;">Stay tuned &mdash; more updates coming soon.</p>
+                        <!-- Headline -->
+                        <tr><td style="padding: 28px 40px 0 40px;">
+                            <p style="margin: 0 0 6px 0; color: #888; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;">100,000 simulations &middot; 436 precincts &middot; v3.1</p>
+                        </td></tr>
+
+                        <!-- Win Probability Cards -->
+                        <tr><td style="padding: 16px 40px 8px 40px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                <tr>
+                                    <td style="padding: 14px 16px; background-color: #1A1A1E; border-left: 4px solid #a50034; width: 33%;">
+                                        <p style="margin: 0; color: #a50034; font-size: 13px; font-weight: 700;">Biss</p>
+                                        <p style="margin: 4px 0 0 0; color: #F0EFEB; font-size: 26px; font-weight: 700; line-height: 1;">77.2%</p>
+                                        <p style="margin: 4px 0 0 0; color: #666; font-size: 11px;">was 80.9%</p>
+                                    </td>
+                                    <td style="width: 8px;"></td>
+                                    <td style="padding: 14px 16px; background-color: #1A1A1E; border-left: 4px solid #228B22; width: 33%;">
+                                        <p style="margin: 0; color: #228B22; font-size: 13px; font-weight: 700;">Kat</p>
+                                        <p style="margin: 4px 0 0 0; color: #F0EFEB; font-size: 26px; font-weight: 700; line-height: 1;">15.6%</p>
+                                        <p style="margin: 4px 0 0 0; color: #666; font-size: 11px;">was 12.8%</p>
+                                    </td>
+                                    <td style="width: 8px;"></td>
+                                    <td style="padding: 14px 16px; background-color: #1A1A1E; border-left: 4px solid #00008B; width: 33%;">
+                                        <p style="margin: 0; color: #6688cc; font-size: 13px; font-weight: 700;">Fine</p>
+                                        <p style="margin: 4px 0 0 0; color: #F0EFEB; font-size: 26px; font-weight: 700; line-height: 1;">7.2%</p>
+                                        <p style="margin: 4px 0 0 0; color: #666; font-size: 11px;">was 6.3%</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td></tr>
+
+                        <!-- What Changed -->
+                        <tr><td style="padding: 24px 40px;">
+                            <p style="margin: 0 0 12px 0; color: #F0EFEB; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">What changed</p>
+                            <p style="margin: 0 0 8px 0; color: #ccc; font-size: 14px; line-height: 1.7;">&bull; Schakowsky endorsement bump <strong style="color: #F0EFEB;">removed</strong> -- all 7 polls now postdate the endorsement, so the effect is already baked in</p>
+                            <p style="margin: 0 0 8px 0; color: #ccc; font-size: 14px; line-height: 1.7;">&bull; Kat's progressive lane loading <strong style="color: #228B22;">increased</strong> -- PPP poll confirms she's the clear progressive champion among 18-45 year olds</p>
+                            <p style="margin: 0 0 8px 0; color: #ccc; font-size: 14px; line-height: 1.7;">&bull; Polling uncertainty widened (sigma 8, up from 7) -- still early</p>
+                            <p style="margin: 0; color: #ccc; font-size: 14px; line-height: 1.7;">&bull; <strong style="color: #31B0B5;">13 new visualizations</strong> including head-to-head margins, turnout analysis, and precinct competitiveness</p>
+                        </td></tr>
+
+                        <!-- Bottom Line -->
+                        <tr><td style="padding: 0 40px 24px 40px;">
+                            <p style="margin: 0; padding: 16px; background-color: #1A1A1E; border-left: 3px solid #31B0B5; color: #ccc; font-size: 14px; line-height: 1.7; font-style: italic;">Biss is the clear frontrunner, but the variance in this race remains high. With a large undecided electorate, election day could still surprise.</p>
                         </td></tr>
 
                         <!-- CTA -->
                         <tr><td style="padding: 0 40px 32px 40px; text-align: center;">
-                            <a href="{SITE_BASE_URL}markets" style="display: inline-block; background-color: #31B0B5; color: #ffffff; text-decoration: none; padding: 12px 32px; font-weight: 600; font-size: 15px;">View Live Markets</a>
+                            <a href="{SITE_BASE_URL}odds" style="display: inline-block; background-color: #31B0B5; color: #ffffff; text-decoration: none; padding: 14px 36px; font-weight: 700; font-size: 15px; letter-spacing: 0.5px;">View Full Model</a>
                         </td></tr>
 
                         <!-- Footer -->
                         <tr><td style="padding: 20px 40px; text-align: center; border-top: 1px solid #2a2a30;">
+                            <p style="margin: 0 0 8px 0; color: #555; font-size: 11px;">IL9Cast &middot; il9.org</p>
                             <p style="margin: 0; color: #555; font-size: 11px;"><a href="{unsub_url}" style="color: #555; text-decoration: underline;">Unsubscribe</a></p>
                         </td></tr>
                     </table>
@@ -2476,7 +2552,7 @@ View Live Markets: """ + SITE_BASE_URL + """markets
         </body>
         </html>
         """
-        if send_email(email, 'IL9Cast - New Things Coming', html, text):
+        if send_email(email, '📊 IL9Cast Model Update -- Biss 77.2%, Kat 15.6%, Fine 7.2%', html, text):
             count += 1
 
     return jsonify({'success': True, 'message': f'Broadcast sent to {count} subscriber(s)'})
