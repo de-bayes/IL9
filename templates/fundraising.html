@@ -39,7 +39,7 @@
             <nav class="desktop-nav">
                 <a href="/markets">Markets</a>
                 <a href="/odds">Model</a>
-                <a href="/fundraising" class="active">Fundraising</a>
+                <a href="/fundraising" class="active">Money</a>
                 <a href="/candidates">Candidates</a>
                 <a href="/methodology">Methodology</a>
                 <a href="/about">About</a>
@@ -56,7 +56,7 @@
             <nav class="mobile-nav" id="mobileNav">
                 <a href="/markets">Markets</a>
                 <a href="/odds">Model</a>
-                <a href="/fundraising" class="active">Fundraising</a>
+                <a href="/fundraising" class="active">Money</a>
                 <a href="/candidates">Candidates</a>
                 <a href="/methodology">Methodology</a>
                 <a href="/about">About</a>
@@ -64,8 +64,8 @@
         </header>
 
         <section class="hero">
-            <h1>Campaign Finance Comparison</h1>
-            <p class="subtitle">FEC filing data for IL-09 Democratic Primary candidates</p>
+            <h1>Money in the Race</h1>
+            <p class="subtitle">Campaign fundraising &amp; independent expenditures in the IL-9 primary</p>
         </section>
 
         <section class="fundraising-content-page">
@@ -190,6 +190,170 @@
                 </article>
             </div>
 
+            <!-- Independent Expenditures Section -->
+            <div id="independent-expenditures" class="ie-divider">
+                <h2 class="ie-section-title">Independent Expenditures</h2>
+                <p class="ie-section-subtitle">Super PAC and outside spending in the IL-9 Democratic primary</p>
+            </div>
+
+            <div class="ie-inline">
+                <div class="ie-comparison">
+                    <div class="ie-box ie-box-outside">
+                        <div class="ie-box-label">Outside Spending (IE)</div>
+                        <div class="ie-box-value">$7.1M</div>
+                        <div class="ie-box-note">Independent expenditures from 9 groups</div>
+                    </div>
+                    <div class="ie-vs">vs.</div>
+                    <div class="ie-box ie-box-candidate">
+                        <div class="ie-box-label">Candidate-Raised</div>
+                        <div class="ie-box-value">$10.2M</div>
+                        <div class="ie-box-note">Total raised by all declared candidates</div>
+                    </div>
+                </div>
+
+                <h3 class="ie-subheading">Net IE by Candidate</h3>
+                <p class="ie-desc">Total independent expenditure dollars supporting or opposing each candidate.</p>
+                <div class="ie-candidate-bars">
+                    <div class="ie-bar-row">
+                        <span class="ie-bar-name">Laura Fine</span>
+                        <div class="ie-bar-track">
+                            <div class="ie-bar-fill ie-bar-support" style="width: 100%;">
+                                <span class="ie-bar-label">+$4.24M</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ie-bar-row">
+                        <span class="ie-bar-name">Phil Andrew</span>
+                        <div class="ie-bar-track">
+                            <div class="ie-bar-fill ie-bar-support" style="width: 6.2%;">
+                                <span class="ie-bar-label">+$263K</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ie-bar-row">
+                        <span class="ie-bar-name">Robert Huynh</span>
+                        <div class="ie-bar-track">
+                            <div class="ie-bar-fill ie-bar-support" style="width: 0.5%;"></div>
+                            <span class="ie-bar-label ie-bar-label-outside">+$6.2K</span>
+                        </div>
+                    </div>
+                    <div class="ie-bar-row">
+                        <span class="ie-bar-name">Kat Abughazaleh</span>
+                        <div class="ie-bar-track">
+                            <div class="ie-bar-fill ie-bar-oppose" style="width: 3.9%;"></div>
+                            <span class="ie-bar-label ie-bar-label-outside ie-oppose-label">-$166K</span>
+                        </div>
+                    </div>
+                    <div class="ie-bar-row">
+                        <span class="ie-bar-name">Daniel Biss</span>
+                        <div class="ie-bar-track">
+                            <div class="ie-bar-fill ie-bar-mixed">
+                                <div class="ie-bar-segment ie-bar-support" style="width: 41.4%;"></div>
+                                <div class="ie-bar-segment ie-bar-oppose" style="width: 58.6%;"></div>
+                            </div>
+                            <span class="ie-bar-label ie-bar-label-outside ie-oppose-label">net -$419K</span>
+                        </div>
+                        <div class="ie-bar-detail">$1.01M support / $1.43M oppose</div>
+                    </div>
+                </div>
+
+                <h3 class="ie-subheading">Active Groups</h3>
+                <p class="ie-desc">Super PACs and outside organizations, ranked by total spending.</p>
+                <div class="ie-group-cards">
+                    <div class="ie-group-card">
+                        <div class="ie-group-header">
+                            <div class="ie-group-name">Elect Chicago Women <span class="ie-aipac-label">(AIPAC suspected pop-up PAC)</span></div>
+                            <div class="ie-group-amount">$5,161,074</div>
+                        </div>
+                        <div class="ie-group-body">
+                            <div class="ie-group-row"><span class="ie-group-label">Supporting</span><span class="ie-group-val ie-val-support">Fine &mdash; $3.73M</span></div>
+                            <div class="ie-group-row"><span class="ie-group-label">Opposing</span><span class="ie-group-val ie-val-oppose">Biss &mdash; $1.43M</span></div>
+                            <div class="ie-group-row"><span class="ie-group-label">Types</span><span class="ie-group-val">TV ads, direct mail, phone messages</span></div>
+                            <div class="ie-group-row"><span class="ie-group-label">Active</span><span class="ie-group-val">Feb 4 &ndash; Mar 3, 2026</span></div>
+                        </div>
+                    </div>
+                    <div class="ie-group-card">
+                        <div class="ie-group-header">
+                            <div class="ie-group-name">Elect Democratic Women Action Fund <span class="ie-aipac-label">(AIPAC suspected pop-up PAC)</span></div>
+                            <div class="ie-group-amount">$500,346</div>
+                        </div>
+                        <div class="ie-group-body">
+                            <div class="ie-group-row"><span class="ie-group-label">Supporting</span><span class="ie-group-val ie-val-support">Fine &mdash; $500K</span></div>
+                            <div class="ie-group-row"><span class="ie-group-label">Types</span><span class="ie-group-val">TV production</span></div>
+                        </div>
+                    </div>
+                    <div class="ie-group-card">
+                        <div class="ie-group-header">
+                            <div class="ie-group-name">CPC PAC</div>
+                            <div class="ie-group-amount">$449,756</div>
+                        </div>
+                        <div class="ie-group-body">
+                            <div class="ie-group-row"><span class="ie-group-label">Supporting</span><span class="ie-group-val ie-val-support">Biss &mdash; $450K</span></div>
+                            <div class="ie-group-row"><span class="ie-group-label">Types</span><span class="ie-group-val">TV ads, media production</span></div>
+                        </div>
+                    </div>
+                    <div class="ie-group-card">
+                        <div class="ie-group-header">
+                            <div class="ie-group-name">3.14 Action Fund</div>
+                            <div class="ie-group-amount">$409,807</div>
+                        </div>
+                        <div class="ie-group-body">
+                            <div class="ie-group-row"><span class="ie-group-label">Supporting</span><span class="ie-group-val ie-val-support">Biss &mdash; $410K</span></div>
+                            <div class="ie-group-row"><span class="ie-group-label">Types</span><span class="ie-group-val">Direct mail, advertising</span></div>
+                        </div>
+                    </div>
+                    <div class="ie-group-card">
+                        <div class="ie-group-header">
+                            <div class="ie-group-name">Leading Democracy Inc</div>
+                            <div class="ie-group-amount">$262,500</div>
+                        </div>
+                        <div class="ie-group-body">
+                            <div class="ie-group-row"><span class="ie-group-label">Supporting</span><span class="ie-group-val ie-val-support">Andrew &mdash; $263K</span></div>
+                            <div class="ie-group-row"><span class="ie-group-label">Types</span><span class="ie-group-val">Media placement</span></div>
+                        </div>
+                    </div>
+                    <div class="ie-group-card">
+                        <div class="ie-group-header">
+                            <div class="ie-group-name">Chicago Progressive Partnership</div>
+                            <div class="ie-group-amount">$165,500</div>
+                        </div>
+                        <div class="ie-group-body">
+                            <div class="ie-group-row"><span class="ie-group-label">Opposing</span><span class="ie-group-val ie-val-oppose">Abughazaleh &mdash; $166K</span></div>
+                            <div class="ie-group-row"><span class="ie-group-label">Types</span><span class="ie-group-val">Media placement</span></div>
+                        </div>
+                    </div>
+                    <div class="ie-group-card">
+                        <div class="ie-group-header">
+                            <div class="ie-group-name">J Street Action Fund</div>
+                            <div class="ie-group-amount">$97,912</div>
+                        </div>
+                        <div class="ie-group-body">
+                            <div class="ie-group-row"><span class="ie-group-label">Supporting</span><span class="ie-group-val ie-val-support">Biss &mdash; $98K</span></div>
+                        </div>
+                    </div>
+                    <div class="ie-group-card">
+                        <div class="ie-group-header">
+                            <div class="ie-group-name">Medicare for All PAC</div>
+                            <div class="ie-group-amount">$50,000</div>
+                        </div>
+                        <div class="ie-group-body">
+                            <div class="ie-group-row"><span class="ie-group-label">Supporting</span><span class="ie-group-val ie-val-support">Biss &mdash; $50K</span></div>
+                        </div>
+                    </div>
+                    <div class="ie-group-card">
+                        <div class="ie-group-header">
+                            <div class="ie-group-name">Unity Solutions PAC</div>
+                            <div class="ie-group-amount">$6,200</div>
+                        </div>
+                        <div class="ie-group-body">
+                            <div class="ie-group-row"><span class="ie-group-label">Supporting</span><span class="ie-group-val ie-val-support">Huynh &mdash; $6.2K</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="ie-source-note">Source: <a href="https://www.fec.gov/data/independent-expenditures/" target="_blank" rel="noopener noreferrer">FEC Independent Expenditures</a> | <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTFFNXjRoIaPE6n8u8KVVscSImYhWRyxTM_V_hJMvLYrKkB_zRS66UDbVQUKr-yxENG0S0ZIzWWu-gr/pubhtml" target="_blank" rel="noopener noreferrer">Source Spreadsheet</a> | Last updated March 6, 2026</p>
+            </div>
+
         </section>
 
         <!-- FOOTER -->
@@ -201,7 +365,7 @@
                     <ul>
                         <li><a href="/markets">Markets</a></li>
                         <li><a href="/candidates">Candidates</a></li>
-                        <li><a href="/fundraising">Fundraising</a></li>
+                        <li><a href="/fundraising">Money</a></li>
                         <li><a href="/methodology">Methodology</a></li>
                         <li><a href="/about">About</a></li>
                     </ul>
@@ -630,6 +794,262 @@
             .ticker-note {
                 font-size: 0.65rem;
             }
+        }
+
+        /* ===== INDEPENDENT EXPENDITURES SECTION ===== */
+        .ie-divider {
+            margin-top: 3rem;
+            padding-top: 2.5rem;
+            border-top: 2px solid var(--border-default);
+            text-align: center;
+        }
+
+        .ie-section-title {
+            font-family: var(--serif);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 0.4rem;
+        }
+
+        .ie-section-subtitle {
+            font-family: var(--sans);
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin: 0 0 2rem;
+        }
+
+        .ie-inline { margin-bottom: 2rem; }
+
+        .ie-comparison {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .ie-box {
+            flex: 1;
+            padding: 1.75rem 1.25rem;
+            border: 1px solid var(--border-default);
+            background: var(--bg-surface);
+            text-align: center;
+        }
+
+        .ie-box-outside { border-left: 4px solid #ef4444; }
+        .ie-box-candidate { border-left: 4px solid #10b981; }
+
+        .ie-box-label {
+            font-family: var(--sans);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-tertiary);
+            margin-bottom: 0.4rem;
+        }
+
+        .ie-box-value {
+            font-family: var(--serif);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
+        }
+
+        .ie-box-note {
+            font-family: var(--sans);
+            font-size: 0.78rem;
+            color: var(--text-tertiary);
+        }
+
+        .ie-vs {
+            font-family: var(--serif);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            flex-shrink: 0;
+        }
+
+        .ie-subheading {
+            font-family: var(--serif);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 0.3rem;
+        }
+
+        .ie-desc {
+            font-family: var(--sans);
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin: 0 0 1rem;
+        }
+
+        .ie-candidate-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .ie-bar-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .ie-bar-name {
+            font-family: var(--sans);
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: right;
+        }
+
+        .ie-bar-track {
+            height: 30px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .ie-bar-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            min-width: 4px;
+        }
+
+        .ie-bar-fill.ie-bar-mixed {
+            width: 57.4%;
+            display: flex;
+        }
+
+        .ie-bar-segment { height: 100%; }
+        .ie-bar-support { background: rgba(16, 185, 129, 0.5); }
+        .ie-bar-oppose { background: rgba(239, 68, 68, 0.4); }
+
+        .ie-bar-label {
+            font-family: var(--sans);
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            padding: 0 0.5rem;
+            white-space: nowrap;
+        }
+
+        .ie-bar-label-outside {
+            margin-left: 8px;
+        }
+
+        .ie-oppose-label { color: #ef4444; }
+
+        .ie-bar-detail {
+            grid-column: 2;
+            font-family: var(--sans);
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            margin-top: -0.2rem;
+        }
+
+        .ie-group-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .ie-group-card {
+            border: 1px solid var(--border-default);
+            background: var(--bg-surface);
+        }
+
+        .ie-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.85rem 1.25rem;
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .ie-group-name {
+            font-family: var(--serif);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .ie-group-amount {
+            font-family: var(--sans);
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .ie-group-body { padding: 0; }
+
+        .ie-group-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 1.25rem;
+            border-bottom: 1px solid var(--border-subtle, var(--border-default));
+        }
+
+        .ie-group-row:last-child { border-bottom: none; }
+
+        .ie-group-label {
+            font-family: var(--sans);
+            font-size: 0.78rem;
+            color: var(--text-tertiary);
+        }
+
+        .ie-group-val {
+            font-family: var(--sans);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: right;
+        }
+
+        .ie-val-support { color: #10b981; }
+        .ie-val-oppose { color: #ef4444; }
+
+        .ie-aipac-label {
+            font-family: var(--sans);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #ef4444;
+            opacity: 0.85;
+        }
+
+        .ie-source-note {
+            font-family: var(--sans);
+            font-size: 0.78rem;
+            color: var(--text-tertiary);
+            font-style: italic;
+            margin-top: 1rem;
+        }
+
+        .ie-source-note a {
+            color: var(--accent-blue);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .ie-comparison { flex-direction: column; gap: 0.75rem; }
+            .ie-vs { display: none; }
+            .ie-box { padding: 1rem; }
+            .ie-box-value { font-size: 1.6rem; }
+            .ie-bar-row { grid-template-columns: 95px 1fr; gap: 0.5rem; }
+            .ie-bar-name { font-size: 0.72rem; }
+            .ie-group-header { padding: 0.6rem 0.85rem; }
+            .ie-group-row { padding: 0.4rem 0.85rem; }
+            .ie-group-name { font-size: 0.82rem; }
         }
     </style>
 

@@ -1639,7 +1639,8 @@ def fundraising():
 
 @app.route('/outside-money')
 def outside_money():
-    return render_template('outside_money.html')
+    from flask import redirect
+    return redirect('/fundraising#independent-expenditures', code=301)
 
 
 @app.route('/updates')
