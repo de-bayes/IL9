@@ -120,38 +120,43 @@
         </section>
 
         <section class="markets-content-page">
-            <section class="realtime-dashboard">
+            <section class="leader-featured" id="leaderFeatured">
                 <div class="leader-card">
                     <img src="" alt="" class="leader-photo" id="leaderPhoto">
                     <div class="leader-info">
                         <span class="leader-label">LEADING CANDIDATE</span>
                         <span class="leader-name" id="leaderName">Loading...</span>
-                        <span class="leader-main-value" id="leaderAggregate">--%</span>
+                        <div class="leader-main-stat">
+                            <span class="leader-main-label">Aggregate Probability</span>
+                            <span class="leader-main-value" id="leaderAggregate">--%</span>
+                        </div>
+                        <div class="leader-divider"></div>
                         <div class="leader-sub-stats">
                             <div class="leader-sub-stat">
                                 <span class="leader-sub-label">Manifold</span>
-                                <span class="leader-sub-value" id="leaderManifold">--</span>
+                                <span class="leader-sub-value" id="leaderManifold">--%</span>
                             </div>
                             <div class="leader-sub-stat">
                                 <span class="leader-sub-label">Kalshi Last</span>
-                                <span class="leader-sub-value" id="leaderKalshiLast">--</span>
+                                <span class="leader-sub-value" id="leaderKalshiLast">--%</span>
                             </div>
                             <div class="leader-sub-stat">
                                 <span class="leader-sub-label">Kalshi Mid</span>
-                                <span class="leader-sub-value" id="leaderKalshiMid">--</span>
+                                <span class="leader-sub-value" id="leaderKalshiMid">--%</span>
                             </div>
                             <div class="leader-sub-stat">
                                 <span class="leader-sub-label">Kalshi Liq</span>
-                                <span class="leader-sub-value" id="leaderKalshiLiq">--</span>
+                                <span class="leader-sub-value" id="leaderKalshiLiq">--%</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="odds-grid" id="bigOddsDisplay">
-                    <div class="big-odds-candidate">
-                        <span class="big-percent">--</span>
-                        <span class="big-name">Loading...</span>
-                    </div>
+            </section>
+
+            <section class="big-odds-display" id="bigOddsDisplay">
+                <div class="big-odds-candidate">
+                    <span class="big-percent">--</span>
+                    <span class="big-name">Loading...</span>
                 </div>
             </section>
 
@@ -388,7 +393,8 @@
             }
         }
 
-        .realtime-dashboard,
+        .leader-featured,
+        .big-odds-display,
         .market-chart-section,
         .additional-markets {
             animation: fadeInUp 0.7s ease-out;
@@ -428,25 +434,22 @@
             }
         }
 
-        /* ===== REALTIME DASHBOARD ===== */
-        .realtime-dashboard {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.25rem;
-            margin-bottom: 2rem;
+        /* Leader Featured Card */
+        .leader-featured {
+            margin: 0 0 2rem 0;
         }
 
         .leader-card {
             display: flex;
-            gap: 1.25rem;
-            padding: 1.75rem;
+            gap: 2rem;
+            padding: 2.5rem;
             background: var(--bg-surface);
             border: 1px solid var(--border-default);
         }
 
         .leader-photo {
-            width: 90px;
-            height: 90px;
+            width: 140px;
+            height: 140px;
             border-radius: 8px;
             object-fit: cover;
             flex-shrink: 0;
@@ -458,41 +461,59 @@
             flex-direction: column;
             justify-content: center;
             flex: 1;
-            min-width: 0;
         }
 
         .leader-label {
-            font-size: 0.65rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.15em;
             color: var(--text-secondary);
             text-transform: uppercase;
-            margin-bottom: 0.15rem;
+            margin-bottom: 0.5rem;
         }
 
         .leader-name {
-            font-size: 1.5rem;
+            font-size: 2.5rem;
             font-weight: 700;
             color: var(--text-primary);
             font-family: var(--serif);
+            margin-bottom: 1rem;
+        }
+
+        .leader-main-stat {
+            margin-top: 0.5rem;
+        }
+
+        .leader-main-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            text-transform: uppercase;
             margin-bottom: 0.25rem;
-            line-height: 1.2;
         }
 
         .leader-main-value {
-            font-size: 2.75rem;
+            font-size: 3.5rem;
             font-weight: 700;
             color: var(--accent-blue);
             font-family: var(--sans);
             line-height: 1;
             letter-spacing: -0.02em;
-            margin-bottom: 0.75rem;
+        }
+
+        .leader-divider {
+            width: 100%;
+            height: 1px;
+            background: var(--border-subtle);
+            margin: 1rem 0;
         }
 
         .leader-sub-stats {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem 1.25rem;
+            gap: 1.25rem 2rem;
         }
 
         .leader-sub-stat {
@@ -501,73 +522,55 @@
         }
 
         .leader-sub-label {
-            font-size: 0.55rem;
+            font-size: 0.6rem;
             font-weight: 600;
             letter-spacing: 0.08em;
             color: var(--text-secondary);
             text-transform: uppercase;
-            margin-bottom: 0.1rem;
+            margin-bottom: 0.2rem;
             opacity: 0.7;
         }
 
         .leader-sub-value {
-            font-size: 1rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: var(--accent-blue);
             font-family: var(--sans);
             line-height: 1;
         }
 
-        /* Odds Grid (right side of dashboard) */
-        .odds-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 0.75rem;
-            align-content: start;
-        }
-
-        .big-odds-candidate {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem 0.5rem;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-        }
-
-        .big-percent {
-            font-size: 2.25rem;
-            font-weight: 700;
-            font-family: var(--sans);
-            color: var(--accent-blue);
-            line-height: 1;
-            margin-bottom: 0.3rem;
-            letter-spacing: -0.02em;
-        }
-
-        .big-name {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-            text-align: center;
-        }
-
-        /* Tablet */
+        /* Tablet and large phone landscape */
         @media (max-width: 768px) {
             .markets-content-page {
                 padding: 0 1.5rem;
             }
 
-            .realtime-dashboard {
-                grid-template-columns: 1fr;
-            }
-
             .leader-card {
-                padding: 1.5rem;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 2rem;
             }
 
-            .odds-grid {
+            .leader-photo {
+                width: 120px;
+                height: 120px;
+            }
+
+            .leader-name {
+                font-size: 2rem;
+            }
+
+            .leader-main-value {
+                font-size: 3rem;
+            }
+
+            .leader-sub-stats {
+                justify-content: center;
+                gap: 1.25rem 1.75rem;
+            }
+
+            .big-odds-display {
                 grid-template-columns: repeat(3, 1fr);
             }
 
@@ -583,24 +586,27 @@
         /* Large phones */
         @media (max-width: 600px) {
             .leader-card {
-                padding: 1.25rem;
-                gap: 1rem;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 1.5rem;
             }
             .leader-photo {
-                width: 80px;
-                height: 80px;
+                width: 100px;
+                height: 100px;
             }
             .leader-name {
-                font-size: 1.35rem;
+                font-size: 1.6rem;
             }
             .leader-main-value {
-                font-size: 2.25rem;
+                font-size: 2.5rem;
             }
             .leader-sub-stats {
-                gap: 0.5rem 1rem;
+                justify-content: center;
+                gap: 1rem 1.5rem;
             }
             .leader-sub-value {
-                font-size: 0.9rem;
+                font-size: 1.1rem;
             }
             .market-chart-section {
                 padding: 1.5rem;
@@ -640,50 +646,60 @@
 
             .leader-card {
                 padding: 1rem;
-                gap: 0.75rem;
+                gap: 1rem;
             }
 
             .leader-photo {
-                width: 70px;
-                height: 70px;
+                width: 80px;
+                height: 80px;
             }
 
             .leader-label {
-                font-size: 0.6rem;
+                font-size: 0.65rem;
+                letter-spacing: 0.06em;
             }
 
             .leader-name {
-                font-size: 1.2rem;
+                font-size: 1.35rem;
+            }
+
+            .leader-main-label {
+                font-size: 0.6rem;
             }
 
             .leader-main-value {
-                font-size: 1.85rem;
+                font-size: 2rem;
+            }
+
+            .leader-sub-stats {
+                gap: 0.8rem 1rem;
             }
 
             .leader-sub-label {
-                font-size: 0.5rem;
+                font-size: 0.55rem;
             }
 
             .leader-sub-value {
-                font-size: 0.85rem;
+                font-size: 0.95rem;
             }
 
-            .odds-grid {
+            .big-odds-display {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 0.6rem;
+                gap: 0.75rem;
+                margin-bottom: 1.5rem;
             }
 
             .big-odds-candidate {
-                padding: 0.75rem 0.4rem;
+                padding: 1rem 0.4rem;
             }
 
             .big-percent {
-                font-size: 1.75rem;
-                margin-bottom: 0.25rem;
+                font-size: 2rem;
+                margin-bottom: 0.4rem;
             }
 
             .big-name {
-                font-size: 0.75rem;
+                font-size: 0.8rem;
             }
 
             .market-chart-section {
@@ -733,41 +749,47 @@
                 padding: 0.75rem;
             }
 
+            .leader-featured {
+                margin-bottom: 1rem;
+            }
+
             .leader-card {
                 padding: 0.75rem;
             }
 
             .leader-photo {
-                width: 60px;
-                height: 60px;
+                width: 70px;
+                height: 70px;
             }
 
             .leader-name {
-                font-size: 1.1rem;
+                font-size: 1.2rem;
             }
 
             .leader-main-value {
-                font-size: 1.6rem;
+                font-size: 1.75rem;
             }
 
             .leader-sub-value {
-                font-size: 0.8rem;
+                font-size: 0.85rem;
             }
 
-            .odds-grid {
-                gap: 0.5rem;
+            .big-odds-display {
+                gap: 0.6rem;
+                margin-bottom: 1.25rem;
             }
 
             .big-odds-candidate {
-                padding: 0.6rem 0.35rem;
+                padding: 0.75rem 0.35rem;
             }
 
             .big-percent {
-                font-size: 1.5rem;
+                font-size: 1.75rem;
+                margin-bottom: 0.3rem;
             }
 
             .big-name {
-                font-size: 0.7rem;
+                font-size: 0.75rem;
             }
 
             .market-chart-section {
@@ -1659,22 +1681,53 @@
             font-family: var(--sans);
         }
 
-        /* Election Night: tighter layout */
-        [data-election-night] .realtime-dashboard {
-            gap: 0.75rem;
-            align-items: stretch;
+        /* Odds Grid */
+        .big-odds-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+            gap: 1rem;
+            margin: 0 0 2rem 0;
+            text-align: center;
         }
-        [data-election-night] .odds-grid {
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: 1fr 1fr;
-            gap: 0.4rem;
-            align-content: stretch;
+
+        .big-odds-candidate {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem 0.5rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
         }
-        [data-election-night] .big-odds-candidate {
-            padding: 0.5rem 0.4rem;
+
+        .big-percent {
+            font-size: 3.5rem;
+            font-weight: 700;
+            font-family: var(--sans);
+            color: var(--accent-blue);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
         }
-        [data-election-night] .leader-card {
-            padding: 1.25rem;
+
+        .big-name {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        @media (max-width: 900px) {
+            .big-odds-display {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .big-odds-display {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .big-percent {
+                font-size: 2.5rem;
+            }
         }
     </style>
 
