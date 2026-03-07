@@ -38,7 +38,7 @@
             <nav class="desktop-nav">
                 <a href="/markets">Markets</a>
                 <a href="/odds">Model</a>
-                <a href="/fundraising">Fundraising</a>
+                <a href="/fundraising">Money</a>
                 <a href="/candidates">Candidates</a>
                 <a href="/methodology" class="active">Methodology</a>
                 <a href="/about">About</a>
@@ -55,7 +55,7 @@
             <nav class="mobile-nav" id="mobileNav">
                 <a href="/markets">Markets</a>
                 <a href="/odds">Model</a>
-                <a href="/fundraising">Fundraising</a>
+                <a href="/fundraising">Money</a>
                 <a href="/candidates">Candidates</a>
                 <a href="/methodology" class="active">Methodology</a>
                 <a href="/about">About</a>
@@ -232,6 +232,20 @@
                     <div class="foldout-inner">
                         <p>Our precinct-level election model is built in Stata and produces precinct-by-precinct projections displayed on an interactive map on the <a href="/odds">Model page</a>. The full methodology is documented in the paper linked below.</p>
                         <p style="margin-top: 1rem;"><a href="/model/methodology" target="_blank" style="color: var(--accent-blue); text-decoration: underline; font-weight: 600;">Read the full methodology (PDF) &rarr;</a></p>
+                        <p style="margin-top: 0.5rem; font-size: 0.82rem; color: var(--text-tertiary); font-style: italic;">Note: The PDF documents the February 2026 model architecture. See v3.1 updates below.</p>
+
+                        <div style="margin-top: 2rem; padding: 1.5rem; background: var(--bg-elevated); border-left: 3px solid var(--accent-gold);">
+                            <h3 style="margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--text-primary);">Model v3.1 Update (March 5, 2026)</h3>
+                            <p style="font-size: 0.88rem; color: var(--text-secondary); margin: 0 0 0.75rem;">Key changes from the February model:</p>
+                            <ul style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; padding-left: 1.25rem; line-height: 1.7;">
+                                <li><strong>New poll integrated:</strong> PPP/Evanston Roundtable poll (Feb 20&ndash;21, n=501 likely voters). First non-affiliated poll of the race &mdash; no candidate or party commissioned it. Weighted at 73% in the polling composite.</li>
+                                <li><strong>Schakowsky endorsement boost removed:</strong> Biss&rsquo;s endorsement from the retiring incumbent is now reflected in the polling data itself, so the separate model multiplier has been removed to avoid double-counting.</li>
+                                <li><strong>Wider polling uncertainty:</strong> Polling error sigma increased from 7 to 8 percentage points, reflecting the genuine uncertainty with only two independent polls.</li>
+                                <li><strong>Abughazaleh progressive lane loading:</strong> Increased from 0.6 to 0.75, reflecting stronger youth/progressive constituency alignment observed in the PPP data.</li>
+                                <li><strong>Updated results:</strong> Biss 77.2% win probability (was ~81%), Abughazaleh 15.6% (was ~13%), Fine 7.2% (was ~6%).</li>
+                                <li><strong>5 new visualization graphs</strong> added to the <a href="/odds" style="color: var(--accent-blue); text-decoration: underline;">Model page</a>.</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -251,7 +265,7 @@
                 <div class="foldout-body" id="foldout-body-fundraising">
                     <div class="foldout-inner">
 
-                        <p>The <a href="/fundraising">Fundraising page</a> aggregates campaign finance data directly from the Federal Election Commission's public API. This gives us real-time insights into total raised, cash on hand, spending patterns, and grassroots support metrics for all candidates in the race.</p>
+                        <p>The <a href="/fundraising">Money page</a> aggregates campaign finance data directly from the Federal Election Commission's public API. This gives us real-time insights into total raised, cash on hand, spending patterns, and grassroots support metrics for all candidates in the race.</p>
 
                         <h3>FEC API Data Sources</h3>
                         <p>We pull data from two primary FEC API endpoints:</p>
@@ -450,7 +464,7 @@
                     <ul>
                         <li><a href="/markets">Markets</a></li>
                         <li><a href="/candidates">Candidates</a></li>
-                        <li><a href="/fundraising">Fundraising</a></li>
+                        <li><a href="/fundraising">Money</a></li>
                         <li><a href="/methodology">Methodology</a></li>
                         <li><a href="/about">About</a></li>
                     </ul>

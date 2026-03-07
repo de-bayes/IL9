@@ -614,6 +614,13 @@ def rdp_simplify(points, epsilon):
 # ===== CHART DATA CACHE =====
 _chart_cache = {'data': None, 'time': 0, 'key': None, 'file_size': 0}
 
+# ===== API PROXY CACHES =====
+# Cache external API responses to avoid re-fetching on every page load.
+# Data only changes every 3 minutes, so 45-second TTL is safe.
+_PROXY_CACHE_TTL = 45  # seconds
+_manifold_cache = {'data': None, 'time': 0}
+_kalshi_cache = {'data': None, 'time': 0}
+
 
 # ===== EMAIL ALERT FUNCTIONS =====
 
@@ -1632,7 +1639,8 @@ def fundraising():
 
 @app.route('/outside-money')
 def outside_money():
-    return render_template('outside_money.html')
+    from flask import redirect
+    return redirect('/fundraising#independent-expenditures', code=301)
 
 
 @app.route('/updates')
@@ -1782,37 +1790,64 @@ def get_timeline():
 
 @app.route('/api/manifold')
 def get_manifold():
-    """Proxy Manifold Markets API to avoid CORS"""
+    """Proxy Manifold Markets API to avoid CORS (cached for 45s)"""
+    global _manifold_cache
+    now = _time.time()
+    if _manifold_cache['data'] and (now - _manifold_cache['time']) < _PROXY_CACHE_TTL:
+        result = jsonify(_manifold_cache['data'])
+        result.headers['Cache-Control'] = 'public, max-age=30'
+        return result
     try:
-        response = requests.get('https://api.manifold.markets/v0/slug/who-will-win-the-democratic-primary-RZdcps6dL9')
+        response = requests.get(
+            'https://api.manifold.markets/v0/slug/who-will-win-the-democratic-primary-RZdcps6dL9',
+            timeout=8
+        )
         response.raise_for_status()
-        result = jsonify(response.json())
-        result.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
-        result.headers['Pragma'] = 'no-cache'
-        result.headers['Expires'] = '0'
+        data = response.json()
+        _manifold_cache = {'data': data, 'time': now}
+        result = jsonify(data)
+        result.headers['Cache-Control'] = 'public, max-age=30'
         return result
     except Exception as e:
+        # Serve stale cache on error rather than failing
+        if _manifold_cache['data']:
+            result = jsonify(_manifold_cache['data'])
+            result.headers['Cache-Control'] = 'public, max-age=10'
+            return result
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/kalshi')
 def get_kalshi():
-    """Proxy Kalshi API to avoid CORS — uses /events endpoint (public, no auth required)"""
+    """Proxy Kalshi API to avoid CORS — uses /events endpoint (cached for 45s)"""
+    global _kalshi_cache
+    now = _time.time()
+    if _kalshi_cache['data'] and (now - _kalshi_cache['time']) < _PROXY_CACHE_TTL:
+        result = jsonify(_kalshi_cache['data'])
+        result.headers['Cache-Control'] = 'public, max-age=30'
+        return result
     try:
-        response = requests.get('https://api.elections.kalshi.com/trade-api/v2/events/KXIL9D-26')
+        response = requests.get(
+            'https://api.elections.kalshi.com/trade-api/v2/events/KXIL9D-26',
+            timeout=8
+        )
         response.raise_for_status()
         data = response.json()
         # Reshape to match the old /markets response format the frontend expects
         markets = data.get('markets', [])
         for m in markets:
-            # The old API had candidate name in 'subtitle'; new API uses yes_sub_title
             if not m.get('subtitle'):
                 m['subtitle'] = m.get('yes_sub_title') or m.get('custom_strike', {}).get('Candidate', '')
-        result = jsonify({"markets": markets})
-        result.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
-        result.headers['Pragma'] = 'no-cache'
-        result.headers['Expires'] = '0'
+        shaped = {"markets": markets}
+        _kalshi_cache = {'data': shaped, 'time': now}
+        result = jsonify(shaped)
+        result.headers['Cache-Control'] = 'public, max-age=30'
         return result
     except Exception as e:
+        # Serve stale cache on error rather than failing
+        if _kalshi_cache['data']:
+            result = jsonify(_kalshi_cache['data'])
+            result.headers['Cache-Control'] = 'public, max-age=10'
+            return result
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/manifold/history')
@@ -1820,13 +1855,13 @@ def get_manifold_history():
     """Get Manifold market history for chart"""
     try:
         # Get the market first to get the ID
-        market_response = requests.get('https://api.manifold.markets/v0/slug/who-will-win-the-democratic-primary-RZdcps6dL9')
+        market_response = requests.get('https://api.manifold.markets/v0/slug/who-will-win-the-democratic-primary-RZdcps6dL9', timeout=8)
         market_response.raise_for_status()
         market = market_response.json()
         market_id = market.get('id')
 
         # Get bets for this market
-        bets_response = requests.get(f'https://api.manifold.markets/v0/bets?contractId={market_id}&limit=1000')
+        bets_response = requests.get(f'https://api.manifold.markets/v0/bets?contractId={market_id}&limit=1000', timeout=10)
         bets_response.raise_for_status()
         bets = bets_response.json()
 
@@ -1841,7 +1876,7 @@ def get_manifold_history():
 def get_kalshi_history(ticker):
     """Get Kalshi market history for a specific ticker"""
     try:
-        response = requests.get(f'https://api.elections.kalshi.com/trade-api/v2/markets/{ticker}/history?limit=1000')
+        response = requests.get(f'https://api.elections.kalshi.com/trade-api/v2/markets/{ticker}/history?limit=1000', timeout=10)
         response.raise_for_status()
         return jsonify(response.json())
     except Exception as e:
