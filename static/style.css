@@ -2868,43 +2868,43 @@ p {
    ============================================ */
 
 [data-election-night] {
-    --bg-primary: #0a1628;
-    --bg-secondary: #0f2044;
-    --text-primary: #f0f4f8;
-    --text-secondary: #94a3b8;
-    --accent: #3b82f6;
-    --accent-blue: #3b82f6;
-    --accent-hover: #2563eb;
-    --accent-cyan: #3b82f6;
+    --bg-primary: #0d1a2d;
+    --bg-secondary: #122240;
+    --text-primary: #e2e8f0;
+    --text-secondary: #8b9bb5;
+    --accent: #5b8fd4;
+    --accent-blue: #5b8fd4;
+    --accent-hover: #4a7ec3;
+    --accent-cyan: #5b8fd4;
     --accent-green: #22c55e;
     --accent-green-bright: #22c55e;
-    --accent-red: #ef4444;
-    --border: rgba(59, 130, 246, 0.12);
-    --grid-color: rgba(59, 130, 246, 0.025);
+    --accent-red: #c44040;
+    --border: rgba(91, 143, 212, 0.12);
+    --grid-color: rgba(91, 143, 212, 0.025);
 }
 
 /* Inner page backgrounds */
 [data-election-night] .inner-page {
-    background: #0a1628;
+    background: #0d1a2d;
 }
 
 [data-election-night] .inner-page::before {
-    background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.15) 20%, rgba(30, 58, 110, 0.08) 40%, transparent 70%);
+    background: radial-gradient(ellipse at center, rgba(91, 143, 212, 0.2) 0%, rgba(91, 143, 212, 0.1) 20%, rgba(30, 53, 88, 0.06) 40%, transparent 70%);
 }
 
 [data-election-night] .inner-page::after {
-    background: radial-gradient(ellipse at center, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.08) 20%, transparent 55%);
+    background: radial-gradient(ellipse at center, rgba(196, 64, 64, 0.1) 0%, rgba(168, 50, 50, 0.05) 20%, transparent 55%);
 }
 
 /* Navbar: blue glow border */
 [data-election-night] .navbar {
-    background-color: rgba(10, 22, 40, 0.95);
-    border-bottom-color: rgba(59, 130, 246, 0.3);
-    box-shadow: 0 2px 20px rgba(59, 130, 246, 0.08);
+    background-color: rgba(13, 26, 45, 0.95);
+    border-bottom-color: rgba(91, 143, 212, 0.2);
+    box-shadow: 0 2px 12px rgba(91, 143, 212, 0.06);
 }
 
 [data-election-night] .nav-brand {
-    color: #3b82f6;
+    color: #5b8fd4;
 }
 
 /* Cards + tables: 3D box shadows */
@@ -2915,43 +2915,43 @@ p {
 [data-election-night] .viz-container,
 [data-election-night] .aggregate-table,
 [data-election-night] .fundraising-table {
-    background: rgba(15, 32, 68, 0.6);
-    border-color: rgba(59, 130, 246, 0.15);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(59, 130, 246, 0.05);
+    background: rgba(18, 34, 64, 0.6);
+    border-color: rgba(91, 143, 212, 0.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(91, 143, 212, 0.04);
 }
 
 [data-election-night] .market-card:hover,
 [data-election-night] .stat-card:hover,
 [data-election-night] .donor-card:hover {
-    border-color: rgba(59, 130, 246, 0.3);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(59, 130, 246, 0.1);
+    border-color: rgba(91, 143, 212, 0.22);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(91, 143, 212, 0.08);
     transform: translateY(-2px);
 }
 
 /* Status badges */
 [data-election-night] .market-status.live {
-    background: rgba(239, 68, 68, 0.15);
-    color: #f87171;
+    background: rgba(196, 64, 64, 0.12);
+    color: #d47070;
 }
 
 /* Cyan accents become blue */
 [data-election-night] .inner-page .odds-table thead th,
 [data-election-night] .inner-page .prob-fill,
 [data-election-night] .aggregate-row.header {
-    color: #60a5fa;
+    color: #7ba8d8;
 }
 
 [data-election-night] .inner-page .prob-fill {
-    background: linear-gradient(90deg, rgba(59, 130, 246, 0.8), rgba(96, 165, 250, 0.9));
+    background: linear-gradient(90deg, rgba(91, 143, 212, 0.7), rgba(123, 168, 216, 0.8));
 }
 
 /* Stat card values: alternating red/blue */
 [data-election-night] .stat-card:nth-child(odd) .stat-value {
-    color: #60a5fa;
+    color: #7ba8d8;
 }
 
 [data-election-night] .stat-card:nth-child(even) .stat-value {
-    color: #f87171;
+    color: #d47070;
 }
 
 /* Inner page nav links */
@@ -2966,38 +2966,38 @@ p {
 
 /* CTA buttons */
 [data-election-night] .market-cta-button {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, #5b8fd4, #4a7ec3);
+    box-shadow: 0 4px 12px rgba(91, 143, 212, 0.2);
 }
 
 [data-election-night] .market-cta-button:hover {
-    background: linear-gradient(135deg, #60a5fa, #3b82f6);
-    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+    background: linear-gradient(135deg, #7ba8d8, #5b8fd4);
+    box-shadow: 0 6px 16px rgba(91, 143, 212, 0.35);
 }
 
 /* Grid background */
 [data-election-night] body::before {
     background-image:
-        linear-gradient(rgba(59, 130, 246, 0.02) 1.5px, transparent 1.5px),
-        linear-gradient(90deg, rgba(59, 130, 246, 0.02) 1.5px, transparent 1.5px);
+        linear-gradient(rgba(91, 143, 212, 0.02) 1.5px, transparent 1.5px),
+        linear-gradient(90deg, rgba(91, 143, 212, 0.02) 1.5px, transparent 1.5px);
 }
 
 /* Live badge turns red */
 [data-election-night] .nav-link-live {
-    color: rgba(239, 68, 68, 0.9);
-    background: rgba(239, 68, 68, 0.08);
-    border-color: rgba(239, 68, 68, 0.3);
+    color: rgba(196, 64, 64, 0.9);
+    background: rgba(196, 64, 64, 0.08);
+    border-color: rgba(196, 64, 64, 0.25);
 }
 
 [data-election-night] .nav-link-live:hover {
-    color: rgba(239, 68, 68, 1);
-    background: rgba(239, 68, 68, 0.15);
-    border-color: rgba(239, 68, 68, 0.6);
+    color: rgba(196, 64, 64, 1);
+    background: rgba(196, 64, 64, 0.12);
+    border-color: rgba(196, 64, 64, 0.5);
 }
 
 [data-election-night] .live-badge-nav {
-    background: #ef4444;
-    box-shadow: 0 0 6px rgba(239, 68, 68, 0.9);
+    background: #c44040;
+    box-shadow: 0 0 5px rgba(196, 64, 64, 0.7);
 }
 
 /* Election Night Banner (inner pages) */
@@ -3010,7 +3010,7 @@ p {
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    background: linear-gradient(90deg, #1e3a6e 0%, #dc2626 50%, #1e3a6e 100%);
+    background: linear-gradient(90deg, #1e3558 0%, #a83232 50%, #1e3558 100%);
     padding: 0.5rem 1rem;
     font-family: var(--font-sans, 'Inter', sans-serif);
     font-size: 0.75rem;

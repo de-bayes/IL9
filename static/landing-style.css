@@ -1214,141 +1214,141 @@ header {
    ============================================ */
 
 [data-election-night] {
-    --bg-primary:       #0a1628;
-    --bg-surface:       #0f2044;
-    --bg-surface-hover: #152a54;
-    --bg-elevated:      #1a3a6e;
-    --border-subtle:    rgba(59, 130, 246, 0.08);
-    --border-default:   rgba(59, 130, 246, 0.15);
-    --border-hover:     rgba(59, 130, 246, 0.3);
-    --text-primary:     #f0f4f8;
-    --text-secondary:   #94a3b8;
-    --text-tertiary:    #64748b;
-    --accent-gold:      #ef4444;
-    --accent-blue:      #3b82f6;
-    --accent-red:       #ef4444;
+    --bg-primary:       #0d1a2d;
+    --bg-surface:       #122240;
+    --bg-surface-hover: #182d4e;
+    --bg-elevated:      #1e3658;
+    --border-subtle:    rgba(100, 140, 200, 0.08);
+    --border-default:   rgba(100, 140, 200, 0.12);
+    --border-hover:     rgba(100, 140, 200, 0.22);
+    --text-primary:     #e2e8f0;
+    --text-secondary:   #8b9bb5;
+    --text-tertiary:    #5e6e84;
+    --accent-gold:      #c44040;
+    --accent-blue:      #5b8fd4;
+    --accent-red:       #c44040;
     --accent-green:     #22c55e;
-    --accent-teal:      #3b82f6;
-    --grid-color:       rgba(59, 130, 246, 0.03);
-    --highlight-bg:     #dc2626;
+    --accent-teal:      #5b8fd4;
+    --grid-color:       rgba(80, 120, 180, 0.03);
+    --highlight-bg:     #a83232;
     --highlight-text:   #ffffff;
-    --header-border:    rgba(59, 130, 246, 0.3);
-    --shadow-soft:      rgba(0, 0, 0, 0.5);
+    --header-border:    rgba(100, 140, 200, 0.2);
+    --shadow-soft:      rgba(0, 0, 0, 0.4);
 }
 
 /* Header glow */
 [data-election-night] header {
-    border-bottom: 2px solid rgba(59, 130, 246, 0.4);
-    box-shadow: 0 2px 20px rgba(59, 130, 246, 0.1);
+    border-bottom: 2px solid rgba(91, 143, 212, 0.25);
+    box-shadow: 0 2px 12px rgba(91, 143, 212, 0.06);
 }
 
-/* Logo highlight turns red */
+/* Logo highlight turns muted red */
 [data-election-night] .logo span {
-    background: #dc2626;
+    background: #a83232;
     color: #ffffff;
 }
 
-/* Hero highlight in red */
+/* Hero highlight in muted red */
 [data-election-night] .hero h1 em {
-    background: #dc2626;
+    background: #a83232;
     color: #ffffff;
-    box-shadow: 4px 0 0 #dc2626, -4px 0 0 #dc2626;
+    box-shadow: 4px 0 0 #a83232, -4px 0 0 #a83232;
 }
 
 /* Dateline dot pulses blue */
 [data-election-night] .hero-dateline .dot {
-    background: #3b82f6;
-    box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+    background: #5b8fd4;
+    box-shadow: 0 0 6px rgba(91, 143, 212, 0.4);
 }
 
-/* Stat boxes: alternating red/blue accents with subtle 3D */
+/* Stat boxes: alternating red/blue accents */
 [data-election-night] .stat-box {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-[data-election-night] .stat-box:nth-child(1) { border-left-color: #3b82f6; }
-[data-election-night] .stat-box:nth-child(2) { border-left-color: #ef4444; }
-[data-election-night] .stat-box:nth-child(3) { border-left-color: #3b82f6; }
-[data-election-night] .stat-box:nth-child(4) { border-left-color: #ef4444; }
+[data-election-night] .stat-box:nth-child(1) { border-left-color: #5b8fd4; }
+[data-election-night] .stat-box:nth-child(2) { border-left-color: #c44040; }
+[data-election-night] .stat-box:nth-child(3) { border-left-color: #5b8fd4; }
+[data-election-night] .stat-box:nth-child(4) { border-left-color: #c44040; }
 
 [data-election-night] .stat-grid {
-    background: rgba(59, 130, 246, 0.1);
-    border-color: rgba(59, 130, 246, 0.2);
+    background: rgba(91, 143, 212, 0.06);
+    border-color: rgba(91, 143, 212, 0.12);
 }
 
-/* Nav cards: red/blue top accents + 3D shadow */
-[data-election-night] .nav-card:nth-child(1) { border-top-color: #3b82f6; }
-[data-election-night] .nav-card:nth-child(2) { border-top-color: #ef4444; }
-[data-election-night] .nav-card:nth-child(3) { border-top-color: #3b82f6; }
+/* Nav cards: muted red/blue top accents */
+[data-election-night] .nav-card:nth-child(1) { border-top-color: #5b8fd4; }
+[data-election-night] .nav-card:nth-child(2) { border-top-color: #c44040; }
+[data-election-night] .nav-card:nth-child(3) { border-top-color: #5b8fd4; }
 
 [data-election-night] .nav-card {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     transition: background 0.15s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 [data-election-night] .nav-card:hover {
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 4px 12px rgba(91, 143, 212, 0.1);
     transform: translateY(-2px);
 }
 
 [data-election-night] .nav-cards {
-    background: rgba(59, 130, 246, 0.08);
-    border-color: rgba(59, 130, 246, 0.2);
+    background: rgba(91, 143, 212, 0.05);
+    border-color: rgba(91, 143, 212, 0.12);
 }
 
-/* Featured card: red accent */
+/* Featured card: muted red accent */
 [data-election-night] .featured-card {
-    border-top-color: #ef4444;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    border-top-color: #c44040;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 [data-election-night] .featured-card-tag {
-    background: #ef4444;
+    background: #c44040;
     color: #ffffff;
 }
 
-/* About block list: red/blue */
-[data-election-night] .about-block-list li:nth-child(1) { border-left-color: #3b82f6; }
-[data-election-night] .about-block-list li:nth-child(2) { border-left-color: #ef4444; }
-[data-election-night] .about-block-list li:nth-child(3) { border-left-color: #3b82f6; }
+/* About block list: muted red/blue */
+[data-election-night] .about-block-list li:nth-child(1) { border-left-color: #5b8fd4; }
+[data-election-night] .about-block-list li:nth-child(2) { border-left-color: #c44040; }
+[data-election-night] .about-block-list li:nth-child(3) { border-left-color: #5b8fd4; }
 
 [data-election-night] .about-block {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-/* Buttons: blue primary, red outline */
+/* Buttons: muted blue primary, muted red outline */
 [data-election-night] .btn-primary {
-    background: #3b82f6;
+    background: #5b8fd4;
     color: #ffffff;
-    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 2px 8px rgba(91, 143, 212, 0.2);
 }
 
 [data-election-night] .btn-primary:hover {
     opacity: 1;
-    background: #2563eb;
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+    background: #4a7ec3;
+    box-shadow: 0 4px 12px rgba(91, 143, 212, 0.3);
 }
 
 [data-election-night] .btn-secondary {
-    color: #ef4444;
-    border-color: #ef4444;
+    color: #c44040;
+    border-color: #c44040;
 }
 
 [data-election-night] .btn-secondary:hover {
-    background: #ef4444;
+    background: #c44040;
     color: #ffffff;
 }
 
 /* Footer */
 [data-election-night] .footer-rule {
-    border-top-color: rgba(59, 130, 246, 0.3);
+    border-top-color: rgba(91, 143, 212, 0.2);
 }
 
 /* Grid background: faint blue */
 [data-election-night] body::before {
     background-image:
-        linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+        linear-gradient(rgba(91, 143, 212, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(91, 143, 212, 0.02) 1px, transparent 1px);
 }
 
 /* Election Night Banner */
@@ -1361,7 +1361,7 @@ header {
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    background: linear-gradient(90deg, #1e3a6e 0%, #dc2626 50%, #1e3a6e 100%);
+    background: linear-gradient(90deg, #1e3558 0%, #a83232 50%, #1e3558 100%);
     padding: 0.5rem 1rem;
     font-family: var(--sans);
     font-size: 0.75rem;
@@ -1388,11 +1388,275 @@ header {
 
 /* Theme toggle icon override for election night */
 [data-election-night] .theme-toggle {
-    border-color: rgba(59, 130, 246, 0.3);
-    color: #94a3b8;
+    border-color: rgba(91, 143, 212, 0.2);
+    color: #8b9bb5;
 }
 
 [data-election-night] .theme-toggle:hover {
-    border-color: rgba(59, 130, 246, 0.5);
-    color: #f0f4f8;
+    border-color: rgba(91, 143, 212, 0.35);
+    color: #e2e8f0;
+}
+
+/* Confetti canvas overlay */
+[data-election-night] .confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* Election Night Live Event Card */
+.en-live-card {
+    display: none;
+    background: linear-gradient(135deg, rgba(91, 143, 212, 0.08), rgba(196, 64, 64, 0.08));
+    border: 1px solid rgba(91, 143, 212, 0.15);
+    padding: 2rem 2.5rem;
+    margin-top: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+[data-election-night] .en-live-card {
+    display: block;
+}
+
+.en-live-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #5b8fd4, #c44040, #5b8fd4);
+}
+
+.en-live-card-tag {
+    display: inline-block;
+    background: #c44040;
+    color: #fff;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.en-live-card h3 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    margin: 0 0 0.75rem 0;
+}
+
+.en-live-card p {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0 0 0.5rem 0;
+}
+
+.en-live-card .en-details {
+    margin-top: 1.25rem;
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.en-live-card .en-detail-item {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.en-live-card .en-detail-item strong {
+    color: var(--text-primary);
+}
+
+@media (max-width: 600px) {
+    .en-live-card {
+        padding: 1.5rem;
+    }
+    .en-live-card h3 {
+        font-size: 1.2rem;
+    }
+    .en-live-card .en-details {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Election Night Video Popup */
+.en-video-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.en-video-overlay.active {
+    display: flex;
+    animation: en-fade-in 0.35s ease;
+}
+
+@keyframes en-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.en-video-modal {
+    background: #0d1117;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    max-width: 680px;
+    width: 90%;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+}
+
+.en-video-wrap {
+    position: relative;
+}
+
+.en-video-modal video {
+    width: 100%;
+    display: block;
+    border-radius: 0;
+}
+
+.en-unmute-btn {
+    display: none;
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    color: #fff;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    z-index: 3;
+}
+
+.en-unmute-btn:hover {
+    background: rgba(0, 0, 0, 0.85);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.en-video-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.2rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: all 0.15s ease;
+}
+
+.en-video-close:hover {
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.7);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.en-video-modal-footer {
+    padding: 1.25rem 1.5rem 1.5rem;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.6;
+}
+
+.en-video-modal-footer strong {
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 600;
+}
+
+.en-video-links {
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.en-video-links + .en-video-links {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: none;
+}
+
+.en-video-links a {
+    color: rgba(255, 255, 255, 0.55);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color 0.15s ease;
+}
+
+.en-video-links a.en-link-primary {
+    color: #5b8fd4;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.en-video-links a:hover {
+    color: #ffffff;
+}
+
+/* Banner message link */
+.en-banner-msg {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    margin-left: 1.5rem;
+    padding-left: 1.5rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.25);
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    transition: color 0.15s ease;
+}
+
+.en-banner-msg:hover {
+    color: #ffffff;
+}
+
+@media (max-width: 600px) {
+    .en-banner-msg {
+        display: none;
+    }
 }

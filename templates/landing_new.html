@@ -5,25 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Primary Meta Tags -->
-    <title>IL9Cast - Illinois 9th District Democratic Primary 2026 Forecast</title>
-    <meta name="title" content="IL9Cast - Illinois 9th District Democratic Primary 2026 Forecast">
-    <meta name="description" content="Live prediction market aggregation and precinct model forecasts for Illinois 9th District Democratic Primary election on March 17, 2026. Real-time odds from Manifold Markets and Kalshi, updated every 3 minutes.">
+    <title>IL9Cast - Illinois 9th District Democratic Primary 2026</title>
+    <meta name="title" content="IL9Cast - Illinois 9th District Democratic Primary 2026">
+    <meta name="description" content="The hub for the Illinois 9th District Democratic Primary. Live prediction markets, precinct-level model, fundraising data, candidate profiles, and election night coverage. March 17, 2026.">
     <meta name="keywords" content="IL9Cast, Illinois 9th District, Democratic Primary, primary election 2026, prediction markets, Manifold Markets, Kalshi, election forecast, Daniel Biss, Jan Schakowsky">
     <link rel="canonical" href="https://il9.org/">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://il9.org/">
-    <meta property="og:title" content="IL9Cast - Illinois 9th District Democratic Primary 2026 Forecast">
-    <meta property="og:description" content="Live prediction market aggregation and precinct model forecasts for Illinois 9th District Democratic Primary. Real-time odds updated every 3 minutes from Manifold Markets and Kalshi.">
-    <meta property="og:site_name" content="IL9Cast - Forecast Aggregator">
+    <meta property="og:title" content="IL9Cast - Illinois 9th District Democratic Primary 2026">
+    <meta property="og:description" content="The hub for the Illinois 9th District Democratic Primary. Live prediction markets, precinct-level model, fundraising data, and election night coverage.">
+    <meta property="og:site_name" content="IL9Cast">
     <meta property="og:image" content="https://il9.org/static/homepage-hero.png">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://il9.org/">
-    <meta property="twitter:title" content="IL9Cast - Illinois 9th District Democratic Primary 2026 Forecast">
-    <meta property="twitter:description" content="Live prediction market aggregation and precinct model forecasts for Illinois 9th District Democratic Primary. Real-time odds updated every 3 minutes.">
+    <meta property="twitter:title" content="IL9Cast - Illinois 9th District Democratic Primary 2026">
+    <meta property="twitter:description" content="The hub for the Illinois 9th District Democratic Primary. Live prediction markets, precinct-level model, fundraising data, and election night coverage.">
     <meta property="twitter:image" content="https://il9.org/static/homepage-hero.png">
 
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
@@ -48,7 +48,7 @@
         "@type": "WebSite",
         "name": "IL9Cast",
         "url": "https://il9.org",
-        "description": "Live prediction market aggregation and precinct model forecasts for Illinois 9th District Democratic Primary election on March 17, 2026",
+        "description": "The hub for the Illinois 9th District Democratic Primary. Live prediction markets, precinct-level model, fundraising data, and election night coverage.",
         "potentialAction": {
             "@type": "SearchAction",
             "target": "https://il9.org/?q={search_term_string}",
@@ -83,10 +83,11 @@
     (function() {
         var t = localStorage.getItem('il9-theme');
         if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-        // Election night mode: auto on March 17 2026, or via ?election-night URL param
+        // Election night mode: auto on March 17 2026 at 6 AM CT, or via ?election-night URL param
         var params = new URLSearchParams(window.location.search);
         var now = new Date();
-        var isElectionDay = (now.getFullYear() === 2026 && now.getMonth() === 2 && now.getDate() === 17);
+        var ct = new Date(now.toLocaleString('en-US', {timeZone: 'America/Chicago'}));
+        var isElectionDay = (ct.getFullYear() === 2026 && ct.getMonth() === 2 && ct.getDate() === 17 && ct.getHours() >= 6);
         if (isElectionDay || params.has('election-night')) {
             document.documentElement.setAttribute('data-election-night', '');
         }
@@ -99,6 +100,7 @@
         <div class="en-banner">
             <span class="en-live-dot"></span>
             Election Night &mdash; March 17, 2026
+            <a href="#" class="en-banner-msg" id="enBannerMsg">A message from Ryan McComb &rarr;</a>
         </div>
 
         <!-- HEADER -->
@@ -137,8 +139,8 @@
                 <span class="dot"></span>
                 Live data &mdash; Updated every 3 minutes
             </div>
-            <h1>Illinois 9th District,<br><em>Democratic Primary Forecast</em></h1>
-            <p class="hero-subtitle">Aggregating prediction market data from Manifold Markets and Kalshi and publishing precinct-level model projections for the March 17, 2026 primary election.</p>
+            <h1>Illinois 9th District,<br><em>Democratic Primary Hub</em></h1>
+            <p class="hero-subtitle">Live prediction markets, a precinct-level election model, fundraising analysis, and full election night coverage for the March 17, 2026 primary.</p>
             <p class="hero-countdown"><span id="countdownCompact">--</span> until polls close &mdash; March 17, 2026 at 7:00 PM CT</p>
         </section>
 
@@ -195,6 +197,21 @@
             </div>
         </section>
 
+        <!-- ELECTION NIGHT LIVE EVENT (hidden unless election-night mode) -->
+        <section class="editorial-section">
+            <div class="en-live-card">
+                <span class="en-live-card-tag">Election Night</span>
+                <h3>Live Model Updates at VoteHub</h3>
+                <p>We're running the IL9Cast precinct model live as results come in on election night. Watch the map update in real time as precincts report -- winner projections, margin shifts, and vote totals across all 436 precincts.</p>
+                <p>Come watch with us or follow along from home.</p>
+                <div class="en-details">
+                    <div class="en-detail-item"><strong>Where:</strong> VoteHub, Evanston</div>
+                    <div class="en-detail-item"><strong>When:</strong> March 17, 2026 -- Polls close at 7 PM CT</div>
+                    <div class="en-detail-item"><strong>What:</strong> Live precinct map + real-time model projections</div>
+                </div>
+            </div>
+        </section>
+
         <!-- FEATURED CASE STUDY -->
         <section class="editorial-section">
             <div class="section-label">Featured Analysis</div>
@@ -213,7 +230,7 @@
             <div class="section-label">About this project</div>
             <div class="about-block">
                 <div class="about-block-text">
-                    <strong>IL9Cast</strong> is an independent forecasting platform for the Illinois 9th District Democratic Primary. We combine prediction market data from multiple platforms using a weighted formula and pair it with our precinct-level election model, while applying multi-layer smoothing for clean visualizations and storing every data point for full transparency.
+                    <strong>IL9Cast</strong> is the independent hub for the Illinois 9th District Democratic Primary. We aggregate live prediction market data, publish a precinct-level election model, track fundraising across all candidates, and will be providing live election night coverage with real-time results and model updates.
                 </div>
                 <ul class="about-block-list">
                     <li>
@@ -277,6 +294,32 @@
 
         <div class="flag-footer-image">
             <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer">
+        </div>
+
+        <!-- Election Night Video Popup -->
+        <div class="en-video-overlay" id="enVideoOverlay">
+            <div class="en-video-modal">
+                <button class="en-video-close" id="enVideoClose">&times;</button>
+                <div class="en-video-wrap">
+                    <video id="enVideo" controls playsinline preload="none">
+                    <source src="{{ url_for('static', filename='election-night-preview.mp4') }}" type="video/mp4">
+                </video>
+                <button class="en-unmute-btn" id="enUnmuteBtn">🔇 Tap to unmute</button>
+                </div>
+                <div class="en-video-modal-footer">
+                    <strong>A message from Ryan McComb</strong><br>
+                    We're running the IL9Cast precinct model live at VoteHub on election night. Watch the map update in real time as precincts report.
+                    <div class="en-video-links">
+                        <a href="/markets" class="en-link-primary">Live Markets &rarr;</a>
+                        <a href="https://votehub.com" target="_blank" rel="noopener" class="en-link-primary">VoteHub.com &rarr;</a>
+                    </div>
+                    <div class="en-video-links">
+                        <a href="https://x.com/bayes_pr" target="_blank" rel="noopener">@bayes_pr (Ryan McComb)</a>
+                        <a href="https://x.com/VoteHub" target="_blank" rel="noopener">@VoteHub</a>
+                        <a href="https://x.com/ZacharyDonnini" target="_blank" rel="noopener">@ZacharyDonnini</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -476,6 +519,107 @@
             loadFundraisingTotal();
             updateCountdown();
             setInterval(updateCountdown, 1000);
+
+            // Election night: video popup
+            if (document.documentElement.hasAttribute('data-election-night')) {
+                const overlay = document.getElementById('enVideoOverlay');
+                const video = document.getElementById('enVideo');
+                const closeBtn = document.getElementById('enVideoClose');
+                const bannerMsg = document.getElementById('enBannerMsg');
+
+                const unmuteBtn = document.getElementById('enUnmuteBtn');
+                function openPopup() {
+                    overlay.classList.add('active');
+                    video.muted = true;
+                    video.play().catch(() => {});
+                    unmuteBtn.style.display = 'block';
+                    var cc = document.querySelector('.confetti-canvas');
+                    if (cc) cc.style.display = 'none';
+                }
+                unmuteBtn.addEventListener('click', () => {
+                    video.muted = false;
+                    unmuteBtn.style.display = 'none';
+                });
+                function closePopup() {
+                    overlay.classList.remove('active');
+                    video.pause();
+                    sessionStorage.setItem('en-video-seen', '1');
+                    var cc = document.querySelector('.confetti-canvas');
+                    if (cc) cc.style.display = '';
+                }
+
+                // Auto-show once per session
+                if (!sessionStorage.getItem('en-video-seen')) {
+                    setTimeout(openPopup, 1500);
+                }
+
+                // Banner link reopens it
+                if (bannerMsg) {
+                    bannerMsg.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        openPopup();
+                    });
+                }
+
+                closeBtn.addEventListener('click', closePopup);
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) closePopup();
+                });
+            }
+
+            // Confetti for election night
+            if (document.documentElement.hasAttribute('data-election-night')) {
+                const canvas = document.createElement('canvas');
+                canvas.className = 'confetti-canvas';
+                document.body.appendChild(canvas);
+                const ctx = canvas.getContext('2d');
+
+                function resize() {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                }
+                resize();
+                window.addEventListener('resize', resize);
+
+                const COLORS = ['#5b8fd4', '#c44040', '#ffffff', '#93c5fd', '#e8a0a0'];
+                const pieces = [];
+                for (let i = 0; i < 75; i++) {
+                    pieces.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height - canvas.height,
+                        w: Math.random() * 6 + 3,
+                        h: Math.random() * 3 + 1.5,
+                        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+                        vy: Math.random() * 0.8 + 0.3,
+                        vx: (Math.random() - 0.5) * 0.6,
+                        rot: Math.random() * Math.PI * 2,
+                        vr: (Math.random() - 0.5) * 0.05,
+                        opacity: Math.random() * 0.3 + 0.2
+                    });
+                }
+
+                function drawConfetti() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    for (const p of pieces) {
+                        p.y += p.vy;
+                        p.x += p.vx;
+                        p.rot += p.vr;
+                        if (p.y > canvas.height + 20) {
+                            p.y = -10;
+                            p.x = Math.random() * canvas.width;
+                        }
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.rot);
+                        ctx.globalAlpha = p.opacity;
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                        ctx.restore();
+                    }
+                    requestAnimationFrame(drawConfetti);
+                }
+                drawConfetti();
+            }
         });
     </script>
 </body>
