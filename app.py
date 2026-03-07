@@ -1633,14 +1633,19 @@ def about():
 def markets():
     return render_template('markets.html')
 
-@app.route('/fundraising')
+@app.route('/money')
 def fundraising():
     return render_template('fundraising.html')
+
+@app.route('/fundraising')
+def fundraising_redirect():
+    from flask import redirect
+    return redirect('/money', code=301)
 
 @app.route('/outside-money')
 def outside_money():
     from flask import redirect
-    return redirect('/fundraising#independent-expenditures', code=301)
+    return redirect('/money#independent-expenditures', code=301)
 
 
 @app.route('/updates')
@@ -1695,7 +1700,7 @@ def robots():
     from flask import Response
     return Response(render_template('robots.txt'), mimetype='text/plain')
 
-@app.route('/fundraising/<candidate_slug>')
+@app.route('/money/<candidate_slug>')
 def candidate_fundraising(candidate_slug):
     """Show individual candidate fundraising page"""
     # Find candidate profile
@@ -2841,6 +2846,10 @@ else:
         thread.start()
     else:
         print(f"[{datetime.now().isoformat()}] Scheduler disabled in pid={os.getpid()} (lock held by another worker)")
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 if __name__ == '__main__':
     # Use debug mode only for local development
