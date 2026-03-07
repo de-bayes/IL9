@@ -50,55 +50,50 @@
 
         <section class="hero">
             <h1>404</h1>
-            <p class="hero-subtitle">Page not found. But we can quantify your uncertainty.</p>
+            <p class="hero-subtitle">Well&hellip; time to update your prior on whether Ryan is a good programmer.</p>
         </section>
 
         <section class="error-content">
             <div class="bayes-card">
                 <h2>Bayes' Theorem</h2>
                 <div class="bayes-equation">
-                    P(A|B) = <span class="frac"><span class="num">P(B|A) &middot; P(A)</span><span class="den">P(B)</span></span>
+                    P(H|E) = <span class="frac"><span class="num">P(E|H) &middot; P(H)</span><span class="den">P(E|H) &middot; P(H) + P(E|&not;H) &middot; P(&not;H)</span></span>
                 </div>
+                <p class="bayes-where">where <em>H</em> = "Ryan is a good programmer" and <em>E</em> = "you just got a 404"</p>
 
                 <div class="bayes-breakdown">
-                    <h3>Posterior Odds of You Not Being a Good Programmer</h3>
-                    <p class="bayes-subtitle">Given that you just typed a URL that doesn't exist</p>
-
                     <div class="bayes-terms">
                         <div class="bayes-term">
-                            <span class="term-label">P(bad typer | not good programmer)</span>
-                            <span class="term-value">0.93</span>
-                            <span class="term-note">Most non-programmers can't type URLs from memory</span>
+                            <span class="term-label">P(H)</span>
+                            <span class="term-value">50%</span>
+                            <span class="term-note">Your prior belief that Ryan is a good programmer</span>
                         </div>
                         <div class="bayes-term">
-                            <span class="term-label">P(not good programmer)</span>
-                            <span class="term-value">0.72</span>
-                            <span class="term-note">Base rate &mdash; most people aren't programmers</span>
+                            <span class="term-label">P(E|H)</span>
+                            <span class="term-value">10%</span>
+                            <span class="term-note">Chance of a 404 if he IS a good programmer</span>
                         </div>
                         <div class="bayes-term">
-                            <span class="term-label">P(bad typer)</span>
-                            <span class="term-value">0.41</span>
-                            <span class="term-note">Unconditional probability of botching a URL</span>
+                            <span class="term-label">P(E|&not;H)</span>
+                            <span class="term-value">60%</span>
+                            <span class="term-note">Chance of a 404 if he is NOT a good programmer</span>
                         </div>
                     </div>
 
                     <div class="bayes-result">
+                        <div class="result-label">Posterior</div>
+                        <div class="result-big">14.3%</div>
                         <div class="result-equation">
-                            P(not good programmer | bad typer) = <span class="frac"><span class="num">0.93 &times; 0.72</span><span class="den">0.41</span></span> = <strong>~163%</strong>
+                            P(H|E) = <span class="frac"><span class="num">0.10 &times; 0.50</span><span class="den">0.10 &times; 0.50 + 0.60 &times; 0.50</span></span> = 0.143
                         </div>
-                        <p class="result-note">That's greater than 100%, which means Bayes himself would say: go outside.</p>
+                        <p class="result-note">Yikes. Maybe stick to the liberal arts.</p>
                     </div>
                 </div>
             </div>
 
             <div class="error-nav">
-                <p>Here are some pages that <em>do</em> exist:</p>
                 <div class="error-links">
-                    <a href="/">Home</a>
-                    <a href="/markets">Markets</a>
-                    <a href="/odds">Model</a>
-                    <a href="/money">Money</a>
-                    <a href="/candidates">Candidates</a>
+                    <a href="/" class="btn-primary">Update Your Posterior &rarr; Home</a>
                 </div>
             </div>
         </section>
@@ -144,10 +139,21 @@
 
         .bayes-equation {
             font-family: 'Libre Baskerville', serif;
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             text-align: center;
-            margin: 1.5rem 0 2rem;
+            margin: 1.5rem 0 1rem;
             letter-spacing: 0.02em;
+        }
+
+        .bayes-where {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted, #666);
+            margin: 0 0 2rem;
+        }
+
+        .bayes-where em {
+            font-family: 'Libre Baskerville', serif;
         }
 
         .frac {
@@ -169,23 +175,7 @@
         }
 
         .bayes-breakdown {
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border-color, #e0e0e0);
-        }
-
-        .bayes-breakdown h3 {
-            font-family: 'Source Sans 3', sans-serif;
-            font-size: 1.15rem;
-            font-weight: 600;
-            margin: 0 0 0.25rem;
-        }
-
-        .bayes-subtitle {
-            font-size: 0.9rem;
-            color: var(--text-muted, #666);
-            margin: 0 0 1.5rem;
-            font-style: italic;
+            margin-top: 0;
         }
 
         .bayes-terms {
@@ -237,15 +227,28 @@
             text-align: center;
         }
 
-        .result-equation {
-            font-family: 'Libre Baskerville', serif;
-            font-size: 1.1rem;
-            margin-bottom: 0.75rem;
+        .result-label {
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted, #666);
+            margin-bottom: 0.25rem;
         }
 
-        .result-equation strong {
-            font-size: 1.4rem;
+        .result-big {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 3rem;
+            font-weight: 700;
             color: var(--accent, #2563eb);
+            margin-bottom: 1rem;
+        }
+
+        .result-equation {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
         }
 
         .result-note {
@@ -259,34 +262,27 @@
             text-align: center;
         }
 
-        .error-nav p {
-            font-size: 1rem;
-            margin-bottom: 1rem;
-            color: var(--text-muted, #666);
-        }
-
         .error-links {
             display: flex;
-            gap: 1rem;
             justify-content: center;
-            flex-wrap: wrap;
         }
 
-        .error-links a {
-            padding: 0.5rem 1.25rem;
-            border: 1px solid var(--border-color, #e0e0e0);
+        .error-links .btn-primary {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background: var(--accent, #2563eb);
+            border: none;
             border-radius: 6px;
             text-decoration: none;
             font-family: 'Source Sans 3', sans-serif;
-            font-weight: 500;
-            color: var(--text-primary, #1a1a1a);
-            transition: background 0.15s, border-color 0.15s;
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: #fff;
+            transition: background 0.15s;
         }
 
-        .error-links a:hover {
-            background: var(--accent, #2563eb);
-            border-color: var(--accent, #2563eb);
-            color: #fff;
+        .error-links .btn-primary:hover {
+            background: #1d4ed8;
         }
 
         @media (max-width: 600px) {
@@ -294,7 +290,10 @@
                 padding: 1.5rem;
             }
             .bayes-equation {
-                font-size: 1.3rem;
+                font-size: 1rem;
+            }
+            .result-big {
+                font-size: 2.2rem;
             }
             .bayes-term {
                 grid-template-columns: 1fr;
