@@ -64,29 +64,38 @@
                 <div class="bayes-breakdown">
                     <div class="bayes-terms">
                         <div class="bayes-term">
-                            <span class="term-label">P(H)</span>
-                            <span class="term-value">50%</span>
+                            <div class="term-top">
+                                <span class="term-label">P(H)</span>
+                                <span class="term-value" id="val-ph">50%</span>
+                            </div>
                             <span class="term-note">Your prior belief that Ryan is a good programmer</span>
+                            <input type="range" class="bayes-slider" id="slider-ph" min="1" max="99" value="50" oninput="updateBayes()">
                         </div>
                         <div class="bayes-term">
-                            <span class="term-label">P(E|H)</span>
-                            <span class="term-value">91%</span>
+                            <div class="term-top">
+                                <span class="term-label">P(E|H)</span>
+                                <span class="term-value" id="val-peh">91%</span>
+                            </div>
                             <span class="term-note">Chance of a 404 if he IS a good programmer</span>
+                            <input type="range" class="bayes-slider" id="slider-peh" min="1" max="99" value="91" oninput="updateBayes()">
                         </div>
                         <div class="bayes-term">
-                            <span class="term-label">P(E|&not;H)</span>
-                            <span class="term-value">60%</span>
+                            <div class="term-top">
+                                <span class="term-label">P(E|&not;H)</span>
+                                <span class="term-value" id="val-penh">60%</span>
+                            </div>
                             <span class="term-note">Chance of a 404 if he is NOT a good programmer</span>
+                            <input type="range" class="bayes-slider" id="slider-penh" min="1" max="99" value="60" oninput="updateBayes()">
                         </div>
                     </div>
 
                     <div class="bayes-result">
                         <div class="result-label">Posterior</div>
-                        <div class="result-big">60.3%</div>
-                        <div class="result-equation">
+                        <div class="result-big" id="posterior-big">60.3%</div>
+                        <div class="result-equation" id="posterior-eq">
                             P(H|E) = <span class="frac"><span class="num">0.91 &times; 0.50</span><span class="den">0.91 &times; 0.50 + 0.60 &times; 0.50</span></span> = 0.603
                         </div>
-                        <p class="result-note">Still more likely than not. Everyone ships bugs sometimes.</p>
+                        <p class="result-note" id="posterior-note">Still more likely than not. Everyone ships bugs sometimes.</p>
                     </div>
                 </div>
             </div>
@@ -186,38 +195,70 @@
         }
 
         .bayes-term {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            grid-template-rows: auto auto;
-            gap: 0.15rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
             padding: 0.75rem 1rem;
             background: var(--bg-subtle, #f7f7f7);
             border-radius: 8px;
+        }
+
+        .term-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
         }
 
         .term-label {
             font-family: 'Source Sans 3', sans-serif;
             font-size: 0.95rem;
             font-weight: 500;
-            grid-row: 1;
-            grid-column: 1;
         }
 
         .term-value {
             font-family: 'Libre Baskerville', serif;
             font-size: 1.3rem;
             font-weight: 700;
-            grid-row: 1 / 3;
-            grid-column: 2;
-            align-self: center;
             color: var(--accent, #2563eb);
         }
 
         .term-note {
             font-size: 0.8rem;
             color: var(--text-muted, #666);
-            grid-row: 2;
-            grid-column: 1;
+        }
+
+        .bayes-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color, #e0e0e0);
+            outline: none;
+            margin-top: 0.25rem;
+            cursor: pointer;
+        }
+
+        .bayes-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent, #2563eb);
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .bayes-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent, #2563eb);
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
         .bayes-result {
@@ -295,13 +336,7 @@
             .result-big {
                 font-size: 2.2rem;
             }
-            .bayes-term {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto auto auto;
-            }
             .term-value {
-                grid-row: auto;
-                grid-column: 1;
                 font-size: 1.1rem;
             }
         }
@@ -324,6 +359,42 @@
             var btn = document.getElementById('hamburger');
             nav.classList.toggle('open');
             btn.classList.toggle('open');
+        }
+
+        function updateBayes() {
+            var ph = parseInt(document.getElementById('slider-ph').value) / 100;
+            var peh = parseInt(document.getElementById('slider-peh').value) / 100;
+            var penh = parseInt(document.getElementById('slider-penh').value) / 100;
+
+            document.getElementById('val-ph').textContent = Math.round(ph * 100) + '%';
+            document.getElementById('val-peh').textContent = Math.round(peh * 100) + '%';
+            document.getElementById('val-penh').textContent = Math.round(penh * 100) + '%';
+
+            var num = peh * ph;
+            var den = peh * ph + penh * (1 - ph);
+            var posterior = den > 0 ? num / den : 0;
+
+            document.getElementById('posterior-big').textContent = (posterior * 100).toFixed(1) + '%';
+
+            var phF = ph.toFixed(2);
+            var pehF = peh.toFixed(2);
+            var penhF = penh.toFixed(2);
+            var notPhF = (1 - ph).toFixed(2);
+            document.getElementById('posterior-eq').innerHTML =
+                'P(H|E) = <span class="frac"><span class="num">' + pehF + ' &times; ' + phF +
+                '</span><span class="den">' + pehF + ' &times; ' + phF + ' + ' + penhF + ' &times; ' + notPhF +
+                '</span></span> = ' + posterior.toFixed(3);
+
+            var note = document.getElementById('posterior-note');
+            if (posterior >= 0.8) {
+                note.textContent = "Mass on good programmer. The 404 barely moved the needle.";
+            } else if (posterior >= 0.5) {
+                note.textContent = "Still more likely than not. Everyone ships bugs sometimes.";
+            } else if (posterior >= 0.2) {
+                note.textContent = "Yikes. Maybe stick to the liberal arts.";
+            } else {
+                note.textContent = "Mass on not a programmer. Consider a career in poetry.";
+            }
         }
     </script>
 </body>
