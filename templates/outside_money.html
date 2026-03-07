@@ -92,49 +92,59 @@
             <div class="ie-section">
                 <h2 class="ie-heading">Net IE by Candidate</h2>
                 <p class="ie-desc">Total independent expenditure dollars supporting or opposing each candidate.</p>
-                <div class="ie-candidate-bars">
-                    <div class="ie-bar-row">
-                        <span class="ie-bar-name">Laura Fine</span>
-                        <div class="ie-bar-track">
-                            <div class="ie-bar-fill ie-bar-support" style="width: 100%;">
-                                <span class="ie-bar-label">+$4.24M</span>
-                            </div>
+                <div class="ie-diverging-chart">
+                    <!-- Fine: +$4.24M -->
+                    <div class="ie-div-row">
+                        <span class="ie-div-name">Laura Fine</span>
+                        <div class="ie-div-track">
+                            <div class="ie-div-bar ie-div-pos" style="left: 10%; width: 90%;"></div>
+                            <div class="ie-div-zero"></div>
+                            <span class="ie-div-label ie-div-label-pos" style="left: 11%;">+$4.24M</span>
                         </div>
                     </div>
-                    <div class="ie-bar-row">
-                        <span class="ie-bar-name">Phil Andrew</span>
-                        <div class="ie-bar-track">
-                            <div class="ie-bar-fill ie-bar-support" style="width: 6.2%;">
-                                <span class="ie-bar-label">+$263K</span>
-                            </div>
+                    <!-- Andrew: +$263K -->
+                    <div class="ie-div-row">
+                        <span class="ie-div-name">Phil Andrew</span>
+                        <div class="ie-div-track">
+                            <div class="ie-div-bar ie-div-pos" style="left: 10%; width: 5.6%;"></div>
+                            <div class="ie-div-zero"></div>
+                            <span class="ie-div-label ie-div-label-pos" style="left: 16.5%;">+$263K</span>
                         </div>
                     </div>
-                    <div class="ie-bar-row">
-                        <span class="ie-bar-name">Robert Huynh</span>
-                        <div class="ie-bar-track">
-                            <div class="ie-bar-fill ie-bar-support" style="width: 0.5%;" data-min>
-                            </div>
-                            <span class="ie-bar-label ie-bar-label-outside">+$6.2K</span>
+                    <!-- Huynh: +$6.2K -->
+                    <div class="ie-div-row">
+                        <span class="ie-div-name">Robert Huynh</span>
+                        <div class="ie-div-track">
+                            <div class="ie-div-bar ie-div-pos" style="left: 10%; width: 0.5%; min-width: 3px;"></div>
+                            <div class="ie-div-zero"></div>
+                            <span class="ie-div-label ie-div-label-pos" style="left: 11.5%;">+$6.2K</span>
                         </div>
                     </div>
-                    <div class="ie-bar-row">
-                        <span class="ie-bar-name">Kat Abughazaleh</span>
-                        <div class="ie-bar-track">
-                            <div class="ie-bar-fill ie-bar-oppose" style="width: 3.9%;">
-                            </div>
-                            <span class="ie-bar-label ie-bar-label-outside ie-oppose-label">-$166K</span>
+                    <!-- Abughazaleh: -$166K -->
+                    <div class="ie-div-row">
+                        <span class="ie-div-name">Kat Abughazaleh</span>
+                        <div class="ie-div-track">
+                            <div class="ie-div-bar ie-div-neg" style="left: 6.04%; width: 3.96%;"></div>
+                            <div class="ie-div-zero"></div>
+                            <span class="ie-div-label ie-div-label-neg" style="right: 91%;">-$166K</span>
                         </div>
                     </div>
-                    <div class="ie-bar-row">
-                        <span class="ie-bar-name">Daniel Biss</span>
-                        <div class="ie-bar-track">
-                            <div class="ie-bar-fill ie-bar-mixed">
-                                <div class="ie-bar-segment ie-bar-support" style="width: 41.4%;"></div>
-                                <div class="ie-bar-segment ie-bar-oppose" style="width: 58.6%;"></div>
-                            </div>
-                            <span class="ie-bar-label ie-bar-label-outside ie-oppose-label">net -$419K</span>
+                    <!-- Biss: net -$419K ($1.01M support / $1.43M oppose) -->
+                    <div class="ie-div-row">
+                        <span class="ie-div-name">Daniel Biss</span>
+                        <div class="ie-div-track">
+                            <div class="ie-div-bar ie-div-neg" style="left: 0; width: 10%;"></div>
+                            <div class="ie-div-zero"></div>
+                            <span class="ie-div-label ie-div-label-neg ie-div-label-inside" style="left: 1%;">-$419K</span>
                         </div>
-                        <div class="ie-bar-detail">$1.01M support / $1.43M oppose</div>
+                        <div class="ie-div-detail">$1.01M support / $1.43M oppose</div>
+                    </div>
+                    <!-- Axis labels -->
+                    <div class="ie-div-row ie-div-axis-row">
+                        <span class="ie-div-name"></span>
+                        <div class="ie-div-axis">
+                            <span class="ie-div-axis-label" style="left: 10%;">$0</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -555,21 +565,21 @@
             flex-shrink: 0;
         }
 
-        /* Net IE Bars */
-        .ie-candidate-bars {
+        /* Diverging bar chart for Net IE */
+        .ie-diverging-chart {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 0.55rem;
         }
 
-        .ie-bar-row {
+        .ie-div-row {
             display: grid;
             grid-template-columns: 130px 1fr;
             align-items: center;
             gap: 0.75rem;
         }
 
-        .ie-bar-name {
+        .ie-div-name {
             font-family: var(--sans);
             font-size: 0.85rem;
             font-weight: 600;
@@ -577,57 +587,72 @@
             text-align: right;
         }
 
-        .ie-bar-track {
+        .ie-div-track {
             height: 32px;
             background: var(--bg-surface);
             border: 1px solid var(--border-default);
             position: relative;
-            display: flex;
-            align-items: center;
         }
 
-        .ie-bar-fill {
-            height: 100%;
-            display: flex;
-            align-items: center;
-            min-width: 4px;
+        .ie-div-zero {
+            position: absolute;
+            left: 10%;
+            top: -2px;
+            bottom: -2px;
+            width: 1.5px;
+            background: var(--text-secondary);
+            z-index: 2;
         }
 
-        .ie-bar-fill.ie-bar-mixed {
-            width: 57.4%;
-            display: flex;
-        }
-
-        .ie-bar-segment {
+        .ie-div-bar {
+            position: absolute;
+            top: 0;
             height: 100%;
         }
 
-        .ie-bar-support { background: rgba(16, 185, 129, 0.5); }
-        .ie-bar-oppose { background: rgba(239, 68, 68, 0.4); }
+        .ie-div-pos { background: rgba(16, 185, 129, 0.5); }
+        .ie-div-neg { background: rgba(239, 68, 68, 0.45); }
 
-        .ie-bar-label {
+        .ie-div-label {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
             font-family: var(--sans);
             font-size: 0.75rem;
             font-weight: 700;
-            color: var(--text-primary);
-            padding: 0 0.5rem;
             white-space: nowrap;
+            z-index: 3;
         }
 
-        .ie-bar-label-outside {
-            position: absolute;
-            left: calc(100% * var(--bar-pct, 0) + 8px);
-            margin-left: 8px;
+        .ie-div-label-pos { color: var(--text-primary); }
+        .ie-div-label-neg { color: #ef4444; }
+
+        .ie-div-label-inside {
+            color: #fff;
+            text-shadow: 0 0 3px rgba(0,0,0,0.5);
         }
 
-        .ie-oppose-label { color: #ef4444; }
-
-        .ie-bar-detail {
+        .ie-div-detail {
             grid-column: 2;
             font-family: var(--sans);
             font-size: 0.72rem;
             color: var(--text-tertiary);
-            margin-top: -0.25rem;
+            margin-top: -0.15rem;
+        }
+
+        .ie-div-axis-row { margin-top: -0.3rem; }
+
+        .ie-div-axis {
+            position: relative;
+            height: 14px;
+        }
+
+        .ie-div-axis-label {
+            position: absolute;
+            transform: translateX(-50%);
+            font-family: var(--sans);
+            font-size: 0.65rem;
+            color: var(--text-tertiary);
         }
 
         /* Group Cards */
@@ -810,11 +835,11 @@
             .ie-vs { display: none; }
             .ie-box { padding: 1.25rem 1rem; }
             .ie-box-value { font-size: 1.75rem; }
-            .ie-bar-row {
+            .ie-div-row {
                 grid-template-columns: 100px 1fr;
                 gap: 0.5rem;
             }
-            .ie-bar-name { font-size: 0.75rem; }
+            .ie-div-name { font-size: 0.75rem; }
             .ie-group-header { padding: 0.75rem 1rem; }
             .ie-group-row { padding: 0.5rem 1rem; }
             .ie-group-name { font-size: 0.9rem; }
@@ -823,10 +848,10 @@
         }
 
         @media (max-width: 375px) {
-            .ie-bar-row {
+            .ie-div-row {
                 grid-template-columns: 80px 1fr;
             }
-            .ie-bar-name { font-size: 0.7rem; }
+            .ie-div-name { font-size: 0.7rem; }
         }
     </style>
 
