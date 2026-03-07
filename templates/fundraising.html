@@ -39,7 +39,7 @@
             <nav class="desktop-nav">
                 <a href="/markets">Markets</a>
                 <a href="/odds">Model</a>
-                <a href="/fundraising" class="active">Money</a>
+                <a href="/money" class="active">Money</a>
                 <a href="/candidates">Candidates</a>
                 <a href="/methodology">Methodology</a>
                 <a href="/about">About</a>
@@ -56,7 +56,7 @@
             <nav class="mobile-nav" id="mobileNav">
                 <a href="/markets">Markets</a>
                 <a href="/odds">Model</a>
-                <a href="/fundraising" class="active">Money</a>
+                <a href="/money" class="active">Money</a>
                 <a href="/candidates">Candidates</a>
                 <a href="/methodology">Methodology</a>
                 <a href="/about">About</a>
@@ -397,7 +397,7 @@
                     <ul>
                         <li><a href="/markets">Markets</a></li>
                         <li><a href="/candidates">Candidates</a></li>
-                        <li><a href="/fundraising">Money</a></li>
+                        <li><a href="/money">Money</a></li>
                         <li><a href="/methodology">Methodology</a></li>
                         <li><a href="/about">About</a></li>
                     </ul>
@@ -1464,7 +1464,7 @@
                 const slug = candidate.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
                 const link = document.createElement('a');
-                link.href = `/fundraising/${slug}`;
+                link.href = `/money/${slug}`;
                 link.className = 'candidate-link-item';
                 link.textContent = candidate.name;
                 grid.appendChild(link);

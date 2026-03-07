@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="IL9Cast - Page Not Found">
+    <title>404 - IL9Cast</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+</head>
+<script>
+    (function() {
+        var t = localStorage.getItem('il9-theme');
+        if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+</script>
+<body>
+    <div class="site-content">
+        <header>
+            <a href="/" class="logo">IL9<span>Cast</span></a>
+            <nav class="desktop-nav">
+                <a href="/markets">Markets</a>
+                <a href="/odds">Model</a>
+                <a href="/money">Money</a>
+                <a href="/candidates">Candidates</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/about">About</a>
+            </nav>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+                <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="mobile-nav" id="mobileNav">
+                <a href="/markets">Markets</a>
+                <a href="/odds">Model</a>
+                <a href="/money">Money</a>
+                <a href="/candidates">Candidates</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/about">About</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <h1>404</h1>
+            <p class="hero-subtitle">Page not found. But we can quantify your uncertainty.</p>
+        </section>
+
+        <section class="error-content">
+            <div class="bayes-card">
+                <h2>Bayes' Theorem</h2>
+                <div class="bayes-equation">
+                    P(A|B) = <span class="frac"><span class="num">P(B|A) &middot; P(A)</span><span class="den">P(B)</span></span>
+                </div>
+
+                <div class="bayes-breakdown">
+                    <h3>Posterior Odds of You Not Being a Good Programmer</h3>
+                    <p class="bayes-subtitle">Given that you just typed a URL that doesn't exist</p>
+
+                    <div class="bayes-terms">
+                        <div class="bayes-term">
+                            <span class="term-label">P(bad typer | not good programmer)</span>
+                            <span class="term-value">0.93</span>
+                            <span class="term-note">Most non-programmers can't type URLs from memory</span>
+                        </div>
+                        <div class="bayes-term">
+                            <span class="term-label">P(not good programmer)</span>
+                            <span class="term-value">0.72</span>
+                            <span class="term-note">Base rate &mdash; most people aren't programmers</span>
+                        </div>
+                        <div class="bayes-term">
+                            <span class="term-label">P(bad typer)</span>
+                            <span class="term-value">0.41</span>
+                            <span class="term-note">Unconditional probability of botching a URL</span>
+                        </div>
+                    </div>
+
+                    <div class="bayes-result">
+                        <div class="result-equation">
+                            P(not good programmer | bad typer) = <span class="frac"><span class="num">0.93 &times; 0.72</span><span class="den">0.41</span></span> = <strong>~163%</strong>
+                        </div>
+                        <p class="result-note">That's greater than 100%, which means Bayes himself would say: go outside.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="error-nav">
+                <p>Here are some pages that <em>do</em> exist:</p>
+                <div class="error-links">
+                    <a href="/">Home</a>
+                    <a href="/markets">Markets</a>
+                    <a href="/odds">Model</a>
+                    <a href="/money">Money</a>
+                    <a href="/candidates">Candidates</a>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-nav">
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/markets">Markets</a></li>
+                        <li><a href="/odds">Model</a></li>
+                        <li><a href="/money">Money</a></li>
+                        <li><a href="/candidates">Candidates</a></li>
+                        <li><a href="/methodology">Methodology</a></li>
+                        <li><a href="/about">About</a></li>
+                    </ul>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <style>
+        .error-content {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        .bayes-card {
+            background: var(--card-bg, #fff);
+            border: 1px solid var(--border-color, #e0e0e0);
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .bayes-card h2 {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1.6rem;
+            margin: 0 0 1.5rem;
+            text-align: center;
+        }
+
+        .bayes-equation {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1.8rem;
+            text-align: center;
+            margin: 1.5rem 0 2rem;
+            letter-spacing: 0.02em;
+        }
+
+        .frac {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+        }
+
+        .frac .num {
+            border-bottom: 2px solid currentColor;
+            padding: 0 0.4em 0.2em;
+            font-size: 0.85em;
+        }
+
+        .frac .den {
+            padding: 0.2em 0.4em 0;
+            font-size: 0.85em;
+        }
+
+        .bayes-breakdown {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color, #e0e0e0);
+        }
+
+        .bayes-breakdown h3 {
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin: 0 0 0.25rem;
+        }
+
+        .bayes-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted, #666);
+            margin: 0 0 1.5rem;
+            font-style: italic;
+        }
+
+        .bayes-terms {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .bayes-term {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            grid-template-rows: auto auto;
+            gap: 0.15rem 1rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-subtle, #f7f7f7);
+            border-radius: 8px;
+        }
+
+        .term-label {
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            grid-row: 1;
+            grid-column: 1;
+        }
+
+        .term-value {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            grid-row: 1 / 3;
+            grid-column: 2;
+            align-self: center;
+            color: var(--accent, #2563eb);
+        }
+
+        .term-note {
+            font-size: 0.8rem;
+            color: var(--text-muted, #666);
+            grid-row: 2;
+            grid-column: 1;
+        }
+
+        .bayes-result {
+            background: var(--bg-subtle, #f7f7f7);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            text-align: center;
+        }
+
+        .result-equation {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .result-equation strong {
+            font-size: 1.4rem;
+            color: var(--accent, #2563eb);
+        }
+
+        .result-note {
+            font-size: 0.85rem;
+            color: var(--text-muted, #666);
+            margin: 0;
+            font-style: italic;
+        }
+
+        .error-nav {
+            text-align: center;
+        }
+
+        .error-nav p {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-muted, #666);
+        }
+
+        .error-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .error-links a {
+            padding: 0.5rem 1.25rem;
+            border: 1px solid var(--border-color, #e0e0e0);
+            border-radius: 6px;
+            text-decoration: none;
+            font-family: 'Source Sans 3', sans-serif;
+            font-weight: 500;
+            color: var(--text-primary, #1a1a1a);
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .error-links a:hover {
+            background: var(--accent, #2563eb);
+            border-color: var(--accent, #2563eb);
+            color: #fff;
+        }
+
+        @media (max-width: 600px) {
+            .bayes-card {
+                padding: 1.5rem;
+            }
+            .bayes-equation {
+                font-size: 1.3rem;
+            }
+            .bayes-term {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            .term-value {
+                grid-row: auto;
+                grid-column: 1;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+
+    <script>
+        function toggleTheme() {
+            var html = document.documentElement;
+            var current = html.getAttribute('data-theme');
+            if (current === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('il9-theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('il9-theme', 'dark');
+            }
+        }
+        function toggleMobileMenu() {
+            var nav = document.getElementById('mobileNav');
+            var btn = document.getElementById('hamburger');
+            nav.classList.toggle('open');
+            btn.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
