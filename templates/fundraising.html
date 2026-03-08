@@ -224,7 +224,7 @@
                     <div class="ie-vs">vs.</div>
                     <div class="ie-box ie-box-candidate">
                         <div class="ie-box-label">Candidate-Raised</div>
-                        <div class="ie-box-value">$10.2M</div>
+                        <div class="ie-box-value" id="ieCandidateRaised">$10.2M</div>
                         <div class="ie-box-note">Total raised by all declared candidates</div>
                     </div>
                 </div>
@@ -1512,6 +1512,13 @@
             document.getElementById('totalRaisedDisplay').textContent = formatCurrency(estimatedCurrentTotal);
             document.getElementById('totalSpentDisplay').textContent = formatCurrency(estimatedCurrentSpent);
             document.getElementById('velocityDisplay').textContent = Math.round(velocityPerHour).toLocaleString();
+
+            // Sync IE section candidate-raised with extrapolated total
+            const ieEl = document.getElementById('ieCandidateRaised');
+            if (ieEl) {
+                const raisedM = (estimatedCurrentTotal / 1000000).toFixed(1);
+                ieEl.textContent = '$' + raisedM + 'M';
+            }
 
             // Start live counter
             liveCounterAmount = 0;
