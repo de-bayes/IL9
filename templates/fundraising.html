@@ -1513,6 +1513,13 @@
             document.getElementById('totalSpentDisplay').textContent = formatCurrency(estimatedCurrentSpent);
             document.getElementById('velocityDisplay').textContent = Math.round(velocityPerHour).toLocaleString();
 
+            // Sync IE section candidate-raised with extrapolated total
+            const ieEl = document.getElementById('ieCandidateRaised');
+            if (ieEl) {
+                const raisedM = (estimatedCurrentTotal / 1000000).toFixed(1);
+                ieEl.textContent = '$' + raisedM + 'M';
+            }
+
             // Start live counter
             liveCounterAmount = 0;
             document.getElementById('liveCounterDisplay').textContent = '$0.00';
@@ -1565,13 +1572,6 @@
                     // Debug: log candidates
                     console.log(`Loaded ${data.candidates.length} candidates:`, data.candidates.map(c => c.name));
                     console.log(`Total raised: ${formatCurrency(totalRaised)}, Total spent: ${formatCurrency(totalSpent)}`);
-
-                    // Update IE section candidate-raised to match actual FEC total
-                    const ieEl = document.getElementById('ieCandidateRaised');
-                    if (ieEl) {
-                        const raisedM = (totalRaised / 1000000).toFixed(1);
-                        ieEl.textContent = '$' + raisedM + 'M';
-                    }
 
                     // Create visualizations
                     createSpendingChart(data.candidates);
