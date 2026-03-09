@@ -267,22 +267,23 @@
 
                         <p>The <a href="/money">Money page</a> aggregates campaign finance data directly from the Federal Election Commission's public API. This gives us real-time insights into total raised, cash on hand, spending patterns, and grassroots support metrics for all candidates in the race.</p>
 
-                        <h3>FEC API Data Sources</h3>
-                        <p>We pull data from two primary FEC API endpoints:</p>
+                        <h3>FEC Data Sources</h3>
+                        <p>All fundraising data is sourced from official FEC filings, currently hardcoded from Pre-Primary reports (coverage through Feb 25, 2026; filed March 5, retrieved March 6, 2026). The original data was pulled from two FEC API endpoints:</p>
                         <div class="formula-box">
                             <strong>Candidate Totals:</strong> <code>GET /v1/candidate/{candidate_id}/totals/</code><br>
-                            Returns aggregate financial summary including receipts, disbursements, cash on hand, and individual contribution breakdowns.
+                            Cumulative financial summary: receipts (Line 11e), disbursements (Line 22), cash on hand (Line 27), and individual contribution breakdowns.
                         </div>
                         <div class="formula-box" style="margin-top: 0.75rem;">
-                            <strong>Disbursements:</strong> <code>GET /v1/schedules/schedule_b/</code><br>
-                            Returns itemized expenditure records (Schedule B) used for burn rate calculations.
+                            <strong>Period-Specific Figures:</strong> FEC Form 3 Column A<br>
+                            Receipts and disbursements for the current filing period only (Jan 1 &ndash; Feb 25, 2026). Used for burn rate and raise rate calculations.
                         </div>
-                        <p>Each candidate is identified by their FEC candidate ID (format: <code>H6IL09XXX</code>). We map candidate names to their IDs and then query their principal campaign committee for financial data. For example:</p>
+                        <p>Each candidate is identified by their FEC committee ID. For example:</p>
                         <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                            <li><strong>Daniel Biss</strong> &rarr; H6IL09228 &rarr; Committee C00855619</li>
-                            <li><strong>Kat Abughazaleh</strong> &rarr; H6IL09178 &rarr; Committee C00851154</li>
-                            <li><strong>Mike Simmons</strong> &rarr; H6IL09293 &rarr; Committee C00857847</li>
+                            <li><strong>Daniel Biss</strong> &rarr; Committee C00905307</li>
+                            <li><strong>Kat Abughazaleh</strong> &rarr; Committee C00900449</li>
+                            <li><strong>Mike Simmons</strong> &rarr; Committee C00910976</li>
                         </ul>
+                        <p><strong>Note on Cash on Hand:</strong> The FEC-reported COH (Line 27) may differ slightly from total receipts minus total disbursements due to beginning balance carryforward, loans, refunds, and other adjustments. We use the FEC-reported figure as the authoritative value.</p>
 
                         <h3>Small Dollar Donations</h3>
                         <p>The "Small $%" metric measures grassroots support by calculating what percentage of a candidate's individual contributions come from donations under $200. This is the FEC's standard definition of small-dollar/grassroots fundraising.</p>
@@ -305,23 +306,17 @@
                         </div>
                         <p>This means 70.2% of Kat's individual donations came from contributors giving less than $200 — a strong indicator of broad grassroots support.</p>
 
-                        <h3>Burn Rate Projections</h3>
-                        <p>Burn rate measures how quickly a campaign is spending money, projected forward to estimate monthly cash consumption. We calculate three different burn rate metrics using real disbursement data from FEC Schedule B filings:</p>
+                        <h3>Burn Rate &amp; Raise Rate</h3>
+                        <p>Burn rate and raise rate measure monthly spending and fundraising velocity during the most recent FEC filing period. Both use <strong>period-specific</strong> figures from FEC Form 3, Column A &mdash; not cumulative totals.</p>
                         <div class="formula-box">
-                            <strong>2-Week Burn:</strong> Last 2 weeks expenditures &times; 2 = monthly rate<br>
-                            <strong>1-Month Burn:</strong> Last 1 month expenditures = monthly rate<br>
-                            <strong>1.5-Month Burn:</strong> Last 1.5 months expenditures &times; 0.66 = monthly rate
+                            <strong>Monthly Rate</strong> = period_amount &divide; (period_days &divide; 30.44)<br><br>
+                            For the Pre-Primary filing (Jan 1 &ndash; Feb 25, 2026 = 56 days):<br>
+                            &bull; <strong>Burn rate</strong> uses period disbursements (Column A, Line 22)<br>
+                            &bull; <strong>Raise rate</strong> uses period receipts (Column A, Line 11e)<br><br>
+                            <strong>Cash runway</strong> = cash_on_hand &divide; burn_rate_monthly
                         </div>
-                        <p>For each candidate, we:</p>
-                        <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                            <li>Get their most recent FEC filing's <code>coverage_end_date</code></li>
-                            <li>Query Schedule B for all disbursements in the lookback period (14, 30, or 45 days)</li>
-                            <li>Sum total disbursement amounts for that period</li>
-                            <li>Multiply by the appropriate factor to normalize to a 30-day monthly rate</li>
-                        </ol>
-                        <p>This gives us three perspectives on spending velocity: recent (2-week), medium-term (1-month), and longer-term (1.5-month). Campaigns often ramp up spending closer to election day, so the 2-week burn tends to be highest.</p>
-                        <p><strong>Implementation:</strong> The system first finds the most recent disbursement within the last 60 days of the reporting period. If found, it uses that date as the anchor point and calculates backwards. If no recent disbursements exist, burn rates show as $0/mo.</p>
-                        <p><strong>Note:</strong> Burn rates are calculated from the Jan 1 &ndash; Feb 25, 2026 pre-primary filing period (56 days). All five candidates now have pre-primary data available.</p>
+                        <p><strong>Why period-specific?</strong> Cumulative totals include money raised and spent over the entire campaign lifecycle. Period-specific figures capture the campaign's <em>current</em> spending and fundraising velocity, which is more useful for projecting forward to election day.</p>
+                        <p><strong>Important distinction:</strong> A candidate's burn rate may exceed their raise rate even if cumulative total_raised exceeds total_spent. This indicates the campaign is currently spending faster than it's raising &mdash; drawing down reserves built up earlier in the cycle.</p>
 
                         <h3>Data Source & Updates</h3>
                         <p>The fundraising data is currently <strong>hardcoded</strong> into the application using Pre-Primary FEC filings through February 25, 2026 (filed March 5, retrieved March 6, 2026). The data is static and doesn't require live API calls.</p>

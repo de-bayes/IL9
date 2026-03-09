@@ -1177,14 +1177,29 @@ View Live Markets: {SITE_BASE_URL}markets
 
 def fetch_all_fec_data():
     """
-    Returns hardcoded FEC data for all IL-09 2026 candidates with profiles.
-    Source:
-      - Pre-Primary filings (through Feb 25, 2026) for all candidates.
-        Filed March 5, 2026. Retrieved March 6, 2026.
+    Returns hardcoded FEC data for all IL-09 2026 candidates.
 
-    Burn rates calculated from pre-primary filing period:
-      - Jan 1 – Feb 25, 2026 (56 days)
-      - Monthly rate = period_amount / (period_days / 30.44)
+    Source: Pre-Primary FEC filings (coverage through Feb 25, 2026).
+    Filed March 5, 2026. Retrieved March 6, 2026.
+
+    Field definitions:
+      - total_raised: Cumulative receipts (FEC Line 11e, Column B - total)
+      - total_spent: Cumulative disbursements (FEC Line 22, Column B - total)
+      - cash_on_hand: FEC-reported COH (Line 27). May differ from
+        total_raised - total_spent due to beginning balance, loans, refunds.
+      - total_donors: Estimated donor count from contribution data
+      - small_dollar_amount: Unitemized individual contributions (under $200)
+      - individual_total: Total individual contributions (itemized + unitemized)
+      - burn_rate_monthly: Period disbursements (Column A, Jan 1-Feb 25 only,
+        56 days) converted to monthly: amount / (56 / 30.44).
+        Uses period-specific disbursements, NOT cumulative total_spent.
+      - raise_rate_monthly: Period receipts (Column A, Jan 1-Feb 25 only,
+        56 days) converted to monthly: amount / (56 / 30.44).
+        Uses period-specific receipts, NOT cumulative total_raised.
+      - cash_runway_months: cash_on_hand / burn_rate_monthly
+      - spent_pct_of_raised: (total_spent / total_raised) * 100
+      - avg_contribution: individual_total / total_donors
+      - small_dollar_pct: (small_dollar_amount / individual_total) * 100
     """
     return [
         {
@@ -1209,7 +1224,7 @@ def fetch_all_fec_data():
             "name": "Kat Abugazaleh",
             "total_raised": 3359172.06,
             "total_spent": 2977254.36,
-            "cash_on_hand": 382621.26,
+            "cash_on_hand": 382621.26,  # FEC Line 27 (differs from receipts-disbursements by $703.56 due to prior balance)
             "total_donors": 49100,
             "small_dollar_amount": 2247721.60,
             "individual_total": 3356755.42,
@@ -1227,7 +1242,7 @@ def fetch_all_fec_data():
             "name": "Laura Fine",
             "total_raised": 2555781.35,
             "total_spent": 2095128.95,
-            "cash_on_hand": 461679.43,
+            "cash_on_hand": 461679.43,  # FEC Line 27 (differs from receipts-disbursements by $1,027.03 due to prior balance)
             "total_donors": 6443,
             "small_dollar_amount": 76381.76,
             "individual_total": 2517581.35,
