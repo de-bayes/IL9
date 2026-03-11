@@ -2270,13 +2270,15 @@ async function fetchManifoldData() {
         const manifoldList = answers
             .map(a => ({
                 name: a.text,
-                probability: Math.round(a.probability * 1000) / 10
+                probability: isExcludedCandidate(a.text) ? 0 : Math.round(a.probability * 1000) / 10,
+                _excluded: isExcludedCandidate(a.text)
             }))
-            .filter(a => a.name !== 'Other' && !a.name.toLowerCase().includes('schakowsky') && !isExcludedCandidate(a.name))
+            .filter(a => a.name !== 'Other' && !a.name.toLowerCase().includes('schakowsky'))
             .sort((a, b) => b.probability - a.probability);
 
-        // Store in lookup object
+        // Store in lookup object (skip excluded candidates so they don't affect aggregate)
         manifoldList.forEach(c => {
+            if (c._excluded) return;
             const key = normalizeCandidate(c.name);
             manifoldData[key] = {
                 displayName: c.name,
@@ -2837,8 +2839,17 @@ async function fetchKalshiData() {
             // Extract candidate name from subtitle or title
             let displayName = m.subtitle || m.title;
 
-            // Filter out Jan Schakowsky and excluded candidates
-            if (displayName.toLowerCase().includes('schakowsky') || isExcludedCandidate(displayName)) {
+            // Filter out Jan Schakowsky
+            if (displayName.toLowerCase().includes('schakowsky')) {
+                return;
+            }
+
+            // Excluded candidates: show in display at 0% but skip from aggregate data
+            if (isExcludedCandidate(displayName)) {
+                kalshiList.push({
+                    name: cleanCandidateName(displayName),
+                    probability: 0
+                });
                 return;
             }
 
