@@ -234,17 +234,20 @@
                 <h2>Market Sources</h2>
 
                 <div class="expandable-market" id="manifoldMarket">
-                    <button class="expand-toggle" onclick="toggleMarket('manifoldMarket')">
-                        <span class="market-name">
-                            Manifold Markets
-                            <span class="live-badge" id="manifoldBadge">
-                                <span class="live-dot"></span>
-                                LIVE
+                    <div class="market-header-row">
+                        <button class="expand-toggle" onclick="toggleMarket('manifoldMarket')">
+                            <span class="market-name">
+                                Manifold Markets
+                                <span class="live-badge" id="manifoldBadge">
+                                    <span class="live-dot"></span>
+                                    LIVE
+                                </span>
                             </span>
-                        </span>
-                        <span class="market-preview" id="manifoldPreview">Loading...</span>
-                        <span class="expand-icon">+</span>
-                    </button>
+                            <span class="market-preview" id="manifoldPreview">Loading...</span>
+                            <span class="expand-icon">+</span>
+                        </button>
+                        <a href="https://manifold.markets/JeromeHPowell/who-will-win-the-democratic-primary-RZdcps6dL9" target="_blank" class="market-header-link" title="View on Manifold Markets">↗</a>
+                    </div>
                     <div class="expand-content">
                         <div class="market-candidates" id="manifoldCandidates">
                             <div class="market-candidate">
@@ -260,17 +263,20 @@
                 </div>
 
                 <div class="expandable-market" id="kalshiMarket">
-                    <button class="expand-toggle" onclick="toggleMarket('kalshiMarket')">
-                        <span class="market-name">
-                            Kalshi
-                            <span class="live-badge" id="kalshiBadge">
-                                <span class="live-dot"></span>
-                                LIVE
+                    <div class="market-header-row">
+                        <button class="expand-toggle" onclick="toggleMarket('kalshiMarket')">
+                            <span class="market-name">
+                                Kalshi
+                                <span class="live-badge" id="kalshiBadge">
+                                    <span class="live-dot"></span>
+                                    LIVE
+                                </span>
                             </span>
-                        </span>
-                        <span class="market-preview" id="kalshiPreview">Loading...</span>
-                        <span class="expand-icon">+</span>
-                    </button>
+                            <span class="market-preview" id="kalshiPreview">Loading...</span>
+                            <span class="expand-icon">+</span>
+                        </button>
+                        <a href="https://kalshi.com/markets/kxil9d/il-9-democratic-primary/kxil9d-26" target="_blank" class="market-header-link" title="View on Kalshi">↗</a>
+                    </div>
                     <div class="expand-content">
                         <div class="market-candidates" id="kalshiCandidates">
                             <div class="market-candidate">
@@ -1281,6 +1287,33 @@
             border: 1px solid var(--border-default);
             overflow: hidden;
             background: var(--bg-surface);
+        }
+
+        .market-header-row {
+            display: flex;
+            align-items: stretch;
+        }
+
+        .market-header-row .expand-toggle {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .market-header-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 1rem;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-size: 1.1rem;
+            border-left: 1px solid var(--border-default);
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .market-header-link:hover {
+            background: var(--bg-surface-hover);
+            color: var(--accent-teal);
         }
 
         .expand-toggle {

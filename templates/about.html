@@ -67,15 +67,18 @@
         </section>
 
         <section class="about-content-page">
-            <article class="about-section">
-                <h2>Created by Ryan McComb</h2>
-                <p>I'm a student at Evanston Township High School with a passion for politics, data science, and prediction markets. I built IL9Cast because I wanted to see real-time market sentiment for the IL-9 primary race and figured some others might find it useful too. In all transparency, I have done some volunteer work for Daniel Biss, but I promise that has not influenced the efficacy of the data presented here. If you want me to make a race forecast like this for your district, I would love to!</p>
-                <p>Also, to be upfront about it: I used AI to help build the website itself -- the Flask backend, the HTML, the CSS. I'm a high schooler, not a web developer. But the actual data pipelines, the aggregation formulas, the model logic, the methodology -- all me. AI helped me put it on a screen. I wrote the code that makes the decisions.</p>
-                <p>If you want to talk markets, forecasting, or have feedback on IL9Cast, feel free to reach out.</p>
-            </article>
 
-            <article class="about-section acknowledgments-callout">
-                <h2>The Lunch Table</h2>
+            <!-- Lead intro -->
+            <div class="about-intro">
+                <h2>Hi, I'm Ryan McComb.</h2>
+                <p>I'm a student at Evanston Township High School with a passion for politics, data science, and prediction markets. I built IL9Cast because I wanted to see real-time market sentiment for the IL-9 primary race and figured some others might find it useful too.</p>
+                <p>IL9Cast is a real-time forecasting platform for the Illinois 9th Congressional District Democratic Primary, scheduled for March 17, 2026. It aggregates live prediction market data from <a href="https://manifold.markets/JeromeHPowell/who-will-win-the-democratic-primary-RZdcps6dL9" target="_blank">Manifold Markets</a> and <a href="https://kalshi.com/markets/kxil9d/il-9-democratic-primary/kxil9d-26" target="_blank">Kalshi</a>, publishes a precinct-level election model with 436 precincts and 100,000 Monte Carlo simulations, and updates every 3 minutes around the clock.</p>
+                <p>In all transparency, I have done some volunteer work for Daniel Biss, but that has not influenced the data or methodology presented here. If you want me to build a race forecast like this for your district, I would love to.</p>
+            </div>
+
+            <!-- The Lunch Table -->
+            <article class="about-card lunch-table-card">
+                <h3>The Lunch Table</h3>
                 <p>This whole thing pretty much runs out of a lunch table at ETHS. Every day my friends sit there while I talk about polling averages and precinct maps instead of normal stuff. They've watched me pull up the site on my phone a hundred times, told me when something looked weird, and somehow kept showing up even though I've definitely bored them half to death. This has been one of the coolest projects of my life. Not because of the model or the data -- because of the people who let me be way too excited about a congressional primary, never made it weird, and never got annoyed. They believed in it before anyone else did, and that matters more than they probably realize.</p>
                 <p class="lunch-names">Sammy Jain, Teddy Gutstein, Vikram Kelly, Nathan Gregory, Ido Salant, John Spyrson, and Nick Jackson.</p>
                 <p>There were a lot of late nights. The time Railway deleted the entire data volume at 3am and I had to rebuild everything from CSV backups. The nights spent staring at chart smoothing algorithms trying to figure out why the lines looked wrong. Refreshing the site over and over after a deploy hoping nothing broke. My parents never once told me to stop, even when I was clearly up way too late on a school night working on a congressional forecast that nobody asked me to build. Thank you for that.</p>
@@ -85,71 +88,45 @@
                 <p>To everyone else at school who's checked out the site, sent me a tip, argued with me about the race, or just let me ramble at them -- thanks. You know who you are.</p>
             </article>
 
-            <article class="about-section">
-                <h2>The Project</h2>
-                <p>IL9Cast is a real-time forecasting platform for the Illinois 9th Congressional District Democratic Primary, scheduled for March 17, 2026. The site aggregates live prediction market data from Manifold Markets and Kalshi and also publishes a precinct-level election model to provide up-to-the-minute probability estimates and geographic insights for each candidate.</p>
-                <p>This project combines sophisticated market aggregation methodology, a precinct-level election model, and clean data visualization to help voters and political observers understand the race dynamics in real time.</p>
-            </article>
+            <!-- Two-column: Press + Contact -->
+            <div class="about-columns">
+                <article class="about-card">
+                    <h3>Press</h3>
+                    <div class="tweet-embed">
+                        <iframe
+                            src="https://platform.twitter.com/embed/Tweet.html?id=2019934482942586970"
+                            title="Tweet from Matthew Eadie about IL9Cast"
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="press-note">Featured in the <strong>Capitol Fax</strong> newsletter.</p>
+                    <p class="press-note">Evanston RoundTable: <a href="https://evanstonroundtable.com/2026/02/10/eths-student-aims-to-forecast-9th-district-congressional-race-using-betting-market-data/" target="_blank" rel="noopener noreferrer">"ETHS student aims to forecast 9th District congressional race using betting market data"</a></p>
+                </article>
+                <article class="about-card">
+                    <h3>Get in Touch</h3>
+                    <ul class="contact-list">
+                        <li><span class="contact-label">Email</span><a href="mailto:IL9Cast@icloud.com">IL9Cast@icloud.com</a></li>
+                        <li><span class="contact-label">X / Twitter</span><a href="https://x.com/bayes_pr" target="_blank" rel="noopener noreferrer">@bayes_pr</a></li>
+                        <li><span class="contact-label">Website</span><a href="https://rjmccomb.xyz" target="_blank" rel="noopener noreferrer">rjmccomb.xyz</a></li>
+                        <li><span class="contact-label">Manifold</span><a href="https://manifold.markets/JeromeHPowell" target="_blank" rel="noopener noreferrer">@JeromeHPowell</a></li>
+                        <li><span class="contact-label">Metaculus</span><a href="https://www.metaculus.com/accounts/profile/238376/" target="_blank" rel="noopener noreferrer">Profile #238376</a></li>
+                    </ul>
+                    <h3 class="inspiration-heading">Inspiration</h3>
+                    <p class="inspiration-text">Built on the shoulders of <strong>Nate Silver</strong>, <strong>FiveThirtyEight</strong>, <strong>The Silver Bulletin</strong>, and <strong>Galen Druke</strong> -- the people who proved data-driven election forecasting could work.</p>
+                </article>
+            </div>
 
-            <article class="about-section">
-                <h2>Press</h2>
-                <div class="tweet-embed">
-                    <iframe
-                        src="https://platform.twitter.com/embed/Tweet.html?id=2019934482942586970"
-                        title="Tweet from Matthew Eadie about IL9Cast"
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                        allowfullscreen>
-                    </iframe>
-                </div>
-                <p class="press-note">We were also featured in the <strong>Capitol Fax</strong> newsletter.</p>
-                <p class="press-note">Read Evanston RoundTable's coverage: <a href="https://evanstonroundtable.com/2026/02/10/eths-student-aims-to-forecast-9th-district-congressional-race-using-betting-market-data/" target="_blank" rel="noopener noreferrer">"ETHS student aims to forecast 9th District congressional race using betting market data"</a>.</p>
-            </article>
-
-            <article class="about-section contact-section">
-                <h2>Contact Information</h2>
-                <div class="contact-grid">
-                    <div>
-                        <p><strong>Email:</strong><br>
-                        <a href="mailto:IL9Cast@icloud.com">IL9Cast@icloud.com</a></p>
-                    </div>
-                    <div>
-                        <p><strong>X / Twitter:</strong><br>
-                        <a href="https://x.com/bayes_pr" target="_blank" rel="noopener noreferrer">@bayes_pr</a></p>
-                    </div>
-                    <div>
-                        <p><strong>Website:</strong><br>
-                        <a href="https://rjmccomb.xyz" target="_blank" rel="noopener noreferrer">rjmccomb.xyz</a></p>
-                    </div>
-                    <div>
-                        <p><strong>Manifold Markets:</strong><br>
-                        <a href="https://manifold.markets/JeromeHPowell" target="_blank" rel="noopener noreferrer">@JeromeHPowell</a></p>
-                    </div>
-                    <div>
-                        <p><strong>Metaculus:</strong><br>
-                        <a href="https://www.metaculus.com/accounts/profile/238376/" target="_blank" rel="noopener noreferrer">Profile #238376</a></p>
-                    </div>
-                </div>
-            </article>
-
-            <article class="about-section">
-                <h2>Inspiration</h2>
-                <p>This forecasting platform is inspired by the pioneering work of data-driven election forecasters including:</p>
-                <ul class="inspiration-list">
-                    <li><strong>Nate Silver</strong> - Creator of FiveThirtyEight and modern election forecasting</li>
-                    <li><strong>538</strong> - The original data-driven election forecast site</li>
-                    <li><strong>The Silver Bulletin</strong> - Nate Silver's current forecasting publication</li>
-                    <li><strong>Galen Druke</strong> - Podcast host and election analyst at 538</li>
-                </ul>
-            </article>
-
-            <article class="about-section support-section">
-                <h2>Support IL9Cast</h2>
+            <!-- Support CTA -->
+            <article class="about-card support-card">
+                <h3>Support IL9Cast</h3>
                 <p>IL9Cast runs on real-time data collection every 3 minutes, persistent data storage, and continuous server infrastructure. If you find this forecast useful, consider helping cover the hosting and operational costs.</p>
                 <div style="text-align: center; margin-top: 1.5rem;">
                     <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="support-button">Support This Project</a>
                 </div>
             </article>
+
         </section>
 
         <footer class="site-footer">
@@ -190,92 +167,101 @@
 
     <style>
         .about-content-page {
-            max-width: 820px;
+            max-width: 860px;
             margin: 0 auto 4rem;
             padding: 0 2rem;
         }
 
-        .about-section {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            padding: 2.5rem;
+        /* Lead intro - no box, editorial feel */
+        .about-intro {
+            margin-bottom: 2.5rem;
+            padding-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .about-intro h2 {
+            font-family: var(--serif);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .about-intro p {
+            font-family: var(--sans);
+            font-size: 1.05rem;
+            line-height: 1.85;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .about-intro p:last-child {
+            margin-bottom: 0;
+        }
+
+        .about-intro a {
+            color: var(--accent-blue);
+            text-decoration: underline;
+        }
+
+        .about-intro a:hover {
+            opacity: 0.8;
+        }
+
+        /* Two-column layout */
+        .about-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
             margin-bottom: 1.5rem;
         }
 
-        .about-section h2 {
+        /* Shared card style */
+        .about-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            padding: 2rem 2.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-columns .about-card {
+            margin-bottom: 0;
+        }
+
+        .about-card h3 {
             font-family: var(--serif);
-            font-size: 1.6rem;
+            font-size: 1.3rem;
             font-weight: 700;
             margin-bottom: 1.25rem;
             color: var(--text-primary);
         }
 
-        .about-section p {
+        .about-card p {
             font-family: var(--sans);
             margin-bottom: 1rem;
             line-height: 1.8;
             color: var(--text-secondary);
         }
 
-        .about-section p:last-child {
+        .about-card p:last-child {
             margin-bottom: 0;
         }
 
-        .contact-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .contact-grid p {
-            margin: 0;
-        }
-
-        .contact-grid a {
-            color: var(--accent-blue);
-            text-decoration: underline;
-        }
-
-        .contact-grid a:hover {
-            opacity: 0.8;
-        }
-
-        .inspiration-list {
-            list-style: none;
-            padding-left: 0;
-            margin: 1rem 0 0;
-        }
-
-        .inspiration-list li {
-            margin-bottom: 0.8rem;
-            padding-left: 1.25rem;
-            position: relative;
-            line-height: 1.6;
-            color: var(--text-secondary);
-            font-family: var(--sans);
-        }
-
-        .inspiration-list li:before {
-            content: "\2192";
-            position: absolute;
-            left: 0;
-            color: var(--accent-gold);
-        }
-
+        /* Press */
         .tweet-embed {
-            max-width: 550px;
-            margin: 0 auto 1.25rem;
+            max-width: 100%;
+            margin: 0 0 1.25rem;
         }
 
         .tweet-embed iframe {
             width: 100%;
-            min-height: 420px;
+            min-height: 380px;
             border: 0;
         }
 
         .press-note {
-            margin-bottom: 0.75rem !important;
+            font-size: 0.92rem;
+            margin-bottom: 0.6rem !important;
         }
 
         .press-note:last-child {
@@ -291,9 +277,59 @@
             opacity: 0.85;
         }
 
-        .acknowledgments-callout {
+        /* Contact list */
+        .contact-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1.75rem;
+        }
+
+        .contact-list li {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--border-subtle);
+            font-family: var(--sans);
+            font-size: 0.95rem;
+        }
+
+        .contact-list li:last-child {
+            border-bottom: none;
+        }
+
+        .contact-label {
+            color: var(--text-tertiary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            min-width: 70px;
+            flex-shrink: 0;
+        }
+
+        .contact-list a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .contact-list a:hover {
+            text-decoration: underline;
+        }
+
+        /* Inspiration */
+        .inspiration-heading {
+            margin-top: 0.5rem;
+        }
+
+        .inspiration-text {
+            font-size: 0.95rem;
+            line-height: 1.75;
+        }
+
+        /* Lunch table */
+        .lunch-table-card {
             border-left: 3px solid var(--accent-blue);
-            background: var(--bg-surface);
         }
 
         .lunch-names {
@@ -301,8 +337,14 @@
             color: var(--text-primary);
         }
 
-        .support-section {
+        /* Support */
+        .support-card {
             border-left: 3px solid var(--accent-gold);
+            text-align: center;
+        }
+
+        .support-card p {
+            text-align: left;
         }
 
         .support-button {
@@ -321,10 +363,11 @@
             opacity: 0.8;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 700px) {
             .about-content-page { padding: 0 1.25rem; }
-            .about-section { padding: 1.75rem 1.25rem; }
-            .about-section h2 { font-size: 1.3rem; }
+            .about-columns { grid-template-columns: 1fr; }
+            .about-card { padding: 1.75rem 1.25rem; }
+            .about-intro h2 { font-size: 1.5rem; }
         }
     </style>
 
