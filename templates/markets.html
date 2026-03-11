@@ -1945,8 +1945,8 @@ async function calculateAggregate() {
     Object.keys(kalshiData).forEach(name => allCandidates.add(name));
 
     allCandidates.forEach(candidateKey => {
-        // Filter out Jan Schakowsky
-        if (candidateKey.toLowerCase().includes('schakowsky')) {
+        // Filter out Jan Schakowsky and Mark Su
+        if (candidateKey.toLowerCase().includes('schakowsky') || candidateKey.toLowerCase().includes('mark su')) {
             return;
         }
 
@@ -2264,7 +2264,7 @@ async function fetchManifoldData() {
                 name: a.text,
                 probability: Math.round(a.probability * 1000) / 10
             }))
-            .filter(a => a.name !== 'Other' && !a.name.toLowerCase().includes('schakowsky'))
+            .filter(a => a.name !== 'Other' && !a.name.toLowerCase().includes('schakowsky') && !a.name.toLowerCase().includes('mark su'))
             .sort((a, b) => b.probability - a.probability);
 
         // Store in lookup object
@@ -2829,8 +2829,8 @@ async function fetchKalshiData() {
             // Extract candidate name from subtitle or title
             let displayName = m.subtitle || m.title;
 
-            // Filter out Jan Schakowsky
-            if (displayName.toLowerCase().includes('schakowsky')) {
+            // Filter out Jan Schakowsky and Mark Su
+            if (displayName.toLowerCase().includes('schakowsky') || displayName.toLowerCase().includes('mark su')) {
                 return;
             }
 

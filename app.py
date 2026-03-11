@@ -2646,12 +2646,17 @@ def collect_market_data():
         if not kalshi_ok:
             print(f"  [Warning] Kalshi API failed - using Manifold-only data (dampened)")
 
+        # Candidates to exclude from the model entirely
+        EXCLUDED_CANDIDATES = {'mark su'}
+
         # Calculate aggregated probabilities
         if manifold_data or kalshi_data:
             all_candidates = set(list(manifold_data.keys()) + list(kalshi_data.keys()))
             aggregated = []
 
             for candidate_key in all_candidates:
+                if candidate_key in EXCLUDED_CANDIDATES:
+                    continue
                 manifold_prob = manifold_data.get(candidate_key, {}).get('probability', 0)
                 kalshi_info = kalshi_data.get(candidate_key, {})
                 kalshi_last = kalshi_info.get('last_price', 0)
