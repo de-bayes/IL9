@@ -1924,6 +1924,14 @@ function normalizeCandidate(name) {
     return cleaned;
 }
 
+// Candidates excluded from all displays
+const EXCLUDED_CANDIDATES = ['mark su', 'nick pyati', 'sam polan', 'howard rosenblum'];
+
+function isExcludedCandidate(name) {
+    const lower = name.toLowerCase();
+    return EXCLUDED_CANDIDATES.some(exc => lower.includes(exc));
+}
+
 function cleanCandidateName(name) {
     // Clean up display name for better readability
     return name
@@ -1945,8 +1953,8 @@ async function calculateAggregate() {
     Object.keys(kalshiData).forEach(name => allCandidates.add(name));
 
     allCandidates.forEach(candidateKey => {
-        // Filter out Jan Schakowsky and Mark Su
-        if (candidateKey.toLowerCase().includes('schakowsky') || candidateKey.toLowerCase().includes('mark su')) {
+        // Filter out Jan Schakowsky and excluded candidates
+        if (candidateKey.toLowerCase().includes('schakowsky') || isExcludedCandidate(candidateKey)) {
             return;
         }
 
@@ -2264,7 +2272,7 @@ async function fetchManifoldData() {
                 name: a.text,
                 probability: Math.round(a.probability * 1000) / 10
             }))
-            .filter(a => a.name !== 'Other' && !a.name.toLowerCase().includes('schakowsky') && !a.name.toLowerCase().includes('mark su'))
+            .filter(a => a.name !== 'Other' && !a.name.toLowerCase().includes('schakowsky') && !isExcludedCandidate(a.name))
             .sort((a, b) => b.probability - a.probability);
 
         // Store in lookup object
@@ -2829,8 +2837,8 @@ async function fetchKalshiData() {
             // Extract candidate name from subtitle or title
             let displayName = m.subtitle || m.title;
 
-            // Filter out Jan Schakowsky and Mark Su
-            if (displayName.toLowerCase().includes('schakowsky') || displayName.toLowerCase().includes('mark su')) {
+            // Filter out Jan Schakowsky and excluded candidates
+            if (displayName.toLowerCase().includes('schakowsky') || isExcludedCandidate(displayName)) {
                 return;
             }
 

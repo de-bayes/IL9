@@ -2647,7 +2647,7 @@ def collect_market_data():
             print(f"  [Warning] Kalshi API failed - using Manifold-only data (dampened)")
 
         # Candidates to exclude from the model entirely
-        EXCLUDED_CANDIDATES = {'mark su'}
+        EXCLUDED_CANDIDATES = {'mark su', 'nick pyati', 'sam polan', 'howard rosenblum'}
 
         # Calculate aggregated probabilities
         if manifold_data or kalshi_data:
