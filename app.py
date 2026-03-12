@@ -12,6 +12,7 @@ import shutil
 from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600  # Cache static files for 1 hour
 
 
 # ===== PATH RESOLUTION =====
@@ -1564,7 +1565,7 @@ CANDIDATE_PROFILES = [
         "name": "Kat Abugazaleh",
         "slug": "kat-abugazaleh",
         "title": "Former Media Matters Researcher",
-        "photo": "images/candidates/katabu.png",
+        "photo": "images/candidates/katabu.jpg",
         "campaign_url": "https://www.katforillinois.com/",
         "bio": "Media critic and researcher focused on combating right-wing disinformation. Running an anti-establishment campaign centered on breaking the status quo and transparent grassroots fundraising.",
         "endorsements": [
@@ -1579,7 +1580,7 @@ CANDIDATE_PROFILES = [
         "name": "Laura Fine",
         "slug": "laura-fine",
         "title": "State Senator",
-        "photo": "images/candidates/fine.png",
+        "photo": "images/candidates/fine.jpg",
         "campaign_url": "https://www.laurafineforcongress.org/",
         "bio": "Illinois State Senator and champion for families. Recently passed laws banning prior authorization for mental health services, requiring insurance coverage for emergency neonatal intensive care, and mandating toxic metal testing in baby food.",
         "endorsements": [
@@ -1610,7 +1611,7 @@ CANDIDATE_PROFILES = [
         "name": "Phil Andrew",
         "slug": "phil-andrew",
         "title": "Former FBI Agent",
-        "photo": "images/candidates/philandrew.png",
+        "photo": "images/candidates/philandrew.jpg",
         "campaign_url": "https://www.philandrewforcongress.com/",
         "bio": "Former FBI special agent and hostage negotiator with 21 years of service. Gun violence survivor shot by Laurie Dann in 1988, advocating for evidence-based community safety strategies.",
         "endorsements": [
