@@ -41,7 +41,7 @@
 
     <!-- Prefetch chart data immediately (before DOM loads) -->
     <script>
-        window._prefetchedChart = fetch('/api/snapshots/chart?period=7d&epsilon=0.5')
+        window._prefetchedChart = fetch('/api/snapshots/chart?period=all&epsilon=0.5')
             .then(function(r) { return r.json(); })
             .catch(function() { return null; });
     </script>
@@ -165,8 +165,8 @@
                     <h2 style="margin: 0;">Market Trends</h2>
                     <div class="chart-toggle" id="chartToggle">
                         <button class="toggle-btn" data-period="1d">1 Day</button>
-                        <button class="toggle-btn active" data-period="7d">7 Days</button>
-                        <button class="toggle-btn" data-period="all">All Time</button>
+                        <button class="toggle-btn" data-period="7d">7 Days</button>
+                        <button class="toggle-btn active" data-period="all">All Time</button>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -1898,7 +1898,7 @@ let marketChart = null;
 let candidatesData = [];
 let manifoldData = {};
 let kalshiData = {};
-let currentChartPeriod = '7d';
+let currentChartPeriod = 'all';
 let manifoldLastUpdate = null;
 let kalshiLastUpdate = null;
 
@@ -2437,12 +2437,12 @@ function isInGap(t0, t1) {
 
 async function renderMarketTrendChart(candidates) {
     const ctx = document.getElementById('marketTrendChart').getContext('2d');
-    const period = currentChartPeriod || '7d';
+    const period = currentChartPeriod || 'all';
 
     // Use prefetched data on first load (period=all), otherwise fetch fresh
     let chartData = {};
     try {
-        if (window._prefetchedChart && period === '7d') {
+        if (window._prefetchedChart && period === 'all') {
             const prefetched = await window._prefetchedChart;
             window._prefetchedChart = null; // Use only once
             if (prefetched) {
