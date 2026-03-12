@@ -41,7 +41,7 @@
 
     <!-- Prefetch chart data immediately (before DOM loads) -->
     <script>
-        window._prefetchedChart = fetch('/api/snapshots/chart?period=all&epsilon=0.5')
+        window._prefetchedChart = fetch('/api/snapshots/chart?period=7d&epsilon=0.5')
             .then(function(r) { return r.json(); })
             .catch(function() { return null; });
     </script>
@@ -122,7 +122,7 @@
         <section class="markets-content-page">
             <section class="leader-featured" id="leaderFeatured">
                 <div class="leader-card">
-                    <img src="" alt="" class="leader-photo" id="leaderPhoto">
+                    <img src="" alt="" class="leader-photo" id="leaderPhoto" decoding="async">
                     <div class="leader-info">
                         <span class="leader-label">LEADING CANDIDATE</span>
                         <span class="leader-name" id="leaderName">Loading...</span>
@@ -165,8 +165,8 @@
                     <h2 style="margin: 0;">Market Trends</h2>
                     <div class="chart-toggle" id="chartToggle">
                         <button class="toggle-btn" data-period="1d">1 Day</button>
-                        <button class="toggle-btn" data-period="7d">7 Days</button>
-                        <button class="toggle-btn active" data-period="all">All Time</button>
+                        <button class="toggle-btn active" data-period="7d">7 Days</button>
+                        <button class="toggle-btn" data-period="all">All Time</button>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -381,7 +381,7 @@
             </div>
         </footer>
         <div class="flag-footer-image">
-            <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer">
+            <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer" loading="lazy">
         </div>
     </div>
 
@@ -1898,7 +1898,7 @@ let marketChart = null;
 let candidatesData = [];
 let manifoldData = {};
 let kalshiData = {};
-let currentChartPeriod = 'all';
+let currentChartPeriod = '7d';
 let manifoldLastUpdate = null;
 let kalshiLastUpdate = null;
 
@@ -1906,16 +1906,16 @@ let kalshiLastUpdate = null;
 const candidateImages = {
     'daniel biss': '/static/images/candidates/biss.jpg',
     'biss': '/static/images/candidates/biss.jpg',
-    'erin bushra': '/static/images/candidates/bushra.png',
-    'bushra': '/static/images/candidates/bushra.png',
-    'robert fine': '/static/images/candidates/fine.png',
-    'fine': '/static/images/candidates/fine.png',
-    'kat abugazaleh': '/static/images/candidates/katabu.png',
-    'abugazaleh': '/static/images/candidates/katabu.png',
+    'erin bushra': '/static/images/candidates/bushra.jpg',
+    'bushra': '/static/images/candidates/bushra.jpg',
+    'robert fine': '/static/images/candidates/fine.jpg',
+    'fine': '/static/images/candidates/fine.jpg',
+    'kat abugazaleh': '/static/images/candidates/katabu.jpg',
+    'abugazaleh': '/static/images/candidates/katabu.jpg',
     'mike simmons': '/static/images/candidates/simmons.jpg',
     'simmons': '/static/images/candidates/simmons.jpg',
-    'phil andrew': '/static/images/candidates/philandrew.png',
-    'andrew': '/static/images/candidates/philandrew.png'
+    'phil andrew': '/static/images/candidates/philandrew.jpg',
+    'andrew': '/static/images/candidates/philandrew.jpg'
 };
 
 function getCandidateImage(name) {
@@ -2091,12 +2091,18 @@ async function calculateAggregate() {
 
     // Save snapshot as backup (backend also saves every 3 min)
     // Frontend saves only when page is viewed, backend ensures continuous collection
-    await saveSnapshot(aggregated);
+    // Fire-and-forget: don't block rendering on snapshot save
+    saveSnapshot(aggregated);
 
     renderBigOdds(aggregated);
 
-    // Render chart with aggregated data (handles both 30d and 1h views)
-    await renderMarketTrendChart(aggregated);
+    // Only render chart on first load, not every poll cycle
+    // Chart data comes from server-side snapshots (updated every 3 min)
+    // Re-fetching/re-rendering chart every poll is wasteful
+    if (!window._chartInitialized) {
+        window._chartInitialized = true;
+        renderMarketTrendChart(aggregated);
+    }
 
     renderBreakdown(breakdowns);
     renderHeatmap(aggregated);
@@ -2334,10 +2340,9 @@ async function fetchManifoldData() {
 
         // Calculate aggregate if both data sources are ready
         if (Object.keys(kalshiData).length > 0 && Object.keys(manifoldData).length > 0) {
-            console.log('Recalculating aggregate with updated Manifold data');
             await calculateAggregate();
         } else {
-            console.log('Waiting for both data sources. Manifold:', Object.keys(manifoldData).length, 'Kalshi:', Object.keys(kalshiData).length);
+            // Waiting for both data sources
         }
 
     } catch (error) {
@@ -2435,7 +2440,7 @@ async function renderMarketTrendChart(candidates) {
     // Use prefetched data on first load (period=all), otherwise fetch fresh
     let chartData = {};
     try {
-        if (window._prefetchedChart && period === 'all') {
+        if (window._prefetchedChart && period === '7d') {
             const prefetched = await window._prefetchedChart;
             window._prefetchedChart = null; // Use only once
             if (prefetched) {
@@ -2476,8 +2481,6 @@ async function renderMarketTrendChart(candidates) {
         end: new Date(r.end).getTime()
     }));
 
-    console.log(`[Chart] Known gaps: ${knownGaps.length}`, knownGaps);
-    console.log(`[Chart] Interpolated ranges: ${interpolatedRanges.length}`, interpolatedRanges);
 
     // Theme-aware chart colors
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -2502,7 +2505,6 @@ async function renderMarketTrendChart(candidates) {
         return { date, snapshot: s };
     }).filter(p => !isNaN(p.date.getTime()));
 
-    console.log(`[Chart] Period: ${period}, Data points: ${parsedSnapshots.length}`);
 
     // Editorial color palette
     const colors = [
@@ -2848,7 +2850,6 @@ async function renderMarketTrendChart(candidates) {
 
 async function fetchKalshiData() {
     try {
-        console.log('Fetching Kalshi data...');
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
         const response = await fetch('/api/kalshi', { signal: controller.signal });
@@ -2861,10 +2862,6 @@ async function fetchKalshiData() {
 
         // Extract markets - each market is a candidate
         const markets = data.markets || [];
-
-        console.log('Kalshi response received. Markets count:', markets.length);
-        console.log('Kalshi markets:', markets); // Debug log
-        console.log('Kalshi data full response:', data);
 
         const kalshiList = [];
 
@@ -2908,7 +2905,6 @@ async function fetchKalshiData() {
                 const spread = (yes_bid > 0 && yes_ask > 0) ? (yes_ask - yes_bid) : 0;
                 let kalshiLiquidity = localMid;
 
-                console.log(`${displayName} RAW DATA: yes_bid=${yes_bid}, yes_ask=${yes_ask}, last=${last_price}, spread=${spread.toFixed(2)}, mid=${localMid.toFixed(1)}`);
 
                 if (spread > 0 && last_price > 0) {
                     // Liquidity weighting: where did the last trade occur within the spread?
@@ -2933,9 +2929,7 @@ async function fetchKalshiData() {
 
                     kalshiLiquidity = Math.max(yes_bid, Math.min(yes_ask, localMid + priceShift));
 
-                    console.log(`${displayName} liquidity: pos_in_spread=${positionInSpread.toFixed(2)}, offset=${offsetFromMid.toFixed(2)}, spread_factor=${spreadFactor.toFixed(2)}, shift=${priceShift.toFixed(2)}, result=${kalshiLiquidity.toFixed(1)}`);
                 } else {
-                    console.log(`${displayName} NO spread/last data - using midpoint ${localMid}`);
                 }
 
                 kalshiData[key] = {
@@ -2959,8 +2953,6 @@ async function fetchKalshiData() {
         kalshiList.sort((a, b) => b.probability - a.probability);
         renderKalshiExpanded(kalshiList);
 
-        console.log('Kalshi candidates processed:', kalshiList);
-        console.log('Kalshi data object:', kalshiData);
 
         // Update timestamp
         const kalshiNow = new Date();
@@ -2974,12 +2966,9 @@ async function fetchKalshiData() {
 
         // Calculate aggregate if both Manifold and Kalshi data are ready
         if (Object.keys(manifoldData).length > 0 && Object.keys(kalshiData).length > 0) {
-            console.log('Recalculating aggregate with updated Kalshi data');
-            console.log('Manifold keys:', Object.keys(manifoldData));
-            console.log('Kalshi keys:', Object.keys(kalshiData));
             await calculateAggregate();
         } else {
-            console.log('Waiting for both data sources. Manifold:', Object.keys(manifoldData).length, 'Kalshi:', Object.keys(kalshiData).length);
+            // Waiting for both data sources
         }
 
     } catch (error) {
@@ -3055,7 +3044,6 @@ function setupPolling() {
             setupNextPoll(); // Re-check interval after each poll in case it changed
         }, interval);
 
-        console.log(`Polling set to every ${interval / 1000 / 60} minute(s)`);
     }
 
     setupNextPoll();
