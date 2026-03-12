@@ -2458,6 +2458,7 @@ async function renderMarketTrendChart(candidates) {
     }
 
     // If no candidates passed (early render before aggregate), derive from chart data
+    // and also populate the leader card + big odds so users see data immediately
     if (!candidates || candidates.length === 0) {
         const snapshots = chartData.snapshots || [];
         if (snapshots.length > 0) {
@@ -2467,6 +2468,14 @@ async function renderMarketTrendChart(candidates) {
                 .sort((a, b) => b.probability - a.probability);
         }
         if (!candidates || candidates.length === 0) return;
+
+        // Show snapshot-derived odds immediately instead of "Loading..."
+        // Live API data will overwrite these once both sources respond
+        const nameEl = document.getElementById('leaderName');
+        if (nameEl && nameEl.textContent === 'Loading...') {
+            renderBigOdds(candidates);
+            renderHeatmap(candidates);
+        }
     }
 
     const snapshots = chartData.snapshots || [];
