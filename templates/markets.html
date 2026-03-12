@@ -1906,12 +1906,14 @@ let kalshiLastUpdate = null;
 const candidateImages = {
     'daniel biss': '/static/images/candidates/biss.jpg',
     'biss': '/static/images/candidates/biss.jpg',
-    'erin bushra': '/static/images/candidates/bushra.jpg',
-    'bushra': '/static/images/candidates/bushra.jpg',
-    'robert fine': '/static/images/candidates/fine.jpg',
+    'bushra amiwala': '/static/images/candidates/bushra.jpg',
+    'amiwala': '/static/images/candidates/bushra.jpg',
+    'laura fine': '/static/images/candidates/fine.jpg',
     'fine': '/static/images/candidates/fine.jpg',
     'kat abugazaleh': '/static/images/candidates/katabu.jpg',
+    'kat abughazaleh': '/static/images/candidates/katabu.jpg',
     'abugazaleh': '/static/images/candidates/katabu.jpg',
+    'abughazaleh': '/static/images/candidates/katabu.jpg',
     'mike simmons': '/static/images/candidates/simmons.jpg',
     'simmons': '/static/images/candidates/simmons.jpg',
     'phil andrew': '/static/images/candidates/philandrew.jpg',
@@ -2473,8 +2475,12 @@ async function renderMarketTrendChart(candidates) {
         // Live API data will overwrite these once both sources respond
         const nameEl = document.getElementById('leaderName');
         if (nameEl && nameEl.textContent === 'Loading...') {
-            renderBigOdds(candidates);
-            renderHeatmap(candidates);
+            try {
+                renderBigOdds(candidates);
+                renderHeatmap(candidates);
+            } catch (e) {
+                console.error('Early render error:', e);
+            }
         }
     }
 
@@ -2892,9 +2898,13 @@ async function fetchKalshiData() {
                 return;
             }
 
-            const last_price = m.last_price || 0;
-            const yes_bid = m.yes_bid || 0;
-            const yes_ask = m.yes_ask || 0;
+            // Handle both old cent-based fields and new dollar-based fields
+            const last_price = m.last_price != null ? m.last_price
+                : (m.last_price_dollars != null ? parseFloat(m.last_price_dollars) * 100 : 0);
+            const yes_bid = m.yes_bid != null ? m.yes_bid
+                : (m.no_ask_dollars != null ? (1 - parseFloat(m.no_ask_dollars)) * 100 : 0);
+            const yes_ask = m.yes_ask != null ? m.yes_ask
+                : (m.no_bid_dollars != null ? (1 - parseFloat(m.no_bid_dollars)) * 100 : 0);
 
             // Only compute a real midpoint when both sides have orders.
             // If yes_bid is 0 (no buy-side interest), midpoint between 0
