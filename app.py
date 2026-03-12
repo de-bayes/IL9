@@ -2230,7 +2230,16 @@ def get_snapshots_chart():
                 c['probability'] = round(ema_state[name], 1)
 
         # ===== RDP SIMPLIFICATION =====
-        # Run RDP per candidate on the smoothed data
+        # Run RDP per candidate on the smoothed data.
+        # Scale epsilon by period: 'all' uses larger epsilon for more aggressive
+        # simplification (fewer points), '1d' keeps more detail.
+        if period == 'all':
+            effective_epsilon = max(epsilon, 1.0)
+        elif period == '7d':
+            effective_epsilon = max(epsilon, 0.5)
+        else:
+            effective_epsilon = epsilon
+
         kept_indices = set()
         kept_indices.add(0)
         kept_indices.add(len(parsed) - 1)
@@ -2249,14 +2258,25 @@ def get_snapshots_chart():
                         break
 
             if len(points) > 2:
-                rdp_indices = rdp_simplify(points, epsilon)
+                rdp_indices = rdp_simplify(points, effective_epsilon)
                 for ri in rdp_indices:
                     kept_indices.add(index_map[ri])
 
         # ===== ENSURE MINIMUM TIME DENSITY =====
-        # Add points to ensure at least one every 15 minutes (900 seconds)
+        # Scale density based on period to keep total points reasonable:
+        #   1d: ~15 min intervals → ~96 density points max
+        #   7d: ~60 min intervals → ~168 density points max
+        #   all: scale to target ~300 total points max
+        if period == '1d':
+            MIN_INTERVAL = 900   # 15 minutes
+        elif period == '7d':
+            MIN_INTERVAL = 3600  # 1 hour
+        else:
+            # For 'all', scale interval so we get ~300 points max
+            # t_range is in seconds; 300 points → interval = t_range/300
+            MIN_INTERVAL = max(3600, int(t_range / 300))
+
         kept_sorted = sorted(kept_indices)
-        MIN_INTERVAL = 900  # 15 minutes in seconds
 
         additional_indices = set()
         for i in range(len(kept_sorted) - 1):
@@ -2266,11 +2286,9 @@ def get_snapshots_chart():
             dt2 = parsed[idx2][0]
             time_gap = (dt2 - dt1).total_seconds()
 
-            # If gap > 15 minutes, add intermediate points
             if time_gap > MIN_INTERVAL:
-                num_needed = int(time_gap / MIN_INTERVAL)
+                num_needed = min(int(time_gap / MIN_INTERVAL), 20)  # cap per-gap additions
                 for j in range(1, num_needed + 1):
-                    # Find index approximately j * (interval) seconds after dt1
                     target_time = dt1 + timedelta(seconds=j * MIN_INTERVAL)
                     # Find closest index to target_time between idx1 and idx2
                     for k in range(idx1 + 1, idx2):
