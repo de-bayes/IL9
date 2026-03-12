@@ -1858,6 +1858,24 @@ def get_kalshi():
         for m in markets:
             if not m.get('subtitle'):
                 m['subtitle'] = m.get('yes_sub_title') or m.get('custom_strike', {}).get('Candidate', '')
+            # Kalshi API changed to dollar-based string fields (e.g. "0.3600")
+            # with old cent-based fields (last_price, yes_bid, yes_ask) returning null.
+            # Translate back to the cent-based numbers both backend and frontend expect.
+            if m.get('last_price') is None and m.get('last_price_dollars') is not None:
+                try:
+                    m['last_price'] = round(float(m['last_price_dollars']) * 100, 1)
+                except (ValueError, TypeError):
+                    m['last_price'] = 0
+            if m.get('yes_bid') is None and m.get('no_ask_dollars') is not None:
+                try:
+                    m['yes_bid'] = round((1.0 - float(m['no_ask_dollars'])) * 100, 1)
+                except (ValueError, TypeError):
+                    m['yes_bid'] = 0
+            if m.get('yes_ask') is None and m.get('no_bid_dollars') is not None:
+                try:
+                    m['yes_ask'] = round((1.0 - float(m['no_bid_dollars'])) * 100, 1)
+                except (ValueError, TypeError):
+                    m['yes_ask'] = 0
         shaped = {"markets": markets}
         _kalshi_cache = {'data': shaped, 'time': now}
         result = jsonify(shaped)
@@ -2617,9 +2635,31 @@ def collect_market_data():
                 display_name = market.get('yes_sub_title') or market.get('subtitle') or market.get('title', '')
                 if 'schakowsky' not in display_name.lower():
                     name = normalize_candidate_name(display_name)
-                    last_price = market.get('last_price', 0)
-                    yes_bid = market.get('yes_bid', 0)
-                    yes_ask = market.get('yes_ask', 0)
+                    # Handle Kalshi API format change: dollar-based string fields
+                    # with old cent-based fields returning None
+                    last_price = market.get('last_price')
+                    if last_price is None and market.get('last_price_dollars') is not None:
+                        try:
+                            last_price = round(float(market['last_price_dollars']) * 100, 1)
+                        except (ValueError, TypeError):
+                            last_price = 0
+                    last_price = last_price or 0
+
+                    yes_bid = market.get('yes_bid')
+                    if yes_bid is None and market.get('no_ask_dollars') is not None:
+                        try:
+                            yes_bid = round((1.0 - float(market['no_ask_dollars'])) * 100, 1)
+                        except (ValueError, TypeError):
+                            yes_bid = 0
+                    yes_bid = yes_bid or 0
+
+                    yes_ask = market.get('yes_ask')
+                    if yes_ask is None and market.get('no_bid_dollars') is not None:
+                        try:
+                            yes_ask = round((1.0 - float(market['no_bid_dollars'])) * 100, 1)
+                        except (ValueError, TypeError):
+                            yes_ask = 0
+                    yes_ask = yes_ask or 0
 
                     # Only compute a real midpoint when both sides have orders.
                     # If yes_bid is 0 (no buy-side interest), the midpoint between
