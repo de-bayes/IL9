@@ -2134,43 +2134,58 @@ def get_snapshots():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-def _compute_chart_data(period, epsilon, preloaded_snapshots=None):
+def _compute_chart_data(period, epsilon, raw_lines=None):
     """
     Compute RDP-simplified chart data for a given period and epsilon.
     Returns dict with 'snapshots', 'gaps', 'interpolated_ranges'.
     Pure computation — no Flask request/response handling.
-    If preloaded_snapshots is provided, uses them instead of reading from disk.
+    If raw_lines is provided (list of JSON strings), parses from those
+    instead of reading from disk. Each parse yields fresh dicts so EMA
+    mutation is safe without deepcopy.
     """
-    # Read all snapshots (or use preloaded)
-    if preloaded_snapshots is not None:
-        # Deep copy so EMA mutation doesn't affect other periods sharing this data
-        import copy
-        all_snapshots = copy.deepcopy(preloaded_snapshots)
+    # For 1d/7d, only parse recent lines (JSONL is chronologically appended).
+    # At 480 snapshots/day, 1d needs ~600 lines, 7d needs ~4000 lines.
+    # Generous 2x buffers to handle gaps/restarts.
+    if period == '1d':
+        max_lines = 1200
+    elif period == '7d':
+        max_lines = 8000
+    else:
+        max_lines = None  # all: parse everything
+
+    # Parse snapshots from raw lines or read from disk
+    if raw_lines is not None:
+        source_lines = raw_lines[-max_lines:] if max_lines else raw_lines
+        all_snapshots = []
+        for line in source_lines:
+            try:
+                all_snapshots.append(json.loads(line))
+            except (json.JSONDecodeError, ValueError):
+                continue
     else:
         all_snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
+        if max_lines and len(all_snapshots) > max_lines:
+            all_snapshots = all_snapshots[-max_lines:]
     if not all_snapshots:
         return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
 
     # Parse timestamps and filter bad ones
+    now_utc = datetime.now(timezone.utc)
+    if period == '1d':
+        cutoff = now_utc - timedelta(days=1)
+    elif period == '7d':
+        cutoff = now_utc - timedelta(days=7)
+    else:
+        cutoff = None
+
     parsed = []
     for snap in all_snapshots:
         dt = parse_snapshot_timestamp(snap.get('timestamp', ''))
         if dt:
+            if cutoff and dt < cutoff:
+                continue
             parsed.append((dt, snap))
     parsed.sort(key=lambda x: x[0])
-
-    if not parsed:
-        return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
-
-    # Filter by period
-    now_utc = datetime.now(timezone.utc)
-    if period == '1d':
-        cutoff = now_utc - timedelta(days=1)
-        parsed = [(dt, s) for dt, s in parsed if dt >= cutoff]
-    elif period == '7d':
-        cutoff = now_utc - timedelta(days=7)
-        parsed = [(dt, s) for dt, s in parsed if dt >= cutoff]
-    # 'all' keeps everything
 
     if not parsed:
         return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
@@ -2332,16 +2347,20 @@ def _prewarm_chart_cache():
     except OSError:
         return
 
-    # Read file once, share across all period computations
-    all_snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
-    if not all_snapshots:
+    # Read raw lines once, re-parse for each period (faster than deepcopy)
+    try:
+        with open(HISTORICAL_DATA_PATH, 'r') as f:
+            raw_lines = [line.strip() for line in f if line.strip()]
+    except (IOError, OSError):
+        return
+    if not raw_lines:
         return
 
     now = _time.time()
     for period in ('all', '7d', '1d'):
         cache_key = f'{period}:0.5'
         try:
-            result = _compute_chart_data(period, 0.5, preloaded_snapshots=all_snapshots)
+            result = _compute_chart_data(period, 0.5, raw_lines=raw_lines)
             etag = hashlib.md5(json.dumps(result, separators=(',', ':')).encode()).hexdigest()[:16]
             with _chart_cache_lock:
                 _chart_cache[cache_key] = {
