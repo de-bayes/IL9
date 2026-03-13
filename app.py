@@ -613,7 +613,12 @@ def rdp_simplify(points, epsilon):
 
 
 # ===== CHART DATA CACHE =====
-_chart_cache = {'data': None, 'time': 0, 'key': None, 'file_size': 0}
+# Multi-slot cache: one entry per period:epsilon key.
+# Invalidated only when file size changes (new snapshot appended).
+# Pre-warmed after each data collection cycle so users always hit cache.
+import threading as _threading
+_chart_cache = {}  # key -> {'data': ..., 'time': ..., 'file_size': ..., 'etag': ...}
+_chart_cache_lock = _threading.Lock()
 
 # ===== API PROXY CACHES =====
 # Cache external API responses to avoid re-fetching on every page load.
@@ -2129,6 +2134,214 @@ def get_snapshots():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+def _compute_chart_data(period, epsilon):
+    """
+    Compute RDP-simplified chart data for a given period and epsilon.
+    Returns dict with 'snapshots', 'gaps', 'interpolated_ranges'.
+    Pure computation — no Flask request/response handling.
+    """
+    # Read all snapshots
+    all_snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
+    if not all_snapshots:
+        return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
+
+    # Parse timestamps and filter bad ones
+    parsed = []
+    for snap in all_snapshots:
+        dt = parse_snapshot_timestamp(snap.get('timestamp', ''))
+        if dt:
+            parsed.append((dt, snap))
+    parsed.sort(key=lambda x: x[0])
+
+    if not parsed:
+        return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
+
+    # Filter by period
+    now_utc = datetime.now(timezone.utc)
+    if period == '1d':
+        cutoff = now_utc - timedelta(days=1)
+        parsed = [(dt, s) for dt, s in parsed if dt >= cutoff]
+    elif period == '7d':
+        cutoff = now_utc - timedelta(days=7)
+        parsed = [(dt, s) for dt, s in parsed if dt >= cutoff]
+    # 'all' keeps everything
+
+    if not parsed:
+        return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
+
+    # Normalize time axis to 0-100 for RDP (same scale as probability 0-100)
+    t_first = parsed[0][0].timestamp()
+    t_last = parsed[-1][0].timestamp()
+    t_range = t_last - t_first if t_last != t_first else 1.0
+
+    # Detect real gaps (>2 hours) in the RAW data before any processing
+    GAP_THRESHOLD_SECS = 7200  # 2 hours
+    gaps = []
+    for i in range(1, len(parsed)):
+        gap_secs = (parsed[i][0] - parsed[i - 1][0]).total_seconds()
+        if gap_secs > GAP_THRESHOLD_SECS:
+            gaps.append({
+                'start': parsed[i - 1][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+                'end': parsed[i][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            })
+
+    # Detect contiguous interpolated ranges (snapshots flagged by bridge/recovery)
+    interpolated_ranges = []
+    interp_start = None
+    for i, (dt, snap) in enumerate(parsed):
+        is_interp = snap.get('interpolated', False)
+        if is_interp and interp_start is None:
+            interp_start = dt
+        elif not is_interp and interp_start is not None:
+            interpolated_ranges.append({
+                'start': interp_start.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+                'end': parsed[i - 1][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            })
+            interp_start = None
+    # Close any range that extends to the end
+    if interp_start is not None:
+        interpolated_ranges.append({
+            'start': interp_start.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+            'end': parsed[-1][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        })
+
+    # ===== EMA SMOOTHING PASS =====
+    # Apply exponential moving average per candidate to eliminate jitter.
+    # alpha controls responsiveness: lower = smoother (0.15 is very smooth)
+    EMA_ALPHA = 0.15
+
+    all_candidates = set()
+    for _, snap in parsed:
+        for c in snap.get('candidates', []):
+            cand_name = c.get('name')
+            if cand_name:
+                all_candidates.add(cand_name)
+
+    # Track EMA state per candidate
+    ema_state = {}  # candidate_name -> current smoothed value
+
+    for i, (dt, snap) in enumerate(parsed):
+        for c in snap.get('candidates', []):
+            name = c.get('name')
+            if not name:
+                continue
+            raw = _safe_float(c.get('probability', 0), 0.0)
+            if name not in ema_state:
+                ema_state[name] = raw  # First value: no smoothing
+            else:
+                ema_state[name] = EMA_ALPHA * raw + (1 - EMA_ALPHA) * ema_state[name]
+            c['probability'] = round(ema_state[name], 1)
+
+    # ===== RDP SIMPLIFICATION =====
+    # Run RDP per candidate on the smoothed data.
+    # Scale epsilon by period: 'all' uses larger epsilon for more aggressive
+    # simplification (fewer points), '1d' keeps more detail.
+    if period == 'all':
+        effective_epsilon = max(epsilon, 1.0)
+    elif period == '7d':
+        effective_epsilon = max(epsilon, 0.5)
+    else:
+        effective_epsilon = epsilon
+
+    kept_indices = set()
+    kept_indices.add(0)
+    kept_indices.add(len(parsed) - 1)
+
+    for cand_name in all_candidates:
+        # Build polyline for this candidate
+        points = []
+        index_map = []  # maps polyline index -> parsed index
+        for i, (dt, snap) in enumerate(parsed):
+            for c in snap.get('candidates', []):
+                if c.get('name') == cand_name:
+                    x = ((dt.timestamp() - t_first) / t_range) * 100.0
+                    y = _safe_float(c.get('probability', 0), 0.0)
+                    points.append((x, y))
+                    index_map.append(i)
+                    break
+
+        if len(points) > 2:
+            rdp_indices = rdp_simplify(points, effective_epsilon)
+            for ri in rdp_indices:
+                kept_indices.add(index_map[ri])
+
+    # ===== ENSURE MINIMUM TIME DENSITY =====
+    # Scale density based on period to keep total points reasonable:
+    #   1d: ~15 min intervals → ~96 density points max
+    #   7d: ~60 min intervals → ~168 density points max
+    #   all: scale to target ~300 total points max
+    if period == '1d':
+        MIN_INTERVAL = 900   # 15 minutes
+    elif period == '7d':
+        MIN_INTERVAL = 3600  # 1 hour
+    else:
+        # For 'all', scale interval so we get ~300 points max
+        # t_range is in seconds; 300 points → interval = t_range/300
+        MIN_INTERVAL = max(3600, int(t_range / 300))
+
+    kept_sorted = sorted(kept_indices)
+
+    additional_indices = set()
+    for i in range(len(kept_sorted) - 1):
+        idx1 = kept_sorted[i]
+        idx2 = kept_sorted[i + 1]
+        dt1 = parsed[idx1][0]
+        dt2 = parsed[idx2][0]
+        time_gap = (dt2 - dt1).total_seconds()
+
+        if time_gap > MIN_INTERVAL:
+            num_needed = min(int(time_gap / MIN_INTERVAL), 20)  # cap per-gap additions
+            for j in range(1, num_needed + 1):
+                target_time = dt1 + timedelta(seconds=j * MIN_INTERVAL)
+                # Find closest index to target_time between idx1 and idx2
+                for k in range(idx1 + 1, idx2):
+                    if parsed[k][0] >= target_time:
+                        additional_indices.add(k)
+                        break
+
+    kept_indices.update(additional_indices)
+    kept_sorted = sorted(kept_indices)
+    result_snapshots = []
+    for idx in kept_sorted:
+        dt, snap = parsed[idx]
+        result_snapshots.append(snap)
+
+    return {
+        'snapshots': result_snapshots,
+        'gaps': gaps,
+        'interpolated_ranges': interpolated_ranges
+    }
+
+
+def _prewarm_chart_cache():
+    """
+    Pre-compute chart data for all periods and store in cache.
+    Called after each data collection cycle so user requests always hit cache.
+    Runs in a background thread to not block the data collection loop.
+    """
+    global _chart_cache
+    try:
+        current_file_size = os.path.getsize(HISTORICAL_DATA_PATH)
+    except OSError:
+        return
+
+    now = _time.time()
+    for period in ('all', '7d', '1d'):
+        cache_key = f'{period}:0.5'
+        try:
+            result = _compute_chart_data(period, 0.5)
+            etag = hashlib.md5(json.dumps(result, separators=(',', ':')).encode()).hexdigest()[:16]
+            with _chart_cache_lock:
+                _chart_cache[cache_key] = {
+                    'data': result,
+                    'time': now,
+                    'file_size': current_file_size,
+                    'etag': etag
+                }
+        except Exception as e:
+            print(f"[{datetime.now().isoformat()}] Error pre-warming cache for {period}: {e}")
+
+
 @app.route('/api/snapshots/chart')
 def get_snapshots_chart():
     """
@@ -2137,201 +2350,57 @@ def get_snapshots_chart():
       period: '1d', '7d', 'all' (default 'all')
       epsilon: RDP tolerance (default 0.5)
     Returns ~200-400 points instead of 5000+ raw.
+
+    Performance: cache is pre-warmed after each data collection cycle (every 3 min).
+    Most requests serve from cache with no computation at all.
+    Supports ETag/If-None-Match for instant 304 responses on repeat visits.
     """
-    global _chart_cache
     try:
         period = request.args.get('period', 'all')
         epsilon = float(request.args.get('epsilon', '0.5'))
         cache_key = f'{period}:{epsilon}'
 
-        # Cache: serve cached result if same params AND file hasn't grown
         now = _time.time()
         try:
             current_file_size = os.path.getsize(HISTORICAL_DATA_PATH)
         except OSError:
             current_file_size = 0
-        if (_chart_cache['key'] == cache_key and _chart_cache['data']
-                and _chart_cache['file_size'] == current_file_size
-                and (now - _chart_cache['time']) < 300):
-            return jsonify(_chart_cache['data'])
 
-        # Read all snapshots
-        all_snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
-        if not all_snapshots:
-            return jsonify({'snapshots': [], 'gaps': []})
+        # Check cache: valid if file size unchanged (no new snapshots since last compute)
+        with _chart_cache_lock:
+            cached = _chart_cache.get(cache_key)
 
-        # Parse timestamps and filter bad ones
-        parsed = []
-        for snap in all_snapshots:
-            dt = parse_snapshot_timestamp(snap.get('timestamp', ''))
-            if dt:
-                parsed.append((dt, snap))
-        parsed.sort(key=lambda x: x[0])
+        if cached and cached['file_size'] == current_file_size and cached['data']:
+            # ETag: if client already has this version, return 304
+            client_etag = request.headers.get('If-None-Match', '').strip('" ')
+            if client_etag and client_etag == cached.get('etag'):
+                resp = app.make_default_options_response()
+                resp.status_code = 304
+                resp.headers['ETag'] = f'"{cached["etag"]}"'
+                resp.headers['Cache-Control'] = 'public, max-age=120'
+                return resp
 
-        if not parsed:
-            return jsonify({'snapshots': [], 'gaps': []})
+            resp = jsonify(cached['data'])
+            if cached.get('etag'):
+                resp.headers['ETag'] = f'"{cached["etag"]}"'
+            resp.headers['Cache-Control'] = 'public, max-age=120'
+            return resp
 
-        # Filter by period
-        now_utc = datetime.now(timezone.utc)
-        if period == '1d':
-            cutoff = now_utc - timedelta(days=1)
-            parsed = [(dt, s) for dt, s in parsed if dt >= cutoff]
-        elif period == '7d':
-            cutoff = now_utc - timedelta(days=7)
-            parsed = [(dt, s) for dt, s in parsed if dt >= cutoff]
-        # 'all' keeps everything
+        # Cache miss: compute fresh (rare — only on first request or non-standard epsilon)
+        result = _compute_chart_data(period, epsilon)
+        etag = hashlib.md5(json.dumps(result, separators=(',', ':')).encode()).hexdigest()[:16]
 
-        if not parsed:
-            return jsonify({'snapshots': [], 'gaps': []})
-
-        # Normalize time axis to 0-100 for RDP (same scale as probability 0-100)
-        t_first = parsed[0][0].timestamp()
-        t_last = parsed[-1][0].timestamp()
-        t_range = t_last - t_first if t_last != t_first else 1.0
-
-        # Detect real gaps (>2 hours) in the RAW data before any processing
-        GAP_THRESHOLD_SECS = 7200  # 2 hours
-        gaps = []
-        for i in range(1, len(parsed)):
-            gap_secs = (parsed[i][0] - parsed[i - 1][0]).total_seconds()
-            if gap_secs > GAP_THRESHOLD_SECS:
-                gaps.append({
-                    'start': parsed[i - 1][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-                    'end': parsed[i][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-                })
-
-        # Detect contiguous interpolated ranges (snapshots flagged by bridge/recovery)
-        interpolated_ranges = []
-        interp_start = None
-        for i, (dt, snap) in enumerate(parsed):
-            is_interp = snap.get('interpolated', False)
-            if is_interp and interp_start is None:
-                interp_start = dt
-            elif not is_interp and interp_start is not None:
-                interpolated_ranges.append({
-                    'start': interp_start.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-                    'end': parsed[i - 1][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-                })
-                interp_start = None
-        # Close any range that extends to the end
-        if interp_start is not None:
-            interpolated_ranges.append({
-                'start': interp_start.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-                'end': parsed[-1][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-            })
-
-        # ===== EMA SMOOTHING PASS =====
-        # Apply exponential moving average per candidate to eliminate jitter.
-        # alpha controls responsiveness: lower = smoother (0.15 is very smooth)
-        EMA_ALPHA = 0.15
-
-        all_candidates = set()
-        for _, snap in parsed:
-            for c in snap.get('candidates', []):
-                cand_name = c.get('name')
-                if cand_name:
-                    all_candidates.add(cand_name)
-
-        # Track EMA state per candidate
-        ema_state = {}  # candidate_name -> current smoothed value
-
-        for i, (dt, snap) in enumerate(parsed):
-            for c in snap.get('candidates', []):
-                name = c.get('name')
-                if not name:
-                    continue
-                raw = _safe_float(c.get('probability', 0), 0.0)
-                if name not in ema_state:
-                    ema_state[name] = raw  # First value: no smoothing
-                else:
-                    ema_state[name] = EMA_ALPHA * raw + (1 - EMA_ALPHA) * ema_state[name]
-                c['probability'] = round(ema_state[name], 1)
-
-        # ===== RDP SIMPLIFICATION =====
-        # Run RDP per candidate on the smoothed data.
-        # Scale epsilon by period: 'all' uses larger epsilon for more aggressive
-        # simplification (fewer points), '1d' keeps more detail.
-        if period == 'all':
-            effective_epsilon = max(epsilon, 1.0)
-        elif period == '7d':
-            effective_epsilon = max(epsilon, 0.5)
-        else:
-            effective_epsilon = epsilon
-
-        kept_indices = set()
-        kept_indices.add(0)
-        kept_indices.add(len(parsed) - 1)
-
-        for cand_name in all_candidates:
-            # Build polyline for this candidate
-            points = []
-            index_map = []  # maps polyline index -> parsed index
-            for i, (dt, snap) in enumerate(parsed):
-                for c in snap.get('candidates', []):
-                    if c.get('name') == cand_name:
-                        x = ((dt.timestamp() - t_first) / t_range) * 100.0
-                        y = _safe_float(c.get('probability', 0), 0.0)
-                        points.append((x, y))
-                        index_map.append(i)
-                        break
-
-            if len(points) > 2:
-                rdp_indices = rdp_simplify(points, effective_epsilon)
-                for ri in rdp_indices:
-                    kept_indices.add(index_map[ri])
-
-        # ===== ENSURE MINIMUM TIME DENSITY =====
-        # Scale density based on period to keep total points reasonable:
-        #   1d: ~15 min intervals → ~96 density points max
-        #   7d: ~60 min intervals → ~168 density points max
-        #   all: scale to target ~300 total points max
-        if period == '1d':
-            MIN_INTERVAL = 900   # 15 minutes
-        elif period == '7d':
-            MIN_INTERVAL = 3600  # 1 hour
-        else:
-            # For 'all', scale interval so we get ~300 points max
-            # t_range is in seconds; 300 points → interval = t_range/300
-            MIN_INTERVAL = max(3600, int(t_range / 300))
-
-        kept_sorted = sorted(kept_indices)
-
-        additional_indices = set()
-        for i in range(len(kept_sorted) - 1):
-            idx1 = kept_sorted[i]
-            idx2 = kept_sorted[i + 1]
-            dt1 = parsed[idx1][0]
-            dt2 = parsed[idx2][0]
-            time_gap = (dt2 - dt1).total_seconds()
-
-            if time_gap > MIN_INTERVAL:
-                num_needed = min(int(time_gap / MIN_INTERVAL), 20)  # cap per-gap additions
-                for j in range(1, num_needed + 1):
-                    target_time = dt1 + timedelta(seconds=j * MIN_INTERVAL)
-                    # Find closest index to target_time between idx1 and idx2
-                    for k in range(idx1 + 1, idx2):
-                        if parsed[k][0] >= target_time:
-                            additional_indices.add(k)
-                            break
-
-        kept_indices.update(additional_indices)
-        kept_sorted = sorted(kept_indices)
-        result_snapshots = []
-        for idx in kept_sorted:
-            dt, snap = parsed[idx]
-            result_snapshots.append(snap)
-
-        result = {
-            'snapshots': result_snapshots,
-            'gaps': gaps,
-            'interpolated_ranges': interpolated_ranges
-        }
-
-        # Cache and return
-        _chart_cache = {'data': result, 'time': now, 'key': cache_key, 'file_size': current_file_size}
+        with _chart_cache_lock:
+            _chart_cache[cache_key] = {
+                'data': result,
+                'time': now,
+                'file_size': current_file_size,
+                'etag': etag
+            }
 
         resp = jsonify(result)
-        resp.headers['Cache-Control'] = 'public, max-age=30'
+        resp.headers['ETag'] = f'"{etag}"'
+        resp.headers['Cache-Control'] = 'public, max-age=120'
         return resp
 
     except Exception as e:
@@ -2799,6 +2868,9 @@ def collect_market_data():
                     check_swings_and_alert(snapshot, prev_snapshot)
                 except Exception as e:
                     print(f"[{datetime.now().isoformat()}] Error checking swings: {e}")
+
+                # Pre-warm chart cache in background thread so next page load is instant
+                _threading.Thread(target=_prewarm_chart_cache, daemon=True).start()
             except Exception as e:
                 print(f"[{datetime.now().isoformat()}] Error saving snapshot: {e}")
                 raise
@@ -2861,6 +2933,9 @@ elif 'gunicorn' not in sys.argv[0]:
 
     # Run initial data collection on startup
     collect_market_data()
+
+    # Pre-warm chart cache so first visitor gets instant response
+    _threading.Thread(target=_prewarm_chart_cache, daemon=True).start()
 
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
@@ -2925,6 +3000,9 @@ else:
         thread.start()
     else:
         print(f"[{datetime.now().isoformat()}] Scheduler disabled in pid={os.getpid()} (lock held by another worker)")
+
+    # Pre-warm chart cache in all workers so first visitor gets instant response
+    _threading.Thread(target=_prewarm_chart_cache, daemon=True).start()
 
 @app.errorhandler(404)
 def page_not_found(e):

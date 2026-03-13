@@ -41,8 +41,13 @@
 
     <!-- Prefetch chart data immediately (before DOM loads) -->
     <script>
+        window._chartEtags = {};  // period -> etag for conditional requests
         window._prefetchedChart = fetch('/api/snapshots/chart?period=all&epsilon=0.5')
-            .then(function(r) { return r.json(); })
+            .then(function(r) {
+                var etag = r.headers.get('ETag');
+                if (etag) window._chartEtags['all'] = etag;
+                return r.json();
+            })
             .catch(function() { return null; });
     </script>
 </head>
@@ -2440,6 +2445,7 @@ async function renderMarketTrendChart(candidates) {
     const period = currentChartPeriod || 'all';
 
     // Use prefetched data on first load (period=all), otherwise fetch fresh
+    // Sends ETag for conditional requests — server returns 304 if data unchanged
     let chartData = {};
     try {
         if (window._prefetchedChart && period === 'all') {
@@ -2448,11 +2454,25 @@ async function renderMarketTrendChart(candidates) {
             if (prefetched) {
                 chartData = prefetched;
             } else {
-                const response = await fetch(`/api/snapshots/chart?period=${period}&epsilon=0.5`);
+                const headers = {};
+                if (window._chartEtags && window._chartEtags[period]) {
+                    headers['If-None-Match'] = window._chartEtags[period];
+                }
+                const response = await fetch(`/api/snapshots/chart?period=${period}&epsilon=0.5`, { headers });
+                if (response.status === 304) return; // No change, keep current chart
+                const etag = response.headers.get('ETag');
+                if (etag) window._chartEtags[period] = etag;
                 chartData = await response.json();
             }
         } else {
-            const response = await fetch(`/api/snapshots/chart?period=${period}&epsilon=0.5`);
+            const headers = {};
+            if (window._chartEtags && window._chartEtags[period]) {
+                headers['If-None-Match'] = window._chartEtags[period];
+            }
+            const response = await fetch(`/api/snapshots/chart?period=${period}&epsilon=0.5`, { headers });
+            if (response.status === 304) return; // No change, keep current chart
+            const etag = response.headers.get('ETag');
+            if (etag) window._chartEtags[period] = etag;
             chartData = await response.json();
         }
     } catch (error) {
