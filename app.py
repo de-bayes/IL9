@@ -2374,11 +2374,11 @@ def get_snapshots_chart():
             # ETag: if client already has this version, return 304
             client_etag = request.headers.get('If-None-Match', '').strip('" ')
             if client_etag and client_etag == cached.get('etag'):
-                resp = app.make_default_options_response()
-                resp.status_code = 304
-                resp.headers['ETag'] = f'"{cached["etag"]}"'
-                resp.headers['Cache-Control'] = 'public, max-age=120'
-                return resp
+                from flask import Response
+                return Response(status=304, headers={
+                    'ETag': f'"{cached["etag"]}"',
+                    'Cache-Control': 'public, max-age=120'
+                })
 
             resp = jsonify(cached['data'])
             if cached.get('etag'):
