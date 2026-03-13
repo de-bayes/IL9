@@ -2155,41 +2155,83 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
     instead of reading from disk. Each parse yields fresh dicts so EMA
     mutation is safe without deepcopy.
     """
-    # For 1d/7d, only parse recent lines (JSONL is chronologically appended).
-    # At 480 snapshots/day, 1d needs ~600 lines, 7d needs ~4000 lines.
-    # Generous 2x buffers to handle gaps/restarts.
+    # Performance strategy by period:
+    #   1d: parse only last ~1200 raw lines (tail of chronological JSONL)
+    #   7d: parse only last ~8000 raw lines
+    #   all: downsample raw lines to ~5000 BEFORE JSON parsing (saves ~300ms),
+    #        then detect gaps via fast regex on full set (only ~22ms)
+    import re
+    MAX_POINTS = 5000
+    GAP_THRESHOLD_SECS = 7200  # 2 hours
+    _ts_re = re.compile(r'"timestamp":\s*"([^"]+)"')
+
+    now_utc = datetime.now(timezone.utc)
     if period == '1d':
         max_lines = 1200
+        cutoff = now_utc - timedelta(days=1)
     elif period == '7d':
         max_lines = 8000
+        cutoff = now_utc - timedelta(days=7)
     else:
-        max_lines = None  # all: parse everything
+        max_lines = None
+        cutoff = None
 
-    # Parse snapshots from raw lines or read from disk
+    # --- Resolve source lines ---
     if raw_lines is not None:
-        source_lines = raw_lines[-max_lines:] if max_lines else raw_lines
-        all_snapshots = []
-        for line in source_lines:
-            try:
-                all_snapshots.append(json.loads(line))
-            except (json.JSONDecodeError, ValueError):
-                continue
+        source_lines = raw_lines
     else:
-        all_snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
-        if max_lines and len(all_snapshots) > max_lines:
-            all_snapshots = all_snapshots[-max_lines:]
+        try:
+            with open(HISTORICAL_DATA_PATH, 'r') as f:
+                source_lines = [line.strip() for line in f if line.strip()]
+        except (IOError, OSError):
+            return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
+
+    if not source_lines:
+        return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
+
+    # --- Gap detection on FULL data via fast regex (no JSON parse needed) ---
+    gaps = []
+    if period == 'all':
+        prev_dt = None
+        for line in source_lines:
+            m = _ts_re.search(line)
+            if m:
+                dt = parse_snapshot_timestamp(m.group(1))
+                if dt and prev_dt:
+                    if (dt - prev_dt).total_seconds() > GAP_THRESHOLD_SECS:
+                        gaps.append({
+                            'start': prev_dt.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+                            'end': dt.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+                        })
+                if dt:
+                    prev_dt = dt
+
+    # --- Trim/downsample raw lines BEFORE JSON parsing ---
+    if max_lines and len(source_lines) > max_lines:
+        # 1d/7d: just take the tail
+        lines_to_parse = source_lines[-max_lines:]
+    elif len(source_lines) > MAX_POINTS:
+        # all: uniform downsample (keeps first, every Nth, last)
+        step = len(source_lines) // MAX_POINTS
+        lines_to_parse = [source_lines[0]]
+        for i in range(step, len(source_lines) - 1, step):
+            lines_to_parse.append(source_lines[i])
+        lines_to_parse.append(source_lines[-1])
+    else:
+        lines_to_parse = source_lines
+
+    # --- JSON parse only the selected lines ---
+    all_snapshots = []
+    for line in lines_to_parse:
+        try:
+            all_snapshots.append(json.loads(line))
+        except (json.JSONDecodeError, ValueError):
+            continue
+
     if not all_snapshots:
         return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
 
-    # Parse timestamps and filter bad ones
-    now_utc = datetime.now(timezone.utc)
-    if period == '1d':
-        cutoff = now_utc - timedelta(days=1)
-    elif period == '7d':
-        cutoff = now_utc - timedelta(days=7)
-    else:
-        cutoff = None
-
+    # --- Parse timestamps, filter by period cutoff ---
     parsed = []
     for snap in all_snapshots:
         dt = parse_snapshot_timestamp(snap.get('timestamp', ''))
@@ -2202,29 +2244,15 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
     if not parsed:
         return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
 
-    # Detect real gaps (>2 hours) in the RAW data BEFORE any downsampling
-    GAP_THRESHOLD_SECS = 7200  # 2 hours
-    gaps = []
-    for i in range(1, len(parsed)):
-        gap_secs = (parsed[i][0] - parsed[i - 1][0]).total_seconds()
-        if gap_secs > GAP_THRESHOLD_SECS:
-            gaps.append({
-                'start': parsed[i - 1][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-                'end': parsed[i][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-            })
-
-    # Pre-downsample for 'all' period: with 48K+ snapshots at 3-min intervals,
-    # processing every point through EMA+RDP is O(n*m) and takes 5+ seconds.
-    # Chart only shows ~1500 points anyway, so downsample to ~5000 before
-    # heavy processing. Keeps first, last, and every Nth point.
-    MAX_POINTS_FOR_PROCESSING = 5000
-    if len(parsed) > MAX_POINTS_FOR_PROCESSING:
-        step = len(parsed) // MAX_POINTS_FOR_PROCESSING
-        downsampled = [parsed[0]]  # always keep first
-        for i in range(step, len(parsed) - 1, step):
-            downsampled.append(parsed[i])
-        downsampled.append(parsed[-1])  # always keep last
-        parsed = downsampled
+    # For 1d/7d, detect gaps on the filtered (smaller) set
+    if period != 'all':
+        for i in range(1, len(parsed)):
+            gap_secs = (parsed[i][0] - parsed[i - 1][0]).total_seconds()
+            if gap_secs > GAP_THRESHOLD_SECS:
+                gaps.append({
+                    'start': parsed[i - 1][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+                    'end': parsed[i][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+                })
 
     # Normalize time axis to 0-100 for RDP (same scale as probability 0-100)
     t_first = parsed[0][0].timestamp()
