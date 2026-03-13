@@ -2134,14 +2134,20 @@ def get_snapshots():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-def _compute_chart_data(period, epsilon):
+def _compute_chart_data(period, epsilon, preloaded_snapshots=None):
     """
     Compute RDP-simplified chart data for a given period and epsilon.
     Returns dict with 'snapshots', 'gaps', 'interpolated_ranges'.
     Pure computation — no Flask request/response handling.
+    If preloaded_snapshots is provided, uses them instead of reading from disk.
     """
-    # Read all snapshots
-    all_snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
+    # Read all snapshots (or use preloaded)
+    if preloaded_snapshots is not None:
+        # Deep copy so EMA mutation doesn't affect other periods sharing this data
+        import copy
+        all_snapshots = copy.deepcopy(preloaded_snapshots)
+    else:
+        all_snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
     if not all_snapshots:
         return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
 
@@ -2318,6 +2324,7 @@ def _prewarm_chart_cache():
     Pre-compute chart data for all periods and store in cache.
     Called after each data collection cycle so user requests always hit cache.
     Runs in a background thread to not block the data collection loop.
+    Reads the JSONL file once, then computes all 3 periods from that single read.
     """
     global _chart_cache
     try:
@@ -2325,11 +2332,16 @@ def _prewarm_chart_cache():
     except OSError:
         return
 
+    # Read file once, share across all period computations
+    all_snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
+    if not all_snapshots:
+        return
+
     now = _time.time()
     for period in ('all', '7d', '1d'):
         cache_key = f'{period}:0.5'
         try:
-            result = _compute_chart_data(period, 0.5)
+            result = _compute_chart_data(period, 0.5, preloaded_snapshots=all_snapshots)
             etag = hashlib.md5(json.dumps(result, separators=(',', ':')).encode()).hexdigest()[:16]
             with _chart_cache_lock:
                 _chart_cache[cache_key] = {

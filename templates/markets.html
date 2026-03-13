@@ -43,13 +43,19 @@
     <script>
         window._chartEtags = {};  // period -> etag for conditional requests
         window._chartRendered = false;  // true once chart has actually rendered
-        window._prefetchedChart = fetch('/api/snapshots/chart?period=all&epsilon=0.5')
-            .then(function(r) {
-                var etag = r.headers.get('ETag');
-                if (etag) window._chartEtags['all'] = etag;
-                return r.json();
-            })
-            .catch(function() { return null; });
+        // Prefetch with 15-second timeout so page isn't stuck waiting on slow cold-cache
+        window._prefetchedChart = (function() {
+            var controller = new AbortController();
+            var timeoutId = setTimeout(function() { controller.abort(); }, 15000);
+            return fetch('/api/snapshots/chart?period=all&epsilon=0.5', { signal: controller.signal })
+                .then(function(r) {
+                    clearTimeout(timeoutId);
+                    var etag = r.headers.get('ETag');
+                    if (etag) window._chartEtags['all'] = etag;
+                    return r.json();
+                })
+                .catch(function() { clearTimeout(timeoutId); return null; });
+        })();
     </script>
 </head>
 <script>
@@ -175,7 +181,10 @@
                         <button class="toggle-btn active" data-period="all">All Time</button>
                     </div>
                 </div>
-                <div class="chart-wrapper">
+                <div class="chart-wrapper" style="position:relative;">
+                    <div id="chartLoadingIndicator" style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none;">
+                        <span style="color:var(--text-secondary,#888);font-size:14px;">Loading chart data&hellip;</span>
+                    </div>
                     <canvas id="marketTrendChart"></canvas>
                 </div>
                 <p class="chart-subtitle">
@@ -2882,6 +2891,9 @@ async function renderMarketTrendChart(candidates) {
 
     // Mark chart as rendered so subsequent fetches can use ETag/304 optimization
     window._chartRendered = true;
+    // Hide loading indicator
+    var loadingEl = document.getElementById('chartLoadingIndicator');
+    if (loadingEl) loadingEl.style.display = 'none';
 }
 
 async function fetchKalshiData() {
