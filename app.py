@@ -2190,12 +2190,7 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
     if not parsed:
         return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
 
-    # Normalize time axis to 0-100 for RDP (same scale as probability 0-100)
-    t_first = parsed[0][0].timestamp()
-    t_last = parsed[-1][0].timestamp()
-    t_range = t_last - t_first if t_last != t_first else 1.0
-
-    # Detect real gaps (>2 hours) in the RAW data before any processing
+    # Detect real gaps (>2 hours) in the RAW data BEFORE any downsampling
     GAP_THRESHOLD_SECS = 7200  # 2 hours
     gaps = []
     for i in range(1, len(parsed)):
@@ -2205,6 +2200,24 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
                 'start': parsed[i - 1][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
                 'end': parsed[i][0].strftime('%Y-%m-%dT%H:%M:%S.%fZ')
             })
+
+    # Pre-downsample for 'all' period: with 48K+ snapshots at 3-min intervals,
+    # processing every point through EMA+RDP is O(n*m) and takes 5+ seconds.
+    # Chart only shows ~1500 points anyway, so downsample to ~5000 before
+    # heavy processing. Keeps first, last, and every Nth point.
+    MAX_POINTS_FOR_PROCESSING = 5000
+    if len(parsed) > MAX_POINTS_FOR_PROCESSING:
+        step = len(parsed) // MAX_POINTS_FOR_PROCESSING
+        downsampled = [parsed[0]]  # always keep first
+        for i in range(step, len(parsed) - 1, step):
+            downsampled.append(parsed[i])
+        downsampled.append(parsed[-1])  # always keep last
+        parsed = downsampled
+
+    # Normalize time axis to 0-100 for RDP (same scale as probability 0-100)
+    t_first = parsed[0][0].timestamp()
+    t_last = parsed[-1][0].timestamp()
+    t_range = t_last - t_first if t_last != t_first else 1.0
 
     # Detect contiguous interpolated ranges (snapshots flagged by bridge/recovery)
     interpolated_ranges = []
