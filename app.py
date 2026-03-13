@@ -616,9 +616,21 @@ def rdp_simplify(points, epsilon):
 # Multi-slot cache: one entry per period:epsilon key.
 # Invalidated only when file size changes (new snapshot appended).
 # Pre-warmed after each data collection cycle so users always hit cache.
+# Thundering-herd protection: per-key locks ensure only one thread computes
+# a given cache entry while others wait for the result.
 import threading as _threading
 _chart_cache = {}  # key -> {'data': ..., 'time': ..., 'file_size': ..., 'etag': ...}
-_chart_cache_lock = _threading.Lock()
+_chart_cache_lock = _threading.Lock()  # guards _chart_cache dict access
+_chart_compute_locks = {}  # key -> Lock, prevents duplicate computation
+_chart_compute_locks_lock = _threading.Lock()  # guards _chart_compute_locks dict
+
+
+def _get_compute_lock(cache_key):
+    """Get or create a per-key lock for thundering-herd protection."""
+    with _chart_compute_locks_lock:
+        if cache_key not in _chart_compute_locks:
+            _chart_compute_locks[cache_key] = _threading.Lock()
+        return _chart_compute_locks[cache_key]
 
 # ===== API PROXY CACHES =====
 # Cache external API responses to avoid re-fetching on every page load.
@@ -2372,18 +2384,25 @@ def _prewarm_chart_cache():
     now = _time.time()
     for period in ('all', '7d', '1d'):
         cache_key = f'{period}:0.5'
-        try:
-            result = _compute_chart_data(period, 0.5, raw_lines=raw_lines)
-            etag = hashlib.md5(json.dumps(result, separators=(',', ':')).encode()).hexdigest()[:16]
+        compute_lock = _get_compute_lock(cache_key)
+        with compute_lock:
+            # Skip if a user request already computed this while we waited
             with _chart_cache_lock:
-                _chart_cache[cache_key] = {
-                    'data': result,
-                    'time': now,
-                    'file_size': current_file_size,
-                    'etag': etag
-                }
-        except Exception as e:
-            print(f"[{datetime.now().isoformat()}] Error pre-warming cache for {period}: {e}")
+                cached = _chart_cache.get(cache_key)
+            if cached and cached['file_size'] == current_file_size:
+                continue
+            try:
+                result = _compute_chart_data(period, 0.5, raw_lines=raw_lines)
+                etag = hashlib.md5(json.dumps(result, separators=(',', ':')).encode()).hexdigest()[:16]
+                with _chart_cache_lock:
+                    _chart_cache[cache_key] = {
+                        'data': result,
+                        'time': now,
+                        'file_size': current_file_size,
+                        'etag': etag
+                    }
+            except Exception as e:
+                print(f"[{datetime.now().isoformat()}] Error pre-warming cache for {period}: {e}")
 
 
 @app.route('/api/snapshots/chart')
@@ -2430,17 +2449,32 @@ def get_snapshots_chart():
             resp.headers['Cache-Control'] = 'public, max-age=120'
             return resp
 
-        # Cache miss: compute fresh (rare — only on first request or non-standard epsilon)
-        result = _compute_chart_data(period, epsilon)
-        etag = hashlib.md5(json.dumps(result, separators=(',', ':')).encode()).hexdigest()[:16]
+        # Cache miss: acquire per-key lock so only one thread computes.
+        # Other threads with the same key wait for the result instead of
+        # all computing independently (thundering herd protection).
+        compute_lock = _get_compute_lock(cache_key)
+        with compute_lock:
+            # Re-check cache — another thread may have populated it while we waited
+            with _chart_cache_lock:
+                cached = _chart_cache.get(cache_key)
+            if cached and cached['file_size'] == current_file_size and cached['data']:
+                resp = jsonify(cached['data'])
+                if cached.get('etag'):
+                    resp.headers['ETag'] = f'"{cached["etag"]}"'
+                resp.headers['Cache-Control'] = 'public, max-age=120'
+                return resp
 
-        with _chart_cache_lock:
-            _chart_cache[cache_key] = {
-                'data': result,
-                'time': now,
-                'file_size': current_file_size,
-                'etag': etag
-            }
+            # Actually compute
+            result = _compute_chart_data(period, epsilon)
+            etag = hashlib.md5(json.dumps(result, separators=(',', ':')).encode()).hexdigest()[:16]
+
+            with _chart_cache_lock:
+                _chart_cache[cache_key] = {
+                    'data': result,
+                    'time': now,
+                    'file_size': current_file_size,
+                    'etag': etag
+                }
 
         resp = jsonify(result)
         resp.headers['ETag'] = f'"{etag}"'
