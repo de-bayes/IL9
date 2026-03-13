@@ -42,7 +42,7 @@
     <!-- Prefetch chart data immediately (before DOM loads) -->
     <script>
         window._chartEtags = {};  // period -> etag for conditional requests
-        window._chartRendered = false;  // true once chart has actually rendered
+        window._chartRenderedPeriod = null;  // tracks which period is currently displayed
         // Prefetch with 15-second timeout so page isn't stuck waiting on slow cold-cache
         window._prefetchedChart = (function() {
             var controller = new AbortController();
@@ -2451,12 +2451,14 @@ function isInGap(t0, t1) {
 }
 
 async function renderMarketTrendChart(candidates) {
-    const ctx = document.getElementById('marketTrendChart').getContext('2d');
+    const canvas = document.getElementById('marketTrendChart');
+    if (!canvas) { console.error('Chart canvas not found'); return; }
+    const ctx = canvas.getContext('2d');
     const period = currentChartPeriod || 'all';
 
-    // Use prefetched data on first load (period=all), otherwise fetch fresh.
-    // Only send ETag for conditional 304 responses AFTER the chart has rendered
-    // at least once — otherwise a 304 on re-fetch would skip rendering entirely.
+    // Fetch chart data. Use prefetched promise on first load, otherwise fetch fresh.
+    // ETag/304 optimization: only skip re-render when SAME period is already displayed.
+    // Without the period check, switching All→7d→All would 304 and keep showing 7d data.
     let chartData = {};
     try {
         if (window._prefetchedChart && period === 'all') {
@@ -2472,12 +2474,13 @@ async function renderMarketTrendChart(candidates) {
             }
         } else {
             const headers = {};
-            // Only use ETag/304 optimization after chart has rendered at least once
-            if (window._chartRendered && window._chartEtags && window._chartEtags[period]) {
+            // Only use 304 when chart is already showing THIS period's data
+            var samePeriodDisplayed = window._chartRenderedPeriod === period;
+            if (samePeriodDisplayed && window._chartEtags && window._chartEtags[period]) {
                 headers['If-None-Match'] = window._chartEtags[period];
             }
             const response = await fetch(`/api/snapshots/chart?period=${period}&epsilon=0.5`, { headers });
-            if (response.status === 304) return; // No change, keep current chart
+            if (response.status === 304) return; // Same period, same data — skip
             const etag = response.headers.get('ETag');
             if (etag) window._chartEtags[period] = etag;
             chartData = await response.json();
@@ -2537,9 +2540,12 @@ async function renderMarketTrendChart(candidates) {
         ctx.fillStyle = chartTextColor;
         ctx.textAlign = 'center';
         ctx.fillText('Collecting historical data... Check back soon for trend charts.', ctx.canvas.width / 2, ctx.canvas.height / 2);
+        var loadingEl2 = document.getElementById('chartLoadingIndicator');
+        if (loadingEl2) loadingEl2.style.display = 'none';
         return;
     }
 
+    try {
     // Parse all timestamps to Date objects
     const parsedSnapshots = snapshots.map(s => {
         const ts = s.timestamp;
@@ -2889,11 +2895,28 @@ async function renderMarketTrendChart(candidates) {
         }
     });
 
-    // Mark chart as rendered so subsequent fetches can use ETag/304 optimization
-    window._chartRendered = true;
+    // Track which period is displayed so 304 only fires for same-period refreshes
+    window._chartRenderedPeriod = period;
     // Hide loading indicator
     var loadingEl = document.getElementById('chartLoadingIndicator');
     if (loadingEl) loadingEl.style.display = 'none';
+
+    } catch (chartError) {
+        console.error('Chart rendering failed:', chartError);
+        // Show error state instead of blank canvas
+        try {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.font = '14px Arial';
+            ctx.fillStyle = isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.7)';
+            ctx.textAlign = 'center';
+            ctx.fillText('Chart temporarily unavailable. Retrying...', ctx.canvas.width / 2, ctx.canvas.height / 2);
+        } catch (e) { /* canvas draw failed too */ }
+        // Retry once after 5 seconds
+        if (!window._chartRetried) {
+            window._chartRetried = true;
+            setTimeout(function() { window._chartRetried = false; renderMarketTrendChart(candidates); }, 5000);
+        }
+    }
 }
 
 async function fetchKalshiData() {
