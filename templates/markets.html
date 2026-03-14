@@ -41,9 +41,21 @@
 
     <!-- Prefetch chart data immediately (before DOM loads) -->
     <script>
-        window._prefetchedChart = fetch('/api/snapshots/chart?period=all&epsilon=0.5')
-            .then(function(r) { return r.json(); })
-            .catch(function() { return null; });
+        window._chartEtags = {};  // period -> etag for conditional requests
+        window._chartRenderedPeriod = null;  // tracks which period is currently displayed
+        // Prefetch with 15-second timeout so page isn't stuck waiting on slow cold-cache
+        window._prefetchedChart = (function() {
+            var controller = new AbortController();
+            var timeoutId = setTimeout(function() { controller.abort(); }, 15000);
+            return fetch('/api/snapshots/chart?period=all&epsilon=0.5', { signal: controller.signal })
+                .then(function(r) {
+                    clearTimeout(timeoutId);
+                    var etag = r.headers.get('ETag');
+                    if (etag) window._chartEtags['all'] = etag;
+                    return r.json();
+                })
+                .catch(function() { clearTimeout(timeoutId); return null; });
+        })();
     </script>
 </head>
 <script>
@@ -169,7 +181,10 @@
                         <button class="toggle-btn active" data-period="all">All Time</button>
                     </div>
                 </div>
-                <div class="chart-wrapper">
+                <div class="chart-wrapper" style="position:relative;">
+                    <div id="chartLoadingIndicator" style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none;">
+                        <span style="color:var(--text-secondary,#888);font-size:14px;">Loading chart data&hellip;</span>
+                    </div>
                     <canvas id="marketTrendChart"></canvas>
                 </div>
                 <p class="chart-subtitle">
@@ -2436,10 +2451,14 @@ function isInGap(t0, t1) {
 }
 
 async function renderMarketTrendChart(candidates) {
-    const ctx = document.getElementById('marketTrendChart').getContext('2d');
+    const canvas = document.getElementById('marketTrendChart');
+    if (!canvas) { console.error('Chart canvas not found'); return; }
+    const ctx = canvas.getContext('2d');
     const period = currentChartPeriod || 'all';
 
-    // Use prefetched data on first load (period=all), otherwise fetch fresh
+    // Fetch chart data. Use prefetched promise on first load, otherwise fetch fresh.
+    // ETag/304 optimization: only skip re-render when SAME period is already displayed.
+    // Without the period check, switching All→7d→All would 304 and keep showing 7d data.
     let chartData = {};
     try {
         if (window._prefetchedChart && period === 'all') {
@@ -2449,10 +2468,21 @@ async function renderMarketTrendChart(candidates) {
                 chartData = prefetched;
             } else {
                 const response = await fetch(`/api/snapshots/chart?period=${period}&epsilon=0.5`);
+                const etag = response.headers.get('ETag');
+                if (etag) window._chartEtags[period] = etag;
                 chartData = await response.json();
             }
         } else {
-            const response = await fetch(`/api/snapshots/chart?period=${period}&epsilon=0.5`);
+            const headers = {};
+            // Only use 304 when chart is already showing THIS period's data
+            var samePeriodDisplayed = window._chartRenderedPeriod === period;
+            if (samePeriodDisplayed && window._chartEtags && window._chartEtags[period]) {
+                headers['If-None-Match'] = window._chartEtags[period];
+            }
+            const response = await fetch(`/api/snapshots/chart?period=${period}&epsilon=0.5`, { headers });
+            if (response.status === 304) return; // Same period, same data — skip
+            const etag = response.headers.get('ETag');
+            if (etag) window._chartEtags[period] = etag;
             chartData = await response.json();
         }
     } catch (error) {
@@ -2510,9 +2540,12 @@ async function renderMarketTrendChart(candidates) {
         ctx.fillStyle = chartTextColor;
         ctx.textAlign = 'center';
         ctx.fillText('Collecting historical data... Check back soon for trend charts.', ctx.canvas.width / 2, ctx.canvas.height / 2);
+        var loadingEl2 = document.getElementById('chartLoadingIndicator');
+        if (loadingEl2) loadingEl2.style.display = 'none';
         return;
     }
 
+    try {
     // Parse all timestamps to Date objects
     const parsedSnapshots = snapshots.map(s => {
         const ts = s.timestamp;
@@ -2861,6 +2894,29 @@ async function renderMarketTrendChart(candidates) {
             }
         }
     });
+
+    // Track which period is displayed so 304 only fires for same-period refreshes
+    window._chartRenderedPeriod = period;
+    // Hide loading indicator
+    var loadingEl = document.getElementById('chartLoadingIndicator');
+    if (loadingEl) loadingEl.style.display = 'none';
+
+    } catch (chartError) {
+        console.error('Chart rendering failed:', chartError);
+        // Show error state instead of blank canvas
+        try {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.font = '14px Arial';
+            ctx.fillStyle = isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.7)';
+            ctx.textAlign = 'center';
+            ctx.fillText('Chart temporarily unavailable. Retrying...', ctx.canvas.width / 2, ctx.canvas.height / 2);
+        } catch (e) { /* canvas draw failed too */ }
+        // Retry once after 5 seconds
+        if (!window._chartRetried) {
+            window._chartRetried = true;
+            setTimeout(function() { window._chartRetried = false; renderMarketTrendChart(candidates); }, 5000);
+        }
+    }
 }
 
 async function fetchKalshiData() {
