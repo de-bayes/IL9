@@ -23,11 +23,8 @@
 <script>
     (function() {
         var t = localStorage.getItem('il9-theme');
-        if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-        var p = new URLSearchParams(window.location.search);
-        var d = new Date();
-        var ct=new Date(d.toLocaleString('en-US',{timeZone:'America/Chicago'})); if ((ct.getFullYear()===2026 && ct.getMonth()===2 && ct.getDate()===17 && ct.getHours()>=6) || p.has('election-night') || p.has('rjmc'))
-            document.documentElement.setAttribute('data-election-night', '');
+        if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        document.documentElement.setAttribute('data-election-night', '');
     })();
 </script>
 <body>
@@ -554,7 +551,7 @@
             </div>
         </footer>
         <div class="flag-footer-image">
-            <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer">
+            <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer" loading="lazy" decoding="async">
         </div>
     </div>
 
@@ -929,9 +926,9 @@
         function toggleTheme() {
             const html = document.documentElement;
             const current = html.getAttribute('data-theme');
-            const next = current === 'dark' ? '' : 'dark';
+            const next = current === 'light' ? '' : 'light';
             html.setAttribute('data-theme', next);
-            localStorage.setItem('il9-theme', next || 'light');
+            localStorage.setItem('il9-theme', next || 'dark');
         }
 
         function toggleMobileMenu() {

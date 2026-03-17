@@ -12,7 +12,7 @@ import shutil
 from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600  # Cache static files for 1 hour
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400  # Cache static files for 1 day
 
 
 # ===== PATH RESOLUTION =====

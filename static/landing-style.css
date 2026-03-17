@@ -9,7 +9,34 @@
 --- */
 
 :root {
-    /* Light editorial palette (default) */
+    /* Dark editorial palette (default — election night) */
+    --bg-primary:       #1A1A1E;
+    --bg-surface:       #232328;
+    --bg-surface-hover: #2A2A30;
+    --bg-elevated:      #2F2F36;
+    --border-subtle:    rgba(255,255,255,0.05);
+    --border-default:   rgba(255,255,255,0.08);
+    --border-hover:     rgba(255,255,255,0.15);
+    --text-primary:     #F0EFEB;
+    --text-secondary:   #A0A0A0;
+    --text-tertiary:    #6B6B6B;
+    --accent-gold:      #F2C306;
+    --accent-blue:      #31B0B5;
+    --accent-red:       #F25446;
+    --accent-green:     #40B040;
+    --accent-teal:      #31B686;
+    --grid-color:       rgba(255,255,255,0.05);
+    --highlight-bg:     #F2C306;
+    --highlight-text:   #1A1A1A;
+    --header-border:    rgba(255,255,255,0.12);
+    --shadow-soft:      rgba(0,0,0,0.3);
+    --serif:            'Libre Baskerville', 'Georgia', 'Times New Roman', serif;
+    --sans:             'Source Sans 3', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono:             'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+}
+
+/* Light mode — Editorial palette */
+[data-theme="light"] {
     --bg-primary:       #F5F0E8;
     --bg-surface:       #E3DDD2;
     --bg-surface-hover: #DBD5C9;
@@ -30,12 +57,9 @@
     --highlight-text:   #1A1A1A;
     --header-border:    var(--text-primary);
     --shadow-soft:      rgba(0,0,0,0.06);
-    --serif:            'Libre Baskerville', 'Georgia', 'Times New Roman', serif;
-    --sans:             'Source Sans 3', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --mono:             'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
 }
 
-/* Dark mode — Arena-inspired */
+/* Dark mode — explicit (alias for default) */
 [data-theme="dark"] {
     --bg-primary:       #1A1A1E;
     --bg-surface:       #232328;
@@ -152,10 +176,10 @@ header {
     stroke-linejoin: round;
 }
 
-.theme-toggle .icon-moon { display: block; }
-.theme-toggle .icon-sun  { display: none; }
-[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
-[data-theme="dark"] .theme-toggle .icon-sun  { display: block; }
+.theme-toggle .icon-sun  { display: block; }
+.theme-toggle .icon-moon { display: none; }
+[data-theme="light"] .theme-toggle .icon-sun  { display: none; }
+[data-theme="light"] .theme-toggle .icon-moon { display: block; }
 
 .logo {
     font-family: var(--serif);
