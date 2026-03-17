@@ -1644,6 +1644,10 @@ CANDIDATE_PROFILES = [
 def landing():
     return render_template('landing_new.html')
 
+@app.route('/rjmc')
+def rjmc_preview():
+    return render_template('landing_new.html', force_election_night=True)
+
 @app.route('/odds')
 def odds():
     return render_template('odds.html')
