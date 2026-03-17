@@ -24,11 +24,8 @@
 <script>
     (function() {
         var t = localStorage.getItem('il9-theme');
-        if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-        var p = new URLSearchParams(window.location.search);
-        var d = new Date();
-        var ct=new Date(d.toLocaleString('en-US',{timeZone:'America/Chicago'})); if ((ct.getFullYear()===2026 && ct.getMonth()===2 && ct.getDate()===17 && ct.getHours()>=6) || p.has('election-night') || p.has('rjmc'))
-            document.documentElement.setAttribute('data-election-night', '');
+        if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        document.documentElement.setAttribute('data-election-night', '');
     })();
 </script>
 <body>
@@ -461,7 +458,7 @@
         </footer>
 
         <div class="flag-footer-image">
-            <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer">
+            <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer" loading="lazy" decoding="async">
         </div>
     </div>
 
@@ -1238,13 +1235,13 @@
 
         // Theme toggle with localStorage persistence
         function toggleTheme() {
-            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            if (isDark) {
+            var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            if (isLight) {
                 document.documentElement.removeAttribute('data-theme');
-                localStorage.setItem('il9-theme', 'light');
-            } else {
-                document.documentElement.setAttribute('data-theme', 'dark');
                 localStorage.setItem('il9-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('il9-theme', 'light');
             }
 
             refreshSpendingChartTheme();
@@ -1269,7 +1266,7 @@
 
         function createSpendingChart(candidates) {
             const ctx = document.getElementById('spendingChart').getContext('2d');
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
             const chartTextColor = isDark ? 'rgba(245, 247, 250, 0.9)' : 'rgba(20, 24, 32, 0.9)';
             const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
             const chartTickMuted = isDark ? 'rgba(220, 224, 232, 0.9)' : 'rgba(35, 42, 58, 0.85)';

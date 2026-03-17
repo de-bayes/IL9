@@ -79,18 +79,11 @@
     </script>
 </head>
 <script>
-    // Apply saved theme BEFORE paint to prevent flash
+    // Apply saved theme BEFORE paint to prevent flash (dark is default)
     (function() {
         var t = localStorage.getItem('il9-theme');
-        if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-        // Election night mode: auto on March 17 2026 at 6 AM CT, or via ?election-night URL param
-        var params = new URLSearchParams(window.location.search);
-        var now = new Date();
-        var ct = new Date(now.toLocaleString('en-US', {timeZone: 'America/Chicago'}));
-        var isElectionDay = (ct.getFullYear() === 2026 && ct.getMonth() === 2 && ct.getDate() === 17 && ct.getHours() >= 6);
-        if (isElectionDay || params.has('election-night') || params.has('rjmc') || {{ force_election_night|default('false')|tojson }}) {
-            document.documentElement.setAttribute('data-election-night', '');
-        }
+        if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        document.documentElement.setAttribute('data-election-night', '');
     })();
 </script>
 <body>
@@ -323,13 +316,13 @@
     <script>
         // Theme toggle with localStorage persistence
         function toggleTheme() {
-            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            if (isDark) {
+            var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            if (isLight) {
                 document.documentElement.removeAttribute('data-theme');
-                localStorage.setItem('il9-theme', 'light');
-            } else {
-                document.documentElement.setAttribute('data-theme', 'dark');
                 localStorage.setItem('il9-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('il9-theme', 'light');
             }
         }
 

@@ -14,7 +14,8 @@
 <script>
     (function() {
         var t = localStorage.getItem('il9-theme');
-        if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        document.documentElement.setAttribute('data-election-night', '');
     })();
 </script>
 <body>
@@ -311,12 +312,12 @@
         function toggleTheme() {
             var html = document.documentElement;
             var current = html.getAttribute('data-theme');
-            if (current === 'dark') {
+            if (current === 'light') {
                 html.removeAttribute('data-theme');
-                localStorage.setItem('il9-theme', 'light');
-            } else {
-                html.setAttribute('data-theme', 'dark');
                 localStorage.setItem('il9-theme', 'dark');
+            } else {
+                html.setAttribute('data-theme', 'light');
+                localStorage.setItem('il9-theme', 'light');
             }
         }
         function toggleMobileMenu() {
