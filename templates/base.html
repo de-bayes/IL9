@@ -15,7 +15,7 @@
     (function() {
         var p = new URLSearchParams(window.location.search);
         var d = new Date();
-        var ct=new Date(d.toLocaleString('en-US',{timeZone:'America/Chicago'})); if ((ct.getFullYear()===2026 && ct.getMonth()===2 && ct.getDate()===17 && ct.getHours()>=6) || p.has('election-night'))
+        var ct=new Date(d.toLocaleString('en-US',{timeZone:'America/Chicago'})); if ((ct.getFullYear()===2026 && ct.getMonth()===2 && ct.getDate()===17 && ct.getHours()>=6) || p.has('election-night') || p.has('rjmc'))
             document.documentElement.setAttribute('data-election-night', '');
     })();
 </script>

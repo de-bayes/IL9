@@ -88,7 +88,7 @@
         var now = new Date();
         var ct = new Date(now.toLocaleString('en-US', {timeZone: 'America/Chicago'}));
         var isElectionDay = (ct.getFullYear() === 2026 && ct.getMonth() === 2 && ct.getDate() === 17 && ct.getHours() >= 6);
-        if (isElectionDay || params.has('election-night') || {{ force_election_night|default('false')|tojson }}) {
+        if (isElectionDay || params.has('election-night') || params.has('rjmc') || {{ force_election_night|default('false')|tojson }}) {
             document.documentElement.setAttribute('data-election-night', '');
         }
     })();
