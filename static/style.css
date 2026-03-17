@@ -3034,3 +3034,24 @@ p {
     0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(255, 255, 255, 0.8); }
     50% { opacity: 0.4; box-shadow: 0 0 12px rgba(255, 255, 255, 1); }
 }
+
+.en-banner-msg {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    margin-left: 1.5rem;
+    padding-left: 1.5rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.25);
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    transition: color 0.15s ease;
+}
+
+.en-banner-msg:hover {
+    color: #ffffff;
+}
+
+@media (max-width: 600px) {
+    .en-banner-msg {
+        display: none;
+    }
+}
