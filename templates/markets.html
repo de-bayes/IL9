@@ -93,7 +93,7 @@
     </div>
 
     <div class="site-content">
-        <div class="en-banner"><span class="en-live-dot"></span> Election Night &mdash; March 17, 2026 <a href="/" class="en-banner-msg">A message from Ryan McComb &rarr;</a></div>
+        <div class="en-banner"><span class="en-live-dot"></span> Daniel Biss wins IL-9 Democratic Primary &mdash; March 17, 2026 <a href="/" class="en-banner-msg">A message from Ryan McComb &rarr;</a></div>
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
             <nav class="desktop-nav">
@@ -124,8 +124,8 @@
         </header>
 
         <section class="hero">
-            <h1>Prediction Markets</h1>
-            <p class="subtitle">Aggregated odds from multiple prediction markets</p>
+            <h1>Election Results</h1>
+            <p class="subtitle">Daniel Biss wins the IL-9 Democratic Primary</p>
         </section>
 
         <section class="markets-content-page">
@@ -133,10 +133,10 @@
                 <div class="leader-card">
                     <img src="" alt="" class="leader-photo" id="leaderPhoto" decoding="async">
                     <div class="leader-info">
-                        <span class="leader-label">LEADING CANDIDATE</span>
+                        <span class="leader-label">WINNER</span>
                         <span class="leader-name" id="leaderName">Loading...</span>
                         <div class="leader-main-stat">
-                            <span class="leader-main-label">Aggregate Probability</span>
+                            <span class="leader-main-label">AGGREGATE PROBABILITY</span>
                             <span class="leader-main-value" id="leaderAggregate">--%</span>
                         </div>
                         <div class="leader-divider"></div>
@@ -161,6 +161,10 @@
                     </div>
                 </div>
             </section>
+
+            <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin: -0.5rem 0 1rem; line-height: 1.5;">
+                Manifold Markets stopped trading as polls closed. Final odds reflect Kalshi data only.
+            </p>
 
             <section class="big-odds-display" id="bigOddsDisplay">
                 <div class="big-odds-candidate">
@@ -1914,6 +1918,10 @@ let currentChartPeriod = 'all';
 let manifoldLastUpdate = null;
 let kalshiLastUpdate = null;
 
+// === ELECTION OVER: Display override (does NOT affect data collection/storage) ===
+const ELECTION_OVER = true;
+const ELECTION_WINNER = 'Daniel Biss';
+
 // Candidate headshot mapping
 const candidateImages = {
     'daniel biss': '/static/images/candidates/biss.jpg',
@@ -2366,6 +2374,43 @@ async function fetchManifoldData() {
 }
 
 function renderBigOdds(candidates) {
+    if (ELECTION_OVER) {
+        // Override display for election results — data collection continues unaffected
+        const photoEl = document.getElementById('leaderPhoto');
+        const nameEl = document.getElementById('leaderName');
+        const aggregateEl = document.getElementById('leaderAggregate');
+        const manifoldEl = document.getElementById('leaderManifold');
+        const kalshiLastEl = document.getElementById('leaderKalshiLast');
+        const kalshiMidEl = document.getElementById('leaderKalshiMid');
+        const kalshiLiqEl = document.getElementById('leaderKalshiLiq');
+
+        const winnerImage = getCandidateImage(ELECTION_WINNER);
+        if (winnerImage) {
+            photoEl.src = winnerImage;
+            photoEl.alt = ELECTION_WINNER;
+            photoEl.style.display = 'block';
+        }
+        nameEl.textContent = ELECTION_WINNER;
+        aggregateEl.textContent = '99.99%';
+
+        // Show Manifold as closed, Kalshi as final
+        manifoldEl.textContent = 'Closed';
+        kalshiLastEl.textContent = '99.0%';
+        kalshiMidEl.textContent = '99.0%';
+        kalshiLiqEl.textContent = '99.0%';
+
+        // Show other candidates at 0%
+        const others = candidates.filter(c => c.name !== ELECTION_WINNER);
+        const container = document.getElementById('bigOddsDisplay');
+        container.innerHTML = others.slice(0, 5).map((c) => `
+            <div class="big-odds-candidate">
+                <span class="big-percent">0%</span>
+                <span class="big-name">${c.name}</span>
+            </div>
+        `).join('');
+        return;
+    }
+
     // Update leader featured card
     if (candidates.length > 0) {
         const leader = candidates[0];
@@ -3095,6 +3140,11 @@ function getPollingInterval() {
 function setupPolling() {
     // Render chart immediately from prefetched data (don't wait for live API calls)
     renderMarketTrendChart(null);
+
+    // If election is over, render winner immediately (don't wait for API calls)
+    if (ELECTION_OVER) {
+        renderBigOdds([]);
+    }
 
     // Fetch live market data in parallel (updates odds display + re-renders chart)
     fetchManifoldData();
