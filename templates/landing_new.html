@@ -93,7 +93,7 @@
         <div class="en-banner">
             <span class="en-live-dot"></span>
             Election Night &mdash; March 17, 2026
-            <a href="#" class="en-banner-msg" id="enBannerMsg">A message from Ryan McComb &rarr;</a>
+            <a href="{{ url_for('static', filename='election-night-preview.mp4') }}" class="en-banner-msg" id="enBannerMsg" target="_blank">A message from Ryan McComb &rarr;</a>
         </div>
 
         <!-- HEADER -->
@@ -286,32 +286,24 @@
             <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer">
         </div>
 
-        <!-- Election Night Video Popup -->
-        <div class="en-video-overlay" id="enVideoOverlay">
-            <div class="en-video-modal">
-                <button class="en-video-close" id="enVideoClose">&times;</button>
-                <div class="en-video-wrap">
-                    <video id="enVideo" controls playsinline preload="none">
-                    <source src="{{ url_for('static', filename='election-night-preview.mp4') }}" type="video/mp4">
-                </video>
-                <button class="en-unmute-btn" id="enUnmuteBtn">🔇 Tap to unmute</button>
+        <!-- Projection Card -->
+        <section class="editorial-section">
+            <div class="projection-card">
+                <div class="projection-card-photo">
+                    <img src="{{ url_for('static', filename='images/candidates/biss.jpg') }}" alt="Daniel Biss">
                 </div>
-                <div class="en-video-modal-footer">
-                    <strong>A message from Ryan McComb</strong><br>
-                    VoteHub will have precinct-by-precinct results.
-                    <div class="en-video-links">
-                        <a href="/markets" class="en-link-primary">Live Markets &rarr;</a>
-                        <a href="https://votehub.com/2026_il09_primary" target="_blank" rel="noopener" class="en-link-primary">VoteHub.com &rarr;</a>
-                    </div>
-                    <div class="en-video-links">
-                        <a href="https://x.com/bayes_pr" target="_blank" rel="noopener">@bayes_pr (Ryan McComb)</a>
-                        <a href="https://x.com/VoteHub" target="_blank" rel="noopener">@VoteHub</a>
-                        <a href="https://x.com/ZacharyDonnini" target="_blank" rel="noopener">@ZacharyDonnini</a>
-                        <a href="https://x.com/mattheweadie22" target="_blank" rel="noopener">@mattheweadie22</a>
+                <div class="projection-card-body">
+                    <span class="projection-card-tag">IL9Cast Projection</span>
+                    <h2 class="projection-card-title">Daniel Biss</h2>
+                    <p class="projection-card-subtitle">Projected Democratic Nominee</p>
+                    <p class="projection-card-desc">IL9Cast projects Daniel Biss to win the Illinois 9th District Democratic Primary.</p>
+                    <div class="projection-card-links">
+                        <a href="/markets" class="btn-primary">Live Markets &rarr;</a>
+                        <a href="/odds" class="btn-secondary">View Model &rarr;</a>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     </div>
 
     <script>
@@ -511,52 +503,7 @@
             updateCountdown();
             setInterval(updateCountdown, 1000);
 
-            // Election night: video popup
-            if (document.documentElement.hasAttribute('data-election-night')) {
-                const overlay = document.getElementById('enVideoOverlay');
-                const video = document.getElementById('enVideo');
-                const closeBtn = document.getElementById('enVideoClose');
-                const bannerMsg = document.getElementById('enBannerMsg');
-
-                const unmuteBtn = document.getElementById('enUnmuteBtn');
-                function openPopup() {
-                    overlay.classList.add('active');
-                    video.muted = true;
-                    video.play().catch(() => {});
-                    unmuteBtn.style.display = 'block';
-                    var cc = document.querySelector('.confetti-canvas');
-                    if (cc) cc.style.display = 'none';
-                }
-                unmuteBtn.addEventListener('click', () => {
-                    video.muted = false;
-                    unmuteBtn.style.display = 'none';
-                });
-                function closePopup() {
-                    overlay.classList.remove('active');
-                    video.pause();
-                    sessionStorage.setItem('en-video-seen', '1');
-                    var cc = document.querySelector('.confetti-canvas');
-                    if (cc) cc.style.display = '';
-                }
-
-                // Auto-show once per session
-                if (!sessionStorage.getItem('en-video-seen')) {
-                    setTimeout(openPopup, 1500);
-                }
-
-                // Banner link reopens it
-                if (bannerMsg) {
-                    bannerMsg.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        openPopup();
-                    });
-                }
-
-                closeBtn.addEventListener('click', closePopup);
-                overlay.addEventListener('click', (e) => {
-                    if (e.target === overlay) closePopup();
-                });
-            }
+            // Banner message link is now a direct link to the video file
 
             // Confetti for election night
             if (document.documentElement.hasAttribute('data-election-night')) {
