@@ -10,7 +10,8 @@ import time as _time
 import atexit
 import shutil
 import gzip
-from apscheduler.schedulers.background import BackgroundScheduler
+# APScheduler no longer needed — site is now static, serving archived data only
+# from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400  # Cache static files for 1 day
@@ -2111,22 +2112,8 @@ def fix_kalshi_gap():
 
 @app.route('/api/snapshot', methods=['POST'])
 def save_snapshot():
-    """Save a historical snapshot of aggregated probabilities (JSONL format)"""
-    try:
-        # Get new snapshot from request
-        new_snapshot = request.json
-        # Use UTC with Z suffix for consistent timezone handling
-        new_snapshot['timestamp'] = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
-
-        # Append to JSONL file
-        append_snapshot_jsonl(HISTORICAL_DATA_PATH, new_snapshot)
-
-        # Count total snapshots
-        total = count_snapshots_jsonl(HISTORICAL_DATA_PATH)
-
-        return jsonify({"success": True, "total_snapshots": total})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    """Disabled — site is now a static archive. No new data collection."""
+    return jsonify({"error": "Site is now a static archive. Data collection has ended."}), 410
 
 @app.route('/api/snapshots/count')
 def get_snapshot_count():
@@ -3027,93 +3014,14 @@ def clean_candidate_name(name):
     cleaned = cleaned.replace('?', '').strip()
     return cleaned
 
-# Set up background scheduler only if not running under gunicorn workers
-# This prevents duplicate schedulers when gunicorn spawns multiple workers
-import sys
-_disable_scheduler = os.environ.get('IL9_DISABLE_SCHEDULER', '').strip().lower() in {'1', 'true', 'yes'}
-if _disable_scheduler:
-    print(f"[{datetime.now().isoformat()}] Scheduler disabled via IL9_DISABLE_SCHEDULER")
-elif 'gunicorn' not in sys.argv[0]:
-    # Running locally or in single-process mode
-    from apscheduler.triggers.cron import CronTrigger
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(func=collect_market_data, trigger="interval", minutes=3)
-    scheduler.add_job(func=send_daily_summary, trigger=CronTrigger(hour=8, minute=0, timezone='America/Chicago'))
-    scheduler.add_job(func=send_csv_backup_email, trigger="interval", hours=4)
-    scheduler.start()
+# ===== SCHEDULER DISABLED — STATIC ARCHIVE MODE =====
+# The site now serves pre-collected historical data only.
+# The scheduler and live data collection code above is preserved for reference
+# but no longer runs. See collect_market_data(), send_daily_summary(), etc.
+print(f"[{datetime.now().isoformat()}] IL9Cast running in static archive mode — no data collection")
 
-    # Run initial data collection on startup
-    collect_market_data()
-
-    # Pre-warm chart cache so first visitor gets instant response
-    _threading.Thread(target=_prewarm_chart_cache, daemon=True).start()
-
-    # Shut down the scheduler when exiting the app
-    atexit.register(lambda: scheduler.shutdown())
-else:
-    # Running under gunicorn - only start scheduler in the main process
-    # Use an inter-process file lock so only one worker runs the scheduler.
-    from threading import Thread
-    import time
-    import fcntl
-    import os
-
-    _scheduler_lock_file = None
-
-    def _acquire_scheduler_lock():
-        """Acquire an exclusive lock; return True only for the elected worker."""
-        global _scheduler_lock_file
-        lock_path = os.environ.get('IL9_SCHEDULER_LOCK_PATH', '/tmp/il9_scheduler.lock')
-        _scheduler_lock_file = open(lock_path, 'w')
-        try:
-            fcntl.flock(_scheduler_lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-            _scheduler_lock_file.write(str(os.getpid()))
-            _scheduler_lock_file.flush()
-            return True
-        except BlockingIOError:
-            return False
-
-    def scheduler_thread():
-        """Background thread for data collection when running under gunicorn"""
-        # Wait a bit for app to fully start
-        time.sleep(5)
-        collect_market_data()  # Initial collection
-
-        while True:
-            time.sleep(3 * 60)  # 3 minutes
-            try:
-                collect_market_data()
-            except Exception as e:
-                print(f"Error in scheduler thread: {e}")
-
-            # Check if it's time for daily summary (8 AM Central Time)
-            try:
-                from zoneinfo import ZoneInfo
-                ct_now = datetime.now(ZoneInfo('America/Chicago'))
-                if ct_now.hour == 8 and ct_now.minute < 3:
-                    send_daily_summary()
-            except Exception as e:
-                print(f"Error sending daily summary: {e}")
-
-            # CSV backup every 4 hours (runs on 3-min cycle, fires when minute < 3 at target hours)
-            try:
-                from zoneinfo import ZoneInfo
-                ct_now = datetime.now(ZoneInfo('America/Chicago'))
-                if ct_now.hour % 4 == 0 and ct_now.minute < 3:
-                    send_csv_backup_email()
-            except Exception as e:
-                print(f"Error sending CSV backup: {e}")
-
-    # Start scheduler thread only in the elected worker.
-    if _acquire_scheduler_lock():
-        print(f"[{datetime.now().isoformat()}] Scheduler lock acquired in pid={os.getpid()}")
-        thread = Thread(target=scheduler_thread, daemon=True)
-        thread.start()
-    else:
-        print(f"[{datetime.now().isoformat()}] Scheduler disabled in pid={os.getpid()} (lock held by another worker)")
-
-    # Pre-warm chart cache in all workers so first visitor gets instant response
-    _threading.Thread(target=_prewarm_chart_cache, daemon=True).start()
+# Pre-warm chart cache so first visitor gets instant response
+_threading.Thread(target=_prewarm_chart_cache, daemon=True).start()
 
 @app.errorhandler(404)
 def page_not_found(e):
