@@ -9,6 +9,7 @@ import os
 import time as _time
 import atexit
 import shutil
+import gzip
 from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
@@ -398,16 +399,24 @@ def recover_snapshots_from_csv_and_current(csv_path, current_path, output_path, 
 
 def read_snapshots_jsonl(filepath):
     """
-    Read snapshots from JSONL file.
+    Read snapshots from JSONL file (plain or gzipped).
     Each line is a separate JSON object.
     Returns list of snapshot dictionaries.
     """
     snapshots = []
-    if not os.path.exists(filepath):
+    # Try gzipped version first, then plain
+    gz_path = filepath + '.gz'
+    if os.path.exists(gz_path):
+        actual_path = gz_path
+        opener = lambda p: gzip.open(p, 'rt', encoding='utf-8')
+    elif os.path.exists(filepath):
+        actual_path = filepath
+        opener = lambda p: open(p, 'r')
+    else:
         return snapshots
 
     try:
-        with open(filepath, 'r') as f:
+        with opener(actual_path) as f:
             for line_num, line in enumerate(f, 1):
                 line = line.strip()
                 if not line:
