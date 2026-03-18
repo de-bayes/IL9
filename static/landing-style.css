@@ -653,6 +653,131 @@ header {
 }
 
 /* ============================================
+   PROJECTION CARD — Nominee projection with photo
+   ============================================ */
+
+.projection-card {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--border-default);
+    border-top: 3px solid var(--accent-blue);
+    background: var(--bg-surface);
+    margin-top: 1.25rem;
+    overflow: hidden;
+}
+
+.projection-card-photo {
+    flex: 0 0 200px;
+    overflow: hidden;
+}
+
+.projection-card-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.projection-card-body {
+    flex: 1;
+    padding: 2rem 2rem 2rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.projection-card-tag {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--accent-blue);
+    padding: 0.2em 0.6em;
+    align-self: flex-start;
+}
+
+.projection-card-title {
+    font-family: var(--serif);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.projection-card-subtitle {
+    font-family: var(--sans);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent-blue);
+    margin: 0;
+    letter-spacing: 0.01em;
+}
+
+.projection-card-desc {
+    font-family: var(--sans);
+    font-size: 0.925rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    margin: 0.25rem 0 0;
+}
+
+.projection-card-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.75rem;
+}
+
+[data-election-night] .projection-card {
+    border-top-color: #5b8fd4;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+[data-election-night] .projection-card-tag {
+    background: #5b8fd4;
+}
+
+[data-election-night] .projection-card-subtitle {
+    color: #5b8fd4;
+}
+
+@media (max-width: 600px) {
+    .projection-card {
+        flex-direction: column;
+    }
+
+    .projection-card-photo {
+        flex: 0 0 auto;
+        max-width: 180px;
+        margin: 1.25rem auto 0;
+    }
+
+    .projection-card-body {
+        padding: 1.25rem;
+        text-align: center;
+        align-items: center;
+    }
+
+    .projection-card-title {
+        font-size: 1.5rem;
+    }
+
+    .projection-card-links {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .projection-card-links .btn-primary,
+    .projection-card-links .btn-secondary {
+        text-align: center;
+    }
+}
+
+/* ============================================
    FEATURED CARD — Case study link on homepage
    ============================================ */
 
