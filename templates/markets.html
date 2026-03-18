@@ -129,7 +129,7 @@
         </section>
 
         <section class="markets-content-page">
-            <section class="leader-featured" id="leaderFeatured">
+            <section class="leader-featured race-called" id="leaderFeatured">
                 <div class="leader-card">
                     <img src="" alt="" class="leader-photo" id="leaderPhoto" decoding="async">
                     <div class="leader-info">
@@ -463,6 +463,44 @@
             padding: 2.5rem;
             background: var(--bg-surface);
             border: 1px solid var(--border-default);
+        }
+
+        /* ===== Winner highlight (race called) ===== */
+        .leader-featured.race-called .leader-card {
+            border: 2px solid #c44040;
+            background: linear-gradient(135deg, rgba(196, 64, 64, 0.12) 0%, var(--bg-surface) 60%);
+            box-shadow: 0 0 24px rgba(196, 64, 64, 0.15), 0 4px 12px rgba(0, 0, 0, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leader-featured.race-called .leader-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #5b8fd4, #c44040, #5b8fd4);
+        }
+
+        .leader-featured.race-called .leader-label {
+            color: #c44040;
+            font-size: 0.85rem;
+            letter-spacing: 0.2em;
+        }
+
+        .leader-featured.race-called .leader-main-label {
+            display: none;
+        }
+
+        .leader-featured.race-called .leader-main-value {
+            color: #c44040;
+        }
+
+        .leader-featured.race-called .leader-photo {
+            border: 2px solid rgba(196, 64, 64, 0.4);
+            box-shadow: 0 0 16px rgba(196, 64, 64, 0.2);
         }
 
         .leader-photo {
@@ -3126,10 +3164,12 @@ function showFinalResults() {
     }
     nameEl.textContent = 'Daniel Biss';
     aggregateEl.textContent = '100%';
-    manifoldEl.textContent = '--';
-    kalshiLastEl.textContent = '--';
-    kalshiMidEl.textContent = '--';
-    kalshiLiqEl.textContent = '--';
+
+    // Hide individual market sub-stats (no longer relevant)
+    const subStats = document.querySelector('.leader-sub-stats');
+    const divider = document.querySelector('.leader-divider');
+    if (subStats) subStats.style.display = 'none';
+    if (divider) divider.style.display = 'none';
 
     // Update other candidates grid
     const container = document.getElementById('bigOddsDisplay');
