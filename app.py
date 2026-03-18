@@ -21,23 +21,24 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400  # Cache static files for 1 day
 
 def resolve_data_path(filename='historical_snapshots.jsonl'):
     """
-    Resolve the correct data directory, checking Railway persistent volume first.
-    Priority: /data/ -> /app/data/ -> local data/
+    Resolve the correct data directory, checking for actual data files.
+    Checks for both plain and .gz versions of the file.
+    Priority: DATA_DIR env var -> /app/data/ -> /data/ -> local data/
     """
     configured_dir = os.environ.get('DATA_DIR', '').strip()
     if configured_dir:
         return os.path.join(configured_dir, filename)
 
-    for candidate_dir in ['/app/data', '/data']:
+    # Check all candidate dirs for actual data (plain or gzipped)
+    local_data = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+    for candidate_dir in ['/app/data', '/data', local_data]:
         candidate_path = os.path.join(candidate_dir, filename)
-        if os.path.exists(candidate_path):
+        gz_path = candidate_path + '.gz'
+        if os.path.exists(gz_path) or os.path.exists(candidate_path):
             return candidate_path
 
-    for candidate_dir in ['/app/data', '/data']:
-        if os.path.exists(candidate_dir):
-            return os.path.join(candidate_dir, filename)
     # Fallback to local data/ directory
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', filename)
+    return os.path.join(local_data, filename)
 
 
 # Path to historical data storage (JSONL format - JSON Lines)
@@ -527,13 +528,23 @@ def append_snapshot_jsonl(filepath, snapshot):
             _release_file_lock(lock_file)
 
 
+def _open_jsonl(filepath):
+    """Open a JSONL file, preferring .gz version if it exists."""
+    gz_path = filepath + '.gz'
+    if os.path.exists(gz_path):
+        return gzip.open(gz_path, 'rt', encoding='utf-8')
+    elif os.path.exists(filepath):
+        return open(filepath, 'r')
+    return None
+
 def count_snapshots_jsonl(filepath):
     """Count total valid snapshots in JSONL file without loading all into memory"""
-    if not os.path.exists(filepath):
+    f = _open_jsonl(filepath)
+    if f is None:
         return 0
 
     count = 0
-    with open(filepath, 'r') as f:
+    with f:
         for line in f:
             stripped = line.strip()
             if stripped and '\x00' not in stripped:
@@ -542,11 +553,12 @@ def count_snapshots_jsonl(filepath):
 
 def count_data_points_jsonl(filepath):
     """Count total data points (candidates across all snapshots) in JSONL file"""
-    if not os.path.exists(filepath):
+    f = _open_jsonl(filepath)
+    if f is None:
         return 0
 
     total_data_points = 0
-    with open(filepath, 'r') as f:
+    with f:
         for line in f:
             line = line.strip()
             if line:
@@ -2173,7 +2185,10 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
         source_lines = raw_lines
     else:
         try:
-            with open(HISTORICAL_DATA_PATH, 'r') as f:
+            f = _open_jsonl(HISTORICAL_DATA_PATH)
+            if f is None:
+                return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
+            with f:
                 source_lines = [line.strip() for line in f if line.strip()]
         except (IOError, OSError):
             return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
@@ -2387,14 +2402,22 @@ def _prewarm_chart_cache():
     Reads the JSONL file once, then computes all 3 periods from that single read.
     """
     global _chart_cache
+    # Determine file size (check .gz first, then plain)
+    gz_path = HISTORICAL_DATA_PATH + '.gz'
     try:
-        current_file_size = os.path.getsize(HISTORICAL_DATA_PATH)
+        if os.path.exists(gz_path):
+            current_file_size = os.path.getsize(gz_path)
+        else:
+            current_file_size = os.path.getsize(HISTORICAL_DATA_PATH)
     except OSError:
         return
 
     # Read raw lines once, re-parse for each period (faster than deepcopy)
     try:
-        with open(HISTORICAL_DATA_PATH, 'r') as f:
+        f = _open_jsonl(HISTORICAL_DATA_PATH)
+        if f is None:
+            return
+        with f:
             raw_lines = [line.strip() for line in f if line.strip()]
     except (IOError, OSError):
         return
@@ -2444,8 +2467,12 @@ def get_snapshots_chart():
         cache_key = f'{period}:{epsilon}'
 
         now = _time.time()
+        gz_path = HISTORICAL_DATA_PATH + '.gz'
         try:
-            current_file_size = os.path.getsize(HISTORICAL_DATA_PATH)
+            if os.path.exists(gz_path):
+                current_file_size = os.path.getsize(gz_path)
+            else:
+                current_file_size = os.path.getsize(HISTORICAL_DATA_PATH)
         except OSError:
             current_file_size = 0
 
@@ -2535,7 +2562,19 @@ def get_fec_candidates():
 def download_snapshots():
     """Download all historical snapshot data as JSONL file"""
     try:
-        if os.path.exists(HISTORICAL_DATA_PATH):
+        gz_path = HISTORICAL_DATA_PATH + '.gz'
+        if os.path.exists(gz_path):
+            # Decompress and serve as plain JSONL for user convenience
+            import io
+            with gzip.open(gz_path, 'rb') as gz_f:
+                data = gz_f.read()
+            return send_file(
+                io.BytesIO(data),
+                mimetype='application/x-ndjson',
+                as_attachment=True,
+                download_name='il9cast_historical_data.jsonl'
+            )
+        elif os.path.exists(HISTORICAL_DATA_PATH):
             return send_file(
                 HISTORICAL_DATA_PATH,
                 mimetype='application/x-ndjson',
