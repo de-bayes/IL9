@@ -1701,23 +1701,15 @@ def candidates():
     latest_snapshot = snapshots[-1] if snapshots else None
 
     # Build candidate data with current odds
+    # Hardcoded final results: Biss won the primary
     candidates_data = []
     for profile in CANDIDATE_PROFILES:
         candidate = profile.copy()
-        # Find current odds from latest snapshot
-        if latest_snapshot:
-            for c in latest_snapshot.get('candidates', []):
-                # Normalize names for matching
-                snapshot_name = c['name'].replace('Abughazaleh', 'Abugazaleh')
-                profile_name = profile['name']
-                if snapshot_name == profile_name:
-                    candidate['current_odds'] = c['probability']
-                    candidate['has_kalshi'] = c.get('hasKalshi', False)
-                    break
-        if 'current_odds' not in candidate:
+        if 'Biss' in candidate['name']:
+            candidate['current_odds'] = 100.0
+        else:
             candidate['current_odds'] = 0.0
-            candidate['has_kalshi'] = False
-
+        candidate['has_kalshi'] = False
         candidates_data.append(candidate)
 
     # Sort by current odds descending
