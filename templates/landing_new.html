@@ -92,7 +92,7 @@
         <!-- Election Night Banner (hidden by default, shown when data-election-night is set) -->
         <div class="en-banner">
             <span class="en-live-dot"></span>
-            Election Night &mdash; March 17, 2026
+            Race Called &mdash; Daniel Biss wins the IL-9 Democratic Primary
             <a href="#" class="en-banner-msg" id="enBannerMsg">A message from Ryan McComb &rarr;</a>
         </div>
 
@@ -130,11 +130,11 @@
         <section class="hero" id="home">
             <div class="hero-dateline">
                 <span class="dot"></span>
-                Live data &mdash; Updated every 3 minutes
+                Race Called &mdash; March 17, 2026
             </div>
-            <h1>Illinois 9th District,<br><em>Democratic Primary Hub</em></h1>
-            <p class="hero-subtitle">Live prediction markets, a precinct-level election model, fundraising analysis, and full election night coverage for the March 17, 2026 primary.</p>
-            <p class="hero-countdown"><span id="countdownCompact">--</span> until polls close &mdash; March 17, 2026 at 7:00 PM CT</p>
+            <h1>Daniel Biss Wins<br><em>IL-9 Democratic Primary</em></h1>
+            <p class="hero-subtitle">Daniel Biss has won the Illinois 9th District Democratic Primary. Historical prediction market data and model results remain available below.</p>
+            <p class="hero-countdown">Primary decided &mdash; March 17, 2026</p>
         </section>
 
         <div class="hero-rule"><hr></div>
@@ -148,9 +148,9 @@
                     <div class="stat-detail">Across <span id="snapshotCount">--</span> snapshots</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-label">Market Leader</div>
-                    <div class="stat-value" id="marketLeader">--</div>
-                    <div class="stat-detail" id="marketLeaderDetail">Loading aggregate data</div>
+                    <div class="stat-label">Winner</div>
+                    <div class="stat-value" id="marketLeader">Biss</div>
+                    <div class="stat-detail" id="marketLeaderDetail">Daniel Biss wins IL-9 primary</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-label">Election Day</div>
@@ -168,11 +168,11 @@
         <!-- ELECTION NIGHT LIVE EVENT (hidden unless election-night mode) -->
         <section class="editorial-section">
             <div class="en-live-card">
-                <span class="en-live-card-tag">Election Night</span>
-                <h3>Live Results at VoteHub</h3>
-                <p>VoteHub will have live precinct-by-precinct results on their site tonight.</p>
+                <span class="en-live-card-tag">Race Called</span>
+                <h3>Daniel Biss Wins</h3>
+                <p>Daniel Biss has won the IL-9 Democratic Primary on March 17, 2026.</p>
                 <div class="en-details">
-                    <div class="en-detail-item"><strong>When:</strong> March 17, 2026 -- Polls close at 7 PM CT</div>
+                    <div class="en-detail-item"><strong>Result:</strong> Daniel Biss wins the Democratic nomination for Illinois 9th District</div>
                 </div>
             </div>
         </section>
@@ -369,31 +369,9 @@
             }
         }
 
-        // Fetch current market leader from latest aggregate snapshot
+        // Race is over — Daniel Biss won. No need to fetch live leader data.
         async function loadMarketLeader() {
-            try {
-                const resp = await fetch('/api/snapshots');
-                const snapshots = await resp.json();
-                if (snapshots && snapshots.length > 0) {
-                    const latest = snapshots[snapshots.length - 1];
-                    if (latest.candidates && latest.candidates.length > 0) {
-                        const sorted = latest.candidates.sort((a, b) => b.probability - a.probability);
-                        const leader = sorted[0];
-                        const leaderEl = document.getElementById('marketLeader');
-                        const detailEl = document.getElementById('marketLeaderDetail');
-                        // Clean name
-                        let name = leader.name || '';
-                        name = name.replace(/\s*(will )?(be the democratic nominee|win|for IL-?9).*$/i, '').trim();
-                        const parts = name.split(' ');
-                        const displayName = parts.length > 1 ? parts[parts.length - 1] : name;
-                        const prob = Math.round(leader.probability * 10) / 10;
-                        if (leaderEl) leaderEl.textContent = displayName;
-                        if (detailEl) detailEl.textContent = prob + '% aggregate probability';
-                    }
-                }
-            } catch (e) {
-                console.error('Failed to fetch market leader:', e);
-            }
+            // Static: winner already shown in HTML
         }
 
         // Fetch total raised from FEC data (extrapolated to current date)

@@ -14,6 +14,11 @@ from apscheduler.schedulers.background import BackgroundScheduler
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400  # Cache static files for 1 day
 
+# ===== RACE CALLED =====
+# The primary is over. Daniel Biss won. Stop all data collection.
+RACE_OVER = True
+RACE_WINNER = "Daniel Biss"
+
 
 # ===== PATH RESOLUTION =====
 
@@ -2111,6 +2116,8 @@ def fix_kalshi_gap():
 @app.route('/api/snapshot', methods=['POST'])
 def save_snapshot():
     """Save a historical snapshot of aggregated probabilities (JSONL format)"""
+    if RACE_OVER:
+        return jsonify({"success": True, "message": "Race is over, no new snapshots accepted"}), 200
     try:
         # Get new snapshot from request
         new_snapshot = request.json
@@ -2779,6 +2786,9 @@ def _dampen_spikes(aggregated):
 def collect_market_data():
     """Fetch market data and save snapshot automatically"""
     global _last_snapshot
+    if RACE_OVER:
+        print(f"[{datetime.now().isoformat()}] Data collection skipped — race is over. Winner: {RACE_WINNER}")
+        return
     try:
         print(f"[{datetime.now().isoformat()}] Running automatic data collection...")
 

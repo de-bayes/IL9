@@ -93,7 +93,7 @@
     </div>
 
     <div class="site-content">
-        <div class="en-banner"><span class="en-live-dot"></span> Election Night &mdash; March 17, 2026 <a href="/" class="en-banner-msg">A message from Ryan McComb &rarr;</a></div>
+        <div class="en-banner"><span class="en-live-dot"></span> Race Called &mdash; Daniel Biss wins the IL-9 Democratic Primary <a href="/" class="en-banner-msg">A message from Ryan McComb &rarr;</a></div>
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
             <nav class="desktop-nav">
@@ -125,7 +125,7 @@
 
         <section class="hero">
             <h1>Prediction Markets</h1>
-            <p class="subtitle">Aggregated odds from multiple prediction markets</p>
+            <p class="subtitle">Race called &mdash; Daniel Biss wins the IL-9 Democratic Primary</p>
         </section>
 
         <section class="markets-content-page">
@@ -133,7 +133,7 @@
                 <div class="leader-card">
                     <img src="" alt="" class="leader-photo" id="leaderPhoto" decoding="async">
                     <div class="leader-info">
-                        <span class="leader-label">LEADING CANDIDATE</span>
+                        <span class="leader-label">WINNER</span>
                         <span class="leader-name" id="leaderName">Loading...</span>
                         <div class="leader-main-stat">
                             <span class="leader-main-label">Aggregate Probability</span>
@@ -3092,9 +3092,84 @@ function getPollingInterval() {
     }
 }
 
+// ===== RACE CALLED — Daniel Biss wins =====
+const RACE_OVER = true;
+const RACE_WINNER = 'Daniel Biss';
+
+function showFinalResults() {
+    // Final results: Biss at 100%, everyone else at 0%
+    const finalCandidates = [
+        { name: 'Daniel Biss', probability: 100, hasKalshi: true },
+        { name: 'Laura Fine', probability: 0, hasKalshi: true },
+        { name: 'Kat Abughazaleh', probability: 0, hasKalshi: true },
+        { name: 'Robert Simmons', probability: 0, hasKalshi: true },
+        { name: 'Erin Maye Quade', probability: 0, hasKalshi: false },
+        { name: 'Mike Simmons', probability: 0, hasKalshi: false }
+    ];
+
+    candidatesData = finalCandidates;
+
+    // Update leader card
+    const photoEl = document.getElementById('leaderPhoto');
+    const nameEl = document.getElementById('leaderName');
+    const aggregateEl = document.getElementById('leaderAggregate');
+    const manifoldEl = document.getElementById('leaderManifold');
+    const kalshiLastEl = document.getElementById('leaderKalshiLast');
+    const kalshiMidEl = document.getElementById('leaderKalshiMid');
+    const kalshiLiqEl = document.getElementById('leaderKalshiLiq');
+
+    const leaderImage = getCandidateImage('Daniel Biss');
+    if (leaderImage) {
+        photoEl.src = leaderImage;
+        photoEl.alt = 'Daniel Biss';
+        photoEl.style.display = 'block';
+    }
+    nameEl.textContent = 'Daniel Biss';
+    aggregateEl.textContent = '100%';
+    manifoldEl.textContent = '--';
+    kalshiLastEl.textContent = '--';
+    kalshiMidEl.textContent = '--';
+    kalshiLiqEl.textContent = '--';
+
+    // Update other candidates grid
+    const container = document.getElementById('bigOddsDisplay');
+    container.innerHTML = finalCandidates.slice(1).map(c => `
+        <div class="big-odds-candidate">
+            <span class="big-percent">0%</span>
+            <span class="big-name">${c.name}</span>
+        </div>
+    `).join('');
+
+    // Update market source badges to show "FINAL"
+    const manifoldBadge = document.getElementById('manifoldBadge');
+    const kalshiBadge = document.getElementById('kalshiBadge');
+    if (manifoldBadge) manifoldBadge.innerHTML = '<span class="live-dot" style="background:#888;box-shadow:none;animation:none;"></span> FINAL';
+    if (kalshiBadge) kalshiBadge.innerHTML = '<span class="live-dot" style="background:#888;box-shadow:none;animation:none;"></span> FINAL';
+
+    document.getElementById('manifoldUpdated').textContent = 'Race called — March 17, 2026';
+    document.getElementById('kalshiUpdated').textContent = 'Race called — March 17, 2026';
+    document.getElementById('manifoldPreview').textContent = 'Winner: Biss 100%';
+    document.getElementById('kalshiPreview').textContent = 'Winner: Biss 100%';
+
+    // Render heatmap with final data
+    try { renderHeatmap(finalCandidates); } catch(e) {}
+
+    // Render breakdown as final
+    const breakdownEl = document.getElementById('breakdownContent');
+    if (breakdownEl) {
+        breakdownEl.innerHTML = '<p style="color: var(--text-secondary); padding: 1rem;">The race has been called. Data collection has stopped. Historical data is preserved above.</p>';
+    }
+}
+
 function setupPolling() {
-    // Render chart immediately from prefetched data (don't wait for live API calls)
+    // Render chart from historical data (preserved)
     renderMarketTrendChart(null);
+
+    if (RACE_OVER) {
+        // Race is over — show final results, no more polling
+        showFinalResults();
+        return;
+    }
 
     // Fetch live market data in parallel (updates odds display + re-renders chart)
     fetchManifoldData();
