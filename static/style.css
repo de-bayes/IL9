@@ -359,6 +359,102 @@ p {
     border-color: var(--accent);
 }
 
+/* ==================== Skip Link (Accessibility) ==================== */
+
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    background: var(--accent);
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    z-index: 2000;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: top 0.15s ease;
+}
+
+.skip-link:focus {
+    top: 0.5rem;
+}
+
+/* ==================== Hamburger Menu (base.html) ==================== */
+
+.base-hamburger {
+    display: none;
+    flex-direction: column;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    gap: 5px;
+    z-index: 1001;
+}
+
+.base-hamburger span {
+    width: 22px;
+    height: 2px;
+    background: var(--text-primary);
+    border-radius: 1px;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.base-hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.base-hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.base-hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+@media (max-width: 768px) {
+    .base-hamburger {
+        display: flex;
+    }
+
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--bg-primary);
+        border-bottom: 1px solid var(--border);
+        flex-direction: column;
+        padding: 0.75rem 0;
+        z-index: 999;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-links.mobile-open {
+        display: flex;
+    }
+
+    .nav-links li {
+        list-style: none;
+    }
+
+    .nav-links .nav-link {
+        display: block;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    .nav-links .nav-link:hover {
+        background: var(--bg-secondary);
+    }
+
+    .nav-container {
+        position: relative;
+    }
+}
+
 /* ==================== Landing Page (Figurative Style) ==================== */
 
 .landing-wrapper {

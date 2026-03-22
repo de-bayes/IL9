@@ -88,6 +88,7 @@
 </script>
 <body>
 
+    <a class="skip-link" href="#home">Skip to content</a>
     <div class="site-content">
         <!-- Election Night Banner (hidden by default, shown when data-election-night is set) -->
         <div class="en-banner">
@@ -97,9 +98,9 @@
         </div>
 
         <!-- HEADER -->
-        <header>
+        <header role="banner">
             <a href="/" class="logo">IL9<span>Cast</span></a>
-            <nav class="desktop-nav">
+            <nav class="desktop-nav" aria-label="Main navigation">
                 <a href="/markets">Markets</a>
                 <a href="/odds">Model</a>
                 <a href="/money">Money</a>
@@ -111,12 +112,12 @@
                 <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
             </button>
-            <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+            <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle navigation menu" aria-expanded="false">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
-            <nav class="mobile-nav" id="mobileNav">
+            <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation">
                 <a href="/markets">Markets</a>
                 <a href="/odds">Model</a>
                 <a href="/money">Money</a>
@@ -129,12 +130,12 @@
         <!-- HERO -->
         <section class="hero" id="home">
             <div class="hero-dateline">
-                <span class="dot"></span>
-                Live data &mdash; Updated every 3 minutes
+                <span class="dot dot-static"></span>
+                <span id="dateline-text">Archived data</span>
             </div>
             <h1>Illinois 9th District,<br><em>Democratic Primary Hub</em></h1>
-            <p class="hero-subtitle">Live prediction markets, a precinct-level election model, fundraising analysis, and full election night coverage for the March 17, 2026 primary.</p>
-            <p class="hero-countdown"><span id="countdownCompact">--</span> until polls close &mdash; March 17, 2026 at 7:00 PM CT</p>
+            <p class="hero-subtitle">Prediction market aggregation, a precinct-level election model, fundraising analysis, and full election night coverage from the March 17, 2026 primary.</p>
+            <p class="hero-countdown" id="countdownLine"><span id="countdownCompact">--</span></p>
         </section>
 
         <div class="hero-rule"><hr></div>
@@ -319,10 +320,11 @@
             }
         }
 
-        // Mobile hamburger menu
         function toggleMobileMenu() {
-            const hamburger = document.getElementById('hamburger');
-            const mobileNav = document.getElementById('mobileNav');
+            var hamburger = document.getElementById('hamburger');
+            var mobileNav = document.getElementById('mobileNav');
+            var expanded = hamburger.getAttribute('aria-expanded') === 'true';
+            hamburger.setAttribute('aria-expanded', !expanded);
             hamburger.classList.toggle('active');
             mobileNav.classList.toggle('active');
         }
@@ -361,27 +363,23 @@
             }
         }
 
-        // Fetch current market leader from latest aggregate snapshot
+        // Fetch current market leader from latest snapshot only (lightweight)
         async function loadMarketLeader() {
             try {
-                const resp = await fetch('/api/snapshots');
-                const snapshots = await resp.json();
-                if (snapshots && snapshots.length > 0) {
-                    const latest = snapshots[snapshots.length - 1];
-                    if (latest.candidates && latest.candidates.length > 0) {
-                        const sorted = latest.candidates.sort((a, b) => b.probability - a.probability);
-                        const leader = sorted[0];
-                        const leaderEl = document.getElementById('marketLeader');
-                        const detailEl = document.getElementById('marketLeaderDetail');
-                        // Clean name
-                        let name = leader.name || '';
-                        name = name.replace(/\s*(will )?(be the democratic nominee|win|for IL-?9).*$/i, '').trim();
-                        const parts = name.split(' ');
-                        const displayName = parts.length > 1 ? parts[parts.length - 1] : name;
-                        const prob = Math.round(leader.probability * 10) / 10;
-                        if (leaderEl) leaderEl.textContent = displayName;
-                        if (detailEl) detailEl.textContent = prob + '% aggregate probability';
-                    }
+                var resp = await fetch('/api/snapshots/latest');
+                var latest = await resp.json();
+                if (latest && latest.candidates && latest.candidates.length > 0) {
+                    var sorted = latest.candidates.sort(function(a, b) { return b.probability - a.probability; });
+                    var leader = sorted[0];
+                    var leaderEl = document.getElementById('marketLeader');
+                    var detailEl = document.getElementById('marketLeaderDetail');
+                    var name = leader.name || '';
+                    name = name.replace(/\s*(will )?(be the democratic nominee|win|for IL-?9).*$/i, '').trim();
+                    var parts = name.split(' ');
+                    var displayName = parts.length > 1 ? parts[parts.length - 1] : name;
+                    var prob = Math.round(leader.probability * 10) / 10;
+                    if (leaderEl) leaderEl.textContent = displayName;
+                    if (detailEl) detailEl.textContent = prob + '% final aggregate probability';
                 }
             } catch (e) {
                 console.error('Failed to fetch market leader:', e);
@@ -468,30 +466,38 @@
             update();
         }
 
-        // Countdown timer
+        // Election state management
         function updateCountdown() {
-            const electionDate = new Date('2026-03-18T01:00:00Z'); // March 17 7PM CT
-            const now = new Date();
-            const timeDiff = electionDate - now;
-            const countdownEl = document.getElementById('countdownCompact');
+            var electionDate = new Date('2026-03-18T01:00:00Z'); // March 17 7PM CT
+            var now = new Date();
+            var timeDiff = electionDate - now;
+            var countdownEl = document.getElementById('countdownCompact');
+            var countdownLine = document.getElementById('countdownLine');
+            var datelineDot = document.querySelector('.hero-dateline .dot');
+            var datelineText = document.getElementById('dateline-text');
             if (!countdownEl) return;
 
             if (timeDiff <= 0) {
-                countdownEl.textContent = 'Polls closed';
+                countdownEl.textContent = 'Primary completed March 17, 2026';
+                if (datelineDot) datelineDot.classList.add('dot-static');
+                if (datelineText) datelineText.textContent = 'Archived data';
                 return;
             }
 
-            const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+            if (datelineDot) datelineDot.classList.remove('dot-static');
+            if (datelineText) datelineText.textContent = 'Live data \u2014 Updated every 3 minutes';
+
+            var days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
 
             if (days > 0) {
-                countdownEl.textContent = days + 'd ' + hours + 'h';
+                countdownEl.textContent = days + 'd ' + hours + 'h until polls close \u2014 March 17, 2026 at 7:00 PM CT';
             } else if (hours > 0) {
-                countdownEl.textContent = hours + 'h ' + minutes + 'm';
+                countdownEl.textContent = hours + 'h ' + minutes + 'm until polls close';
             } else {
-                const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-                countdownEl.textContent = minutes + 'm ' + seconds + 's';
+                var seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+                countdownEl.textContent = minutes + 'm ' + seconds + 's until polls close';
             }
         }
 

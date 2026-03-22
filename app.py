@@ -2141,6 +2141,40 @@ def get_snapshot_count():
     except Exception as e:
         return jsonify({"count": 0, "snapshots": 0, "data_points": 0})
 
+@app.route('/api/snapshots/latest')
+def get_latest_snapshot():
+    """Return only the most recent snapshot — avoids loading entire history."""
+    try:
+        gz_path = HISTORICAL_DATA_PATH + '.gz'
+        if os.path.exists(gz_path):
+            with gzip.open(gz_path, 'rt', encoding='utf-8') as f:
+                last_line = None
+                for line in f:
+                    stripped = line.strip()
+                    if stripped:
+                        last_line = stripped
+            if last_line:
+                return jsonify(json.loads(last_line))
+        elif os.path.exists(HISTORICAL_DATA_PATH):
+            last_line = None
+            with open(HISTORICAL_DATA_PATH, 'rb') as f:
+                f.seek(0, 2)
+                pos = f.tell()
+                buf = b''
+                while pos > 0:
+                    chunk = min(4096, pos)
+                    pos -= chunk
+                    f.seek(pos)
+                    buf = f.read(chunk) + buf
+                    lines = buf.split(b'\n')
+                    for line in reversed(lines):
+                        stripped = line.strip()
+                        if stripped:
+                            return jsonify(json.loads(stripped.decode('utf-8')))
+        return jsonify({"error": "No snapshots available"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/api/snapshots')
 def get_snapshots():
     """Retrieve historical snapshots for charting (reads JSONL format)"""

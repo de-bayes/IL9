@@ -19,7 +19,8 @@
     })();
 </script>
 <body>
-    <nav class="navbar">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
         <div class="nav-container">
             <div class="nav-brand-section">
                 <a href="/" class="nav-brand">IL9CAST</a>
@@ -27,8 +28,8 @@
             </div>
 
             <div class="nav-right">
-                <ul class="nav-links">
-                    <li><a href="/markets" class="nav-link nav-link-live"><span class="live-badge-nav"></span>Markets</a></li>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="/markets" class="nav-link">Markets</a></li>
                     <li><a href="/odds" class="nav-link">Model</a></li>
                     <li><a href="/money" class="nav-link">Money</a></li>
                     <li><a href="/candidates" class="nav-link">Candidates</a></li>
@@ -36,7 +37,12 @@
                     <li><a href="/about" class="nav-link">About</a></li>
                 </ul>
                 <button class="dark-mode-toggle" id="darkModeToggle" aria-label="Toggle dark mode">
-                    <span class="toggle-icon">◐</span>
+                    <span class="toggle-icon">&#9684;</span>
+                </button>
+                <button class="base-hamburger" id="baseHamburger" aria-label="Toggle navigation menu" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
             </div>
         </div>
@@ -66,7 +72,7 @@
         </div>
     </div>
 
-    <main class="main-content">
+    <main class="main-content" id="main-content">
         {% block content %}{% endblock %}
     </main>
 
@@ -135,36 +141,36 @@
             toggle.textContent = isDark ? '◑' : '◐';
         }
 
-        // Fundraising callout popup
         async function initFundraisingCallout() {
-            const callout = document.getElementById('fundraisingCallout');
-            const closeBtn = document.getElementById('closeCallout');
+            var callout = document.getElementById('fundraisingCallout');
+            var closeBtn = document.getElementById('closeCallout');
 
-            // Don't show on homepage
             if (window.location.pathname === '/' || window.location.pathname === '') {
                 return;
             }
 
-            // Check if already dismissed this session
             if (sessionStorage.getItem('fundraisingCalloutDismissed') === 'true') {
                 return;
             }
 
-            // Fetch and calculate extrapolated total
+            var pageViews = parseInt(sessionStorage.getItem('il9-page-views') || '0', 10) + 1;
+            sessionStorage.setItem('il9-page-views', String(pageViews));
+
+            if (pageViews < 3) return;
+
             try {
-                const resp = await fetch('/api/fec/candidates');
-                const data = await resp.json();
-                const candidates = data.candidates || data;
+                var resp = await fetch('/api/fec/candidates');
+                var data = await resp.json();
+                var candidates = data.candidates || data;
 
                 if (!Array.isArray(candidates)) return;
 
-                let totalRaised = 0;
-                for (let i = 0; i < candidates.length; i++) {
+                var totalRaised = 0;
+                for (var i = 0; i < candidates.length; i++) {
                     totalRaised += candidates[i].total_raised || 0;
                 }
 
-                // Extrapolate to current date
-                const campaignStartDates = {
+                var campaignStartDates = {
                     "Daniel Biss": "2024-06-01",
                     "Kat Abugazaleh": "2024-08-01",
                     "Laura Fine": "2024-07-01",
@@ -173,27 +179,26 @@
                     "Bushra Amiwala": "2024-05-01"
                 };
 
-                let totalVelocity = 0;
-                for (let j = 0; j < candidates.length; j++) {
-                    const c = candidates[j];
-                    const startStr = campaignStartDates[c.name];
+                var totalVelocity = 0;
+                for (var j = 0; j < candidates.length; j++) {
+                    var c = candidates[j];
+                    var startStr = campaignStartDates[c.name];
                     if (startStr) {
-                        const start = new Date(startStr);
-                        const fecEnd = c.name === "Bushra Amiwala"
+                        var start = new Date(startStr);
+                        var fecEnd = c.name === "Bushra Amiwala"
                             ? new Date("2025-09-30")
                             : new Date("2025-12-31");
-                        const daysActive = (fecEnd - start) / (1000 * 60 * 60 * 24);
+                        var daysActive = (fecEnd - start) / (1000 * 60 * 60 * 24);
                         if (daysActive > 0) {
                             totalVelocity += c.total_raised / daysActive;
                         }
                     }
                 }
 
-                const daysSinceFiling = (new Date() - new Date("2025-12-31")) / (1000 * 60 * 60 * 24);
-                const estimatedTotal = totalRaised + (totalVelocity * daysSinceFiling);
+                var daysSinceFiling = (new Date() - new Date("2025-12-31")) / (1000 * 60 * 60 * 24);
+                var estimatedTotal = totalRaised + (totalVelocity * daysSinceFiling);
 
-                // Format with all zeros and cents
-                const formatted = new Intl.NumberFormat('en-US', {
+                var formatted = new Intl.NumberFormat('en-US', {
                     style: 'currency',
                     currency: 'USD',
                     minimumFractionDigits: 2,
@@ -202,33 +207,67 @@
 
                 document.getElementById('candidatesTotal').textContent = formatted;
 
-                // Show popup after a short delay
-                setTimeout(() => {
+                setTimeout(function() {
                     callout.classList.add('show');
-                }, 800);
+                }, 3000);
 
             } catch (e) {
                 console.error('Failed to load fundraising data:', e);
             }
 
-            // Close button handler
-            closeBtn.addEventListener('click', () => {
+            closeBtn.addEventListener('click', function() {
                 callout.classList.remove('show');
                 sessionStorage.setItem('fundraisingCalloutDismissed', 'true');
             });
 
-            // Close on overlay click
-            callout.addEventListener('click', (e) => {
+            callout.addEventListener('click', function(e) {
                 if (e.target === callout) {
+                    callout.classList.remove('show');
+                    sessionStorage.setItem('fundraisingCalloutDismissed', 'true');
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && callout.classList.contains('show')) {
                     callout.classList.remove('show');
                     sessionStorage.setItem('fundraisingCalloutDismissed', 'true');
                 }
             });
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        function initMobileMenu() {
+            var hamburger = document.getElementById('baseHamburger');
+            var navLinks = document.getElementById('navLinks');
+            if (!hamburger || !navLinks) return;
+
+            hamburger.addEventListener('click', function() {
+                var expanded = hamburger.getAttribute('aria-expanded') === 'true';
+                hamburger.setAttribute('aria-expanded', !expanded);
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('mobile-open');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+                    hamburger.classList.remove('active');
+                    hamburger.setAttribute('aria-expanded', 'false');
+                    navLinks.classList.remove('mobile-open');
+                }
+            });
+
+            navLinks.querySelectorAll('a').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    hamburger.classList.remove('active');
+                    hamburger.setAttribute('aria-expanded', 'false');
+                    navLinks.classList.remove('mobile-open');
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
             initDarkMode();
             initDropdowns();
+            initMobileMenu();
             initFundraisingCallout();
         });
     </script>
