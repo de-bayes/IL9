@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mockup &mdash; IL9Cast Archive (post-cleanup preview)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/landing-style.css">
+    <style>
+        /* Mockup-only chrome so the file is self-explanatory when opened directly */
+        .mockup-hint {
+            position: fixed;
+            bottom: 12px;
+            right: 12px;
+            z-index: 9999;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            color: var(--text-secondary);
+            font-family: var(--sans);
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.5rem 0.75rem;
+        }
+        .mockup-hint button {
+            background: none;
+            border: 1px solid var(--border-default);
+            color: var(--text-secondary);
+            font: inherit;
+            padding: 0.2rem 0.5rem;
+            margin-left: 0.5rem;
+            cursor: pointer;
+        }
+        .mockup-hint button:hover {
+            color: var(--text-primary);
+            border-color: var(--border-hover);
+        }
+    </style>
+</head>
+<script>
+    // Default to light mode in mockup so the user immediately sees the neutral off-white
+    (function() {
+        var t = localStorage.getItem('il9-theme-mockup');
+        if (t !== 'dark') document.documentElement.setAttribute('data-theme', 'light');
+    })();
+</script>
+<body>
+
+    <div class="site-content">
+        <!-- ARCHIVE BANNER -->
+        <div class="archive-banner">Archive &middot; Live forecasting ended March 17, 2026</div>
+
+        <!-- HEADER -->
+        <header>
+            <a href="#" class="logo">IL9<span>Cast</span></a>
+            <nav class="desktop-nav">
+                <a href="#">Markets</a>
+                <a href="#">Model</a>
+                <a href="#">Money</a>
+                <a href="#">Candidates</a>
+                <a href="#">Methodology</a>
+                <a href="#">About</a>
+            </nav>
+            <button class="theme-toggle" onclick="toggleMockupTheme()" aria-label="Toggle dark mode">
+                <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+        </header>
+
+        <!-- HERO -->
+        <section class="hero">
+            <h1>Illinois 9th District<br><em>Democratic Primary</em></h1>
+            <p class="hero-subtitle">A retrospective of IL9Cast: how prediction markets, a precinct-level model, and campaign-finance data tracked the March 17, 2026 primary &mdash; and how the forecast compared to the actual result.</p>
+        </section>
+
+        <div class="hero-rule"><hr></div>
+
+        <!-- STAT BOXES -->
+        <div class="stat-strip">
+            <div class="stat-grid">
+                <div class="stat-box">
+                    <div class="stat-label">Primary Winner</div>
+                    <div class="stat-value">Biss</div>
+                    <div class="stat-detail">29.6% of the vote</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Model's Call</div>
+                    <div class="stat-value">77.2%</div>
+                    <div class="stat-detail">Win probability assigned to Biss</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Election Day</div>
+                    <div class="stat-value">Mar 17</div>
+                    <div class="stat-detail">Democratic Primary, 2026</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Snapshots Collected</div>
+                    <div class="stat-value">22,184</div>
+                    <div class="stat-detail">155,288 data points archived</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HOW THE MODEL DID -->
+        <section class="editorial-section">
+            <div class="section-label">How the model did</div>
+            <div class="accuracy-card">
+                <p class="accuracy-lede">The precinct model was published two weeks before the primary. It called the correct winner, put the top three candidates in the right order, and landed within about two points on every top-three vote share.</p>
+                <div class="accuracy-rows">
+                    <div class="accuracy-row">
+                        <span class="accuracy-name">Biss</span>
+                        <span class="accuracy-pred">predicted <strong>31.6%</strong></span>
+                        <span class="accuracy-arrow">&rarr;</span>
+                        <span class="accuracy-actual">actual <strong>29.6%</strong></span>
+                        <span class="accuracy-err accuracy-err-good">&minus;2.0 pp</span>
+                    </div>
+                    <div class="accuracy-row">
+                        <span class="accuracy-name">Abughazaleh</span>
+                        <span class="accuracy-pred">predicted <strong>24.3%</strong></span>
+                        <span class="accuracy-arrow">&rarr;</span>
+                        <span class="accuracy-actual">actual <strong>25.9%</strong></span>
+                        <span class="accuracy-err accuracy-err-good">+1.6 pp</span>
+                    </div>
+                    <div class="accuracy-row">
+                        <span class="accuracy-name">Fine</span>
+                        <span class="accuracy-pred">predicted <strong>19.7%</strong></span>
+                        <span class="accuracy-arrow">&rarr;</span>
+                        <span class="accuracy-actual">actual <strong>20.4%</strong></span>
+                        <span class="accuracy-err accuracy-err-good">+0.7 pp</span>
+                    </div>
+                </div>
+                <p class="accuracy-footnote">The model assigned Biss a <strong>77.2%</strong> win probability. He won. <a href="#" class="accuracy-link">See the full comparison on the Model page &rarr;</a></p>
+            </div>
+        </section>
+
+        <!-- EXPLORE SECTION -->
+        <section class="editorial-section">
+            <div class="section-label">Explore the archive</div>
+            <div class="nav-cards">
+                <a href="#" class="nav-card">
+                    <div class="nav-card-type">Aggregated Odds</div>
+                    <div class="nav-card-title">Prediction Markets</div>
+                    <div class="nav-card-desc">Weighted aggregation of Manifold Markets and Kalshi through election night &mdash; the full archived time series.</div>
+                    <div class="nav-card-arrow">View markets &rarr;</div>
+                </a>
+                <a href="#" class="nav-card">
+                    <div class="nav-card-type">Candidate Profiles</div>
+                    <div class="nav-card-title">The Candidates</div>
+                    <div class="nav-card-desc">Profiles, final vote shares, and a look back at every candidate who ran in the IL-9 Democratic primary.</div>
+                    <div class="nav-card-arrow">View candidates &rarr;</div>
+                </a>
+                <a href="#" class="nav-card">
+                    <div class="nav-card-type">Precinct Simulation</div>
+                    <div class="nav-card-title">Precinct Model</div>
+                    <div class="nav-card-desc">100,000-simulation Monte Carlo across 436 precincts &mdash; now paired with actual results so you can see how the model performed.</div>
+                    <div class="nav-card-arrow">View model &rarr;</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- ABOUT SECTION -->
+        <section class="editorial-section">
+            <div class="section-label">About this project</div>
+            <div class="about-block">
+                <div class="about-block-text">
+                    <strong>IL9Cast</strong> was an independent hub for the Illinois 9th District Democratic Primary. From January through election day it aggregated prediction market data, published a precinct-level election model, tracked fundraising across every candidate, and on March 17 covered the race in real time. It now lives on as an archive.
+                </div>
+                <ul class="about-block-list">
+                    <li><strong>Manifold Markets</strong>40% weight in aggregation formula</li>
+                    <li><strong>Kalshi</strong>60% weight (last price, midpoint, liquidity-adjusted)</li>
+                    <li><strong>Precinct-Level Model</strong>100,000 simulation runs across 436 precincts</li>
+                    <li><strong>Open Data</strong>Full historical dataset available for download</li>
+                </ul>
+            </div>
+
+            <div class="cta-row">
+                <a href="#" class="btn-primary">See model vs actual</a>
+                <a href="#" class="btn-secondary">Archived Markets</a>
+                <a href="#" class="btn-secondary">Download Data</a>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="site-footer">
+            <hr class="footer-rule">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Navigate</h4>
+                    <ul>
+                        <li><a href="#">Markets</a></li>
+                        <li><a href="#">Candidates</a></li>
+                        <li><a href="#">Money</a></li>
+                        <li><a href="#">Methodology</a></li>
+                        <li><a href="#">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Download Data</a></li>
+                        <li><a href="#">GitHub</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Disclaimer</h4>
+                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data and presents model-based projections for informational purposes only.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 IL9Cast. Built with open data.</span>
+            </div>
+        </footer>
+    </div>
+
+    <div class="mockup-hint">
+        Preview &middot; post-cleanup landing
+        <button onclick="toggleMockupTheme()">Toggle theme</button>
+    </div>
+
+    <script>
+        function toggleMockupTheme() {
+            var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            if (isLight) {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('il9-theme-mockup', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('il9-theme-mockup', 'light');
+            }
+        }
+    </script>
+</body>
+</html>
