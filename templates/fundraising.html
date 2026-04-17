@@ -77,33 +77,24 @@
             <!-- === FUNDRAISING TAB === -->
             <div id="tab-fundraising" class="money-tab-panel">
 
-            <!-- Live Money Ticker - Hidden until data loads -->
+            <!-- Final Campaign Finance Summary (archived) -->
             <article class="live-money-ticker hidden" id="liveMoneyTicker">
                 <div class="ticker-header">
-                    <h2>Live Campaign Finance Tracker</h2>
-                    <p class="ticker-subtitle">Updated from FEC filings as of March 5, 2026. Pre-Primary data (through Feb 25) for all candidates.</p>
+                    <h2>Campaign Finance &mdash; Final Filing</h2>
+                    <p class="ticker-subtitle">Pre-primary FEC filings (through Feb 25, 2026) for all candidates. Figures frozen as of March 17, 2026.</p>
                 </div>
 
                 <div class="ticker-stats-grid">
                     <div class="ticker-stat-card ticker-stat-primary">
-                        <div class="ticker-label">Est. Total Raised (All Candidates)</div>
+                        <div class="ticker-label">Total Raised (All Candidates)</div>
                         <div class="ticker-value" id="totalRaisedDisplay">$0</div>
-                        <div class="ticker-note">* Extrapolated to current date</div>
+                        <div class="ticker-note">Cycle-to-date at final filing</div>
                     </div>
 
                     <div class="ticker-stat-card ticker-stat-secondary">
-                        <div class="ticker-label">Est. Total Spent (All Candidates)</div>
+                        <div class="ticker-label">Total Spent (All Candidates)</div>
                         <div class="ticker-value" id="totalSpentDisplay">$0</div>
-                        <div class="ticker-note">* Extrapolated to current date</div>
-                    </div>
-
-                    <div class="ticker-stat-card ticker-stat-live">
-                        <div class="ticker-label">
-                            <span class="live-pulse"></span>
-                            Raised Since You Loaded This Page
-                        </div>
-                        <div class="ticker-value ticker-value-live" id="liveCounterDisplay">$0.00</div>
-                        <div class="ticker-velocity">~$<span id="velocityDisplay">0</span>/hour across all campaigns</div>
+                        <div class="ticker-note">Cycle-to-date at final filing</div>
                     </div>
                 </div>
             </article>
@@ -1505,75 +1496,25 @@
             });
         }
 
-        // Live Money Ticker
-        let liveCounterInterval = null;
-        let liveCounterAmount = 0;
-        let velocityPerSecond = 0;
-
+        // Campaign Finance Summary (archive mode: frozen at final filing totals)
         function startLiveCounter(totalRaised, totalSpent, candidates) {
-            // Use raise_rate_monthly from FEC data (calculated from actual filing periods)
-            let totalDailyVelocity = 0;
-            let totalDailySpendRate = 0;
-
+            // Sum candidates' reported totals as of their coverage_end_date.
+            // No extrapolation forward and no ticking counter — the race is over.
+            let finalTotalRaised = 0;
+            let finalTotalSpent = 0;
             candidates.forEach(candidate => {
-                const raiseRate = candidate.raise_rate_monthly || 0;
-                const burnRate = candidate.burn_rate_monthly || 0;
-                // Convert monthly to daily (30.44 days/month)
-                totalDailyVelocity += raiseRate / 30.44;
-                totalDailySpendRate += burnRate / 30.44;
+                finalTotalRaised += candidate.total_raised || 0;
+                finalTotalSpent += candidate.total_spent || 0;
             });
 
-            const velocityPerHour = totalDailyVelocity / 24;
-            velocityPerSecond = velocityPerHour / 3600;
+            document.getElementById('totalRaisedDisplay').textContent = formatCurrency(finalTotalRaised);
+            document.getElementById('totalSpentDisplay').textContent = formatCurrency(finalTotalSpent);
 
-            console.log(`Combined velocity: $${Math.round(totalDailyVelocity)}/day = $${Math.round(velocityPerHour)}/hour`);
-
-            // Extrapolate from each candidate's coverage_end_date to today
-            const today = new Date();
-            let estimatedCurrentTotal = 0;
-            let estimatedCurrentSpent = 0;
-
-            candidates.forEach(candidate => {
-                const coverageEnd = new Date(candidate.coverage_end_date);
-                const daysSince = Math.max(0, (today - coverageEnd) / (1000 * 60 * 60 * 24));
-                const dailyRaise = (candidate.raise_rate_monthly || 0) / 30.44;
-                const dailyBurn = (candidate.burn_rate_monthly || 0) / 30.44;
-                estimatedCurrentTotal += candidate.total_raised + (dailyRaise * daysSince);
-                estimatedCurrentSpent += candidate.total_spent + (dailyBurn * daysSince);
-            });
-
-            // Display extrapolated totals
-            document.getElementById('totalRaisedDisplay').textContent = formatCurrency(estimatedCurrentTotal);
-            document.getElementById('totalSpentDisplay').textContent = formatCurrency(estimatedCurrentSpent);
-            document.getElementById('velocityDisplay').textContent = Math.round(velocityPerHour).toLocaleString();
-
-            // Sync IE section candidate-raised with extrapolated total
             const ieEl = document.getElementById('ieCandidateRaised');
             if (ieEl) {
-                const raisedM = (estimatedCurrentTotal / 1000000).toFixed(1);
+                const raisedM = (finalTotalRaised / 1000000).toFixed(1);
                 ieEl.textContent = '$' + raisedM + 'M';
             }
-
-            // Start live counter
-            liveCounterAmount = 0;
-            document.getElementById('liveCounterDisplay').textContent = '$0.00';
-
-            // Update every 100ms for smooth animation
-            if (liveCounterInterval) clearInterval(liveCounterInterval);
-            liveCounterInterval = setInterval(() => {
-                liveCounterAmount += velocityPerSecond * 0.1; // 100ms = 0.1 seconds
-
-                if (liveCounterAmount < 100) {
-                    document.getElementById('liveCounterDisplay').textContent =
-                        '$' + liveCounterAmount.toFixed(2);
-                } else if (liveCounterAmount < 1000) {
-                    document.getElementById('liveCounterDisplay').textContent =
-                        '$' + liveCounterAmount.toFixed(0);
-                } else {
-                    document.getElementById('liveCounterDisplay').textContent =
-                        formatCurrency(liveCounterAmount);
-                }
-            }, 100);
 
             // Show ticker
             document.getElementById('liveMoneyTicker').classList.remove('hidden');

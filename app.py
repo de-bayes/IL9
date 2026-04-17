@@ -652,14 +652,6 @@ def _get_compute_lock(cache_key):
             _chart_compute_locks[cache_key] = _threading.Lock()
         return _chart_compute_locks[cache_key]
 
-# ===== API PROXY CACHES =====
-# Cache external API responses to avoid re-fetching on every page load.
-# Data only changes every 3 minutes, so 45-second TTL is safe.
-_PROXY_CACHE_TTL = 45  # seconds
-_manifold_cache = {'data': None, 'time': 0}
-_kalshi_cache = {'data': None, 'time': 0}
-
-
 # ===== EMAIL ALERT FUNCTIONS =====
 
 def read_subscribers():
@@ -1855,117 +1847,60 @@ def get_timeline():
 
     return jsonify(timeline)
 
+# Archive mode: serve the final Manifold/Kalshi responses from snapshots bundled
+# in the git repo. No live network calls — the site must keep working even if
+# the external APIs change or go away.
+_ARCHIVE_DIR = os.path.join(os.path.dirname(__file__), 'data', 'archive')
+
+def _serve_archive_json(filename):
+    path = os.path.join(_ARCHIVE_DIR, filename)
+    try:
+        with open(path, 'r') as f:
+            data = json.load(f)
+    except (IOError, OSError, ValueError) as e:
+        return jsonify({"error": f"archive unavailable: {e}"}), 500
+    result = jsonify(data)
+    result.headers['Cache-Control'] = 'public, max-age=3600'
+    return result
+
 @app.route('/api/manifold')
 def get_manifold():
-    """Proxy Manifold Markets API to avoid CORS (cached for 45s)"""
-    global _manifold_cache
-    now = _time.time()
-    if _manifold_cache['data'] and (now - _manifold_cache['time']) < _PROXY_CACHE_TTL:
-        result = jsonify(_manifold_cache['data'])
-        result.headers['Cache-Control'] = 'public, max-age=30'
-        return result
-    try:
-        response = requests.get(
-            'https://api.manifold.markets/v0/slug/who-will-win-the-democratic-primary-RZdcps6dL9',
-            timeout=8
-        )
-        response.raise_for_status()
-        data = response.json()
-        _manifold_cache = {'data': data, 'time': now}
-        result = jsonify(data)
-        result.headers['Cache-Control'] = 'public, max-age=30'
-        return result
-    except Exception as e:
-        # Serve stale cache on error rather than failing
-        if _manifold_cache['data']:
-            result = jsonify(_manifold_cache['data'])
-            result.headers['Cache-Control'] = 'public, max-age=10'
-            return result
-        return jsonify({"error": str(e)}), 500
+    """Serve the final archived Manifold Markets response."""
+    return _serve_archive_json('manifold.json')
 
 @app.route('/api/kalshi')
 def get_kalshi():
-    """Proxy Kalshi API to avoid CORS — uses /events endpoint (cached for 45s)"""
-    global _kalshi_cache
-    now = _time.time()
-    if _kalshi_cache['data'] and (now - _kalshi_cache['time']) < _PROXY_CACHE_TTL:
-        result = jsonify(_kalshi_cache['data'])
-        result.headers['Cache-Control'] = 'public, max-age=30'
-        return result
+    """Serve the final archived Kalshi response (reshaped to legacy /markets format)."""
+    path = os.path.join(_ARCHIVE_DIR, 'kalshi.json')
     try:
-        response = requests.get(
-            'https://api.elections.kalshi.com/trade-api/v2/events/KXIL9D-26',
-            timeout=8
-        )
-        response.raise_for_status()
-        data = response.json()
-        # Reshape to match the old /markets response format the frontend expects
-        markets = data.get('markets', [])
-        for m in markets:
-            if not m.get('subtitle'):
-                m['subtitle'] = m.get('yes_sub_title') or m.get('custom_strike', {}).get('Candidate', '')
-            # Kalshi API changed to dollar-based string fields (e.g. "0.3600")
-            # with old cent-based fields (last_price, yes_bid, yes_ask) returning null.
-            # Translate back to the cent-based numbers both backend and frontend expect.
-            if m.get('last_price') is None and m.get('last_price_dollars') is not None:
-                try:
-                    m['last_price'] = round(float(m['last_price_dollars']) * 100, 1)
-                except (ValueError, TypeError):
-                    m['last_price'] = 0
-            if m.get('yes_bid') is None and m.get('no_ask_dollars') is not None:
-                try:
-                    m['yes_bid'] = round((1.0 - float(m['no_ask_dollars'])) * 100, 1)
-                except (ValueError, TypeError):
-                    m['yes_bid'] = 0
-            if m.get('yes_ask') is None and m.get('no_bid_dollars') is not None:
-                try:
-                    m['yes_ask'] = round((1.0 - float(m['no_bid_dollars'])) * 100, 1)
-                except (ValueError, TypeError):
-                    m['yes_ask'] = 0
-        shaped = {"markets": markets}
-        _kalshi_cache = {'data': shaped, 'time': now}
-        result = jsonify(shaped)
-        result.headers['Cache-Control'] = 'public, max-age=30'
-        return result
-    except Exception as e:
-        # Serve stale cache on error rather than failing
-        if _kalshi_cache['data']:
-            result = jsonify(_kalshi_cache['data'])
-            result.headers['Cache-Control'] = 'public, max-age=10'
-            return result
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/api/manifold/history')
-def get_manifold_history():
-    """Get Manifold market history for chart"""
-    try:
-        # Get the market first to get the ID
-        market_response = requests.get('https://api.manifold.markets/v0/slug/who-will-win-the-democratic-primary-RZdcps6dL9', timeout=8)
-        market_response.raise_for_status()
-        market = market_response.json()
-        market_id = market.get('id')
-
-        # Get bets for this market
-        bets_response = requests.get(f'https://api.manifold.markets/v0/bets?contractId={market_id}&limit=1000', timeout=10)
-        bets_response.raise_for_status()
-        bets = bets_response.json()
-
-        return jsonify({
-            "market": market,
-            "bets": bets
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/api/kalshi/history/<ticker>')
-def get_kalshi_history(ticker):
-    """Get Kalshi market history for a specific ticker"""
-    try:
-        response = requests.get(f'https://api.elections.kalshi.com/trade-api/v2/markets/{ticker}/history?limit=1000', timeout=10)
-        response.raise_for_status()
-        return jsonify(response.json())
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        with open(path, 'r') as f:
+            data = json.load(f)
+    except (IOError, OSError, ValueError) as e:
+        return jsonify({"error": f"archive unavailable: {e}"}), 500
+    markets = data.get('markets', [])
+    for m in markets:
+        if not m.get('subtitle'):
+            m['subtitle'] = m.get('yes_sub_title') or m.get('custom_strike', {}).get('Candidate', '')
+        # Kalshi switched to dollar-based string fields; normalise to legacy
+        # cent-based numeric fields the front-end expects.
+        if m.get('last_price') is None and m.get('last_price_dollars') is not None:
+            try:
+                m['last_price'] = round(float(m['last_price_dollars']) * 100, 1)
+            except (ValueError, TypeError):
+                m['last_price'] = 0
+        if m.get('yes_bid') is None and m.get('no_ask_dollars') is not None:
+            try:
+                m['yes_bid'] = round((1.0 - float(m['no_ask_dollars'])) * 100, 1)
+            except (ValueError, TypeError):
+                m['yes_bid'] = 0
+        if m.get('yes_ask') is None and m.get('no_bid_dollars') is not None:
+            try:
+                m['yes_ask'] = round((1.0 - float(m['no_bid_dollars'])) * 100, 1)
+            except (ValueError, TypeError):
+                m['yes_ask'] = 0
+    result = jsonify({"markets": markets})
+    result.headers['Cache-Control'] = 'public, max-age=3600'
+    return result
 
 
 @app.route('/api/admin/repair-snapshots', methods=['POST'])
@@ -2175,16 +2110,19 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
     GAP_THRESHOLD_SECS = 7200  # 2 hours
     _ts_re = re.compile(r'"timestamp":\s*"([^"]+)"')
 
-    now_utc = datetime.now(timezone.utc)
+    # Archive mode: anchor period windows to the most recent snapshot, not to
+    # wall-clock "now". Otherwise post-election visits see empty 1d/7d charts.
     if period == '1d':
         max_lines = 1200
-        cutoff = now_utc - timedelta(days=1)
+        period_days = 1
     elif period == '7d':
         max_lines = 8000
-        cutoff = now_utc - timedelta(days=7)
+        period_days = 7
     else:
         max_lines = None
-        cutoff = None
+        period_days = None
+
+    cutoff = None  # filled in after we know the latest snapshot timestamp below
 
     # --- Resolve source lines ---
     if raw_lines is not None:
@@ -2201,6 +2139,19 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
 
     if not source_lines:
         return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
+
+    # --- Anchor period cutoff to the latest snapshot timestamp ---
+    # Scan back from the end to find the most recent parseable timestamp.
+    if period_days is not None:
+        latest_dt = None
+        for line in reversed(source_lines):
+            m = _ts_re.search(line)
+            if m:
+                latest_dt = parse_snapshot_timestamp(m.group(1))
+                if latest_dt:
+                    break
+        if latest_dt is not None:
+            cutoff = latest_dt - timedelta(days=period_days)
 
     # --- Gap detection on FULL data via fast regex (no JSON parse needed) ---
     gaps = []
@@ -2220,9 +2171,31 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
                     prev_dt = dt
 
     # --- Trim/downsample raw lines BEFORE JSON parsing ---
-    if max_lines and len(source_lines) > max_lines:
-        # 1d/7d: just take the tail
-        lines_to_parse = source_lines[-max_lines:]
+    if cutoff is not None:
+        # 1d/7d: binary-search-ish scan from the end using fast regex to find
+        # the earliest line within the cutoff window. This gives the *full*
+        # time window regardless of how dense the trailing data is.
+        start_idx = len(source_lines)
+        for i in range(len(source_lines) - 1, -1, -1):
+            m = _ts_re.search(source_lines[i])
+            if not m:
+                continue
+            dt = parse_snapshot_timestamp(m.group(1))
+            if dt is None:
+                continue
+            if dt >= cutoff:
+                start_idx = i
+            else:
+                break
+        lines_to_parse = source_lines[start_idx:]
+        # Safety cap: if the window is huge (e.g. dense election-night data),
+        # uniformly downsample before parsing.
+        if max_lines and len(lines_to_parse) > max_lines:
+            step = max(1, len(lines_to_parse) // max_lines)
+            lines_to_parse = [lines_to_parse[i] for i in range(0, len(lines_to_parse), step)]
+            # Always include the final line so the chart's right edge is correct.
+            if lines_to_parse[-1] is not source_lines[-1]:
+                lines_to_parse.append(source_lines[-1])
     elif len(source_lines) > MAX_POINTS:
         # all: uniform downsample (keeps first, every Nth, last)
         step = len(source_lines) // MAX_POINTS
@@ -2630,27 +2603,8 @@ def download_snapshots_csv():
 
 @app.route('/api/subscribe', methods=['POST'])
 def subscribe():
-    """Subscribe an email to alerts."""
-    import re
-    data = request.get_json()
-    if not data or not data.get('email'):
-        return jsonify({'error': 'Email required'}), 400
-
-    email = data['email'].lower().strip()
-    if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
-        return jsonify({'error': 'Invalid email address'}), 400
-
-    threshold = data.get('threshold', 5.0)
-
-    try:
-        token = add_subscriber(email, threshold)
-        try:
-            send_welcome_email(email, threshold)
-        except Exception as e:
-            print(f"[{datetime.now().isoformat()}] Welcome email failed: {e}")
-        return jsonify({'success': True, 'message': 'Subscribed! Check your email.'})
-    except ValueError as e:
-        return jsonify({'error': str(e)}), 409
+    """Archive mode: subscriptions are closed."""
+    return jsonify({'error': 'Email alerts ended with the March 17, 2026 primary.'}), 410
 
 @app.route('/unsubscribe')
 def unsubscribe():

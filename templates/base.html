@@ -50,7 +50,7 @@
                 <div class="callout-box callout-box-primary">
                     <div class="callout-label">Total Raised by IL-9 Candidates</div>
                     <div class="callout-value" id="candidatesTotal">$0.00</div>
-                    <div class="callout-note">Extrapolated to current date</div>
+                    <div class="callout-note">Final FEC filings through Feb 25, 2026</div>
                 </div>
                 <div class="callout-box callout-box-secondary">
                     <div class="callout-label">Total Raised by IL9Cast.org</div>
@@ -149,7 +149,7 @@
                 return;
             }
 
-            // Fetch and calculate extrapolated total
+            // Archive mode: sum of candidates' final reported totals, no extrapolation.
             try {
                 const resp = await fetch('/api/fec/candidates');
                 const data = await resp.json();
@@ -162,42 +162,12 @@
                     totalRaised += candidates[i].total_raised || 0;
                 }
 
-                // Extrapolate to current date
-                const campaignStartDates = {
-                    "Daniel Biss": "2024-06-01",
-                    "Kat Abugazaleh": "2024-08-01",
-                    "Laura Fine": "2024-07-01",
-                    "Mike Simmons": "2025-01-01",
-                    "Phil Andrew": "2024-09-01",
-                    "Bushra Amiwala": "2024-05-01"
-                };
-
-                let totalVelocity = 0;
-                for (let j = 0; j < candidates.length; j++) {
-                    const c = candidates[j];
-                    const startStr = campaignStartDates[c.name];
-                    if (startStr) {
-                        const start = new Date(startStr);
-                        const fecEnd = c.name === "Bushra Amiwala"
-                            ? new Date("2025-09-30")
-                            : new Date("2025-12-31");
-                        const daysActive = (fecEnd - start) / (1000 * 60 * 60 * 24);
-                        if (daysActive > 0) {
-                            totalVelocity += c.total_raised / daysActive;
-                        }
-                    }
-                }
-
-                const daysSinceFiling = (new Date() - new Date("2025-12-31")) / (1000 * 60 * 60 * 24);
-                const estimatedTotal = totalRaised + (totalVelocity * daysSinceFiling);
-
-                // Format with all zeros and cents
                 const formatted = new Intl.NumberFormat('en-US', {
                     style: 'currency',
                     currency: 'USD',
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
-                }).format(estimatedTotal);
+                }).format(totalRaised);
 
                 document.getElementById('candidatesTotal').textContent = formatted;
 
