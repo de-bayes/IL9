@@ -12,7 +12,34 @@ import shutil
 import gzip
 
 app = Flask(__name__)
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400  # Cache static files for 1 day
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400  # Cache static files for 1 day (safe due to ?v= cache-buster)
+
+
+@app.url_defaults
+def _append_static_version(endpoint, values):
+    """Append a ?v=<mtime> cache-buster to every url_for('static', ...) call
+    so browsers automatically pick up changed CSS/JS without a hard refresh."""
+    if endpoint != 'static':
+        return
+    filename = values.get('filename')
+    if not filename or 'v' in values:
+        return
+    try:
+        filepath = os.path.join(app.static_folder, filename)
+        values['v'] = int(os.path.getmtime(filepath))
+    except OSError:
+        pass
+
+
+@app.after_request
+def _no_cache_html(response):
+    """Prevent browsers from serving stale HTML pages. Static assets and JSON
+    APIs keep their own cache headers; only text/html gets forced revalidation."""
+    if response.mimetype == 'text/html' and 'Cache-Control' not in response.headers:
+        response.headers['Cache-Control'] = 'no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    return response
 
 
 # ===== PATH RESOLUTION =====
