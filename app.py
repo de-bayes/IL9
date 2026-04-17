@@ -10,8 +10,6 @@ import time as _time
 import atexit
 import shutil
 import gzip
-# APScheduler no longer needed — site is now static, serving archived data only
-# from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400  # Cache static files for 1 day
@@ -653,14 +651,6 @@ def _get_compute_lock(cache_key):
         if cache_key not in _chart_compute_locks:
             _chart_compute_locks[cache_key] = _threading.Lock()
         return _chart_compute_locks[cache_key]
-
-# ===== API PROXY CACHES =====
-# Cache external API responses to avoid re-fetching on every page load.
-# Data only changes every 3 minutes, so 45-second TTL is safe.
-_PROXY_CACHE_TTL = 45  # seconds
-_manifold_cache = {'data': None, 'time': 0}
-_kalshi_cache = {'data': None, 'time': 0}
-
 
 # ===== EMAIL ALERT FUNCTIONS =====
 
@@ -1715,27 +1705,40 @@ def updates():
 def case_study_bid_ask():
     return render_template('case_study_bid_ask.html')
 
+# Certified final vote shares for the March 17, 2026 IL-9 Democratic primary.
+# Top-three numbers are from Ballotpedia / AP reporting; candidates below that
+# did not have cleanly reported per-candidate tallies in open sources, so they
+# are shown as a grouped bucket rather than fabricated.
+FINAL_VOTE_SHARES = {
+    'Daniel Biss':        {'share': 29.6, 'label': '29.6%', 'sublabel': 'Final Vote Share',     'sort_rank': 1},
+    'Kat Abugazaleh':     {'share': 25.9, 'label': '25.9%', 'sublabel': 'Final Vote Share',     'sort_rank': 2},
+    'Laura Fine':         {'share': 20.4, 'label': '20.4%', 'sublabel': 'Final Vote Share',     'sort_rank': 3},
+}
+
+
 @app.route('/candidates')
 def candidates():
-    """Show candidate profiles with live odds and individual charts"""
-    # Get latest snapshot for current odds
-    snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
-    latest_snapshot = snapshots[-1] if snapshots else None
-
-    # Build candidate data with current odds
-    # Hardcoded final results: Biss won the primary
+    """Show candidate profiles with certified final vote shares."""
     candidates_data = []
     for profile in CANDIDATE_PROFILES:
         candidate = profile.copy()
-        if 'Biss' in candidate['name']:
-            candidate['current_odds'] = 100.0
+        result = FINAL_VOTE_SHARES.get(candidate['name'])
+        if result:
+            candidate['current_odds'] = result['share']
+            candidate['result_label'] = result['label']
+            candidate['result_sublabel'] = result['sublabel']
+            candidate['_sort_rank'] = result['sort_rank']
         else:
+            # Outside the top 3; per-candidate tallies weren't cleanly reported.
             candidate['current_odds'] = 0.0
+            candidate['result_label'] = '< 6%'
+            candidate['result_sublabel'] = 'Below top 3'
+            candidate['_sort_rank'] = 99
         candidate['has_kalshi'] = False
         candidates_data.append(candidate)
 
-    # Sort by current odds descending
-    candidates_data.sort(key=lambda x: x['current_odds'], reverse=True)
+    # Top 3 in result order, then everyone else in profile order.
+    candidates_data.sort(key=lambda x: (x['_sort_rank'], x.get('name', '')))
 
     return render_template('candidates.html', candidates=candidates_data)
 
@@ -1844,117 +1847,60 @@ def get_timeline():
 
     return jsonify(timeline)
 
+# Archive mode: serve the final Manifold/Kalshi responses from snapshots bundled
+# in the git repo. No live network calls — the site must keep working even if
+# the external APIs change or go away.
+_ARCHIVE_DIR = os.path.join(os.path.dirname(__file__), 'data', 'archive')
+
+def _serve_archive_json(filename):
+    path = os.path.join(_ARCHIVE_DIR, filename)
+    try:
+        with open(path, 'r') as f:
+            data = json.load(f)
+    except (IOError, OSError, ValueError) as e:
+        return jsonify({"error": f"archive unavailable: {e}"}), 500
+    result = jsonify(data)
+    result.headers['Cache-Control'] = 'public, max-age=3600'
+    return result
+
 @app.route('/api/manifold')
 def get_manifold():
-    """Proxy Manifold Markets API to avoid CORS (cached for 45s)"""
-    global _manifold_cache
-    now = _time.time()
-    if _manifold_cache['data'] and (now - _manifold_cache['time']) < _PROXY_CACHE_TTL:
-        result = jsonify(_manifold_cache['data'])
-        result.headers['Cache-Control'] = 'public, max-age=30'
-        return result
-    try:
-        response = requests.get(
-            'https://api.manifold.markets/v0/slug/who-will-win-the-democratic-primary-RZdcps6dL9',
-            timeout=8
-        )
-        response.raise_for_status()
-        data = response.json()
-        _manifold_cache = {'data': data, 'time': now}
-        result = jsonify(data)
-        result.headers['Cache-Control'] = 'public, max-age=30'
-        return result
-    except Exception as e:
-        # Serve stale cache on error rather than failing
-        if _manifold_cache['data']:
-            result = jsonify(_manifold_cache['data'])
-            result.headers['Cache-Control'] = 'public, max-age=10'
-            return result
-        return jsonify({"error": str(e)}), 500
+    """Serve the final archived Manifold Markets response."""
+    return _serve_archive_json('manifold.json')
 
 @app.route('/api/kalshi')
 def get_kalshi():
-    """Proxy Kalshi API to avoid CORS — uses /events endpoint (cached for 45s)"""
-    global _kalshi_cache
-    now = _time.time()
-    if _kalshi_cache['data'] and (now - _kalshi_cache['time']) < _PROXY_CACHE_TTL:
-        result = jsonify(_kalshi_cache['data'])
-        result.headers['Cache-Control'] = 'public, max-age=30'
-        return result
+    """Serve the final archived Kalshi response (reshaped to legacy /markets format)."""
+    path = os.path.join(_ARCHIVE_DIR, 'kalshi.json')
     try:
-        response = requests.get(
-            'https://api.elections.kalshi.com/trade-api/v2/events/KXIL9D-26',
-            timeout=8
-        )
-        response.raise_for_status()
-        data = response.json()
-        # Reshape to match the old /markets response format the frontend expects
-        markets = data.get('markets', [])
-        for m in markets:
-            if not m.get('subtitle'):
-                m['subtitle'] = m.get('yes_sub_title') or m.get('custom_strike', {}).get('Candidate', '')
-            # Kalshi API changed to dollar-based string fields (e.g. "0.3600")
-            # with old cent-based fields (last_price, yes_bid, yes_ask) returning null.
-            # Translate back to the cent-based numbers both backend and frontend expect.
-            if m.get('last_price') is None and m.get('last_price_dollars') is not None:
-                try:
-                    m['last_price'] = round(float(m['last_price_dollars']) * 100, 1)
-                except (ValueError, TypeError):
-                    m['last_price'] = 0
-            if m.get('yes_bid') is None and m.get('no_ask_dollars') is not None:
-                try:
-                    m['yes_bid'] = round((1.0 - float(m['no_ask_dollars'])) * 100, 1)
-                except (ValueError, TypeError):
-                    m['yes_bid'] = 0
-            if m.get('yes_ask') is None and m.get('no_bid_dollars') is not None:
-                try:
-                    m['yes_ask'] = round((1.0 - float(m['no_bid_dollars'])) * 100, 1)
-                except (ValueError, TypeError):
-                    m['yes_ask'] = 0
-        shaped = {"markets": markets}
-        _kalshi_cache = {'data': shaped, 'time': now}
-        result = jsonify(shaped)
-        result.headers['Cache-Control'] = 'public, max-age=30'
-        return result
-    except Exception as e:
-        # Serve stale cache on error rather than failing
-        if _kalshi_cache['data']:
-            result = jsonify(_kalshi_cache['data'])
-            result.headers['Cache-Control'] = 'public, max-age=10'
-            return result
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/api/manifold/history')
-def get_manifold_history():
-    """Get Manifold market history for chart"""
-    try:
-        # Get the market first to get the ID
-        market_response = requests.get('https://api.manifold.markets/v0/slug/who-will-win-the-democratic-primary-RZdcps6dL9', timeout=8)
-        market_response.raise_for_status()
-        market = market_response.json()
-        market_id = market.get('id')
-
-        # Get bets for this market
-        bets_response = requests.get(f'https://api.manifold.markets/v0/bets?contractId={market_id}&limit=1000', timeout=10)
-        bets_response.raise_for_status()
-        bets = bets_response.json()
-
-        return jsonify({
-            "market": market,
-            "bets": bets
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/api/kalshi/history/<ticker>')
-def get_kalshi_history(ticker):
-    """Get Kalshi market history for a specific ticker"""
-    try:
-        response = requests.get(f'https://api.elections.kalshi.com/trade-api/v2/markets/{ticker}/history?limit=1000', timeout=10)
-        response.raise_for_status()
-        return jsonify(response.json())
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        with open(path, 'r') as f:
+            data = json.load(f)
+    except (IOError, OSError, ValueError) as e:
+        return jsonify({"error": f"archive unavailable: {e}"}), 500
+    markets = data.get('markets', [])
+    for m in markets:
+        if not m.get('subtitle'):
+            m['subtitle'] = m.get('yes_sub_title') or m.get('custom_strike', {}).get('Candidate', '')
+        # Kalshi switched to dollar-based string fields; normalise to legacy
+        # cent-based numeric fields the front-end expects.
+        if m.get('last_price') is None and m.get('last_price_dollars') is not None:
+            try:
+                m['last_price'] = round(float(m['last_price_dollars']) * 100, 1)
+            except (ValueError, TypeError):
+                m['last_price'] = 0
+        if m.get('yes_bid') is None and m.get('no_ask_dollars') is not None:
+            try:
+                m['yes_bid'] = round((1.0 - float(m['no_ask_dollars'])) * 100, 1)
+            except (ValueError, TypeError):
+                m['yes_bid'] = 0
+        if m.get('yes_ask') is None and m.get('no_bid_dollars') is not None:
+            try:
+                m['yes_ask'] = round((1.0 - float(m['no_bid_dollars'])) * 100, 1)
+            except (ValueError, TypeError):
+                m['yes_ask'] = 0
+    result = jsonify({"markets": markets})
+    result.headers['Cache-Control'] = 'public, max-age=3600'
+    return result
 
 
 @app.route('/api/admin/repair-snapshots', methods=['POST'])
@@ -2122,11 +2068,6 @@ def fix_kalshi_gap():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/snapshot', methods=['POST'])
-def save_snapshot():
-    """Disabled — site is now a static archive. No new data collection."""
-    return jsonify({"error": "Site is now a static archive. Data collection has ended."}), 410
-
 @app.route('/api/snapshots/count')
 def get_snapshot_count():
     """Return total snapshot count and data points without loading all data"""
@@ -2169,16 +2110,19 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
     GAP_THRESHOLD_SECS = 7200  # 2 hours
     _ts_re = re.compile(r'"timestamp":\s*"([^"]+)"')
 
-    now_utc = datetime.now(timezone.utc)
+    # Archive mode: anchor period windows to the most recent snapshot, not to
+    # wall-clock "now". Otherwise post-election visits see empty 1d/7d charts.
     if period == '1d':
         max_lines = 1200
-        cutoff = now_utc - timedelta(days=1)
+        period_days = 1
     elif period == '7d':
         max_lines = 8000
-        cutoff = now_utc - timedelta(days=7)
+        period_days = 7
     else:
         max_lines = None
-        cutoff = None
+        period_days = None
+
+    cutoff = None  # filled in after we know the latest snapshot timestamp below
 
     # --- Resolve source lines ---
     if raw_lines is not None:
@@ -2195,6 +2139,19 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
 
     if not source_lines:
         return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
+
+    # --- Anchor period cutoff to the latest snapshot timestamp ---
+    # Scan back from the end to find the most recent parseable timestamp.
+    if period_days is not None:
+        latest_dt = None
+        for line in reversed(source_lines):
+            m = _ts_re.search(line)
+            if m:
+                latest_dt = parse_snapshot_timestamp(m.group(1))
+                if latest_dt:
+                    break
+        if latest_dt is not None:
+            cutoff = latest_dt - timedelta(days=period_days)
 
     # --- Gap detection on FULL data via fast regex (no JSON parse needed) ---
     gaps = []
@@ -2214,9 +2171,31 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
                     prev_dt = dt
 
     # --- Trim/downsample raw lines BEFORE JSON parsing ---
-    if max_lines and len(source_lines) > max_lines:
-        # 1d/7d: just take the tail
-        lines_to_parse = source_lines[-max_lines:]
+    if cutoff is not None:
+        # 1d/7d: binary-search-ish scan from the end using fast regex to find
+        # the earliest line within the cutoff window. This gives the *full*
+        # time window regardless of how dense the trailing data is.
+        start_idx = len(source_lines)
+        for i in range(len(source_lines) - 1, -1, -1):
+            m = _ts_re.search(source_lines[i])
+            if not m:
+                continue
+            dt = parse_snapshot_timestamp(m.group(1))
+            if dt is None:
+                continue
+            if dt >= cutoff:
+                start_idx = i
+            else:
+                break
+        lines_to_parse = source_lines[start_idx:]
+        # Safety cap: if the window is huge (e.g. dense election-night data),
+        # uniformly downsample before parsing.
+        if max_lines and len(lines_to_parse) > max_lines:
+            step = max(1, len(lines_to_parse) // max_lines)
+            lines_to_parse = [lines_to_parse[i] for i in range(0, len(lines_to_parse), step)]
+            # Always include the final line so the chart's right edge is correct.
+            if lines_to_parse[-1] is not source_lines[-1]:
+                lines_to_parse.append(source_lines[-1])
     elif len(source_lines) > MAX_POINTS:
         # all: uniform downsample (keeps first, every Nth, last)
         step = len(source_lines) // MAX_POINTS
@@ -2624,27 +2603,8 @@ def download_snapshots_csv():
 
 @app.route('/api/subscribe', methods=['POST'])
 def subscribe():
-    """Subscribe an email to alerts."""
-    import re
-    data = request.get_json()
-    if not data or not data.get('email'):
-        return jsonify({'error': 'Email required'}), 400
-
-    email = data['email'].lower().strip()
-    if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
-        return jsonify({'error': 'Invalid email address'}), 400
-
-    threshold = data.get('threshold', 5.0)
-
-    try:
-        token = add_subscriber(email, threshold)
-        try:
-            send_welcome_email(email, threshold)
-        except Exception as e:
-            print(f"[{datetime.now().isoformat()}] Welcome email failed: {e}")
-        return jsonify({'success': True, 'message': 'Subscribed! Check your email.'})
-    except ValueError as e:
-        return jsonify({'error': str(e)}), 409
+    """Archive mode: subscriptions are closed."""
+    return jsonify({'error': 'Email alerts ended with the March 17, 2026 primary.'}), 410
 
 @app.route('/unsubscribe')
 def unsubscribe():
@@ -2756,308 +2716,10 @@ View Live Markets: """ + SITE_BASE_URL + """markets
     return jsonify({'success': True, 'message': f'Broadcast sent to {count} subscriber(s)'})
 
 
-# Background task to collect data every 3 minutes
-# Reduces over-sampling and ensures clean 3-minute intervals
-# Includes spike dampening to prevent chart artifacts
+# Prediction-market data collection ran every 3 minutes from Jan through
+# election night (March 17, 2026). The site is now a static archive; the
+# scheduler is gone and the JSONL snapshot file is read-only.
 
-# Maximum percentage-point change allowed per 3-minute interval per candidate
-MAX_CHANGE_PER_INTERVAL = 3.0
-
-# In-memory cache of last successful snapshot for spike dampening and API fallback
-_last_snapshot = None
-
-def _get_last_snapshot():
-    """Get the most recent snapshot for spike dampening comparison."""
-    global _last_snapshot
-    if _last_snapshot is not None:
-        return _last_snapshot
-    # Load from file on first run
-    try:
-        snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
-        if snapshots:
-            _last_snapshot = snapshots[-1]
-            return _last_snapshot
-    except Exception:
-        pass
-    return None
-
-def _dampen_spikes(aggregated):
-    """
-    Prevent sudden spikes by capping per-candidate change to MAX_CHANGE_PER_INTERVAL.
-    Compares new values against the previous snapshot and clamps large jumps.
-    """
-    prev = _get_last_snapshot()
-    if not prev:
-        return aggregated  # No previous data, allow any values
-
-    prev_by_name = {c['name']: c['probability'] for c in prev.get('candidates', [])}
-
-    for c in aggregated:
-        if c['name'] in prev_by_name:
-            prev_prob = prev_by_name[c['name']]
-            delta = c['probability'] - prev_prob
-            if abs(delta) > MAX_CHANGE_PER_INTERVAL:
-                clamped = prev_prob + (MAX_CHANGE_PER_INTERVAL if delta > 0 else -MAX_CHANGE_PER_INTERVAL)
-                print(f"  [Spike dampened] {c['name']}: {c['probability']:.1f}% -> {clamped:.1f}% (was {delta:+.1f}% change)")
-                c['probability'] = clamped
-
-    return aggregated
-
-def collect_market_data():
-    """Fetch market data and save snapshot automatically"""
-    global _last_snapshot
-    try:
-        print(f"[{datetime.now().isoformat()}] Running automatic data collection...")
-
-        # Fetch Manifold data
-        manifold_data = {}
-        manifold_ok = False
-        try:
-            manifold_response = requests.get('https://api.manifold.markets/v0/slug/who-will-win-the-democratic-primary-RZdcps6dL9', timeout=10)
-            manifold_response.raise_for_status()
-            manifold_market = manifold_response.json()
-
-            answers = manifold_market.get('answers', [])
-            for answer in answers:
-                if answer.get('text') != 'Other' and 'schakowsky' not in answer.get('text', '').lower():
-                    name = normalize_candidate_name(answer.get('text', ''))
-                    manifold_data[name] = {
-                        'probability': round(answer.get('probability', 0) * 100, 1),
-                        'displayName': answer.get('text', '')
-                    }
-            manifold_ok = True
-        except Exception as e:
-            print(f"Error fetching Manifold data: {e}")
-
-        # Fetch Kalshi data
-        kalshi_data = {}
-        kalshi_ok = False
-        try:
-            kalshi_response = requests.get('https://api.elections.kalshi.com/trade-api/v2/events/KXIL9D-26', timeout=10)
-            kalshi_response.raise_for_status()
-            kalshi_markets = kalshi_response.json().get('markets', [])
-
-            for market in kalshi_markets:
-                display_name = market.get('yes_sub_title') or market.get('subtitle') or market.get('title', '')
-                if 'schakowsky' not in display_name.lower():
-                    name = normalize_candidate_name(display_name)
-                    # Handle Kalshi API format change: dollar-based string fields
-                    # with old cent-based fields returning None
-                    last_price = market.get('last_price')
-                    if last_price is None and market.get('last_price_dollars') is not None:
-                        try:
-                            last_price = round(float(market['last_price_dollars']) * 100, 1)
-                        except (ValueError, TypeError):
-                            last_price = 0
-                    last_price = last_price or 0
-
-                    yes_bid = market.get('yes_bid')
-                    if yes_bid is None and market.get('no_ask_dollars') is not None:
-                        try:
-                            yes_bid = round((1.0 - float(market['no_ask_dollars'])) * 100, 1)
-                        except (ValueError, TypeError):
-                            yes_bid = 0
-                    yes_bid = yes_bid or 0
-
-                    yes_ask = market.get('yes_ask')
-                    if yes_ask is None and market.get('no_bid_dollars') is not None:
-                        try:
-                            yes_ask = round((1.0 - float(market['no_bid_dollars'])) * 100, 1)
-                        except (ValueError, TypeError):
-                            yes_ask = 0
-                    yes_ask = yes_ask or 0
-
-                    # Only compute a real midpoint when both sides have orders.
-                    # If yes_bid is 0 (no buy-side interest), the midpoint between
-                    # 0 and the ask is meaningless — fall back to last_price.
-                    if yes_bid > 0 and yes_ask > 0:
-                        midpoint = (yes_bid + yes_ask) / 2
-                    else:
-                        midpoint = last_price
-
-                    # Calculate liquidity-weighted price
-                    spread = yes_ask - yes_bid if (yes_bid > 0 and yes_ask > 0) else 0
-                    liquidity_price = midpoint
-
-                    if spread > 0 and last_price > 0:
-                        position_in_spread = max(0, min(1, (last_price - yes_bid) / spread))
-                        offset_from_mid = position_in_spread - 0.5
-                        spread_factor = max(0.2, 1 - (spread / 10) * 0.8)
-                        # Multiply by spread (not a fixed constant) so the shift is
-                        # proportional to the spread width and can never leave [bid, ask].
-                        price_shift = offset_from_mid * spread * spread_factor
-                        liquidity_price = max(yes_bid, min(yes_ask, midpoint + price_shift))
-
-                    kalshi_data[name] = {
-                        'last_price': last_price,
-                        'midpoint': midpoint,
-                        'liquidity': liquidity_price,
-                        'yes_bid': yes_bid,
-                        'yes_ask': yes_ask,
-                        'displayName': display_name
-                    }
-            kalshi_ok = True
-        except Exception as e:
-            print(f"Error fetching Kalshi data: {e}")
-
-        # If both APIs failed, skip this interval entirely (no bad data)
-        if not manifold_ok and not kalshi_ok:
-            print(f"[{datetime.now().isoformat()}] Both APIs failed - skipping snapshot to avoid bad data")
-            return
-
-        # If only one API failed, log a warning (spike dampening will handle it)
-        if not manifold_ok:
-            print(f"  [Warning] Manifold API failed - using Kalshi-only data (dampened)")
-        if not kalshi_ok:
-            print(f"  [Warning] Kalshi API failed - using Manifold-only data (dampened)")
-
-        # Candidates to exclude from the model entirely
-        EXCLUDED_CANDIDATES = {'mark su', 'nick pyati', 'sam polan', 'howard rosenblum', 'illinois senate'}
-
-        # Calculate aggregated probabilities
-        if manifold_data or kalshi_data:
-            all_candidates = set(list(manifold_data.keys()) + list(kalshi_data.keys()))
-            aggregated = []
-
-            for candidate_key in all_candidates:
-                if candidate_key in EXCLUDED_CANDIDATES:
-                    continue
-                manifold_prob = manifold_data.get(candidate_key, {}).get('probability', 0)
-                kalshi_info = kalshi_data.get(candidate_key, {})
-                kalshi_last = kalshi_info.get('last_price', 0)
-                kalshi_mid = kalshi_info.get('midpoint', 0)
-                kalshi_liq = kalshi_info.get('liquidity', kalshi_mid)
-
-                kalshi_bid = kalshi_info.get('yes_bid', 0)
-                kalshi_ask = kalshi_info.get('yes_ask', 0)
-                has_two_sided_book = kalshi_bid > 0 and kalshi_ask > 0
-                has_unlocked_spread = kalshi_ask > kalshi_bid
-
-                # Treat Kalshi as inactive when the order book is one-sided/locked.
-                # A non-zero last trade with no current bid can be stale and can
-                # otherwise overstate thinly traded candidates.
-                has_kalshi = has_two_sided_book and has_unlocked_spread and (kalshi_last > 0 or kalshi_mid > 0)
-
-                if has_kalshi:
-                    last_outside_spread = (
-                        kalshi_bid > 0 and kalshi_ask > 0 and
-                        (kalshi_last > kalshi_ask or kalshi_last < kalshi_bid)
-                    )
-                    if last_outside_spread:
-                        # Throttled: reduce last_price weight, boost spread-based components
-                        aggregate = (0.40 * manifold_prob) + (0.20 * kalshi_last) + (0.28 * kalshi_mid) + (0.12 * kalshi_liq)
-                        print(f"  [Spread throttle] {candidate_key}: last={kalshi_last:.1f} outside [{kalshi_bid:.1f}, {kalshi_ask:.1f}]")
-                    else:
-                        # Normal weights
-                        aggregate = (0.40 * manifold_prob) + (0.42 * kalshi_last) + (0.12 * kalshi_mid) + (0.06 * kalshi_liq)
-                else:
-                    if (kalshi_last > 0 or kalshi_mid > 0) and (not has_two_sided_book or not has_unlocked_spread):
-                        print(
-                            f"  [Kalshi ignored] {candidate_key}: "
-                            f"non-actionable book bid={kalshi_bid:.1f}, ask={kalshi_ask:.1f}, "
-                            f"last={kalshi_last:.1f}"
-                        )
-                    aggregate = manifold_prob
-
-                if aggregate > 0 or manifold_prob > 0:
-                    display_name = manifold_data.get(candidate_key, {}).get('displayName') or kalshi_info.get('displayName', candidate_key)
-                    clean_name = clean_candidate_name(display_name)
-
-                    aggregated.append({
-                        'name': clean_name,
-                        'probability': aggregate,
-                        'hasKalshi': has_kalshi
-                    })
-
-            # Soft normalization (30% strength)
-            total = sum(c['probability'] for c in aggregated)
-            if total > 0:
-                for c in aggregated:
-                    fully_normalized = (c['probability'] / total) * 100
-                    adjustment = fully_normalized - c['probability']
-                    c['probability'] = c['probability'] + (adjustment * 0.30)
-
-            # Spike dampening: cap per-candidate change to prevent chart artifacts
-            aggregated = _dampen_spikes(aggregated)
-
-            aggregated.sort(key=lambda x: x['probability'], reverse=True)
-
-            # Save snapshot with UTC timestamp (Z suffix marks it as UTC)
-            snapshot = {
-                'candidates': [{
-                    'name': c['name'],
-                    'probability': round(c['probability'], 1),
-                    'hasKalshi': c['hasKalshi']
-                } for c in aggregated],
-                'timestamp': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
-            }
-
-            # Append to JSONL file (atomic operation)
-            try:
-                prev_snapshot = _last_snapshot
-                append_snapshot_jsonl(HISTORICAL_DATA_PATH, snapshot)
-                _last_snapshot = snapshot  # Update in-memory cache
-                total_count = count_snapshots_jsonl(HISTORICAL_DATA_PATH)
-                print(f"[{datetime.now().isoformat()}] Snapshot saved successfully. Total snapshots: {total_count}")
-
-                # Check for big swings and send alerts
-                try:
-                    check_swings_and_alert(snapshot, prev_snapshot)
-                except Exception as e:
-                    print(f"[{datetime.now().isoformat()}] Error checking swings: {e}")
-
-                # Pre-warm chart cache in background thread so next page load is instant
-                _threading.Thread(target=_prewarm_chart_cache, daemon=True).start()
-            except Exception as e:
-                print(f"[{datetime.now().isoformat()}] Error saving snapshot: {e}")
-                raise
-
-        else:
-            print(f"[{datetime.now().isoformat()}] No data collected from either API")
-
-    except Exception as e:
-        print(f"[{datetime.now().isoformat()}] Error in automatic data collection: {e}")
-
-def normalize_candidate_name(name):
-    """Normalize candidate name for matching across platforms"""
-    import re
-    cleaned = name.lower()
-    # Remove common prefixes
-    cleaned = re.sub(r'^wil\s+', '', cleaned)
-    cleaned = re.sub(r'^will\s+', '', cleaned)
-    # Remove common suffixes
-    cleaned = re.sub(r'\s+be the democratic nominee.*$', '', cleaned)
-    cleaned = re.sub(r'\s+for il-9.*$', '', cleaned)
-    cleaned = re.sub(r'\s+win.*$', '', cleaned)
-    cleaned = cleaned.replace('?', '')
-    cleaned = re.sub(r'^dr\.\s*', '', cleaned)
-    cleaned = cleaned.strip()
-
-    # Handle name variations/misspellings
-    name_variations = {
-        'kat abughazaleh': 'kat abugazaleh',
-    }
-    if cleaned in name_variations:
-        cleaned = name_variations[cleaned]
-
-    return cleaned
-
-def clean_candidate_name(name):
-    """Clean up candidate name for display"""
-    import re
-    # Case-insensitive cleaning for display
-    cleaned = re.sub(r'^wil\s+', '', name, flags=re.IGNORECASE)
-    cleaned = re.sub(r'^will\s+', '', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\s+be the democratic nominee.*$', '', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\s+for il-9.*$', '', cleaned, flags=re.IGNORECASE)
-    cleaned = cleaned.replace('?', '').strip()
-    return cleaned
-
-# ===== SCHEDULER DISABLED — STATIC ARCHIVE MODE =====
-# The site now serves pre-collected historical data only.
-# The scheduler and live data collection code above is preserved for reference
-# but no longer runs. See collect_market_data(), send_daily_summary(), etc.
-print(f"[{datetime.now().isoformat()}] IL9Cast running in static archive mode — no data collection")
 
 # Pre-warm chart cache so first visitor gets instant response
 _threading.Thread(target=_prewarm_chart_cache, daemon=True).start()

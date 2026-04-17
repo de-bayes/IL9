@@ -5,24 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Primary Meta Tags -->
-    <title>Live Prediction Markets - IL9Cast | Illinois 9th District Primary 2026</title>
-    <meta name="title" content="Live Prediction Markets - IL9Cast | Illinois 9th District Primary 2026">
-    <meta name="description" content="Real-time prediction market odds for Illinois 9th District Democratic Primary 2026. Aggregated data from Manifold Markets and Kalshi, updated every 3 minutes. See live market trends and historical charts.">
-    <meta name="keywords" content="prediction markets, IL9 primary odds, Manifold Markets IL9, Kalshi IL9, Illinois 9th District forecast, live election odds, market trends">
+    <title>Prediction Markets (Archived) &mdash; IL9Cast</title>
+    <meta name="title" content="Prediction Markets (Archived) &mdash; IL9Cast">
+    <meta name="description" content="Archived prediction market data for the IL-9 Democratic primary. Weighted aggregation of Manifold Markets and Kalshi through election night on March 17, 2026, with the full historical time series.">
+    <meta name="keywords" content="prediction markets, IL9 primary, Manifold Markets, Kalshi, Illinois 9th District, archive, historical market data">
     <link rel="canonical" href="https://il9.org/markets">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://il9.org/markets">
-    <meta property="og:title" content="Live Prediction Markets - IL9Cast | Illinois 9th District Primary 2026">
-    <meta property="og:description" content="Real-time prediction market odds for Illinois 9th District Democratic Primary 2026. Updated every 3 minutes from Manifold Markets and Kalshi.">
+    <meta property="og:title" content="Prediction Markets (Archived) &mdash; IL9Cast">
+    <meta property="og:description" content="Archived prediction market data for the IL-9 Democratic primary through election night on March 17, 2026.">
     <meta property="og:site_name" content="IL9Cast">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://il9.org/markets">
-    <meta property="twitter:title" content="Live Prediction Markets - IL9Cast">
-    <meta property="twitter:description" content="Real-time prediction market odds for Illinois 9th District Democratic Primary 2026.">
+    <meta property="twitter:title" content="Prediction Markets (Archived) &mdash; IL9Cast">
+    <meta property="twitter:description" content="Archived prediction market data for the IL-9 Democratic primary through election night on March 17, 2026.">
 
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -62,7 +62,6 @@
     (function() {
         var t = localStorage.getItem('il9-theme');
         if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
-        document.documentElement.setAttribute('data-election-night', '');
     })();
 </script>
 <body>
@@ -93,7 +92,7 @@
     </div>
 
     <div class="site-content">
-        <div class="en-banner"><span class="en-live-dot"></span> Daniel Biss wins IL-9 Democratic Primary &mdash; March 17, 2026 <a href="/" class="en-banner-msg">A message from Ryan McComb &rarr;</a></div>
+        <div class="archive-banner">Archive &middot; Final market consensus on March 17, 2026 at 9:30 PM CT: Biss 100%</div>
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
             <nav class="desktop-nav">
@@ -124,8 +123,8 @@
         </header>
 
         <section class="hero">
-            <h1>Election Results</h1>
-            <p class="subtitle">Daniel Biss wins the IL-9 Democratic Primary</p>
+            <h1>Prediction Markets <em>(Archived)</em></h1>
+            <p class="subtitle">Weighted aggregation of Manifold Markets &amp; Kalshi through the March 17, 2026 primary</p>
         </section>
 
         <section class="markets-content-page">
@@ -183,8 +182,8 @@
                     </div>
                 </div>
                 <div class="chart-wrapper" style="position:relative;">
-                    <div id="chartLoadingIndicator" style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none;">
-                        <span style="color:var(--text-secondary,#888);font-size:14px;">Loading chart data&hellip;</span>
+                    <div id="chartLoadingIndicator" style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none;opacity:1;transition:opacity 0.3s ease;">
+                        <span style="color:var(--text-tertiary,#888);font-size:13px;letter-spacing:0.02em;">Loading chart data&hellip;</span>
                     </div>
                     <canvas id="marketTrendChart"></canvas>
                 </div>
@@ -254,10 +253,6 @@
                         <button class="expand-toggle" onclick="toggleMarket('manifoldMarket')">
                             <span class="market-name">
                                 Manifold Markets
-                                <span class="live-badge" id="manifoldBadge">
-                                    <span class="live-dot"></span>
-                                    LIVE
-                                </span>
                             </span>
                             <span class="market-preview" id="manifoldPreview">Loading...</span>
                             <span class="expand-icon">+</span>
@@ -272,7 +267,7 @@
                             </div>
                         </div>
                         <div class="market-footer">
-                            <span class="last-updated" id="manifoldUpdated">Fetching data...</span>
+                            <span class="last-updated" id="manifoldUpdated">Final archived snapshot</span>
                             <a href="https://manifold.markets/JeromeHPowell/who-will-win-the-democratic-primary-RZdcps6dL9" target="_blank" class="market-link">View on Manifold →</a>
                         </div>
                     </div>
@@ -283,10 +278,6 @@
                         <button class="expand-toggle" onclick="toggleMarket('kalshiMarket')">
                             <span class="market-name">
                                 Kalshi
-                                <span class="live-badge" id="kalshiBadge">
-                                    <span class="live-dot"></span>
-                                    LIVE
-                                </span>
                             </span>
                             <span class="market-preview" id="kalshiPreview">Loading...</span>
                             <span class="expand-icon">+</span>
@@ -301,29 +292,17 @@
                             </div>
                         </div>
                         <div class="market-footer">
-                            <span class="last-updated" id="kalshiUpdated">Fetching data...</span>
+                            <span class="last-updated" id="kalshiUpdated">Final archived snapshot</span>
                             <a href="https://kalshi.com/markets/kxil9d/il-9-democratic-primary/kxil9d-26" target="_blank" class="market-link">View on Kalshi →</a>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Email Alerts Section -->
-            <section class="email-alerts-section">
-                <h2>Get Email Alerts</h2>
-                <p class="alerts-description">Receive big swing alerts and a daily summary at 8 AM CT</p>
-                <form class="subscribe-form" id="subscribeForm" onsubmit="return handleSubscribe(event)">
-                    <input type="email" id="subscribeEmail" placeholder="your@email.com" required class="subscribe-input" />
-                    <select id="subscribeThreshold" class="subscribe-threshold">
-                        <option value="2">Alert at 2%+ moves</option>
-                        <option value="3">Alert at 3%+ moves</option>
-                        <option value="5" selected>Alert at 5%+ moves</option>
-                        <option value="7">Alert at 7%+ moves</option>
-                        <option value="10">Alert at 10%+ moves</option>
-                    </select>
-                    <button type="submit" class="subscribe-button">Subscribe</button>
-                </form>
-                <div id="subscribeMessage" class="subscribe-message"></div>
+            <!-- Email Alerts Section (archived) -->
+            <section class="email-alerts-section email-alerts-archived">
+                <h2>Email Alerts</h2>
+                <p class="alerts-description">Swing alerts and daily summaries are no longer sent &mdash; the race was called on March 17, 2026. Thanks to everyone who subscribed while the site was live.</p>
             </section>
 
             <!-- Download Data Section -->
@@ -342,28 +321,6 @@
                 </div>
             </section>
         </section>
-
-        <!-- Email Subscribe Popup Modal -->
-        <div id="emailModal" class="email-modal">
-            <div class="email-modal-overlay" onclick="closeEmailModal()"></div>
-            <div class="email-modal-content">
-                <button class="email-modal-close" onclick="closeEmailModal()">&times;</button>
-                <h2>Get Email Alerts</h2>
-                <p class="email-modal-description">Receive big swing alerts and a daily summary at 8 AM CT</p>
-                <form class="subscribe-form" id="subscribeFormModal" onsubmit="return handleSubscribeModal(event)">
-                    <input type="email" id="subscribeEmailModal" placeholder="your@email.com" required class="subscribe-input" />
-                    <select id="subscribeThresholdModal" class="subscribe-threshold">
-                        <option value="2">Alert at 2%+ moves</option>
-                        <option value="3">Alert at 3%+ moves</option>
-                        <option value="5" selected>Alert at 5%+ moves</option>
-                        <option value="7">Alert at 7%+ moves</option>
-                        <option value="10">Alert at 10%+ moves</option>
-                    </select>
-                    <button type="submit" class="subscribe-button">Subscribe</button>
-                </form>
-                <div id="subscribeMessageModal" class="subscribe-message"></div>
-            </div>
-        </div>
 
         <footer class="site-footer">
             <hr class="footer-rule">
@@ -1303,6 +1260,12 @@
             border: 1px solid var(--border-default);
             overflow: hidden;
             background: var(--bg-surface);
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .expandable-market:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-surface-hover);
         }
 
         .market-header-row {
@@ -1359,42 +1322,6 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-        }
-
-        .live-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.25rem 0.6rem;
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.5);
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--accent-red);
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-
-        .live-dot {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background: var(--accent-red);
-            border-radius: 50%;
-            box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
-            animation: pulse-live 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse-live {
-            0%, 100% {
-                opacity: 1;
-                box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
-            }
-            50% {
-                opacity: 0.5;
-                box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
-            }
         }
 
         .market-preview {
@@ -1880,35 +1807,9 @@ function formatCentralTime(date, options = {}) {
     return formatter.format(date) + ' CT';
 }
 
-// Update status badges based on data freshness
-function updateStatusBadges(manifoldTime, kalshiTime) {
-    const now = Date.now();
-    const staleThreshold = 5 * 60 * 1000; // 5 minutes
-
-    // Manifold status - always show as vivid
-    const manifoldBadge = document.getElementById('manifoldBadge');
-    if (manifoldBadge) {
-        manifoldBadge.style.opacity = '1';
-    }
-
-    // Kalshi status - always show as vivid
-    const kalshiBadge = document.getElementById('kalshiBadge');
-    if (kalshiBadge) {
-        kalshiBadge.style.opacity = '1';
-    }
-
-    // Railway is always live
-    const railwayDot = document.getElementById('railwayDot');
-    if (railwayDot) {
-        railwayDot.classList.add('online');
-    }
-
-    // AWS is always live
-    const awsDot = document.getElementById('awsDot');
-    if (awsDot) {
-        awsDot.classList.add('online');
-    }
-}
+// Archive mode: LIVE badges and infrastructure dots were removed with the
+// election-night theme. This is a no-op kept for callers.
+function updateStatusBadges(manifoldTime, kalshiTime) {}
 
 let marketChart = null;
 let candidatesData = [];
@@ -2349,10 +2250,10 @@ async function fetchManifoldData() {
 
         renderManifoldExpanded(manifoldList);
 
-        // Update timestamp
+        // Final archived update timestamp
         const updated = new Date(data.lastBetTime || data.lastUpdatedTime);
         manifoldLastUpdate = updated.getTime();
-        document.getElementById('manifoldUpdated').textContent = `Updated ${formatCentralTime(updated, {
+        document.getElementById('manifoldUpdated').textContent = `Final update ${formatCentralTime(updated, {
             month: 'short', day: 'numeric', year: 'numeric',
             hour: 'numeric', minute: '2-digit'
         })}`;
@@ -2687,9 +2588,9 @@ async function renderMarketTrendChart(candidates) {
         tooltipFormat = 'MMM d, yyyy';
     }
 
-    // X-axis bounds: first data point to now
+    // X-axis bounds: first to last data point (archive — never extend past last snapshot)
     const firstTime = parsedSnapshots[0].date.getTime();
-    const nowTime = Date.now();
+    const nowTime = parsedSnapshots[parsedSnapshots.length - 1].date.getTime();
 
     // Interpolated data shaded region plugin
     const interpolatedRegionPlugin = {
@@ -2948,9 +2849,12 @@ async function renderMarketTrendChart(candidates) {
 
     // Track which period is displayed so 304 only fires for same-period refreshes
     window._chartRenderedPeriod = period;
-    // Hide loading indicator
+    // Fade out loading indicator
     var loadingEl = document.getElementById('chartLoadingIndicator');
-    if (loadingEl) loadingEl.style.display = 'none';
+    if (loadingEl) {
+        loadingEl.style.opacity = '0';
+        setTimeout(function() { loadingEl.style.display = 'none'; }, 300);
+    }
 
     } catch (chartError) {
         console.error('Chart rendering failed:', chartError);
@@ -3080,12 +2984,9 @@ async function fetchKalshiData() {
         renderKalshiExpanded(kalshiList);
 
 
-        // Update timestamp
-        const kalshiNow = new Date();
-        kalshiLastUpdate = kalshiNow.getTime();
-        document.getElementById('kalshiUpdated').textContent = `Live data - ${formatCentralTime(kalshiNow, {
-            hour: 'numeric', minute: '2-digit', second: '2-digit'
-        })}`;
+        // Archive mode: show the race-call time rather than a rolling "now".
+        kalshiLastUpdate = Date.UTC(2026, 2, 18, 2, 30);  // Mar 17 2026, 9:30 PM CT
+        document.getElementById('kalshiUpdated').textContent = 'Final archived snapshot — Mar 17, 2026, 9:30 PM CT';
 
         // Update status badges
         updateStatusBadges(manifoldLastUpdate, kalshiLastUpdate);
@@ -3147,37 +3048,15 @@ function getPollingInterval() {
 }
 
 function setupPolling() {
-    // Render chart immediately from prefetched data (don't wait for live API calls)
+    // Archive mode: render chart + winner from the last snapshot; no polling.
     renderMarketTrendChart(null);
+    renderBigOdds([]);
 
-    // If election is over, render winner immediately (don't wait for API calls)
-    if (ELECTION_OVER) {
-        renderBigOdds([]);
-    }
-
-    // Fetch live market data in parallel (updates odds display + re-renders chart)
+    // One-shot fetch of the final cached Manifold/Kalshi responses to fill in
+    // the expandable "Market Sources" panels with the last-known per-candidate
+    // numbers. No setInterval — data is frozen as of March 17, 2026.
     fetchManifoldData();
     fetchKalshiData();
-
-    // Set up interval polling with dynamic intervals
-    let currentInterval = null;
-
-    function setupNextPoll() {
-        const interval = getPollingInterval();
-
-        if (currentInterval) {
-            clearInterval(currentInterval);
-        }
-
-        currentInterval = setInterval(() => {
-            fetchManifoldData();
-            fetchKalshiData();
-            setupNextPoll(); // Re-check interval after each poll in case it changed
-        }, interval);
-
-    }
-
-    setupNextPoll();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -3211,103 +3090,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
 
     <script>
-    function handleSubscribe(e) {
-        e.preventDefault();
-        var email = document.getElementById('subscribeEmail').value;
-        var threshold = parseFloat(document.getElementById('subscribeThreshold').value);
-        var btn = document.querySelector('.subscribe-button');
-        var msg = document.getElementById('subscribeMessage');
-        btn.disabled = true;
-        btn.textContent = 'Subscribing...';
-        msg.textContent = '';
-        msg.className = 'subscribe-message';
-
-        fetch('/api/subscribe', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email: email, threshold: threshold})
-        })
-        .then(function(r) { return r.json().then(function(d) { return {ok: r.ok, data: d}; }); })
-        .then(function(result) {
-            if (result.ok) {
-                msg.textContent = result.data.message || 'Subscribed!';
-                msg.className = 'subscribe-message success';
-                document.getElementById('subscribeEmail').value = '';
-            } else {
-                msg.textContent = result.data.error || 'Something went wrong.';
-                msg.className = 'subscribe-message error';
-            }
-        })
-        .catch(function() {
-            msg.textContent = 'Network error. Please try again.';
-            msg.className = 'subscribe-message error';
-        })
-        .finally(function() {
-            btn.disabled = false;
-            btn.textContent = 'Subscribe';
-        });
-
-        return false;
-    }
-
-    // Email Modal Logic
-    function closeEmailModal() {
-        var modal = document.getElementById('emailModal');
-        modal.classList.remove('show');
-        localStorage.setItem('emailModalDismissed', 'true');
-    }
-
-    function handleSubscribeModal(e) {
-        e.preventDefault();
-        var email = document.getElementById('subscribeEmailModal').value;
-        var threshold = parseFloat(document.getElementById('subscribeThresholdModal').value);
-        var btn = e.target.querySelector('.subscribe-button');
-        var msg = document.getElementById('subscribeMessageModal');
-        btn.disabled = true;
-        btn.textContent = 'Subscribing...';
-        msg.textContent = '';
-        msg.className = 'subscribe-message';
-
-        fetch('/api/subscribe', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email: email, threshold: threshold})
-        })
-        .then(function(r) { return r.json().then(function(d) { return {ok: r.ok, data: d}; }); })
-        .then(function(result) {
-            if (result.ok) {
-                msg.textContent = result.data.message || 'Subscribed!';
-                msg.className = 'subscribe-message success';
-                document.getElementById('subscribeEmailModal').value = '';
-                setTimeout(function() {
-                    closeEmailModal();
-                }, 2000);
-            } else {
-                msg.textContent = result.data.error || 'Something went wrong.';
-                msg.className = 'subscribe-message error';
-            }
-        })
-        .catch(function() {
-            msg.textContent = 'Network error. Please try again.';
-            msg.className = 'subscribe-message error';
-        })
-        .finally(function() {
-            btn.disabled = false;
-            btn.textContent = 'Subscribe';
-        });
-
-        return false;
-    }
-
-    // Email modal auto-popup disabled for better UX
-    // Users can still manually trigger via inline subscribe form
-
-    // Close modal on Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeEmailModal();
-        }
-    });
+    // Email subscription form and modal removed in archive mode.
 
     // Fundraising callout popup
     async function initFundraisingCallout() {
@@ -3324,7 +3107,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Fetch and calculate extrapolated total
+        // Archive mode: sum of candidates' final reported totals, no extrapolation.
         try {
             const resp = await fetch('/api/fec/candidates');
             const data = await resp.json();
@@ -3337,42 +3120,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalRaised += candidates[i].total_raised || 0;
             }
 
-            // Extrapolate to current date
-            const campaignStartDates = {
-                "Daniel Biss": "2024-06-01",
-                "Kat Abugazaleh": "2024-08-01",
-                "Laura Fine": "2024-07-01",
-                "Mike Simmons": "2025-01-01",
-                "Phil Andrew": "2024-09-01",
-                "Bushra Amiwala": "2024-05-01"
-            };
-
-            let totalVelocity = 0;
-            for (let j = 0; j < candidates.length; j++) {
-                const c = candidates[j];
-                const startStr = campaignStartDates[c.name];
-                if (startStr) {
-                    const start = new Date(startStr);
-                    const fecEnd = c.name === "Bushra Amiwala"
-                        ? new Date("2025-09-30")
-                        : new Date("2025-12-31");
-                    const daysActive = (fecEnd - start) / (1000 * 60 * 60 * 24);
-                    if (daysActive > 0) {
-                        totalVelocity += c.total_raised / daysActive;
-                    }
-                }
-            }
-
-            const daysSinceFiling = (new Date() - new Date("2025-12-31")) / (1000 * 60 * 60 * 24);
-            const estimatedTotal = totalRaised + (totalVelocity * daysSinceFiling);
-
-            // Format with all zeros and cents
             const formatted = new Intl.NumberFormat('en-US', {
                 style: 'currency',
                 currency: 'USD',
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
-            }).format(estimatedTotal);
+            }).format(totalRaised);
 
             document.getElementById('candidatesTotal').textContent = formatted;
 
