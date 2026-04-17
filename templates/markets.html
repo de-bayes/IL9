@@ -5,24 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Primary Meta Tags -->
-    <title>Live Prediction Markets - IL9Cast | Illinois 9th District Primary 2026</title>
-    <meta name="title" content="Live Prediction Markets - IL9Cast | Illinois 9th District Primary 2026">
-    <meta name="description" content="Real-time prediction market odds for Illinois 9th District Democratic Primary 2026. Aggregated data from Manifold Markets and Kalshi, updated every 3 minutes. See live market trends and historical charts.">
-    <meta name="keywords" content="prediction markets, IL9 primary odds, Manifold Markets IL9, Kalshi IL9, Illinois 9th District forecast, live election odds, market trends">
+    <title>Prediction Markets (Archived) &mdash; IL9Cast</title>
+    <meta name="title" content="Prediction Markets (Archived) &mdash; IL9Cast">
+    <meta name="description" content="Archived prediction market data for the IL-9 Democratic primary. Weighted aggregation of Manifold Markets and Kalshi through election night on March 17, 2026, with the full historical time series.">
+    <meta name="keywords" content="prediction markets, IL9 primary, Manifold Markets, Kalshi, Illinois 9th District, archive, historical market data">
     <link rel="canonical" href="https://il9.org/markets">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://il9.org/markets">
-    <meta property="og:title" content="Live Prediction Markets - IL9Cast | Illinois 9th District Primary 2026">
-    <meta property="og:description" content="Real-time prediction market odds for Illinois 9th District Democratic Primary 2026. Updated every 3 minutes from Manifold Markets and Kalshi.">
+    <meta property="og:title" content="Prediction Markets (Archived) &mdash; IL9Cast">
+    <meta property="og:description" content="Archived prediction market data for the IL-9 Democratic primary through election night on March 17, 2026.">
     <meta property="og:site_name" content="IL9Cast">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://il9.org/markets">
-    <meta property="twitter:title" content="Live Prediction Markets - IL9Cast">
-    <meta property="twitter:description" content="Real-time prediction market odds for Illinois 9th District Democratic Primary 2026.">
+    <meta property="twitter:title" content="Prediction Markets (Archived) &mdash; IL9Cast">
+    <meta property="twitter:description" content="Archived prediction market data for the IL-9 Democratic primary through election night on March 17, 2026.">
 
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -62,7 +62,6 @@
     (function() {
         var t = localStorage.getItem('il9-theme');
         if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
-        document.documentElement.setAttribute('data-election-night', '');
     })();
 </script>
 <body>
@@ -93,7 +92,7 @@
     </div>
 
     <div class="site-content">
-        <div class="en-banner"><span class="en-live-dot"></span> Daniel Biss wins IL-9 Democratic Primary &mdash; March 17, 2026 <a href="/" class="en-banner-msg">A message from Ryan McComb &rarr;</a></div>
+        <div class="archive-banner">Archive &middot; Final market consensus on March 17, 2026 at 9:30 PM CT: Biss 100%</div>
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
             <nav class="desktop-nav">
@@ -124,8 +123,8 @@
         </header>
 
         <section class="hero">
-            <h1>Election Results</h1>
-            <p class="subtitle">Daniel Biss wins the IL-9 Democratic Primary</p>
+            <h1>Prediction Markets <em>(Archived)</em></h1>
+            <p class="subtitle">Weighted aggregation of Manifold Markets &amp; Kalshi through the March 17, 2026 primary</p>
         </section>
 
         <section class="markets-content-page">
@@ -254,10 +253,6 @@
                         <button class="expand-toggle" onclick="toggleMarket('manifoldMarket')">
                             <span class="market-name">
                                 Manifold Markets
-                                <span class="live-badge" id="manifoldBadge">
-                                    <span class="live-dot"></span>
-                                    LIVE
-                                </span>
                             </span>
                             <span class="market-preview" id="manifoldPreview">Loading...</span>
                             <span class="expand-icon">+</span>
@@ -283,10 +278,6 @@
                         <button class="expand-toggle" onclick="toggleMarket('kalshiMarket')">
                             <span class="market-name">
                                 Kalshi
-                                <span class="live-badge" id="kalshiBadge">
-                                    <span class="live-dot"></span>
-                                    LIVE
-                                </span>
                             </span>
                             <span class="market-preview" id="kalshiPreview">Loading...</span>
                             <span class="expand-icon">+</span>
@@ -1359,42 +1350,6 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-        }
-
-        .live-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.25rem 0.6rem;
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.5);
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--accent-red);
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-
-        .live-dot {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background: var(--accent-red);
-            border-radius: 50%;
-            box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
-            animation: pulse-live 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse-live {
-            0%, 100% {
-                opacity: 1;
-                box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
-            }
-            50% {
-                opacity: 0.5;
-                box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
-            }
         }
 
         .market-preview {

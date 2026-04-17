@@ -24,14 +24,12 @@
     (function() {
         var t = localStorage.getItem('il9-theme');
         if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
-        document.documentElement.setAttribute('data-election-night', '');
     })();
 </script>
 <body>
 
 
     <div class="site-content">
-        <div class="en-banner"><span class="en-live-dot"></span> Election Night &mdash; March 17, 2026 <a href="/" class="en-banner-msg">A message from Ryan McComb &rarr;</a></div>
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
             <nav class="desktop-nav">
@@ -63,7 +61,7 @@
 
         <section class="hero">
             <h1>Candidate Profiles</h1>
-            <p class="subtitle">Illinois 9th District Democratic Primary • March 17, 2026</p>
+            <p class="subtitle">Illinois 9th District Democratic Primary &middot; March 17, 2026 &middot; Final Results</p>
         </section>
 
         <section class="candidates-grid">
@@ -80,8 +78,8 @@
                         <h2>{{ candidate.name }}</h2>
                         <p class="candidate-title">{{ candidate.title }}</p>
                         <div class="candidate-odds">
-                            <span class="odds-value">{{ "%.1f"|format(candidate.current_odds) }}%</span>
-                            <span class="odds-label">Current Odds</span>
+                            <span class="odds-value">{% if candidate.result_label %}{{ candidate.result_label }}{% else %}{{ "%.1f"|format(candidate.current_odds) }}%{% endif %}</span>
+                            <span class="odds-label">{% if candidate.result_sublabel %}{{ candidate.result_sublabel }}{% else %}Final Vote Share{% endif %}</span>
                         </div>
                     </div>
                 </div>

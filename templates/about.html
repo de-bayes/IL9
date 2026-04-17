@@ -24,12 +24,10 @@
     (function() {
         var t = localStorage.getItem('il9-theme');
         if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
-        document.documentElement.setAttribute('data-election-night', '');
     })();
 </script>
 <body>
     <div class="site-content">
-        <div class="en-banner"><span class="en-live-dot"></span> Election Night &mdash; March 17, 2026 <a href="/" class="en-banner-msg">A message from Ryan McComb &rarr;</a></div>
         <header>
             <a href="/" class="logo">IL9<span>Cast</span></a>
             <nav class="desktop-nav">
@@ -61,6 +59,7 @@
 
         <section class="hero">
             <h1>About IL9Cast</h1>
+            <p class="subtitle">Archive &middot; the Illinois 9th District Democratic primary was held March 17, 2026.</p>
         </section>
 
         <section class="about-content-page">
@@ -69,7 +68,7 @@
             <div class="about-intro">
                 <h2>Hi, I'm Ryan McComb.</h2>
                 <p>I'm a student at Evanston Township High School with a passion for politics, data science, and prediction markets. I built IL9Cast because I wanted to see real-time market sentiment for the IL-9 primary race and figured some others might find it useful too.</p>
-                <p>IL9Cast is a real-time forecasting platform for the Illinois 9th Congressional District Democratic Primary, scheduled for March 17, 2026. It aggregates live prediction market data from <a href="https://manifold.markets/JeromeHPowell/who-will-win-the-democratic-primary-RZdcps6dL9" target="_blank">Manifold Markets</a> and <a href="https://kalshi.com/markets/kxil9d/il-9-democratic-primary/kxil9d-26" target="_blank">Kalshi</a>, publishes a precinct-level election model with 436 precincts and 100,000 Monte Carlo simulations, and updates every 3 minutes around the clock.</p>
+                <p>IL9Cast was a real-time forecasting platform for the Illinois 9th Congressional District Democratic Primary on March 17, 2026. It aggregated live prediction market data from <a href="https://manifold.markets/JeromeHPowell/who-will-win-the-democratic-primary-RZdcps6dL9" target="_blank">Manifold Markets</a> and <a href="https://kalshi.com/markets/kxil9d/il-9-democratic-primary/kxil9d-26" target="_blank">Kalshi</a>, published a precinct-level election model with 436 precincts and 100,000 Monte Carlo simulations, and updated every 3 minutes around the clock. It now lives on as an archive &mdash; see the <a href="/odds">Model</a> page for how the forecast compared to actual results.</p>
                 <p>In all transparency, I have done some volunteer work for Daniel Biss, but that has not influenced the data or methodology presented here. If you want me to build a race forecast like this for your district, I would love to.</p>
             </div>
 
