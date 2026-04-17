@@ -877,6 +877,15 @@ header {
     transition: background 0.15s ease;
 }
 
+.featured-card--postmortem {
+    border-top-color: var(--accent-blue);
+}
+
+.featured-card--postmortem .featured-card-tag {
+    background: var(--accent-blue);
+    color: var(--bg-primary);
+}
+
 .featured-card:hover {
     background: var(--bg-surface-hover);
 }
