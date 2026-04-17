@@ -321,21 +321,18 @@ header {
 
 .hero h1 {
     font-family: var(--serif);
-    font-size: 3.25rem;
+    font-size: 3rem;
     font-weight: 400;
     line-height: 1.15;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
     color: var(--text-primary);
     margin-bottom: 1.5rem;
 }
 
 .hero h1 em {
     font-style: italic;
-    background: var(--highlight-bg);
-    color: var(--highlight-text);
-    padding: 0.05em 0.2em;
-    margin: 0 -0.05em;
-    text-decoration: none;
+    color: var(--text-secondary);
+    font-weight: 400;
 }
 
 .hero-subtitle {
@@ -544,7 +541,6 @@ header {
     border: 1px solid var(--border-default);
     background: var(--bg-surface);
     padding: 2rem 2rem;
-    border-left: 3px solid var(--accent-teal);
 }
 
 .accuracy-lede {
@@ -871,23 +867,14 @@ header {
     text-decoration: none;
     color: inherit;
     border: 1px solid var(--border-default);
-    border-top: 3px solid var(--accent-gold);
     background: var(--bg-surface);
     margin-top: 1.25rem;
-    transition: background 0.15s ease;
-}
-
-.featured-card--postmortem {
-    border-top-color: var(--accent-blue);
-}
-
-.featured-card--postmortem .featured-card-tag {
-    background: var(--accent-blue);
-    color: var(--bg-primary);
+    transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .featured-card:hover {
     background: var(--bg-surface-hover);
+    border-color: var(--border-hover);
 }
 
 .featured-card-inner {
@@ -899,13 +886,11 @@ header {
 
 .featured-card-tag {
     font-family: var(--sans);
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--bg-primary);
-    background: var(--accent-gold);
-    padding: 0.2em 0.6em;
+    color: var(--text-tertiary);
     align-self: flex-start;
 }
 
