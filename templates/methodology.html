@@ -344,11 +344,11 @@
                 <div class="foldout-body" id="foldout-body-infra">
                     <div class="foldout-inner">
 
-                        <p>IL9Cast is a pretty lean operation — a single Python app running on Railway that does everything from fetching market data to serving the website. Here's how it all fits together.</p>
+                        <p>IL9Cast is a pretty lean operation — a single Python app on Railway serving the site and APIs. <strong>Today’s deployment is a static archive:</strong> the live prediction-market scraper that ran through the March 17, 2026 primary has been removed. The Markets page reads <strong>frozen</strong> API snapshots from <code>data/archive/</code> and plots history from the JSONL file. The sections below describe how the system worked during the race and what still runs now.</p>
 
                         <h3>The Cloud Setup</h3>
                         <p>We run on <strong>Railway</strong>, which is a platform-as-a-service that deploys straight from GitHub. Every time we push code to the <code>main</code> branch, Railway automatically builds and deploys a new version using Nixpacks (their build system). The whole deploy cycle takes about 30 seconds.</p>
-                        <p>The app runs behind <strong>Gunicorn</strong>, a production-grade Python WSGI server. We use the <code>--preload</code> flag, which is important — it loads the app once in memory before forking workers, so our background data collector only starts a single thread instead of duplicating itself across workers. Without that flag, you'd get multiple scrapers all writing to the same file at the same time, which is a recipe for corrupted data.</p>
+                        <p>The app runs behind <strong>Gunicorn</strong>, a production-grade Python WSGI server. Production uses the <code>--preload</code> flag (see <code>railway.toml</code>) so the master loads the app once before workers fork. That mattered when a background collector was running; it avoids duplicate worker-side threads. The root <code>Procfile</code> may omit <code>--preload</code>; Railway follows <code>railway.toml</code> for the start command.</p>
                         <p>Here's the key configuration from <code>railway.toml</code>:</p>
                         <div class="formula-box" style="font-size: 0.95rem;">
                             startCommand = "gunicorn app:app --preload"<br>
@@ -360,21 +360,16 @@
 
                         <h3>Persistent Storage (the tricky part)</h3>
                         <p>Railway containers are ephemeral by default — when the app redeploys, everything on the filesystem gets wiped. That's fine for code, but our historical data needs to survive between deploys. So we use a <strong>Railway persistent volume</strong> mounted at <code>/app/data</code>.</p>
-                        <p>When the app boots up, it runs a path resolution function that checks, in order: <code>/data</code>, <code>/app/data</code>, then falls back to a local <code>data/</code> directory. This means the same code works on Railway (where the volume lives at <code>/app/data</code>) and on a developer's laptop (where it just uses the local folder). No environment variables, no conditional imports — just a directory check.</p>
+                        <p>When the app boots, <code>resolve_data_path()</code> picks the data directory: optional <code>DATA_DIR</code>, else the first place that already has <code>historical_snapshots.jsonl</code> (or <code>.jsonl.gz</code>) among <code>/app/data</code>, <code>/data</code>, and the repo’s <code>data/</code> folder, otherwise defaulting to local <code>data/</code>. That way Railway volumes and local dev both work.</p>
 
                         <h3>Why JSONL (and not a database)</h3>
                         <p>You might wonder why we're storing data in a flat file instead of PostgreSQL or SQLite. Honestly? For our use case, JSONL is better.</p>
-                        <p><strong>JSONL</strong> (JSON Lines) means one JSON object per line. Every 3 minutes, the scraper appends a single line to the file — that's it. No connection pools, no schema migrations, no ORM overhead. The file is human-readable (you can literally <code>tail</code> it to see the latest data), and if a line gets corrupted, every other line is still perfectly valid. Try saying that about a SQLite database after a partial write.</p>
-                        <p>The append operation is actually a bit more careful than a simple file write:</p>
-                        <ul class="method-list">
-                            <li><strong>Write to a temp file first</strong> — the new snapshot goes to <code>historical_snapshots.jsonl.tmp</code></li>
-                            <li><strong>Copy existing content + new line</strong> — both old data and the new snapshot get written to the temp file</li>
-                            <li><strong>Atomic replace</strong> — <code>os.replace()</code> swaps the temp file into place in a single filesystem operation. If the app crashes mid-write, either the old file or the new file exists — never a half-written mess</li>
-                        </ul>
+                        <p><strong>JSONL</strong> (JSON Lines) means one JSON object per line. During the race, every 3 minutes a new line was appended. No connection pools, no schema migrations, no ORM overhead. The file is human-readable (you can literally <code>tail</code> it), and if a line is bad, the reader can skip it without losing the rest.</p>
+                        <p>The writer used a <strong>file lock</strong>, append mode, and <code>fsync</code> for safe concurrent appends. Some recovery tools rewrite the file in full; that’s separate from steady-state collection.</p>
                         <p>At 480 snapshots per day (~3 KB each), the file grows at roughly 1.4 MB/day. After a full election cycle, we're looking at maybe 70 MB total. That's nothing — your phone has thousands of times more storage. A database would be overkill here.</p>
 
-                        <h3>The Data Collection Loop</h3>
-                        <p>Every 3 minutes, a background thread wakes up and runs our <code>collect_market_data()</code> function. Here's what happens in those few hundred milliseconds:</p>
+                        <h3>The Data Collection Loop (historical)</h3>
+                        <p>Through election night, snapshots were taken every <strong>3 minutes</strong>. Each cycle:</p>
                         <ul class="method-list">
                             <li><strong>1. Fetch Manifold</strong> — HTTP GET to their public API. Returns JSON with each candidate's probability (0.0–1.0 scale, which we multiply by 100). Timeout: 10 seconds.</li>
                             <li><strong>2. Fetch Kalshi</strong> — HTTP GET to their trade API. Returns an array of markets, each with <code>last_price</code>, <code>yes_bid</code>, and <code>yes_ask</code>. Same 10-second timeout.</li>
@@ -382,17 +377,12 @@
                             <li><strong>4. Aggregate</strong> — Apply the 40/42/12/6 weighted formula (see the Markets Aggregation section above).</li>
                             <li><strong>5. Soft normalize</strong> — Nudge probabilities 30% toward summing to 100%, so the chart doesn't show the race at 130% or 80% total.</li>
                             <li><strong>6. Spike dampen</strong> — Compare to the previous snapshot. If any candidate moved more than &plusmn;3 percentage points, clamp the change. This prevents chart artifacts from thin-market Kalshi trades.</li>
-                            <li><strong>7. Save</strong> — Atomically append to the JSONL file.</li>
+                            <li><strong>7. Save</strong> — Append to the JSONL file (locked + fsync).</li>
                         </ul>
-                        <p>If <em>both</em> APIs fail (say Manifold is down and Kalshi returns an error), we skip the snapshot entirely. Bad data is worse than missing data — the chart just won't have a point for that 3-minute window, and the gap detection handles it gracefully.</p>
+                        <p>If <em>both</em> APIs failed, we skipped that interval. The scraper thread has since been removed from the codebase; the timeline on disk is read-only for the public site.</p>
 
-                        <h3>The Scheduler Problem</h3>
-                        <p>Running a background task alongside a web server sounds simple, but there's a subtle gotcha. When you run Flask locally, you get one process — easy. But Gunicorn can spawn multiple worker processes, and each one would try to run its own scheduler. That means two workers = two scrapers = double the data (and double the API calls).</p>
-                        <p>We solve this two ways depending on the environment:</p>
-                        <ul class="method-list">
-                            <li><strong>Local development:</strong> Uses APScheduler's <code>BackgroundScheduler</code>, which runs the job in a background thread within the single Flask process.</li>
-                            <li><strong>Production (Gunicorn):</strong> Detects Gunicorn via <code>sys.argv[0]</code> and instead spins up a plain <code>threading.Thread</code> in daemon mode. The <code>--preload</code> flag ensures this thread is created once in the master process before workers fork, so only one thread ever exists.</li>
-                        </ul>
+                        <h3>The Scheduler Problem (historical)</h3>
+                        <p>Running a background task alongside Gunicorn required care: multiple workers could mean duplicate scrapers. We used <code>--preload</code> and a single background thread in the master process so only one collector ran. That entire subsystem is gone in the archive deployment; only chart computation and HTTP serving run now.</p>
 
                         <h3>Chart Data Pipeline</h3>
                         <p>When you load the Markets page, your browser hits <code>/api/snapshots/chart?period=1d</code> (or <code>7d</code> or <code>all</code>). Here's what the server does before sending data back:</p>
@@ -415,25 +405,23 @@
                         </ul>
 
                         <h3>What Could Go Wrong (and what we do about it)</h3>
-                        <p>A few things have bitten us before, so we built defenses:</p>
+                        <p>Defenses that still matter in archive mode:</p>
                         <ul class="method-list">
-                            <li><strong>API timeouts:</strong> Both Manifold and Kalshi calls have 10-second timeouts. If they're slow, we fail fast instead of blocking the scheduler thread.</li>
-                            <li><strong>Partial API failure:</strong> If only one API goes down, we still collect what we can, but spike dampening prevents the sudden weight shift from creating chart artifacts.</li>
-                            <li><strong>Railway restarts:</strong> The persistent volume survives container restarts. When the app boots, it checks for existing data and picks up where it left off.</li>
-                            <li><strong>Corrupt JSONL lines:</strong> The reader skips unparseable lines and logs a warning. One bad line doesn't take down the whole dataset — that's the beauty of line-delimited formats.</li>
-                            <li><strong>Duplicate schedulers:</strong> The Gunicorn <code>--preload</code> + <code>sys.argv</code> detection ensures exactly one scraper thread exists in production.</li>
+                            <li><strong>Railway restarts:</strong> The persistent volume survives container restarts when used.</li>
+                            <li><strong>Corrupt JSONL lines:</strong> The reader skips unparseable lines. One bad line doesn't take down the whole dataset.</li>
+                            <li><strong>Chart gaps:</strong> Intervals longer than 2 hours between snapshots are drawn as dashed segments (real outages, not the normal 3-minute cadence).</li>
                         </ul>
+                        <p>While the live scraper ran: 10-second API timeouts, partial API failure handling, spike dampening, and a single collector thread under Gunicorn avoided bad data and duplicate writes.</p>
 
                         <h3>Dependencies</h3>
-                        <p>The whole app runs on five Python packages:</p>
+                        <p>Production Python dependencies are pinned in <code>requirements.txt</code>:</p>
                         <div class="formula-box" style="font-size: 0.95rem;">
                             Flask 2.3.2 &nbsp;&mdash;&nbsp; web framework<br>
                             Werkzeug 2.3.6 &nbsp;&mdash;&nbsp; WSGI utilities (Flask dependency)<br>
-                            Requests 2.31.0 &nbsp;&mdash;&nbsp; HTTP client for API calls<br>
-                            Gunicorn 21.2.0 &nbsp;&mdash;&nbsp; production WSGI server<br>
-                            APScheduler 3.10.4 &nbsp;&mdash;&nbsp; background job scheduling (dev mode)
+                            Requests 2.31.0 &nbsp;&mdash;&nbsp; HTTP client<br>
+                            Gunicorn 21.2.0 &nbsp;&mdash;&nbsp; production WSGI server
                         </div>
-                        <p>No NumPy, no Pandas, no heavyweight data libraries. The EMA, RDP, and aggregation math are all hand-written in ~100 lines of plain Python. For a project that processes a few hundred data points, there's no reason to import a 30 MB library.</p>
+                        <p>No NumPy, no Pandas, no heavyweight data libraries. Chart EMA and RDP run in plain Python.</p>
 
                     </div>
                 </div>
