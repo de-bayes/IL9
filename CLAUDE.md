@@ -50,7 +50,7 @@ railway logs
 
 ### Application Structure
 
-**Backend:** Flask 2.3.2 + APScheduler for background data collection
+**Backend:** Flask 3.1.1 + APScheduler for background data collection
 - `app.py` (~950 lines) - Main Flask app with routes, API endpoints, data collection, smoothing pipelines
 - Background task runs every **3 minutes** (not 1 minute) to fetch and aggregate market data
 - Production: Gunicorn with `--preload` flag to ensure single scheduler instance
@@ -163,6 +163,16 @@ Applied to:
 - `POST /api/snapshot` - Save new snapshot (internal use by scraper)
 - `GET /api/download/snapshots` - Download all historical data as JSONL file
 
+**Admin Endpoints** (require `Authorization: Bearer <ADMIN_API_TOKEN>` header; return 503 if `ADMIN_API_TOKEN` env var is not set, 401 for invalid/missing tokens):
+- `POST /api/admin/repair-snapshots` - Run JSONL repair on demand
+- `POST /api/admin/recover-snapshots` - Rebuild snapshots from CSV + JSONL
+- `POST /api/admin/bridge-to-present` - Fill gap from last snapshot to now
+- `POST /api/admin/force-csv-recovery` - Force full CSV recovery
+- `POST /api/admin/send-csv-backup` - Trigger CSV backup email
+- `POST /api/admin/fix-kalshi-gap` - Remove Manifold-only data gap
+- `GET /api/test-swing-alert` - Send fake swing alert to subscribers (testing)
+- `POST /api/broadcast` - Send broadcast email to all subscribers
+
 **Page Routes**
 - `GET /` - Landing page (landing_new.html)
 - `GET /markets` - Live markets aggregation (markets.html)
@@ -246,15 +256,17 @@ In-memory cache (`_chart_cache`) stores `{data, time, key}`:
 | Duplicate schedulers | `--preload` + `sys.argv` check ensures one scheduler thread |
 | Data gap > 2 hours | Detected and marked with dashed lines (real outage, not normal 3-min intervals) |
 | Thin-market prices | Fallback to `last_price` when `yes_bid = 0` |
+| Unauthorized admin access | `_require_admin_token` decorator on all admin endpoints; requires `ADMIN_API_TOKEN` env var |
+| Missing EMAIL_SECRET_SALT | Startup warning + insecure fallback default; must be set in production |
 
 ### Dependencies
 
 Only 5 production packages:
 ```
-Flask==2.3.2         # Web framework
-Werkzeug==2.3.6      # WSGI utilities
-Requests==2.31.0     # HTTP client for APIs
-Gunicorn==21.2.0     # Production WSGI server
+Flask==3.1.1         # Web framework
+Werkzeug==3.1.3      # WSGI utilities
+Requests==2.32.3     # HTTP client for APIs
+Gunicorn==23.0.0     # Production WSGI server
 APScheduler==3.10.4  # Background scheduling (dev mode)
 ```
 
