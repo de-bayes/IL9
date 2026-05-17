@@ -1,7 +1,9 @@
 from flask import Flask, jsonify, render_template, request, send_file
+from functools import wraps
 import random
 import math
 import hashlib
+import hmac
 from datetime import datetime, timedelta, timezone
 import requests
 import json
@@ -81,7 +83,14 @@ SUBSCRIBERS_PATH = resolve_data_path('email_subscribers.jsonl')
 RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
 RESEND_FROM_EMAIL = os.environ.get('RESEND_FROM_EMAIL', 'alerts@il9.org')
 RESEND_FROM = f"IL9Cast <{RESEND_FROM_EMAIL}>"  # Display name + email
-EMAIL_SECRET_SALT = os.environ.get('EMAIL_SECRET_SALT', 'il9cast-change-me')
+EMAIL_SECRET_SALT = os.environ.get('EMAIL_SECRET_SALT')
+if not EMAIL_SECRET_SALT:
+    import warnings
+    warnings.warn('EMAIL_SECRET_SALT is not set! Email tokens will be insecure.', stacklevel=1)
+    EMAIL_SECRET_SALT = 'il9cast-change-me'
+
+# Admin API authentication token (must be set in production)
+ADMIN_API_TOKEN = os.environ.get('ADMIN_API_TOKEN')
 SITE_BASE_URL = os.environ.get('SITE_BASE_URL', 'https://il9.org/')
 SWING_THRESHOLD = 5.0  # percentage points to trigger alert
 _swing_debounce = {}  # candidate_name -> last_alert_time (UTC timestamp)
@@ -1930,7 +1939,21 @@ def get_kalshi():
     return result
 
 
+def _require_admin_token(f):
+    """Decorator that rejects requests without a valid ADMIN_API_TOKEN."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not ADMIN_API_TOKEN:
+            return jsonify({'error': 'Admin API is disabled (ADMIN_API_TOKEN not configured)'}), 503
+        token = request.headers.get('Authorization', '').removeprefix('Bearer ').strip()
+        if not token or not hmac.compare_digest(token, ADMIN_API_TOKEN):
+            return jsonify({'error': 'Unauthorized'}), 401
+        return f(*args, **kwargs)
+    return decorated
+
+
 @app.route('/api/admin/repair-snapshots', methods=['POST'])
+@_require_admin_token
 def repair_snapshots_admin():
     """Run JSONL repair on demand and return recovery metadata."""
     try:
@@ -1945,10 +1968,11 @@ def repair_snapshots_admin():
 
 
 @app.route('/api/admin/recover-snapshots', methods=['POST'])
+@_require_admin_token
 def recover_snapshots_admin():
     """Rebuild snapshots by stitching a CSV history source with current volume JSONL data."""
     try:
-        csv_path = request.args.get('csv_path') or REPO_CSV_PATH
+        csv_path = REPO_CSV_PATH
         bridge_interval_minutes = int(request.args.get('bridge_minutes', 3))
         max_bridge_hours = int(request.args.get('max_bridge_hours', 72))
         apply_changes = (request.args.get('apply', '0').strip().lower() in {'1', 'true', 'yes'})
@@ -1982,6 +2006,7 @@ def recover_snapshots_admin():
 
 
 @app.route('/api/admin/bridge-to-present', methods=['POST'])
+@_require_admin_token
 def bridge_to_present_admin():
     """Fill the gap from the last snapshot to now with flat-interpolated data."""
     try:
@@ -1996,6 +2021,7 @@ def bridge_to_present_admin():
 
 
 @app.route('/api/admin/force-csv-recovery', methods=['POST'])
+@_require_admin_token
 def force_csv_recovery_admin():
     """Force a full CSV recovery regardless of marker state or snapshot counts.
     Directly calls recover function to merge CSV + current JSONL, bypassing all guards."""
@@ -2043,6 +2069,7 @@ def force_csv_recovery_admin():
 
 
 @app.route('/api/admin/send-csv-backup', methods=['POST'])
+@_require_admin_token
 def send_csv_backup_admin():
     """Manually trigger a CSV backup email."""
     try:
@@ -2053,6 +2080,7 @@ def send_csv_backup_admin():
 
 
 @app.route('/api/admin/fix-kalshi-gap', methods=['POST'])
+@_require_admin_token
 def fix_kalshi_gap():
     """One-time fix: remove last N min of Manifold-only data. Default 50 min."""
     try:
@@ -2652,8 +2680,9 @@ def unsubscribe():
         return render_template('unsubscribe.html', success=True, message='You are already unsubscribed.')
 
 @app.route('/api/test-swing-alert')
+@_require_admin_token
 def test_swing_alert():
-    """Test endpoint: send a fake swing alert to all subscribers"""
+    """Test endpoint: send a fake swing alert to all subscribers (admin only)."""
     fake_swings = [
         {'name': 'Daniel Biss', 'old': 58.2, 'new': 64.7, 'delta': 6.5},
         {'name': 'Jan Schakowsky', 'old': 24.1, 'new': 18.3, 'delta': -5.8}
@@ -2672,12 +2701,9 @@ def test_swing_alert():
     return jsonify({'success': True, 'message': f'Test swing alert sent to {count} subscriber(s)'})
 
 @app.route('/api/broadcast', methods=['POST'])
+@_require_admin_token
 def broadcast_email():
-    """Send a one-time broadcast email to all subscribers. Requires secret key."""
-    data = request.get_json(force=True) if request.data else {}
-    secret = data.get('secret', '')
-    if secret != EMAIL_SECRET_SALT:
-        return jsonify({'error': 'Unauthorized'}), 403
+    """Send a one-time broadcast email to all subscribers. Requires admin token."""
 
     subscribers = read_subscribers()
     if not subscribers:
@@ -2758,6 +2784,6 @@ def page_not_found(e):
 if __name__ == '__main__':
     # Use debug mode only for local development
     import os
-    debug_mode = os.environ.get('FLASK_ENV') != 'production'
+    debug_mode = os.environ.get('FLASK_DEBUG', '').lower() in ('1', 'true')
     port = int(os.environ.get('PORT', 8000))
     app.run(debug=debug_mode, host='0.0.0.0', port=port)

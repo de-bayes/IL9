@@ -1288,7 +1288,7 @@
         };
 
         // ===== MAP INIT =====
-        var map = L.map('precinct-map', { zoomControl: true, attributionControl: false }).setView([42.00, -87.72], 11);
+        var map = L.map('precinct-map', { zoomControl: true, attributionControl: true }).setView([42.00, -87.72], 11);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             maxZoom: 19, subdomains: 'abcd'
         }).addTo(map);
