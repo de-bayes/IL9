@@ -1208,10 +1208,6 @@ header {
 }
 
 @media (max-width: 480px) {
-    .hero h1 {
-        font-size: 1.75rem;
-    }
-
     .stat-grid {
         grid-template-columns: 1fr 1fr;
     }
@@ -1238,8 +1234,28 @@ header {
 }
 
 @media (max-width: 375px) {
-    .stat-grid {
-        grid-template-columns: 1fr;
+    .hero {
+        padding: 2rem 1rem 1rem;
+    }
+
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .stat-strip {
+        padding: 0 1rem;
+    }
+
+    .editorial-section {
+        padding: 0 1rem;
+    }
+
+    .site-footer {
+        padding: 0 1rem 1.5rem;
     }
 }
 
