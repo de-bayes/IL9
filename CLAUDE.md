@@ -2,11 +2,23 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Site status: archive (read this first)
+
+**IL9Cast is a post-primary static archive** (primary: March 17, 2026). There is **no live scraper**. Historical JSONL on the Railway volume is **read-only** in normal operation.
+
+| Topic | Where to read |
+|-------|----------------|
+| Archive behavior, frozen APIs, disabled features | [docs/ARCHIVE_MODE.md](docs/ARCHIVE_MODE.md) |
+| Railway deploy, health check, env vars | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
+| All documentation index | [docs/README.md](docs/README.md) |
+
+**Do not** assume 3-minute collection, `collect_market_data()`, or `POST /api/snapshot` — those are removed.
+
+---
+
 ## Project Overview
 
-**IL9Cast** - Illinois 9th District Democratic Primary Forecast aggregator for the March 17, 2026 primary. Aggregates prediction market data from Manifold Markets and Kalshi every **3 minutes** using a weighted formula, stores historical snapshots in JSONL format, applies multi-layer smoothing for clean charts, and serves an interactive web dashboard with Central Time display.
-
-**Fresh Start:** All historical data from before Jan 30, 2026 has been purged. The system rebuilds from zero starting Jan 30 onward.
+**IL9Cast** — Illinois 9th District Democratic Primary prediction market archive. Aggregated Manifold + Kalshi data (Jan 30 – Mar 17, 2026) in JSONL, with smoothed charts and a precinct Monte Carlo model page.
 
 ## Development Commands
 
@@ -19,7 +31,10 @@ pip install -r requirements.txt
 python app.py
 
 # Run production server locally (matches Railway)
-gunicorn app:app --preload
+gunicorn app:app --config gunicorn.conf.py
+
+# Performance smoke tests (server on :8000)
+python scripts/smoke_test_perf.py
 ```
 
 ### Data Management

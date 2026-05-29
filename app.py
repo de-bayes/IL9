@@ -9,7 +9,6 @@ import requests
 import json
 import os
 import time as _time
-import atexit
 import shutil
 import gzip
 
@@ -1461,16 +1460,22 @@ def import_repo_csv_to_volume_if_needed(csv_path=REPO_CSV_PATH, output_path=HIST
     if not os.path.exists(csv_path):
         return {'imported': False, 'reason': 'csv_missing', 'csv_path': csv_path, 'output_path': output_path}
 
-    # Marker present → volume is healthy, skip
+    # Marker present → skip only if snapshots actually exist (handles stale/git markers)
     if os.path.exists(marker):
-        return {'imported': False, 'reason': 'already_recovered', 'csv_path': csv_path, 'output_path': output_path}
+        if count_snapshots_jsonl(output_path) > 0:
+            return {'imported': False, 'reason': 'already_recovered', 'csv_path': csv_path, 'output_path': output_path}
+        try:
+            os.remove(marker)
+            print(f"[{datetime.now().isoformat()}] Removed stale recovery marker (no snapshots on disk)")
+        except OSError:
+            pass
 
     csv_snapshots = load_snapshots_from_csv(csv_path)
     if not csv_snapshots:
         return {'imported': False, 'reason': 'csv_empty', 'csv_path': csv_path, 'output_path': output_path}
 
     csv_count = len(csv_snapshots)
-    existing_count = count_snapshots_jsonl(output_path) if os.path.exists(output_path) else 0
+    existing_count = count_snapshots_jsonl(output_path)
 
     # If JSONL already has more data than CSV and is healthy, just create marker
     if existing_count >= csv_count:
@@ -1524,12 +1529,15 @@ def import_repo_csv_to_volume_if_needed(csv_path=REPO_CSV_PATH, output_path=HIST
         stats = {'reason': 'csv_only_import', 'snapshots_written': csv_count}
         print(f"[{datetime.now().isoformat()}] CSV-only import: wrote {csv_count} snapshots")
 
-    # Bridge from last snapshot to present (fills gap with flat interpolated data)
-    bridge_stats = bridge_to_present(output_path)
-    stats['bridge_to_present'] = bridge_stats
-    if bridge_stats.get('bridged'):
-        print(f"[{datetime.now().isoformat()}] Bridged {bridge_stats['snapshots_added']} snapshots to present "
-              f"(gap was {bridge_stats['gap_hours']}h)")
+    # Archive site: do not fabricate post-election snapshots unless ops explicitly enable.
+    if os.environ.get('ENABLE_RECOVERY_BRIDGE', '').lower() in ('1', 'true', 'yes'):
+        bridge_stats = bridge_to_present(output_path)
+        stats['bridge_to_present'] = bridge_stats
+        if bridge_stats.get('bridged'):
+            print(f"[{datetime.now().isoformat()}] Bridged {bridge_stats['snapshots_added']} snapshots "
+                  f"(gap was {bridge_stats['gap_hours']}h)")
+    else:
+        stats['bridge_to_present'] = {'bridged': False, 'reason': 'archive_mode_skip'}
 
     # Create recovery marker so we don't re-run on next restart
     os.makedirs(os.path.dirname(marker), exist_ok=True)
@@ -1635,16 +1643,6 @@ else:
         print(f"[{datetime.now().isoformat()}] CSV import skipped: {import_result.get('reason', 'unknown')}")
     purge_old_data()
     repair_snapshots_jsonl(HISTORICAL_DATA_PATH)
-
-# Mock candidate data
-CANDIDATES = [
-    {"id": 1, "name": "Maria Garcia", "party_role": "State Rep", "color": "#FF6B6B"},
-    {"id": 2, "name": "James Wilson", "party_role": "Community Organizer", "color": "#4ECDC4"},
-    {"id": 3, "name": "Dr. Sarah Ahmed", "party_role": "Physician", "color": "#45B7D1"},
-    {"id": 4, "name": "Tom Mueller", "party_role": "Labor Leader", "color": "#FFA07A"},
-    {"id": 5, "name": "Angela Chen", "party_role": "Tech Entrepreneur", "color": "#98D8C8"},
-    {"id": 6, "name": "Robert Jackson", "party_role": "Former Alderman", "color": "#F7DC6F"},
-]
 
 # Real IL-9 Candidate Profiles
 CANDIDATE_PROFILES = [
@@ -1904,54 +1902,6 @@ def candidate_fundraising(candidate_slug):
     return render_template('candidate_fundraising.html', candidate=candidate)
 
 # API Endpoints
-@app.route('/api/forecast')
-def get_forecast():
-    """Generate mock forecast data"""
-    random.seed(42)
-    base_odds = [28, 22, 18, 16, 10, 6]
-    odds = [max(1, o + random.randint(-3, 3)) for o in base_odds]
-    total = sum(odds)
-    odds = [round(100 * o / total) for o in odds]
-
-    candidates = []
-    for i, candidate in enumerate(CANDIDATES):
-        candidates.append({
-            **candidate,
-            "probability": odds[i],
-            "trend": random.choice(["up", "down", "stable"]),
-            "polling_avg": round(odds[i] + random.uniform(-2, 2), 1),
-            "change": random.randint(-5, 5),
-            "last_update": (datetime.now() - timedelta(hours=random.randint(1, 48))).isoformat()
-        })
-
-    return jsonify({
-        "candidates": candidates,
-        "last_updated": datetime.now().isoformat(),
-        "primary_date": "2026-03-17"
-    })
-
-@app.route('/api/timeline')
-def get_timeline():
-    """Generate mock polling trend data"""
-    timeline = []
-    start_date = datetime.now() - timedelta(days=90)
-
-    for day in range(0, 91, 7):
-        current_date = start_date + timedelta(days=day)
-        day_data = {
-            "date": current_date.strftime("%Y-%m-%d"),
-            "candidates": {}
-        }
-
-        base = [25, 22, 18, 15, 12, 8]
-        for i, candidate in enumerate(CANDIDATES):
-            variance = random.randint(-4, 4)
-            day_data["candidates"][candidate["name"]] = max(1, base[i] + variance)
-
-        timeline.append(day_data)
-
-    return jsonify(timeline)
-
 # Archive mode: serve the final Manifold/Kalshi responses from snapshots bundled
 # in the git repo. No live network calls — the site must keep working even if
 # the external APIs change or go away.
@@ -2547,12 +2497,14 @@ def get_snapshots_chart():
       epsilon: RDP tolerance (default 0.5)
     Returns ~200-400 points instead of 5000+ raw.
 
-    Performance: cache is pre-warmed after each data collection cycle (every 3 min).
+    Performance: cache is pre-warmed at startup and invalidated when JSONL file size changes.
     Most requests serve from cache with no computation at all.
     Supports ETag/If-None-Match for instant 304 responses on repeat visits.
     """
     try:
         period = request.args.get('period', 'all')
+        if period not in ('1d', '7d', 'all'):
+            return jsonify({'error': 'Invalid period; use 1d, 7d, or all'}), 400
         epsilon = float(request.args.get('epsilon', '0.5'))
         cache_key = f'{period}:{epsilon}'
 

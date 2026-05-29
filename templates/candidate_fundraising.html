@@ -364,6 +364,11 @@
             }
         }
 
+        function toggleMobileMenu() {
+            document.getElementById('hamburger').classList.toggle('active');
+            document.getElementById('mobileNav').classList.toggle('active');
+        }
+
         // FEC DATA FETCHING
         (function() {
             const candidate = {{ candidate | tojson }};

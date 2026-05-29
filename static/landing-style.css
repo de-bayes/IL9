@@ -30,10 +30,6 @@
     --highlight-text:   #1A1A1A;
     --header-border:    rgba(255,255,255,0.12);
     --shadow-soft:      rgba(0,0,0,0.3);
-    --accent-538-red:   #ED1C24;
-    --layout-gutter:    clamp(1rem, 3.5vw, 2.5rem);
-    --layout-max:       820px;
-    --content-max:      900px;
     --serif:            'Libre Baskerville', 'Georgia', 'Times New Roman', serif;
     --sans:             'Source Sans 3', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     --mono:             'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
@@ -95,15 +91,22 @@
 
 html {
     scroll-behavior: smooth;
-    overflow-x: clip;
 }
 
-img,
-video,
-canvas,
-svg {
-    max-width: 100%;
-    height: auto;
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent-gold, #c9a227);
+    outline-offset: 2px;
 }
 
 body {
@@ -133,18 +136,14 @@ header {
     position: sticky;
     top: 0;
     z-index: 200;
-    background: color-mix(in srgb, var(--bg-primary) 92%, transparent);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    padding: 0 var(--layout-gutter);
+    background: var(--bg-primary);
+    padding: 0 2.5rem;
     max-width: 100%;
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     border-bottom: 2px solid var(--header-border);
     height: 56px;
-    gap: 0.5rem;
 }
 
 /* Theme toggle */
@@ -317,9 +316,9 @@ header {
    ============================================ */
 
 .hero {
-    max-width: var(--layout-max);
+    max-width: 820px;
     margin: 0 auto;
-    padding: clamp(2.5rem, 8vw, 7rem) var(--layout-gutter) clamp(1.5rem, 4vw, 3rem);
+    padding: 7rem 2rem 3rem;
     text-align: left;
 }
 
@@ -338,13 +337,12 @@ header {
 
 .hero h1 {
     font-family: var(--serif);
-    font-size: clamp(1.75rem, 4.5vw + 0.75rem, 3rem);
+    font-size: 3rem;
     font-weight: 400;
-    line-height: 1.12;
+    line-height: 1.15;
     letter-spacing: -0.015em;
     color: var(--text-primary);
-    margin-bottom: 1.25rem;
-    text-wrap: balance;
+    margin-bottom: 1.5rem;
 }
 
 .hero h1 em {
@@ -353,21 +351,20 @@ header {
     font-weight: 400;
 }
 
-.hero-subtitle,
-.hero .subtitle {
+.hero-subtitle {
     font-family: var(--sans);
-    font-size: clamp(0.95rem, 1.5vw + 0.5rem, 1.15rem);
+    font-size: 1.15rem;
     color: var(--text-secondary);
-    line-height: 1.65;
-    max-width: 38rem;
+    line-height: 1.7;
+    max-width: 580px;
     margin-bottom: 0.75rem;
 }
 
 /* Thin rule under hero */
 .hero-rule {
-    max-width: var(--layout-max);
+    max-width: 820px;
     margin: 0 auto;
-    padding: 0 var(--layout-gutter);
+    padding: 0 2rem;
 }
 
 .hero-rule hr {
@@ -380,9 +377,9 @@ header {
    ============================================ */
 
 .stat-strip {
-    max-width: var(--layout-max);
-    margin: clamp(1.5rem, 4vw, 2.5rem) auto 0;
-    padding: 0 var(--layout-gutter);
+    max-width: 820px;
+    margin: 2.5rem auto 0;
+    padding: 0 2rem;
 }
 
 .stat-grid {
@@ -442,9 +439,9 @@ header {
    ============================================ */
 
 .editorial-section {
-    max-width: var(--layout-max);
-    margin: clamp(2rem, 5vw, 3.5rem) auto 0;
-    padding: 0 var(--layout-gutter);
+    max-width: 820px;
+    margin: 3.5rem auto 0;
+    padding: 0 2rem;
 }
 
 .section-label {
@@ -529,7 +526,7 @@ header {
     align-items: center;
     justify-content: center;
     gap: 0.6rem;
-    padding: 0.6rem var(--layout-gutter);
+    padding: 0.6rem 1rem;
     background: var(--bg-surface);
     border-bottom: 1px solid var(--border-default);
     color: var(--text-secondary);
@@ -961,9 +958,9 @@ header {
    ============================================ */
 
 .site-footer {
-    max-width: var(--layout-max);
-    margin: clamp(3rem, 8vw, 5rem) auto 0;
-    padding: 0 var(--layout-gutter) clamp(1.5rem, 4vw, 3rem);
+    max-width: 820px;
+    margin: 5rem auto 0;
+    padding: 0 2rem 3rem;
 }
 
 .footer-rule {
@@ -1094,26 +1091,6 @@ header {
 
     .hamburger {
         display: flex;
-        order: 5;
-        margin-left: 0.25rem;
-    }
-
-    .theme-toggle {
-        order: 4;
-        margin-left: auto;
-    }
-
-    .logo {
-        order: 1;
-        flex: 1;
-        min-width: 0;
-    }
-
-    header {
-        height: auto;
-        min-height: 50px;
-        padding-top: 0.35rem;
-        padding-bottom: 0.35rem;
     }
 
     .stat-grid {
@@ -1131,6 +1108,34 @@ header {
 }
 
 @media (max-width: 768px) {
+    header {
+        padding: 0 1.5rem;
+    }
+
+    .hero {
+        padding: 3.5rem 1.5rem 1.5rem;
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.05rem;
+    }
+
+    .stat-strip {
+        padding: 0 1.5rem;
+    }
+
+    .editorial-section {
+        padding: 0 1.5rem;
+    }
+
+    .hero-rule {
+        padding: 0 1.5rem;
+    }
+
     .footer-content {
         grid-template-columns: 1fr;
         gap: 1.75rem;
@@ -1148,8 +1153,8 @@ header {
 
 @media (max-width: 600px) {
     header {
+        padding: 0 1.25rem;
         height: 50px;
-        min-height: 50px;
     }
 
     .logo {
@@ -1160,11 +1165,24 @@ header {
         top: 50px;
     }
 
+    .hero {
+        padding: 2.5rem 1.25rem 1.25rem;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
     .hero-dateline {
         font-size: 0.7rem;
     }
 
+    .hero-subtitle {
+        font-size: 0.95rem;
+    }
+
     .stat-strip {
+        padding: 0 1.25rem;
         margin-top: 2rem;
     }
 
@@ -1206,6 +1224,10 @@ header {
 }
 
 @media (max-width: 480px) {
+    .hero h1 {
+        font-size: 1.75rem;
+    }
+
     .stat-grid {
         grid-template-columns: 1fr 1fr;
     }
@@ -1232,8 +1254,28 @@ header {
 }
 
 @media (max-width: 375px) {
-    .stat-grid {
-        grid-template-columns: 1fr;
+    .hero {
+        padding: 2rem 1rem 1rem;
+    }
+
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .stat-strip {
+        padding: 0 1rem;
+    }
+
+    .editorial-section {
+        padding: 0 1rem;
+    }
+
+    .site-footer {
+        padding: 0 1rem 1.5rem;
     }
 }
 
@@ -1400,107 +1442,5 @@ header {
     .callout-donate-btn {
         width: 100%;
         padding: 0.9rem 2rem;
-    }
-}
-
-/* ============================================
-   538 EDITORIAL POLISH — Shared page utilities
-   ============================================ */
-
-[class$="-content-page"],
-.markets-content-page {
-    max-width: var(--content-max);
-    margin: 0 auto clamp(2.5rem, 6vw, 4rem);
-    padding: 0 var(--layout-gutter);
-    width: 100%;
-    min-width: 0;
-}
-
-.model-page {
-    max-width: min(1100px, 100%);
-    margin: 0 auto clamp(2.5rem, 6vw, 4rem);
-    padding: 0 var(--layout-gutter);
-    width: 100%;
-    min-width: 0;
-}
-
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-    outline: 2px solid var(--accent-blue);
-    outline-offset: 2px;
-}
-
-.nav-card,
-.stat-box,
-.leader-card,
-.market-chart-section,
-.model-section,
-.method-foldout {
-    transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.section-label::after {
-    content: '';
-    display: block;
-    width: 2.5rem;
-    height: 3px;
-    background: var(--accent-538-red);
-    margin-top: 0.5rem;
-}
-
-.desktop-nav a.active {
-    border-bottom-color: var(--accent-538-red);
-}
-
-#mobileNav.active a.active {
-    border-left: 3px solid var(--accent-538-red);
-    padding-left: calc(2.5rem - 3px);
-}
-
-.chart-wrapper,
-.market-chart-section .chart-wrapper {
-    min-width: 0;
-    overflow: hidden;
-}
-
-.chart-toggle {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    html {
-        scroll-behavior: auto;
-    }
-
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-}
-
-@media (max-width: 1024px) {
-    .editorial-section,
-    .stat-strip,
-    .hero-rule {
-        max-width: min(var(--layout-max), 100%);
-    }
-}
-
-@media (max-width: 480px) {
-    .archive-banner {
-        font-size: 0.65rem;
-        letter-spacing: 0.06em;
-        padding-top: 0.75rem;
-        padding-bottom: 0.75rem;
-        text-align: left;
-        justify-content: flex-start;
     }
 }

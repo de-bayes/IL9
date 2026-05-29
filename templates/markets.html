@@ -2013,10 +2013,7 @@ async function calculateAggregate() {
     // Store aggregated data for chart updates
     candidatesData = aggregated;
 
-    // Save snapshot as backup (backend also saves every 3 min)
-    // Frontend saves only when page is viewed, backend ensures continuous collection
-    // Fire-and-forget: don't block rendering on snapshot save
-    saveSnapshot(aggregated);
+    // Archive mode: snapshots are read-only on the server.
 
     renderBigOdds(aggregated);
 
@@ -2032,25 +2029,6 @@ async function calculateAggregate() {
     renderHeatmap(aggregated);
 }
 
-async function saveSnapshot(candidates) {
-    try {
-        const snapshot = {
-            candidates: candidates.map(c => ({
-                name: c.name,
-                probability: Math.round(c.probability * 10) / 10,
-                hasKalshi: c.hasKalshi
-            }))
-        };
-
-        await fetch('/api/snapshot', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(snapshot)
-        });
-    } catch (error) {
-        console.error('Error saving snapshot:', error);
-    }
-}
 
 function renderBreakdown(breakdowns) {
     const container = document.getElementById('breakdownContent');

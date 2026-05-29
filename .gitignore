@@ -37,6 +37,7 @@ data/historical_snapshots.jsonl.lock
 data/email_subscribers.jsonl
 data/fec_cache.json
 data/.purge_*
+data/.csv_recovery_done
 data/*.backup.*
 data/*.pre-*
 
@@ -60,7 +61,6 @@ data/*.pre-*
 # Screenshots (local debugging only)
 SCREENHSHOTS/
 Screenshot*.png
-artifacts/
 
 # Local design scratch folders
 final homescreen inspiration/
