@@ -37,6 +37,8 @@ def init_performance(app):
             return response
         if response.status_code < 200 or response.status_code >= 300:
             return response
+        if request.path == '/api/model/precincts' or response.status_code == 304:
+            return response
         if response.mimetype not in _GZIP_TYPES:
             return response
         if response.headers.get('Content-Encoding'):

@@ -443,23 +443,6 @@
         }
     </style>
 
-    <script>
-        function toggleTheme() {
-            var isLight = document.documentElement.getAttribute('data-theme') === 'light';
-            if (isLight) {
-                document.documentElement.removeAttribute('data-theme');
-                localStorage.setItem('il9-theme', 'dark');
-            } else {
-                document.documentElement.setAttribute('data-theme', 'light');
-                localStorage.setItem('il9-theme', 'light');
-            }
-        }
-
-        function toggleMobileMenu() {
-            document.getElementById('hamburger').classList.toggle('active');
-            document.getElementById('mobileNav').classList.toggle('active');
-        }
-    </script>
-
+    <script src="{{ url_for('static', filename='site.js') }}"></script>
 </body>
 </html>

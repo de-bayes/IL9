@@ -27,3 +27,12 @@ max_requests_jitter = 100
 accesslog = "-"
 errorlog = "-"
 loglevel = os.environ.get("LOG_LEVEL", "info")
+
+def post_fork(server, worker):
+    """Reinitialize threading locks after fork (preload_app safety)."""
+    import app as app_module
+    import threading
+    app_module._chart_cache_lock = threading.Lock()
+    app_module._chart_compute_locks_lock = threading.Lock()
+    app_module._jsonl_lines_lock = threading.Lock()
+    app_module._chart_compute_locks = {}

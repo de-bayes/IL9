@@ -307,24 +307,6 @@
         }
     </style>
 
-    <script>
-        function toggleTheme() {
-            var html = document.documentElement;
-            var current = html.getAttribute('data-theme');
-            if (current === 'light') {
-                html.removeAttribute('data-theme');
-                localStorage.setItem('il9-theme', 'dark');
-            } else {
-                html.setAttribute('data-theme', 'light');
-                localStorage.setItem('il9-theme', 'light');
-            }
-        }
-        function toggleMobileMenu() {
-            var nav = document.getElementById('mobileNav');
-            var btn = document.getElementById('hamburger');
-            nav.classList.toggle('active');
-            btn.classList.toggle('active');
-        }
-    </script>
+    <script src="{{ url_for('static', filename='site.js') }}"></script>
 </body>
 </html>

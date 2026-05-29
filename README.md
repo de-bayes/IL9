@@ -1,8 +1,8 @@
-# IL9Cast - Illinois 9th District Primary Forecast
+# IL9Cast — IL-9 Democratic Primary Archive
 
-A real-time prediction market aggregator for the Illinois 9th Congressional District Democratic Primary scheduled for **March 17, 2026**.
+**Post-primary archive** of prediction market data and models for the Illinois 9th District Democratic Primary (**March 17, 2026**). Live scraping ended on election night; the site serves frozen JSONL history, archived Manifold/Kalshi snapshots, and interactive charts.
 
-IL9Cast combines live market data from **Manifold Markets** and **Kalshi** using a sophisticated weighted aggregation formula to provide accurate, up-to-the-minute probability estimates for each candidate.
+See **[docs/ARCHIVE_MODE.md](docs/ARCHIVE_MODE.md)** and **[docs/ROUTES.md](docs/ROUTES.md)** for current behavior.
 
 ## Features
 
@@ -28,7 +28,7 @@ pip install -r requirements.txt
 
 # Run local development server
 python app.py
-# Visit http://localhost:5000
+# Visit http://localhost:8000
 ```
 
 ### Production (Railway)
@@ -44,7 +44,7 @@ railway up
 ## Architecture Overview
 
 ### Backend (Flask)
-- **Framework**: Flask 2.3.2 with Gunicorn WSGI server
+- **Framework**: Flask 3.1.1 with Gunicorn WSGI server
 - **Scheduling**: APScheduler for background data collection every 3 minutes
 - **Storage**: JSONL format for append-only, corruption-resistant data persistence
 - **Data Processing**: Multi-layer smoothing pipeline with RDP simplification
@@ -142,8 +142,8 @@ pip install -r requirements.txt
 python app.py
 
 # Test API endpoints
-curl http://localhost:5000/api/manifold
-curl http://localhost:5000/api/snapshots/chart?period=1d
+curl http://localhost:8000/api/manifold
+curl http://localhost:8000/api/snapshots/chart?period=1d
 ```
 
 ### Data Management
@@ -175,7 +175,7 @@ python -c "import app; print(app.count_snapshots_jsonl())"
 
 ## Dependencies
 
-- **Flask 2.3.2** - Web framework
+- **Flask 3.1.1** - Web framework
 - **APScheduler** - Background task scheduling
 - **Requests** - HTTP client for APIs
 - **Gunicorn** - WSGI application server
@@ -208,10 +208,10 @@ with open('data/historical_snapshots.jsonl') as f:
 
 ```bash
 # Get optimized data for 1-day period
-curl 'http://localhost:5000/api/snapshots/chart?period=1d' | python -m json.tool | head -20
+curl 'http://localhost:8000/api/snapshots/chart?period=1d' | python -m json.tool | head -20
 
 # Verify RDP simplification is working
-curl 'http://localhost:5000/api/snapshots/chart?period=all' | \
+curl 'http://localhost:8000/api/snapshots/chart?period=all' | \
   python -c "import sys, json; d=json.load(sys.stdin); print(f'Points: {len(d[0][\"data\"])}')"
 ```
 

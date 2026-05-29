@@ -8,6 +8,7 @@ Use this index to find the right doc. **Start with [ARCHIVE_MODE.md](ARCHIVE_MOD
 |----------|---------|
 | [ARCHIVE_MODE.md](ARCHIVE_MODE.md) | Static archive: no live scraper, frozen APIs, read-only JSONL |
 | [DEPLOYMENT.md](DEPLOYMENT.md) | Railway / Gunicorn deploy, health check, env vars |
+| [ROUTES.md](ROUTES.md) | Canonical route registry |
 | [../CLAUDE.md](../CLAUDE.md) | Agent-oriented overview + commands (see archive banner at top) |
 
 ## Data & recovery

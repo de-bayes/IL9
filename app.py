@@ -1433,7 +1433,8 @@ def initialize_data():
 
     # Only seed data if historical file doesn't exist at all
     # Once Railway starts collecting, never overwrite its data
-    if not os.path.exists(HISTORICAL_DATA_PATH) and os.path.exists(SEED_DATA_PATH):
+    has_data = count_snapshots_jsonl(HISTORICAL_DATA_PATH) > 0
+    if not has_data and os.path.exists(SEED_DATA_PATH):
         print(f"[{datetime.now().isoformat()}] Seeding data from {SEED_DATA_PATH}")
         try:
             with open(SEED_DATA_PATH, 'r') as src:
@@ -1902,6 +1903,12 @@ def candidate_fundraising(candidate_slug):
     return render_template('candidate_fundraising.html', candidate=candidate)
 
 # API Endpoints
+
+@app.route('/api/snapshot', methods=['POST'])
+def save_snapshot():
+    """Live collection ended; returns 410 for legacy clients."""
+    return jsonify({'error': 'Live snapshot collection ended March 17, 2026'}), 410
+
 # Archive mode: serve the final Manifold/Kalshi responses from snapshots bundled
 # in the git repo. No live network calls — the site must keep working even if
 # the external APIs change or go away.
@@ -2505,7 +2512,11 @@ def get_snapshots_chart():
         period = request.args.get('period', 'all')
         if period not in ('1d', '7d', 'all'):
             return jsonify({'error': 'Invalid period; use 1d, 7d, or all'}), 400
-        epsilon = float(request.args.get('epsilon', '0.5'))
+        try:
+            epsilon = float(request.args.get('epsilon', '0.5'))
+            epsilon = max(0.1, min(epsilon, 5.0))
+        except (TypeError, ValueError):
+            return jsonify({'error': 'invalid epsilon'}), 400
         cache_key = f'{period}:{epsilon}'
 
         now = _time.time()
@@ -2784,10 +2795,11 @@ View Live Markets: """ + SITE_BASE_URL + """markets
 
 # Pre-warm chart cache at startup (archive site: one-time cost, every request hits cache).
 # Synchronous prewarm avoids lock contention between background thread and first visitors.
-try:
-    _prewarm_chart_cache()
-except Exception as _prewarm_err:
-    print(f"[{datetime.now().isoformat()}] Chart cache prewarm skipped: {_prewarm_err}")
+if os.environ.get('IL9_SKIP_STARTUP_TASKS', '').strip().lower() not in ('1', 'true', 'yes'):
+    try:
+        _prewarm_chart_cache()
+    except Exception as _prewarm_err:
+        print(f"[{datetime.now().isoformat()}] Chart cache prewarm skipped: {_prewarm_err}")
 
 @app.errorhandler(404)
 def page_not_found(e):

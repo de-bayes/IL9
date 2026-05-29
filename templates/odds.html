@@ -255,7 +255,7 @@
                     <div id="precinct-map"></div>
                     <div id="map-legend"></div>
                     <div id="info-panel">
-                        <button id="close-info">&times;</button>
+                        <button type="button" id="close-info" aria-label="Close precinct details">&times;</button>
                         <h3 id="info-precinct"></h3>
                         <div class="winner-line" id="info-winner"></div>
                         <div id="info-bars"></div>
@@ -1587,9 +1587,9 @@
                 'Margin over ' + p.runner_up + ': <strong>+' + p.margin + ' pts</strong>';
 
             var wr = '';
-            if (p.pct_biss_wins != null) wr += '<span style="color:#ef4444">Biss ' + p.pct_biss_wins.toFixed(1) + '%</span>';
-            if (p.pct_fine_wins != null) wr += ' &middot; <span style="color:#3b82f6">Fine ' + p.pct_fine_wins.toFixed(1) + '%</span>';
-            if (p.pct_abughazaleh_wins != null) wr += ' &middot; <span style="color:#10b981">Abu. ' + p.pct_abughazaleh_wins.toFixed(1) + '%</span>';
+            if (p.pct_biss_wins != null) wr += '<span style="color:' + COLORS['Biss'] + '">Biss ' + p.pct_biss_wins.toFixed(1) + '%</span>';
+            if (p.pct_fine_wins != null) wr += ' &middot; <span style="color:' + COLORS['Fine'] + '">Fine ' + p.pct_fine_wins.toFixed(1) + '%</span>';
+            if (p.pct_abughazaleh_wins != null) wr += ' &middot; <span style="color:' + COLORS['Abughazaleh'] + '">Abu. ' + p.pct_abughazaleh_wins.toFixed(1) + '%</span>';
             document.getElementById('info-winrates').innerHTML = wr;
         }
 
@@ -1804,7 +1804,10 @@
 
         // ===== LOAD GEOJSON =====
         fetch('/api/model/precincts')
-            .then(function(r) { return r.json(); })
+            .then(function(r) {
+                if (!r.ok) throw new Error('Precinct data HTTP ' + r.status);
+                return r.json();
+            })
             .then(function(geojson) {
                 document.getElementById('map-loading').style.display = 'none';
 
@@ -1901,6 +1904,13 @@
                 buildCompGrid(allPrecinctData);
                 buildBattlegroundTable(allPrecinctData);
                 renderFullTable();
+            })
+            .catch(function(err) {
+                var el = document.getElementById('map-loading');
+                el.style.display = 'flex';
+                el.setAttribute('aria-live', 'assertive');
+                el.textContent = 'Could not load precinct map. Please try again later.';
+                console.error(err);
             });
         }); // end whenMapReady / initPrecinctMap
     </script>
