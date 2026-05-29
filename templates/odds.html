@@ -439,8 +439,9 @@
         /* ===== MODEL PAGE LAYOUT ===== */
         .model-page {
             max-width: 1100px;
-            margin: 0 auto 4rem;
-            padding: 0 2rem;
+            margin-left: auto;
+            margin-right: auto;
+            min-width: 0;
         }
 
         /* ===== HEADLINE WIN PROBABILITIES ===== */
@@ -1206,12 +1207,8 @@
         .tip-meta { font-size: 10px; color: #64748b; margin-top: 4px; }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 900px) {
-            .win-prob-cards { flex-wrap: wrap; }
-            .win-prob-card { flex: 1 1 min(100%, 200px); min-width: 0; }
-        }
-
         @media (max-width: 768px) {
+            .model-page { padding: 0 1rem; }
             .win-prob-cards { flex-direction: column; }
             .prob-pct { font-size: 1.5rem; }
             .model-section { padding: 1.5rem 1.25rem; }

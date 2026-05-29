@@ -619,6 +619,10 @@
                 font-size: 0.9rem;
             }
 
+            .markets-content-page {
+                padding: 1rem;
+            }
+
             .leader-card {
                 padding: 1rem;
                 gap: 1rem;
@@ -812,10 +816,11 @@
         }
 
         .market-chart-section .chart-wrapper {
-            height: 320px;
+            height: clamp(200px, 42vw, 320px);
             position: relative;
             padding: 0.5rem 0;
             width: 100%;
+            min-width: 0;
         }
 
         .chart-toggle {
@@ -824,9 +829,10 @@
             background: var(--bg-elevated);
             padding: 4px;
             border: 1px solid var(--border-default);
-            flex-wrap: wrap;
-            justify-content: center;
-            width: auto;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            width: 100%;
+            max-width: 100%;
         }
 
         .toggle-btn {
