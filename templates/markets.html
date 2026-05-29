@@ -29,6 +29,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+    <link rel="preload" href="/api/snapshots/chart?period=all&amp;epsilon=0.5" as="fetch" crossorigin>
 
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-WVTWQBBG8S"></script>
@@ -816,11 +817,10 @@
         }
 
         .market-chart-section .chart-wrapper {
-            height: clamp(200px, 42vw, 320px);
+            height: 320px;
             position: relative;
             padding: 0.5rem 0;
             width: 100%;
-            min-width: 0;
         }
 
         .chart-toggle {
@@ -829,10 +829,9 @@
             background: var(--bg-elevated);
             padding: 4px;
             border: 1px solid var(--border-default);
-            flex-wrap: nowrap;
-            justify-content: flex-start;
-            width: 100%;
-            max-width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: auto;
         }
 
         .toggle-btn {

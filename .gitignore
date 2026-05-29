@@ -60,6 +60,7 @@ data/*.pre-*
 # Screenshots (local debugging only)
 SCREENHSHOTS/
 Screenshot*.png
+artifacts/
 
 # Local design scratch folders
 final homescreen inspiration/

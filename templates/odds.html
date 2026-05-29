@@ -10,8 +10,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+    <link rel="dns-prefetch" href="https://unpkg.com">
+    <link rel="dns-prefetch" href="https://basemaps.cartocdn.com">
+    <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin>
+    <link rel="preload" href="/api/model/precincts" as="fetch" crossorigin>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-WVTWQBBG8S"></script>
@@ -1399,6 +1403,15 @@
             'avg_andrew': 'Andrew'
         };
 
+        function whenMapReady(fn) {
+            if (window.L) { fn(); return; }
+            function run() { if (window.L) fn(); }
+            window.addEventListener('load', run);
+            var s = document.querySelector('script[src*="leaflet"]');
+            if (s) s.addEventListener('load', run);
+        }
+
+        whenMapReady(function initPrecinctMap() {
         // ===== MAP INIT =====
         var mapRenderer = L.canvas({ padding: 0.5 });
         var map = L.map('precinct-map', {
@@ -1790,7 +1803,7 @@
         document.getElementById('winnerFilter').addEventListener('change', renderFullTable);
 
         // ===== LOAD GEOJSON =====
-        fetch('{{ url_for("static", filename="model/il9_precinct_model.geojson") }}')
+        fetch('/api/model/precincts')
             .then(function(r) { return r.json(); })
             .then(function(geojson) {
                 document.getElementById('map-loading').style.display = 'none';
@@ -1889,6 +1902,7 @@
                 buildBattlegroundTable(allPrecinctData);
                 renderFullTable();
             });
+        }); // end whenMapReady / initPrecinctMap
     </script>
 </body>
 </html>
