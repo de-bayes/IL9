@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block meta %}{% endblock %}
+    {% include '_head_common.html' %}
+    {% block head_extra %}{% endblock %}
+    {% block analytics %}{% include '_analytics.html' %}{% endblock %}
+</head>
+{% include '_theme_flash.html' %}
+<body>
+    {% block body_before %}{% endblock %}
+    <div class="site-content">
+        {% block site_banner %}{% endblock %}
+        {% include '_header_nav.html' %}
+        {% block content %}{% endblock %}
+        {% block footer %}
+            {% include '_site_footer.html' %}
+        {% endblock %}
+    </div>
+    {% block page_styles %}{% endblock %}
+    {% block page_scripts %}{% endblock %}
+    <script src="{{ url_for('static', filename='site.js') }}"></script>
+</body>
+</html>

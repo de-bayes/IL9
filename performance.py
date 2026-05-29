@@ -74,7 +74,5 @@ def init_performance(app):
             'image/png', 'image/jpeg', 'image/webp', 'image/svg+xml',
             'font/woff2', 'application/font-woff2',
         ):
-            response.headers.setdefault(
-                'Cache-Control', 'public, max-age=31536000, immutable'
-            )
+            response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
         return response

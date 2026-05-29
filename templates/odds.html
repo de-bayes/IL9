@@ -1799,7 +1799,15 @@
         });
 
         // Search & filter handlers
-        document.getElementById('precinctSearch').addEventListener('input', renderFullTable);
+        function debounce(fn, ms) {
+            var t;
+            return function() {
+                var args = arguments, ctx = this;
+                clearTimeout(t);
+                t = setTimeout(function() { fn.apply(ctx, args); }, ms);
+            };
+        }
+        document.getElementById('precinctSearch').addEventListener('input', debounce(renderFullTable, 200));
         document.getElementById('winnerFilter').addEventListener('change', renderFullTable);
 
         // ===== LOAD GEOJSON =====
@@ -1914,5 +1922,6 @@
             });
         }); // end whenMapReady / initPrecinctMap
     </script>
+    <script src="{{ url_for('static', filename='site.js') }}"></script>
 </body>
 </html>

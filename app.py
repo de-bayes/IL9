@@ -2,6 +2,9 @@ from flask import Flask, jsonify, render_template, request, send_file
 from functools import wraps
 import random
 import math
+from functools import lru_cache
+import bisect
+import re
 import hashlib
 import hmac
 from datetime import datetime, timedelta, timezone
@@ -608,22 +611,19 @@ def count_data_points_jsonl(filepath):
 
 # ===== TIMESTAMP PARSING =====
 
+@lru_cache(maxsize=100000)
 def parse_snapshot_timestamp(ts_str):
-    """
-    Parse ISO timestamp string to UTC datetime.
-    Handles both Z-suffix and no-suffix (all are UTC).
-    Returns None if unparseable.
-    """
+    """Parse ISO timestamp to UTC datetime. Cached for chart hot path."""
     if not ts_str:
         return None
-    ts_clean = ts_str.rstrip('Z')
-    for fmt in ('%Y-%m-%dT%H:%M:%S.%f', '%Y-%m-%dT%H:%M:%S'):
-        try:
-            dt = datetime.strptime(ts_clean, fmt)
-            return dt.replace(tzinfo=timezone.utc)
-        except ValueError:
-            continue
-    return None
+    try:
+        s = ts_str.replace('Z', '+00:00') if ts_str.endswith('Z') else ts_str
+        dt = datetime.fromisoformat(s)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
+    except (ValueError, TypeError):
+        return None
 
 
 # ===== RAMER-DOUGLAS-PEUCKER SIMPLIFICATION =====
@@ -682,7 +682,7 @@ _chart_cache_lock = _threading.Lock()  # guards _chart_cache dict access
 _chart_compute_locks = {}  # key -> Lock, prevents duplicate computation
 _chart_compute_locks_lock = _threading.Lock()  # guards _chart_compute_locks dict
 
-_jsonl_lines_cache = {'size': None, 'lines': None}
+_jsonl_lines_cache = {'size': None, 'lines': None, 'ts_index': None}
 _jsonl_lines_lock = _threading.Lock()
 
 
@@ -699,24 +699,52 @@ def _jsonl_data_size():
     return 0
 
 
+_TS_RE = re.compile(r'"timestamp":\s*"([^"]+)"')
+
+
 def get_jsonl_raw_lines():
     """Return all JSONL lines, cached until the underlying file grows."""
     size = _jsonl_data_size()
     with _jsonl_lines_lock:
         if _jsonl_lines_cache['size'] == size and _jsonl_lines_cache['lines'] is not None:
             return _jsonl_lines_cache['lines']
+    lines = []
+    ts_index = []
     try:
         f = _open_jsonl(HISTORICAL_DATA_PATH)
         if f is None:
             return []
         with f:
-            lines = [line.strip() for line in f if line.strip()]
+            for i, line in enumerate(f):
+                s = line.strip()
+                if not s:
+                    continue
+                lines.append(s)
+                m = _TS_RE.search(s)
+                if m:
+                    dt = parse_snapshot_timestamp(m.group(1))
+                    if dt:
+                        ts_index.append((dt.timestamp(), i))
     except (IOError, OSError):
         return []
     with _jsonl_lines_lock:
         _jsonl_lines_cache['size'] = size
         _jsonl_lines_cache['lines'] = lines
+        _jsonl_lines_cache['ts_index'] = ts_index
     return lines
+
+
+def get_jsonl_ts_index():
+    """Epoch timestamp + line index pairs for fast period windows."""
+    get_jsonl_raw_lines()
+    with _jsonl_lines_lock:
+        return _jsonl_lines_cache.get('ts_index') or []
+
+
+
+def _chart_etag_key(file_size, period, epsilon):
+    """Stable ETag for frozen archive data without serializing full payload."""
+    return hashlib.md5(f"{file_size}:{period}:{epsilon:.2f}".encode()).hexdigest()[:16]
 
 
 def _get_compute_lock(cache_key):
@@ -2251,18 +2279,28 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
         # 1d/7d: binary-search-ish scan from the end using fast regex to find
         # the earliest line within the cutoff window. This gives the *full*
         # time window regardless of how dense the trailing data is.
-        start_idx = len(source_lines)
-        for i in range(len(source_lines) - 1, -1, -1):
-            m = _ts_re.search(source_lines[i])
-            if not m:
-                continue
-            dt = parse_snapshot_timestamp(m.group(1))
-            if dt is None:
-                continue
-            if dt >= cutoff:
-                start_idx = i
+        ts_index = get_jsonl_ts_index()
+        start_idx = 0
+        if ts_index and cutoff is not None:
+            cutoff_epoch = cutoff.timestamp()
+            start_idx = bisect.bisect_left(ts_index, (cutoff_epoch, 0))
+            if start_idx < len(ts_index):
+                start_idx = ts_index[start_idx][1]
             else:
-                break
+                start_idx = len(source_lines)
+        else:
+            start_idx = len(source_lines)
+            for i in range(len(source_lines) - 1, -1, -1):
+                m = _ts_re.search(source_lines[i])
+                if not m:
+                    continue
+                dt = parse_snapshot_timestamp(m.group(1))
+                if dt is None:
+                    continue
+                if dt >= cutoff:
+                    start_idx = i
+                else:
+                    break
         lines_to_parse = source_lines[start_idx:]
         # Safety cap: if the window is huge (e.g. dense election-night data),
         # uniformly downsample before parsing.
@@ -2449,6 +2487,37 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
     }
 
 
+
+def _load_disk_chart_cache():
+    """Load precomputed chart JSON from data/chart_cache/ if present (archive deploy)."""
+    cache_dir = os.path.join(os.path.dirname(__file__), 'data', 'chart_cache')
+    if not os.path.isdir(cache_dir):
+        return False
+    size = _jsonl_data_size()
+    now = _time.time()
+    loaded = 0
+    for period in ('all', '7d', '1d'):
+        path = os.path.join(cache_dir, f'{period}.json')
+        if not os.path.exists(path):
+            continue
+        try:
+            with open(path, 'r') as f:
+                result = json.load(f)
+            key = f'{period}:0.5'
+            etag = _chart_etag_key(size, period, 0.5)
+            with _chart_cache_lock:
+                _chart_cache[key] = {
+                    'data': result,
+                    'time': now,
+                    'file_size': size,
+                    'etag': etag,
+                }
+            loaded += 1
+        except (IOError, OSError, json.JSONDecodeError):
+            continue
+    return loaded == 3
+
+
 def _prewarm_chart_cache():
     """
     Pre-compute chart data for all periods and store in cache.
@@ -2457,6 +2526,8 @@ def _prewarm_chart_cache():
     Reads the JSONL file once, then computes all 3 periods from that single read.
     """
     global _chart_cache
+    if _load_disk_chart_cache():
+        return
     # Determine file size (check .gz first, then plain)
     gz_path = HISTORICAL_DATA_PATH + '.gz'
     try:
@@ -2483,7 +2554,7 @@ def _prewarm_chart_cache():
                 continue
             try:
                 result = _compute_chart_data(period, 0.5, raw_lines=raw_lines)
-                etag = hashlib.md5(json.dumps(result, separators=(',', ':')).encode()).hexdigest()[:16]
+                etag = _chart_etag_key(current_file_size, period, 0.5)
                 with _chart_cache_lock:
                     _chart_cache[cache_key] = {
                         'data': result,
@@ -2546,7 +2617,7 @@ def get_snapshots_chart():
             resp = jsonify(cached['data'])
             if cached.get('etag'):
                 resp.headers['ETag'] = f'"{cached["etag"]}"'
-            resp.headers['Cache-Control'] = 'public, max-age=120'
+            resp.headers['Cache-Control'] = 'public, max-age=86400'
             return resp
 
         # Cache miss: acquire per-key lock so only one thread computes.
@@ -2561,12 +2632,12 @@ def get_snapshots_chart():
                 resp = jsonify(cached['data'])
                 if cached.get('etag'):
                     resp.headers['ETag'] = f'"{cached["etag"]}"'
-                resp.headers['Cache-Control'] = 'public, max-age=120'
+                resp.headers['Cache-Control'] = 'public, max-age=86400'
                 return resp
 
             # Actually compute
             result = _compute_chart_data(period, epsilon)
-            etag = hashlib.md5(json.dumps(result, separators=(',', ':')).encode()).hexdigest()[:16]
+            etag = _chart_etag_key(current_file_size, period, 0.5)
 
             with _chart_cache_lock:
                 _chart_cache[cache_key] = {
@@ -2578,7 +2649,7 @@ def get_snapshots_chart():
 
         resp = jsonify(result)
         resp.headers['ETag'] = f'"{etag}"'
-        resp.headers['Cache-Control'] = 'public, max-age=120'
+        resp.headers['Cache-Control'] = 'public, max-age=86400'
         return resp
 
     except Exception as e:

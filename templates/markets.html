@@ -1708,8 +1708,8 @@
         }
     </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script>
 function toggleTheme() {
     var isLight = document.documentElement.getAttribute('data-theme') === 'light';
@@ -3127,5 +3127,6 @@ document.addEventListener('DOMContentLoaded', () => {
         initFundraisingCallout();
     }
     </script>
+    <script src="{{ url_for('static', filename='site.js') }}"></script>
 </body>
 </html>

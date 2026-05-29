@@ -13,7 +13,7 @@ preload_app = True
 
 # Thread workers: good for I/O-bound Flask (JSON APIs, static, proxies).
 worker_class = "gthread"
-workers = int(os.environ.get("WEB_CONCURRENCY", min(4, multiprocessing.cpu_count() + 1)))
+workers = int(os.environ.get("WEB_CONCURRENCY", min(2, multiprocessing.cpu_count() + 1)))
 threads = int(os.environ.get("GUNICORN_THREADS", "4"))
 
 timeout = int(os.environ.get("GUNICORN_TIMEOUT", "120"))
@@ -30,9 +30,15 @@ loglevel = os.environ.get("LOG_LEVEL", "info")
 
 def post_fork(server, worker):
     """Reinitialize threading locks after fork (preload_app safety)."""
+    import os
     import app as app_module
     import threading
     app_module._chart_cache_lock = threading.Lock()
     app_module._chart_compute_locks_lock = threading.Lock()
     app_module._jsonl_lines_lock = threading.Lock()
     app_module._chart_compute_locks = {}
+    if worker.age == 1 and os.environ.get('IL9_DISABLE_CHART_PREWARM', '').lower() not in ('1', 'true', 'yes'):
+        try:
+            app_module._prewarm_chart_cache()
+        except Exception:
+            pass
