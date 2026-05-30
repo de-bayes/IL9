@@ -29,7 +29,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
-    <link rel="preload" href="/api/snapshots/chart?period=all&amp;epsilon=0.5" as="fetch" crossorigin>
 
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-WVTWQBBG8S"></script>
@@ -1476,177 +1475,6 @@
             font-size: 0.95rem;
         }
 
-        .subscribe-form {
-            display: flex;
-            gap: 0.75rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .subscribe-input {
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-default);
-            border-radius: 6px;
-            background: var(--bg-elevated);
-            color: var(--text-primary);
-            font-size: 1rem;
-            font-family: var(--sans);
-            width: 280px;
-            max-width: 100%;
-            outline: none;
-            transition: border-color 0.3s ease;
-        }
-
-        .subscribe-input:focus {
-            border-color: var(--accent-blue);
-        }
-
-        .subscribe-input::placeholder {
-            color: var(--text-tertiary);
-        }
-
-        .subscribe-threshold {
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-default);
-            border-radius: 6px;
-            background: var(--bg-elevated);
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            font-family: var(--sans);
-            width: 200px;
-            max-width: 100%;
-            outline: none;
-            transition: border-color 0.3s ease;
-            cursor: pointer;
-        }
-
-        .subscribe-threshold:focus {
-            border-color: var(--accent-blue);
-        }
-
-        .subscribe-button {
-            padding: 0.75rem 1.5rem;
-            background: var(--text-primary);
-            color: var(--bg-primary);
-            border: none;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: opacity 0.15s ease;
-            font-family: var(--sans);
-        }
-
-        .subscribe-button:hover {
-            opacity: 0.8;
-        }
-
-        .subscribe-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .subscribe-message {
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            min-height: 1.4em;
-        }
-
-        .subscribe-message.success {
-            color: var(--accent-green);
-        }
-
-        .subscribe-message.error {
-            color: var(--accent-red);
-        }
-
-        /* Email Subscribe Modal Popup */
-        .email-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 10000;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .email-modal.show {
-            display: block;
-        }
-
-        .email-modal-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--bg-primary);
-        }
-
-        .email-modal-content {
-            position: relative;
-            max-width: 500px;
-            margin: 15% auto;
-            background: var(--bg-surface);
-            border: 2px solid var(--border-hover);
-            padding: 40px;
-            box-shadow: 0 8px 32px var(--shadow-soft);
-            animation: slideUp 0.4s ease-out;
-            text-align: center;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .email-modal-close {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 32px;
-            cursor: pointer;
-            line-height: 1;
-            padding: 0;
-            width: 32px;
-            height: 32px;
-            transition: color 0.2s ease;
-        }
-
-        .email-modal-close:hover {
-            color: var(--accent-blue);
-        }
-
-        .email-modal-content h2 {
-            margin: 0 0 12px 0;
-            font-size: 2rem;
-            font-family: var(--serif);
-            font-weight: 700;
-            color: var(--accent-blue);
-        }
-
-        .email-modal-description {
-            margin: 0 0 24px 0;
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
         .last-updated {
             color: var(--text-secondary);
             font-size: 0.85rem;
@@ -1708,8 +1536,8 @@
         }
     </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script>
 function toggleTheme() {
     var isLight = document.documentElement.getAttribute('data-theme') === 'light';
@@ -1722,7 +1550,6 @@ function toggleTheme() {
     }
     // Re-render chart with updated theme colors
     if (candidatesData && candidatesData.length > 0) {
-        if (window._chartEtags) { Object.keys(window._chartEtags).forEach(function(k) { delete window._chartEtags[k]; }); }
         renderMarketTrendChart(candidatesData);
     }
 }
@@ -1808,9 +1635,6 @@ function formatCentralTime(date, options = {}) {
     const formatter = new Intl.DateTimeFormat('en-US', { ...defaults, ...options });
     return formatter.format(date) + ' CT';
 }
-
-// Archive mode: LIVE badges and infrastructure dots were removed with the
-// election-night theme. This is a no-op kept for callers.
 
 let marketChart = null;
 let candidatesData = [];
@@ -2013,13 +1837,9 @@ async function calculateAggregate() {
     // Store aggregated data for chart updates
     candidatesData = aggregated;
 
-    // Archive mode: snapshots are read-only on the server.
-
     renderBigOdds(aggregated);
 
-    // Only render chart on first load, not every poll cycle
-    // Chart data comes from server-side snapshots (updated every 3 min)
-    // Re-fetching/re-rendering chart every poll is wasteful
+    // Only render chart on first load (archive: chart data is static JSONL)
     if (!window._chartInitialized) {
         window._chartInitialized = true;
         renderMarketTrendChart(aggregated);
@@ -2028,7 +1848,6 @@ async function calculateAggregate() {
     renderBreakdown(breakdowns);
     renderHeatmap(aggregated);
 }
-
 
 function renderBreakdown(breakdowns) {
     const container = document.getElementById('breakdownContent');
@@ -2236,8 +2055,6 @@ async function fetchManifoldData() {
             month: 'short', day: 'numeric', year: 'numeric',
             hour: 'numeric', minute: '2-digit'
         })}`;
-
-        // Update status badges
 
         // Calculate aggregate if both data sources are ready
         if (Object.keys(kalshiData).length > 0 && Object.keys(manifoldData).length > 0) {
@@ -2966,8 +2783,6 @@ async function fetchKalshiData() {
         kalshiLastUpdate = Date.UTC(2026, 2, 18, 2, 30);  // Mar 17 2026, 9:30 PM CT
         document.getElementById('kalshiUpdated').textContent = 'Final archived snapshot — Mar 17, 2026, 9:30 PM CT';
 
-        // Update status badges
-
         // Calculate aggregate if both Manifold and Kalshi data are ready
         if (Object.keys(manifoldData).length > 0 && Object.keys(kalshiData).length > 0) {
             await calculateAggregate();
@@ -3003,7 +2818,6 @@ function renderKalshiExpanded(candidates) {
         </div>
     `).join('');
 }
-
 
 function setupPolling() {
     // Archive mode: render chart + winner from the last snapshot; no polling.

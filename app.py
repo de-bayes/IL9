@@ -2,6 +2,9 @@ from flask import Flask, jsonify, render_template, request, send_file
 from functools import wraps
 import random
 import math
+from functools import lru_cache
+import bisect
+import re
 import hashlib
 import hmac
 from datetime import datetime, timedelta, timezone
@@ -94,10 +97,6 @@ if not EMAIL_SECRET_SALT:
 # Admin API authentication token (must be set in production)
 ADMIN_API_TOKEN = os.environ.get('ADMIN_API_TOKEN')
 SITE_BASE_URL = os.environ.get('SITE_BASE_URL', 'https://il9.org/')
-SWING_THRESHOLD = 5.0  # percentage points to trigger alert
-_swing_debounce = {}  # candidate_name -> last_alert_time (UTC timestamp)
-_daily_summary_sent = None  # date string of last sent daily summary
-
 # ===== JSONL HELPER FUNCTIONS =====
 
 def _acquire_file_lock(lock_path):
@@ -537,33 +536,6 @@ def repair_snapshots_jsonl(filepath):
 
     return stats
 
-
-def append_snapshot_jsonl(filepath, snapshot):
-    """
-    Append a single snapshot to JSONL file safely.
-    Uses a file lock + append + fsync to prevent inter-process corruption.
-    """
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-
-    lock_path = filepath + '.lock'
-    lock_file = None
-    try:
-        lock_file = _acquire_file_lock(lock_path)
-        line = json.dumps(snapshot, separators=(',', ':')) + '\n'
-        with open(filepath, 'a') as f:
-            f.write(line)
-            f.flush()
-            os.fsync(f.fileno())
-        return True
-
-    except Exception as e:
-        print(f"[{datetime.now().isoformat()}] Error appending to JSONL: {e}")
-        raise
-    finally:
-        if lock_file is not None:
-            _release_file_lock(lock_file)
-
-
 def _open_jsonl(filepath):
     """Open a JSONL file, preferring .gz version if it exists."""
     gz_path = filepath + '.gz'
@@ -608,22 +580,19 @@ def count_data_points_jsonl(filepath):
 
 # ===== TIMESTAMP PARSING =====
 
+@lru_cache(maxsize=100000)
 def parse_snapshot_timestamp(ts_str):
-    """
-    Parse ISO timestamp string to UTC datetime.
-    Handles both Z-suffix and no-suffix (all are UTC).
-    Returns None if unparseable.
-    """
+    """Parse ISO timestamp to UTC datetime. Cached for chart hot path."""
     if not ts_str:
         return None
-    ts_clean = ts_str.rstrip('Z')
-    for fmt in ('%Y-%m-%dT%H:%M:%S.%f', '%Y-%m-%dT%H:%M:%S'):
-        try:
-            dt = datetime.strptime(ts_clean, fmt)
-            return dt.replace(tzinfo=timezone.utc)
-        except ValueError:
-            continue
-    return None
+    try:
+        s = ts_str.replace('Z', '+00:00') if ts_str.endswith('Z') else ts_str
+        dt = datetime.fromisoformat(s)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
+    except (ValueError, TypeError):
+        return None
 
 
 # ===== RAMER-DOUGLAS-PEUCKER SIMPLIFICATION =====
@@ -682,7 +651,7 @@ _chart_cache_lock = _threading.Lock()  # guards _chart_cache dict access
 _chart_compute_locks = {}  # key -> Lock, prevents duplicate computation
 _chart_compute_locks_lock = _threading.Lock()  # guards _chart_compute_locks dict
 
-_jsonl_lines_cache = {'size': None, 'lines': None}
+_jsonl_lines_cache = {'size': None, 'lines': None, 'ts_index': None}
 _jsonl_lines_lock = _threading.Lock()
 
 
@@ -699,24 +668,52 @@ def _jsonl_data_size():
     return 0
 
 
+_TS_RE = re.compile(r'"timestamp":\s*"([^"]+)"')
+
+
 def get_jsonl_raw_lines():
     """Return all JSONL lines, cached until the underlying file grows."""
     size = _jsonl_data_size()
     with _jsonl_lines_lock:
         if _jsonl_lines_cache['size'] == size and _jsonl_lines_cache['lines'] is not None:
             return _jsonl_lines_cache['lines']
+    lines = []
+    ts_index = []
     try:
         f = _open_jsonl(HISTORICAL_DATA_PATH)
         if f is None:
             return []
         with f:
-            lines = [line.strip() for line in f if line.strip()]
+            for i, line in enumerate(f):
+                s = line.strip()
+                if not s:
+                    continue
+                lines.append(s)
+                m = _TS_RE.search(s)
+                if m:
+                    dt = parse_snapshot_timestamp(m.group(1))
+                    if dt:
+                        ts_index.append((dt.timestamp(), i))
     except (IOError, OSError):
         return []
     with _jsonl_lines_lock:
         _jsonl_lines_cache['size'] = size
         _jsonl_lines_cache['lines'] = lines
+        _jsonl_lines_cache['ts_index'] = ts_index
     return lines
+
+
+def get_jsonl_ts_index():
+    """Epoch timestamp + line index pairs for fast period windows."""
+    get_jsonl_raw_lines()
+    with _jsonl_lines_lock:
+        return _jsonl_lines_cache.get('ts_index') or []
+
+
+
+def _chart_etag_key(file_size, period, epsilon):
+    """Stable ETag for frozen archive data without serializing full payload."""
+    return hashlib.md5(f"{file_size}:{period}:{epsilon:.2f}".encode()).hexdigest()[:16]
 
 
 def _get_compute_lock(cache_key):
@@ -746,33 +743,6 @@ def read_subscribers():
     except (IOError, OSError):
         pass
     return subscribers
-
-def add_subscriber(email, threshold=5.0):
-    """Add a subscriber. Returns unsub token. Raises ValueError if duplicate."""
-    email = email.lower().strip()
-    threshold = float(threshold) if threshold else 5.0
-
-    # Validate threshold range
-    if threshold < 1.0 or threshold > 20.0:
-        raise ValueError('Threshold must be between 1% and 20%')
-
-    existing = read_subscribers()
-    for sub in existing:
-        if sub.get('email') == email:
-            raise ValueError('Already subscribed')
-
-    record = {
-        'email': email,
-        'threshold': threshold,
-        'subscribed_at': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
-    }
-
-    os.makedirs(os.path.dirname(SUBSCRIBERS_PATH), exist_ok=True)
-    with open(SUBSCRIBERS_PATH, 'a') as f:
-        f.write(json.dumps(record) + '\n')
-
-    return make_unsub_token(email)
-
 def remove_subscriber(email):
     """Remove a subscriber by rewriting JSONL without that email."""
     email = email.lower().strip()
@@ -917,139 +887,6 @@ def send_csv_backup_email():
     except Exception as e:
         print(f"[{datetime.now().isoformat()}] CSV backup email error: {e}")
         return False
-
-
-def send_welcome_email(email, threshold=5.0):
-    """Send welcome email to new subscriber."""
-    token = make_unsub_token(email)
-    unsub_url = f"{SITE_BASE_URL}unsubscribe?email={email}&token={token}"
-
-    # Plain text version
-    text = f"""
-Welcome to IL9Cast Alerts!
-
-You'll now receive:
-
-⚡ Big Swing Alerts
-Get notified immediately when any candidate moves {threshold:.1f}%+ in the prediction markets
-
-📊 Daily Summary
-Every morning at 8 AM CT: current standings and 24-hour changes
-
-View Live Markets: {SITE_BASE_URL}markets
-
----
-Unsubscribe: {unsub_url}
-    """
-
-    # HTML version
-    html = f"""
-    <!DOCTYPE html>
-    <html>
-    <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-    <body style="margin: 0; padding: 0; background-color: #1A1A1E; font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #1A1A1E;">
-            <tr><td align="center" style="padding: 40px 20px;">
-                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #232328; border: 1px solid #31B0B5;">
-                    <!-- Logo -->
-                    <tr><td style="padding: 32px 40px 0 40px; text-align: center; border-bottom: 1px solid #2a2a30;">
-                        <h1 style="margin: 0 0 6px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; letter-spacing: 1px;">
-                            <span style="color: #F0EFEB;">IL9</span><span style="color: #31B0B5;">Cast</span>
-                        </h1>
-                        <p style="margin: 0 0 20px 0; color: #888; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;">Alert System Activated</p>
-                    </td></tr>
-
-                    <!-- Welcome -->
-                    <tr><td style="padding: 32px 40px 24px 40px; text-align: center;">
-                        <h2 style="margin: 0 0 8px 0; color: #F0EFEB; font-family: Georgia, 'Times New Roman', serif; font-size: 22px; font-weight: 400;">Welcome</h2>
-                        <p style="margin: 0; color: #888; font-size: 14px; line-height: 1.6;">You're now subscribed to IL-9 primary race alerts.</p>
-                    </td></tr>
-
-                    <!-- Features -->
-                    <tr><td style="padding: 0 40px 12px 40px;">
-                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #1A1A1E; border: 1px solid #2a2a30;">
-                            <tr><td style="padding: 20px 24px;">
-                                <h3 style="margin: 0 0 6px 0; color: #31B0B5; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Big Swing Alerts</h3>
-                                <p style="margin: 0; color: #999; font-size: 14px; line-height: 1.5;">Notified when any candidate moves {threshold:.1f}%+ in prediction markets</p>
-                            </td></tr>
-                        </table>
-                    </td></tr>
-                    <tr><td style="padding: 0 40px 24px 40px;">
-                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #1A1A1E; border: 1px solid #2a2a30;">
-                            <tr><td style="padding: 20px 24px;">
-                                <h3 style="margin: 0 0 6px 0; color: #31B0B5; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Daily Summary</h3>
-                                <p style="margin: 0; color: #999; font-size: 14px; line-height: 1.5;">Every morning at 8 AM CT: standings and 24-hour changes</p>
-                            </td></tr>
-                        </table>
-                    </td></tr>
-
-                    <!-- CTA -->
-                    <tr><td style="padding: 8px 40px 32px 40px; text-align: center;">
-                        <a href="{SITE_BASE_URL}markets" style="display: inline-block; background-color: #31B0B5; color: #ffffff; text-decoration: none; padding: 12px 32px; font-weight: 600; font-size: 15px;">View Live Markets</a>
-                    </td></tr>
-
-                    <!-- Footer -->
-                    <tr><td style="padding: 20px 40px; text-align: center; border-top: 1px solid #2a2a30;">
-                        <p style="margin: 0; color: #555; font-size: 11px;"><a href="{unsub_url}" style="color: #555; text-decoration: underline;">Unsubscribe</a></p>
-                    </td></tr>
-                </table>
-            </td></tr>
-        </table>
-    </body>
-    </html>
-    """
-    send_email(email, 'Welcome to IL9Cast Alerts', html, text)
-
-def check_swings_and_alert(new_snapshot, prev_snapshot):
-    """Compare snapshots and send alerts based on each subscriber's threshold. 60-min debounce per candidate."""
-    if not prev_snapshot:
-        return
-
-    prev_by_name = {c['name']: c['probability'] for c in prev_snapshot.get('candidates', [])}
-    now_ts = _time.time()
-
-    # Calculate all deltas
-    all_swings = []
-    for c in new_snapshot.get('candidates', []):
-        name = c['name']
-        new_prob = c['probability']
-        old_prob = prev_by_name.get(name)
-        if old_prob is None:
-            continue
-        delta = new_prob - old_prob
-        if abs(delta) >= 1.0:  # Only track swings >= 1% (minimum threshold)
-            all_swings.append({
-                'name': name,
-                'old': old_prob,
-                'new': new_prob,
-                'delta': delta
-            })
-
-    if not all_swings:
-        return
-
-    # Send alerts to each subscriber based on their threshold
-    subscribers = read_subscribers()
-    for sub in subscribers:
-        email = sub['email']
-        threshold = sub.get('threshold', 5.0)
-
-        # Filter swings that meet this subscriber's threshold
-        subscriber_swings = []
-        for swing in all_swings:
-            if abs(swing['delta']) >= threshold:
-                # Check 60-minute debounce (per candidate, globally)
-                last_alert = _swing_debounce.get(swing['name'], 0)
-                if now_ts - last_alert < 3600:
-                    continue
-                subscriber_swings.append(swing)
-
-        if subscriber_swings:
-            # Update debounce for all candidates we're alerting about
-            for swing in subscriber_swings:
-                _swing_debounce[swing['name']] = now_ts
-            send_swing_alert_to_subscriber(email, subscriber_swings)
-
 def send_swing_alert_to_subscriber(email, swings):
     """Build and send swing alert email to a single subscriber."""
     if not swings:
@@ -1140,142 +977,6 @@ View Live Markets: {SITE_BASE_URL}markets
     </html>
     """
     send_email(email, subject, html, text)
-
-def send_daily_summary():
-    """Send daily summary email with current standings and 24h changes."""
-    global _daily_summary_sent
-    today_str = datetime.now(timezone.utc).strftime('%Y-%m-%d')
-    if _daily_summary_sent == today_str:
-        return
-    _daily_summary_sent = today_str
-
-    subscribers = read_subscribers()
-    if not subscribers:
-        return
-
-    snapshots = read_snapshots_jsonl(HISTORICAL_DATA_PATH)
-    if not snapshots:
-        return
-
-    current = snapshots[-1]
-    now_utc = datetime.now(timezone.utc)
-    cutoff_24h = now_utc - timedelta(hours=24)
-
-    # Find snapshot closest to 24h ago
-    old_snapshot = None
-    for snap in snapshots:
-        dt = parse_snapshot_timestamp(snap.get('timestamp', ''))
-        if dt and dt <= cutoff_24h:
-            old_snapshot = snap
-
-    old_by_name = {}
-    if old_snapshot:
-        old_by_name = {c['name']: c['probability'] for c in old_snapshot.get('candidates', [])}
-
-    rows = ''
-    for c in sorted(current.get('candidates', []), key=lambda x: x['probability'], reverse=True):
-        name = c['name']
-        prob = c['probability']
-        old_prob = old_by_name.get(name)
-        if old_prob is not None:
-            delta = prob - old_prob
-            arrow = '▲' if delta > 0 else ('▼' if delta < 0 else '—')
-            color = '#31B686' if delta > 0 else ('#e74c3c' if delta < 0 else '#888')
-            if delta != 0:
-                change_str = f'{arrow} {abs(delta):.1f}%'
-            else:
-                change_str = '—'
-        else:
-            color = '#888'
-            change_str = 'New'
-
-        rows += f"""
-                                            <tr>
-                                                <td style="padding: 14px; border-bottom: 1px solid #2a2a30; color: #F0EFEB; font-weight: 500;">{name}</td>
-                                                <td style="padding: 14px; border-bottom: 1px solid #2a2a30; color: #31B0B5; font-weight: 700; font-size: 16px;">{prob:.1f}%</td>
-                                                <td style="padding: 14px; border-bottom: 1px solid #2a2a30; color: {color}; font-weight: 600;">{change_str}</td>
-                                            </tr>"""
-
-    ct_time = datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=-6)))
-    date_str = ct_time.strftime('%B %d, %Y')
-
-    # Plain text version
-    text_rows = []
-    for c in sorted(current.get('candidates', []), key=lambda x: x['probability'], reverse=True):
-        name = c['name']
-        prob = c['probability']
-        old_prob = old_by_name.get(name)
-        if old_prob is not None:
-            delta = prob - old_prob
-            arrow = '▲' if delta > 0 else ('▼' if delta < 0 else '—')
-            text_rows.append(f"{name}: {prob:.1f}% ({arrow} {abs(delta):.1f}% 24h)")
-        else:
-            text_rows.append(f"{name}: {prob:.1f}% (New)")
-
-    text = f"""
-IL9Cast Daily Summary - {date_str}
-
-{chr(10).join(text_rows)}
-
-View Live Markets: {SITE_BASE_URL}markets
-    """
-
-    for sub in subscribers:
-        email = sub['email']
-        token = make_unsub_token(email)
-        unsub_url = f"{SITE_BASE_URL}unsubscribe?email={email}&token={token}"
-
-        html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-        <body style="margin: 0; padding: 0; background-color: #1A1A1E; font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #1A1A1E;">
-                <tr><td align="center" style="padding: 40px 20px;">
-                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #232328; border: 1px solid #31B0B5;">
-                        <!-- Logo -->
-                        <tr><td style="padding: 32px 40px 0 40px; text-align: center; border-bottom: 1px solid #2a2a30;">
-                            <h1 style="margin: 0 0 6px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; letter-spacing: 1px;">
-                                <span style="color: #F0EFEB;">IL9</span><span style="color: #31B0B5;">Cast</span>
-                            </h1>
-                            <p style="margin: 0 0 20px 0; color: #888; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;">Daily Summary &middot; {date_str}</p>
-                        </td></tr>
-
-                        <!-- Data Table -->
-                        <tr><td style="padding: 28px 40px;">
-                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #1A1A1E; border: 1px solid #2a2a30;">
-                                <thead>
-                                    <tr>
-                                        <th style="text-align: left; padding: 12px 14px; color: #888; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 1px solid #2a2a30;">Candidate</th>
-                                        <th style="text-align: left; padding: 12px 14px; color: #888; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 1px solid #2a2a30;">Current</th>
-                                        <th style="text-align: left; padding: 12px 14px; color: #888; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 1px solid #2a2a30;">24h Change</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {rows}
-                                </tbody>
-                            </table>
-                        </td></tr>
-
-                        <!-- CTA -->
-                        <tr><td style="padding: 0 40px 32px 40px; text-align: center;">
-                            <a href="{SITE_BASE_URL}markets" style="display: inline-block; background-color: #31B0B5; color: #ffffff; text-decoration: none; padding: 12px 32px; font-weight: 600; font-size: 15px;">View Live Markets</a>
-                        </td></tr>
-
-                        <!-- Footer -->
-                        <tr><td style="padding: 20px 40px; text-align: center; border-top: 1px solid #2a2a30;">
-                            <p style="margin: 0; color: #555; font-size: 11px;"><a href="{unsub_url}" style="color: #555; text-decoration: underline;">Unsubscribe</a></p>
-                        </td></tr>
-                    </table>
-                </td></tr>
-            </table>
-        </body>
-        </html>
-        """
-        send_email(email, f'IL9Cast Daily Summary - {date_str}', html, text)
-
-    print(f"[{datetime.now().isoformat()}] Daily summary sent to {len(subscribers)} subscriber(s)")
-
 
 # ===== FEC API FUNCTIONS =====
 
@@ -2251,18 +1952,28 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
         # 1d/7d: binary-search-ish scan from the end using fast regex to find
         # the earliest line within the cutoff window. This gives the *full*
         # time window regardless of how dense the trailing data is.
-        start_idx = len(source_lines)
-        for i in range(len(source_lines) - 1, -1, -1):
-            m = _ts_re.search(source_lines[i])
-            if not m:
-                continue
-            dt = parse_snapshot_timestamp(m.group(1))
-            if dt is None:
-                continue
-            if dt >= cutoff:
-                start_idx = i
+        ts_index = get_jsonl_ts_index()
+        start_idx = 0
+        if ts_index and cutoff is not None:
+            cutoff_epoch = cutoff.timestamp()
+            start_idx = bisect.bisect_left(ts_index, (cutoff_epoch, 0))
+            if start_idx < len(ts_index):
+                start_idx = ts_index[start_idx][1]
             else:
-                break
+                start_idx = len(source_lines)
+        else:
+            start_idx = len(source_lines)
+            for i in range(len(source_lines) - 1, -1, -1):
+                m = _ts_re.search(source_lines[i])
+                if not m:
+                    continue
+                dt = parse_snapshot_timestamp(m.group(1))
+                if dt is None:
+                    continue
+                if dt >= cutoff:
+                    start_idx = i
+                else:
+                    break
         lines_to_parse = source_lines[start_idx:]
         # Safety cap: if the window is huge (e.g. dense election-night data),
         # uniformly downsample before parsing.
@@ -2449,6 +2160,37 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
     }
 
 
+
+def _load_disk_chart_cache():
+    """Load precomputed chart JSON from data/chart_cache/ if present (archive deploy)."""
+    cache_dir = os.path.join(os.path.dirname(__file__), 'data', 'chart_cache')
+    if not os.path.isdir(cache_dir):
+        return False
+    size = _jsonl_data_size()
+    now = _time.time()
+    loaded = 0
+    for period in ('all', '7d', '1d'):
+        path = os.path.join(cache_dir, f'{period}.json')
+        if not os.path.exists(path):
+            continue
+        try:
+            with open(path, 'r') as f:
+                result = json.load(f)
+            key = f'{period}:0.5'
+            etag = _chart_etag_key(size, period, 0.5)
+            with _chart_cache_lock:
+                _chart_cache[key] = {
+                    'data': result,
+                    'time': now,
+                    'file_size': size,
+                    'etag': etag,
+                }
+            loaded += 1
+        except (IOError, OSError, json.JSONDecodeError):
+            continue
+    return loaded == 3
+
+
 def _prewarm_chart_cache():
     """
     Pre-compute chart data for all periods and store in cache.
@@ -2457,6 +2199,8 @@ def _prewarm_chart_cache():
     Reads the JSONL file once, then computes all 3 periods from that single read.
     """
     global _chart_cache
+    if _load_disk_chart_cache():
+        return
     # Determine file size (check .gz first, then plain)
     gz_path = HISTORICAL_DATA_PATH + '.gz'
     try:
@@ -2483,7 +2227,7 @@ def _prewarm_chart_cache():
                 continue
             try:
                 result = _compute_chart_data(period, 0.5, raw_lines=raw_lines)
-                etag = hashlib.md5(json.dumps(result, separators=(',', ':')).encode()).hexdigest()[:16]
+                etag = _chart_etag_key(current_file_size, period, 0.5)
                 with _chart_cache_lock:
                     _chart_cache[cache_key] = {
                         'data': result,
@@ -2546,7 +2290,7 @@ def get_snapshots_chart():
             resp = jsonify(cached['data'])
             if cached.get('etag'):
                 resp.headers['ETag'] = f'"{cached["etag"]}"'
-            resp.headers['Cache-Control'] = 'public, max-age=120'
+            resp.headers['Cache-Control'] = 'public, max-age=86400'
             return resp
 
         # Cache miss: acquire per-key lock so only one thread computes.
@@ -2561,12 +2305,12 @@ def get_snapshots_chart():
                 resp = jsonify(cached['data'])
                 if cached.get('etag'):
                     resp.headers['ETag'] = f'"{cached["etag"]}"'
-                resp.headers['Cache-Control'] = 'public, max-age=120'
+                resp.headers['Cache-Control'] = 'public, max-age=86400'
                 return resp
 
             # Actually compute
             result = _compute_chart_data(period, epsilon)
-            etag = hashlib.md5(json.dumps(result, separators=(',', ':')).encode()).hexdigest()[:16]
+            etag = _chart_etag_key(current_file_size, period, 0.5)
 
             with _chart_cache_lock:
                 _chart_cache[cache_key] = {
@@ -2578,7 +2322,7 @@ def get_snapshots_chart():
 
         resp = jsonify(result)
         resp.headers['ETag'] = f'"{etag}"'
-        resp.headers['Cache-Control'] = 'public, max-age=120'
+        resp.headers['Cache-Control'] = 'public, max-age=86400'
         return resp
 
     except Exception as e:

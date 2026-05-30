@@ -1,0 +1,30 @@
+        <header>
+            <a href="/" class="logo">IL9<span>Cast</span></a>
+            <nav class="desktop-nav">
+                <a href="/markets"{% if nav_active == 'markets' %} class="active"{% endif %}>Markets</a>
+                <a href="/odds"{% if nav_active == 'model' %} class="active"{% endif %}>Model</a>
+                <a href="/money"{% if nav_active == 'money' %} class="active"{% endif %}>Money</a>
+                <a href="/candidates"{% if nav_active == 'candidates' %} class="active"{% endif %}>Candidates</a>
+                <a href="/methodology"{% if nav_active == 'methodology' %} class="active"{% endif %}>Methodology</a>
+                <a href="/about"{% if nav_active == 'about' %} class="active"{% endif %}>About</a>
+            </nav>
+            <div class="header-actions">
+                <button type="button" class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle color theme">
+                    <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                </button>
+                <button type="button" class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <nav class="mobile-nav" id="mobileNav">
+                <a href="/markets">Markets</a>
+                <a href="/odds">Model</a>
+                <a href="/money">Money</a>
+                <a href="/candidates">Candidates</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/about">About</a>
+            </nav>
+        </header>

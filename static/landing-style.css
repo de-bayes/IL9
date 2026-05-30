@@ -9,6 +9,10 @@
 --- */
 
 :root {
+    --page-gutter: clamp(1rem, 4vw, 2.5rem);
+    --page-max: 820px;
+    --accent-color: var(--accent-gold);
+    --accent: var(--accent-blue);
     /* Dark editorial palette (default — election night) */
     --bg-primary:       #1A1A1E;
     --bg-surface:       #232328;
@@ -1425,4 +1429,48 @@ header {
         width: 100%;
         padding: 0.9rem 2rem;
     }
+}
+
+
+/* --- Shared utilities (reduce inline styles) --- */
+.text-link {
+    color: var(--accent-blue);
+    text-decoration: underline;
+    font-weight: inherit;
+}
+.text-link--strong { font-weight: 600; }
+.section-footnote {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-default);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+.section-footnote--center {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+}
+.page-shell { margin-top: 1.5rem; }
+.page-shell--center { text-align: center; }
+.stat-value--numeric {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    min-width: 5.5ch;
+}
+.content-visibility-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 400px;
+}
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    order: 3;
+    margin-left: auto;
+}
+.hamburger {
+    min-width: 44px;
+    min-height: 44px;
 }
