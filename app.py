@@ -9,12 +9,14 @@ import requests
 import json
 import os
 import time as _time
-import atexit
 import shutil
 import gzip
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400  # Cache static files for 1 day (safe due to ?v= cache-buster)
+
+from performance import init_performance
+init_performance(app)
 
 
 @app.url_defaults
@@ -679,6 +681,42 @@ _chart_cache = {}  # key -> {'data': ..., 'time': ..., 'file_size': ..., 'etag':
 _chart_cache_lock = _threading.Lock()  # guards _chart_cache dict access
 _chart_compute_locks = {}  # key -> Lock, prevents duplicate computation
 _chart_compute_locks_lock = _threading.Lock()  # guards _chart_compute_locks dict
+
+_jsonl_lines_cache = {'size': None, 'lines': None}
+_jsonl_lines_lock = _threading.Lock()
+
+
+def _jsonl_data_size():
+    """Byte size of the active snapshots file (gz preferred)."""
+    gz_path = HISTORICAL_DATA_PATH + '.gz'
+    try:
+        if os.path.exists(gz_path):
+            return os.path.getsize(gz_path)
+        if os.path.exists(HISTORICAL_DATA_PATH):
+            return os.path.getsize(HISTORICAL_DATA_PATH)
+    except OSError:
+        pass
+    return 0
+
+
+def get_jsonl_raw_lines():
+    """Return all JSONL lines, cached until the underlying file grows."""
+    size = _jsonl_data_size()
+    with _jsonl_lines_lock:
+        if _jsonl_lines_cache['size'] == size and _jsonl_lines_cache['lines'] is not None:
+            return _jsonl_lines_cache['lines']
+    try:
+        f = _open_jsonl(HISTORICAL_DATA_PATH)
+        if f is None:
+            return []
+        with f:
+            lines = [line.strip() for line in f if line.strip()]
+    except (IOError, OSError):
+        return []
+    with _jsonl_lines_lock:
+        _jsonl_lines_cache['size'] = size
+        _jsonl_lines_cache['lines'] = lines
+    return lines
 
 
 def _get_compute_lock(cache_key):
@@ -1395,7 +1433,8 @@ def initialize_data():
 
     # Only seed data if historical file doesn't exist at all
     # Once Railway starts collecting, never overwrite its data
-    if not os.path.exists(HISTORICAL_DATA_PATH) and os.path.exists(SEED_DATA_PATH):
+    has_data = count_snapshots_jsonl(HISTORICAL_DATA_PATH) > 0
+    if not has_data and os.path.exists(SEED_DATA_PATH):
         print(f"[{datetime.now().isoformat()}] Seeding data from {SEED_DATA_PATH}")
         try:
             with open(SEED_DATA_PATH, 'r') as src:
@@ -1422,16 +1461,22 @@ def import_repo_csv_to_volume_if_needed(csv_path=REPO_CSV_PATH, output_path=HIST
     if not os.path.exists(csv_path):
         return {'imported': False, 'reason': 'csv_missing', 'csv_path': csv_path, 'output_path': output_path}
 
-    # Marker present → volume is healthy, skip
+    # Marker present → skip only if snapshots actually exist (handles stale/git markers)
     if os.path.exists(marker):
-        return {'imported': False, 'reason': 'already_recovered', 'csv_path': csv_path, 'output_path': output_path}
+        if count_snapshots_jsonl(output_path) > 0:
+            return {'imported': False, 'reason': 'already_recovered', 'csv_path': csv_path, 'output_path': output_path}
+        try:
+            os.remove(marker)
+            print(f"[{datetime.now().isoformat()}] Removed stale recovery marker (no snapshots on disk)")
+        except OSError:
+            pass
 
     csv_snapshots = load_snapshots_from_csv(csv_path)
     if not csv_snapshots:
         return {'imported': False, 'reason': 'csv_empty', 'csv_path': csv_path, 'output_path': output_path}
 
     csv_count = len(csv_snapshots)
-    existing_count = count_snapshots_jsonl(output_path) if os.path.exists(output_path) else 0
+    existing_count = count_snapshots_jsonl(output_path)
 
     # If JSONL already has more data than CSV and is healthy, just create marker
     if existing_count >= csv_count:
@@ -1485,12 +1530,15 @@ def import_repo_csv_to_volume_if_needed(csv_path=REPO_CSV_PATH, output_path=HIST
         stats = {'reason': 'csv_only_import', 'snapshots_written': csv_count}
         print(f"[{datetime.now().isoformat()}] CSV-only import: wrote {csv_count} snapshots")
 
-    # Bridge from last snapshot to present (fills gap with flat interpolated data)
-    bridge_stats = bridge_to_present(output_path)
-    stats['bridge_to_present'] = bridge_stats
-    if bridge_stats.get('bridged'):
-        print(f"[{datetime.now().isoformat()}] Bridged {bridge_stats['snapshots_added']} snapshots to present "
-              f"(gap was {bridge_stats['gap_hours']}h)")
+    # Archive site: do not fabricate post-election snapshots unless ops explicitly enable.
+    if os.environ.get('ENABLE_RECOVERY_BRIDGE', '').lower() in ('1', 'true', 'yes'):
+        bridge_stats = bridge_to_present(output_path)
+        stats['bridge_to_present'] = bridge_stats
+        if bridge_stats.get('bridged'):
+            print(f"[{datetime.now().isoformat()}] Bridged {bridge_stats['snapshots_added']} snapshots "
+                  f"(gap was {bridge_stats['gap_hours']}h)")
+    else:
+        stats['bridge_to_present'] = {'bridged': False, 'reason': 'archive_mode_skip'}
 
     # Create recovery marker so we don't re-run on next restart
     os.makedirs(os.path.dirname(marker), exist_ok=True)
@@ -1597,16 +1645,6 @@ else:
     purge_old_data()
     repair_snapshots_jsonl(HISTORICAL_DATA_PATH)
 
-# Mock candidate data
-CANDIDATES = [
-    {"id": 1, "name": "Maria Garcia", "party_role": "State Rep", "color": "#FF6B6B"},
-    {"id": 2, "name": "James Wilson", "party_role": "Community Organizer", "color": "#4ECDC4"},
-    {"id": 3, "name": "Dr. Sarah Ahmed", "party_role": "Physician", "color": "#45B7D1"},
-    {"id": 4, "name": "Tom Mueller", "party_role": "Labor Leader", "color": "#FFA07A"},
-    {"id": 5, "name": "Angela Chen", "party_role": "Tech Entrepreneur", "color": "#98D8C8"},
-    {"id": 6, "name": "Robert Jackson", "party_role": "Former Alderman", "color": "#F7DC6F"},
-]
-
 # Real IL-9 Candidate Profiles
 CANDIDATE_PROFILES = [
     {
@@ -1688,6 +1726,12 @@ CANDIDATE_PROFILES = [
 ]
 
 # Routes
+@app.route('/healthz')
+def healthz():
+    """Lightweight health check for Railway (no template render)."""
+    return jsonify({'status': 'ok'}), 200
+
+
 @app.route('/')
 def landing():
     return render_template('landing_new.html')
@@ -1699,6 +1743,30 @@ def rjmc_preview():
 @app.route('/odds')
 def odds():
     return render_template('odds.html')
+
+
+@app.route('/api/model/precincts')
+def api_model_precincts():
+    """
+    Serve precinct GeoJSON with gzip when supported (~1.6 MB -> ~250 KB).
+    Cached immutably — geometry does not change on the archive site.
+    """
+    model_dir = os.path.join(app.static_folder, 'model')
+    gz_path = os.path.join(model_dir, 'il9_precinct_model.geojson.gz')
+    plain_path = os.path.join(model_dir, 'il9_precinct_model.geojson')
+    accept = request.headers.get('Accept-Encoding', '').lower()
+    if 'gzip' in accept and os.path.exists(gz_path):
+        resp = send_file(gz_path, mimetype='application/geo+json')
+        resp.headers['Content-Encoding'] = 'gzip'
+        resp.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+        resp.headers['Vary'] = 'Accept-Encoding'
+        return resp
+    if os.path.exists(plain_path):
+        resp = send_file(plain_path, mimetype='application/geo+json')
+        resp.headers['Cache-Control'] = 'public, max-age=86400'
+        return resp
+    return jsonify({'error': 'Precinct GeoJSON not found'}), 404
+
 
 @app.route('/model/methodology')
 def model_methodology():
@@ -1835,53 +1903,11 @@ def candidate_fundraising(candidate_slug):
     return render_template('candidate_fundraising.html', candidate=candidate)
 
 # API Endpoints
-@app.route('/api/forecast')
-def get_forecast():
-    """Generate mock forecast data"""
-    random.seed(42)
-    base_odds = [28, 22, 18, 16, 10, 6]
-    odds = [max(1, o + random.randint(-3, 3)) for o in base_odds]
-    total = sum(odds)
-    odds = [round(100 * o / total) for o in odds]
 
-    candidates = []
-    for i, candidate in enumerate(CANDIDATES):
-        candidates.append({
-            **candidate,
-            "probability": odds[i],
-            "trend": random.choice(["up", "down", "stable"]),
-            "polling_avg": round(odds[i] + random.uniform(-2, 2), 1),
-            "change": random.randint(-5, 5),
-            "last_update": (datetime.now() - timedelta(hours=random.randint(1, 48))).isoformat()
-        })
-
-    return jsonify({
-        "candidates": candidates,
-        "last_updated": datetime.now().isoformat(),
-        "primary_date": "2026-03-17"
-    })
-
-@app.route('/api/timeline')
-def get_timeline():
-    """Generate mock polling trend data"""
-    timeline = []
-    start_date = datetime.now() - timedelta(days=90)
-
-    for day in range(0, 91, 7):
-        current_date = start_date + timedelta(days=day)
-        day_data = {
-            "date": current_date.strftime("%Y-%m-%d"),
-            "candidates": {}
-        }
-
-        base = [25, 22, 18, 15, 12, 8]
-        for i, candidate in enumerate(CANDIDATES):
-            variance = random.randint(-4, 4)
-            day_data["candidates"][candidate["name"]] = max(1, base[i] + variance)
-
-        timeline.append(day_data)
-
-    return jsonify(timeline)
+@app.route('/api/snapshot', methods=['POST'])
+def save_snapshot():
+    """Live collection ended; returns 410 for legacy clients."""
+    return jsonify({'error': 'Live snapshot collection ended March 17, 2026'}), 410
 
 # Archive mode: serve the final Manifold/Kalshi responses from snapshots bundled
 # in the git repo. No live network calls — the site must keep working even if
@@ -2183,13 +2209,8 @@ def _compute_chart_data(period, epsilon, raw_lines=None):
     if raw_lines is not None:
         source_lines = raw_lines
     else:
-        try:
-            f = _open_jsonl(HISTORICAL_DATA_PATH)
-            if f is None:
-                return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
-            with f:
-                source_lines = [line.strip() for line in f if line.strip()]
-        except (IOError, OSError):
+        source_lines = get_jsonl_raw_lines()
+        if not source_lines:
             return {'snapshots': [], 'gaps': [], 'interpolated_ranges': []}
 
     if not source_lines:
@@ -2446,15 +2467,7 @@ def _prewarm_chart_cache():
     except OSError:
         return
 
-    # Read raw lines once, re-parse for each period (faster than deepcopy)
-    try:
-        f = _open_jsonl(HISTORICAL_DATA_PATH)
-        if f is None:
-            return
-        with f:
-            raw_lines = [line.strip() for line in f if line.strip()]
-    except (IOError, OSError):
-        return
+    raw_lines = get_jsonl_raw_lines()
     if not raw_lines:
         return
 
@@ -2491,13 +2504,19 @@ def get_snapshots_chart():
       epsilon: RDP tolerance (default 0.5)
     Returns ~200-400 points instead of 5000+ raw.
 
-    Performance: cache is pre-warmed after each data collection cycle (every 3 min).
+    Performance: cache is pre-warmed at startup and invalidated when JSONL file size changes.
     Most requests serve from cache with no computation at all.
     Supports ETag/If-None-Match for instant 304 responses on repeat visits.
     """
     try:
         period = request.args.get('period', 'all')
-        epsilon = float(request.args.get('epsilon', '0.5'))
+        if period not in ('1d', '7d', 'all'):
+            return jsonify({'error': 'Invalid period; use 1d, 7d, or all'}), 400
+        try:
+            epsilon = float(request.args.get('epsilon', '0.5'))
+            epsilon = max(0.1, min(epsilon, 5.0))
+        except (TypeError, ValueError):
+            return jsonify({'error': 'invalid epsilon'}), 400
         cache_key = f'{period}:{epsilon}'
 
         now = _time.time()
@@ -2774,8 +2793,13 @@ View Live Markets: """ + SITE_BASE_URL + """markets
 # scheduler is gone and the JSONL snapshot file is read-only.
 
 
-# Pre-warm chart cache so first visitor gets instant response
-_threading.Thread(target=_prewarm_chart_cache, daemon=True).start()
+# Pre-warm chart cache at startup (archive site: one-time cost, every request hits cache).
+# Synchronous prewarm avoids lock contention between background thread and first visitors.
+if os.environ.get('IL9_SKIP_STARTUP_TASKS', '').strip().lower() not in ('1', 'true', 'yes'):
+    try:
+        _prewarm_chart_cache()
+    except Exception as _prewarm_err:
+        print(f"[{datetime.now().isoformat()}] Chart cache prewarm skipped: {_prewarm_err}")
 
 @app.errorhandler(404)
 def page_not_found(e):

@@ -60,28 +60,6 @@
 }
 
 /* Dark mode — explicit (alias for default) */
-[data-theme="dark"] {
-    --bg-primary:       #1A1A1E;
-    --bg-surface:       #232328;
-    --bg-surface-hover: #2A2A30;
-    --bg-elevated:      #2F2F36;
-    --border-subtle:    rgba(255,255,255,0.05);
-    --border-default:   rgba(255,255,255,0.08);
-    --border-hover:     rgba(255,255,255,0.15);
-    --text-primary:     #F0EFEB;
-    --text-secondary:   #A0A0A0;
-    --text-tertiary:    #6B6B6B;
-    --accent-gold:      #F2C306;
-    --accent-blue:      #31B0B5;
-    --accent-red:       #F25446;
-    --accent-green:     #40B040;
-    --accent-teal:      #31B686;
-    --grid-color:       rgba(255,255,255,0.05);
-    --highlight-bg:     #F2C306;
-    --highlight-text:   #1A1A1A;
-    --header-border:    rgba(255,255,255,0.12);
-    --shadow-soft:      rgba(0,0,0,0.3);
-}
 
 * {
     margin: 0;
@@ -91,6 +69,26 @@
 
 html {
     scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent-gold, #c9a227);
+    outline-offset: 2px;
+}
+
+html, body {
+    overflow-x: hidden;
 }
 
 body {

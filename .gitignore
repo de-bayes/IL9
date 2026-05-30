@@ -37,6 +37,7 @@ data/historical_snapshots.jsonl.lock
 data/email_subscribers.jsonl
 data/fec_cache.json
 data/.purge_*
+data/.csv_recovery_done
 data/*.backup.*
 data/*.pre-*
 

@@ -29,6 +29,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+    <link rel="preload" href="/api/snapshots/chart?period=all&amp;epsilon=0.5" as="fetch" crossorigin>
 
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-WVTWQBBG8S"></script>
@@ -1707,8 +1708,8 @@
         }
     </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script>
 function toggleTheme() {
     var isLight = document.documentElement.getAttribute('data-theme') === 'light';
@@ -1721,6 +1722,7 @@ function toggleTheme() {
     }
     // Re-render chart with updated theme colors
     if (candidatesData && candidatesData.length > 0) {
+        if (window._chartEtags) { Object.keys(window._chartEtags).forEach(function(k) { delete window._chartEtags[k]; }); }
         renderMarketTrendChart(candidatesData);
     }
 }
@@ -1809,7 +1811,6 @@ function formatCentralTime(date, options = {}) {
 
 // Archive mode: LIVE badges and infrastructure dots were removed with the
 // election-night theme. This is a no-op kept for callers.
-function updateStatusBadges(manifoldTime, kalshiTime) {}
 
 let marketChart = null;
 let candidatesData = [];
@@ -2012,10 +2013,7 @@ async function calculateAggregate() {
     // Store aggregated data for chart updates
     candidatesData = aggregated;
 
-    // Save snapshot as backup (backend also saves every 3 min)
-    // Frontend saves only when page is viewed, backend ensures continuous collection
-    // Fire-and-forget: don't block rendering on snapshot save
-    saveSnapshot(aggregated);
+    // Archive mode: snapshots are read-only on the server.
 
     renderBigOdds(aggregated);
 
@@ -2031,25 +2029,6 @@ async function calculateAggregate() {
     renderHeatmap(aggregated);
 }
 
-async function saveSnapshot(candidates) {
-    try {
-        const snapshot = {
-            candidates: candidates.map(c => ({
-                name: c.name,
-                probability: Math.round(c.probability * 10) / 10,
-                hasKalshi: c.hasKalshi
-            }))
-        };
-
-        await fetch('/api/snapshot', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(snapshot)
-        });
-    } catch (error) {
-        console.error('Error saving snapshot:', error);
-    }
-}
 
 function renderBreakdown(breakdowns) {
     const container = document.getElementById('breakdownContent');
@@ -2259,7 +2238,6 @@ async function fetchManifoldData() {
         })}`;
 
         // Update status badges
-        updateStatusBadges(manifoldLastUpdate, kalshiLastUpdate);
 
         // Calculate aggregate if both data sources are ready
         if (Object.keys(kalshiData).length > 0 && Object.keys(manifoldData).length > 0) {
@@ -2989,7 +2967,6 @@ async function fetchKalshiData() {
         document.getElementById('kalshiUpdated').textContent = 'Final archived snapshot — Mar 17, 2026, 9:30 PM CT';
 
         // Update status badges
-        updateStatusBadges(manifoldLastUpdate, kalshiLastUpdate);
 
         // Calculate aggregate if both Manifold and Kalshi data are ready
         if (Object.keys(manifoldData).length > 0 && Object.keys(kalshiData).length > 0) {
@@ -3027,25 +3004,6 @@ function renderKalshiExpanded(candidates) {
     `).join('');
 }
 
-function getPollingInterval() {
-    const electionDay = new Date('2026-03-17');
-    const today = new Date();
-    const millisecondsUntilElection = electionDay - today;
-    const daysUntilElection = millisecondsUntilElection / (1000 * 60 * 60 * 24);
-
-    // Election day: poll every 1 minute
-    if (daysUntilElection <= 0 && daysUntilElection > -1) {
-        return 1 * 60 * 1000; // 1 minute
-    }
-    // Last 3 days before election: poll every 1 minute
-    else if (daysUntilElection <= 3) {
-        return 1 * 60 * 1000; // 1 minute
-    }
-    // Default: poll every 3 minutes
-    else {
-        return 3 * 60 * 1000; // 3 minutes
-    }
-}
 
 function setupPolling() {
     // Archive mode: render chart + winner from the last snapshot; no polling.

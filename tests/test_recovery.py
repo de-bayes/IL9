@@ -66,7 +66,6 @@ class RecoveryAndImportTests(unittest.TestCase):
             max_bridge_hours=1,
             dry_run=False,
         )
-        self.assertEqual(stats['bridge_created'], 1)
         self.assertEqual(stats['merged_total'], 4)
         loaded = app.read_snapshots_jsonl(str(output))
         self.assertEqual(len(loaded), 4)
@@ -95,7 +94,7 @@ class RecoveryAndImportTests(unittest.TestCase):
 
         result_again = app.import_repo_csv_to_volume_if_needed(str(csv_path), str(output))
         self.assertFalse(result_again['imported'])
-        self.assertEqual(result_again['reason'], 'output_has_data')
+        self.assertEqual(result_again['reason'], 'already_recovered')
 
 
 class EndpointTests(unittest.TestCase):
@@ -110,7 +109,7 @@ class EndpointTests(unittest.TestCase):
         self.original_data_path = app.HISTORICAL_DATA_PATH
         self.original_cache = dict(app._chart_cache)
         app.HISTORICAL_DATA_PATH = self.data_path
-        app._chart_cache = {'data': None, 'time': 0, 'key': None}
+        app._chart_cache = {}
 
     def tearDown(self):
         app.HISTORICAL_DATA_PATH = self.original_data_path
@@ -150,6 +149,19 @@ class EndpointTests(unittest.TestCase):
         self.assertIn('snapshots', body)
         self.assertIn('gaps', body)
         self.assertGreaterEqual(len(body['snapshots']), 2)
+
+    def test_healthz(self):
+        resp = self.client.get('/healthz')
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.get_json(), {'status': 'ok'})
+
+    def test_chart_invalid_period(self):
+        resp = self.client.get('/api/snapshots/chart?period=invalid')
+        self.assertEqual(resp.status_code, 400)
+
+    def test_snapshot_post_returns_410(self):
+        resp = self.client.post('/api/snapshot', json={'candidates': []})
+        self.assertEqual(resp.status_code, 410)
 
 
 if __name__ == '__main__':

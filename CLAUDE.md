@@ -2,11 +2,23 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Site status: archive (read this first)
+
+**IL9Cast is a post-primary static archive** (primary: March 17, 2026). There is **no live scraper**. Historical JSONL on the Railway volume is **read-only** in normal operation.
+
+| Topic | Where to read |
+|-------|----------------|
+| Archive behavior, frozen APIs, disabled features | [docs/ARCHIVE_MODE.md](docs/ARCHIVE_MODE.md) |
+| Railway deploy, health check, env vars | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
+| All documentation index | [docs/README.md](docs/README.md) |
+
+**Do not** assume 3-minute collection, `collect_market_data()`, or `POST /api/snapshot` — those are removed.
+
+---
+
 ## Project Overview
 
-**IL9Cast** - Illinois 9th District Democratic Primary Forecast aggregator for the March 17, 2026 primary. Aggregates prediction market data from Manifold Markets and Kalshi every **3 minutes** using a weighted formula, stores historical snapshots in JSONL format, applies multi-layer smoothing for clean charts, and serves an interactive web dashboard with Central Time display.
-
-**Fresh Start:** All historical data from before Jan 30, 2026 has been purged. The system rebuilds from zero starting Jan 30 onward.
+**IL9Cast** — Illinois 9th District Democratic Primary prediction market archive. Aggregated Manifold + Kalshi data (Jan 30 – Mar 17, 2026) in JSONL, with smoothed charts and a precinct Monte Carlo model page.
 
 ## Development Commands
 
@@ -19,7 +31,10 @@ pip install -r requirements.txt
 python app.py
 
 # Run production server locally (matches Railway)
-gunicorn app:app --preload
+gunicorn app:app --config gunicorn.conf.py
+
+# Performance smoke tests (server on :8000)
+python scripts/smoke_test_perf.py
 ```
 
 ### Data Management
@@ -53,7 +68,9 @@ railway logs
 **Backend:** Flask 3.1.1 + APScheduler for background data collection
 - `app.py` (~950 lines) - Main Flask app with routes, API endpoints, data collection, smoothing pipelines
 - Background task runs every **3 minutes** (not 1 minute) to fetch and aggregate market data
-- Production: Gunicorn with `--preload` flag to ensure single scheduler instance
+- Production: Gunicorn via `gunicorn.conf.py` (`preload_app`, `gthread` workers)
+- `performance.py` — security headers, gzip JSON/text, immutable cache for `?v=` static
+- **Archive mode:** scraper removed; JSONL read-only; chart cache pre-warms at import
 - Includes spike dampening (±3% per interval), EMA smoothing, RDP simplification, gap detection
 
 **Frontend:** Server-side Jinja2 templates + Chart.js + Leaflet.js visualization
@@ -159,7 +176,9 @@ Applied to:
 - `GET /api/manifold` - Proxy to Manifold market data
 - `GET /api/kalshi` - Proxy to Kalshi market data
 - `GET /api/snapshots` - Full historical snapshot data (JSONL format)
-- `GET /api/snapshots/chart?period={1d|7d|all}&epsilon=0.5` - RDP-simplified chart data with gaps. Uses 60-second in-memory cache.
+- `GET /api/snapshots/chart?period={1d|7d|all}&epsilon=0.5` - RDP chart data; cache keyed by JSONL file size; ETag / 304; `get_jsonl_raw_lines()`
+- `GET /healthz` - Lightweight JSON health check for Railway
+- `GET /api/model/precincts` - Precinct GeoJSON; gzip when client accepts encoding
 - `POST /api/snapshot` - Save new snapshot (internal use by scraper)
 - `GET /api/download/snapshots` - Download all historical data as JSONL file
 
@@ -192,10 +211,9 @@ Applied to:
 - Auto-restart: ON_FAILURE, up to 10 retries
 - Environment: Python 3.x, port 8000 (or `$PORT`)
 
-**Why `--preload` flag?**
-- Loads Flask app once in master process before workers fork
-- Ensures background scheduler thread only exists once
-- Without it: N workers = N duplicate data collection threads
+**Why `preload_app`?**
+- Loads Flask once before workers fork; chart/JSONL caches initialized in master
+- `gthread` workers handle concurrent chart/API traffic
 
 **Path Resolution** (`app.py:17-27`):
 Checks in order: `/data`, `/app/data`, then local `data/` directory. Works on Railway and locally without env vars.
@@ -333,7 +351,9 @@ Templates with navigation:
 - `templates/odds.html` — Precinct Model page with Leaflet map, data tables, graph gallery
 - `templates/methodology.html` — 4-section foldout UI with infrastructure docs
 - `templates/markets.html` — Markets page with Central Time formatting
-- `static/model/il9_precinct_model.geojson` — GeoJSON with 436 matched + 109 unmatched precincts (4.6MB)
+- `static/model/il9_precinct_model.geojson` — GeoJSON (~1.6MB)
+- `static/model/il9_precinct_model.geojson.gz` — Precompressed for `/api/model/precincts` (~250KB)
+- `gunicorn.conf.py`, `performance.py`, `scripts/smoke_test_perf.py`
 - `static/model/methodology.pdf` — Model methodology paper
 - `static/model/*.png` — Model visualization graphs (6 files)
 - `Procfile` — Railway start command
@@ -418,4 +438,12 @@ ls -lh /app/data/
 2. **Model Methodology PDF** — Served at `/model/methodology` via Flask `send_file` route
 3. **Nav Reorder** — "Model" link moved to rightmost position across all templates to signify primary feature
 4. **Methodology Foldout Updated** — Section 2 changed from "Forecast Model (Coming Soon)" to "Precinct Model" with links to model page and methodology PDF
+
+## Recent Major Changes (May 2026)
+
+1. **538 Editorial UI** — Fluid layout, responsive nav, shared page utilities in `landing-style.css`
+2. **Performance stack** — `gunicorn.conf.py`, `performance.py`, `/healthz`, JSONL line cache, synchronous chart prewarm, ETag 304s
+3. **Precinct API** — `GET /api/model/precincts` with gzip; map uses deferred Leaflet + resource hints + preload
+4. **Markets prefetch** — Chart API preloaded from `<head>`; responsive chart height and scrollable period toggles
+5. **Archive mode** — Site is post-primary archive; scraper removed; JSONL read-only on Railway volume
 

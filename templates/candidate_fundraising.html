@@ -352,18 +352,8 @@
         }
     </style>
 
+    <script src="{{ url_for('static', filename='site.js') }}"></script>
     <script>
-        function toggleTheme() {
-            var isLight = document.documentElement.getAttribute('data-theme') === 'light';
-            if (isLight) {
-                document.documentElement.removeAttribute('data-theme');
-                localStorage.setItem('il9-theme', 'dark');
-            } else {
-                document.documentElement.setAttribute('data-theme', 'light');
-                localStorage.setItem('il9-theme', 'light');
-            }
-        }
-
         // FEC DATA FETCHING
         (function() {
             const candidate = {{ candidate | tojson }};
