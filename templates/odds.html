@@ -21,354 +21,380 @@
 {% endblock %}
 
 {% block content %}
-<section class="hero">
-            <h1>Precinct Model</h1>
-        </section>
+<header class="archive-page-header">
+    <p class="archive-page-header__kicker">IL-09 Democratic Primary &middot; Precinct Forecast Archive</p>
+    <h1 class="archive-page-header__title">Precinct Model</h1>
+    <p class="archive-page-header__meta">Pre-election forecast &middot; 100,000 simulations &middot; 436 precincts &middot; Published March 5, 2026</p>
+</header>
 
-        <div class="mobile-note">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            This interactive map is best viewed on a desktop or tablet.
+<section class="model-page">
+
+    <!-- Win Probability Summary -->
+    <div class="data-panel">
+        <p class="data-panel__label">Win Probability</p>
+        <table class="stat-table">
+            <thead>
+                <tr>
+                    <th>Candidate</th>
+                    <th>Win Probability</th>
+                    <th>Avg. Vote Share</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="cand-color-swatch" style="background:#a50034;"></span>Biss</td>
+                    <td>77.2%</td>
+                    <td>31.6%</td>
+                </tr>
+                <tr>
+                    <td><span class="cand-color-swatch" style="background:#228B22;"></span>Abughazaleh</td>
+                    <td>15.6%</td>
+                    <td>24.3%</td>
+                </tr>
+                <tr>
+                    <td><span class="cand-color-swatch" style="background:#00008B;"></span>Fine</td>
+                    <td>7.2%</td>
+                    <td>19.7%</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="data-panel__footnote">100,000 Monte Carlo simulations &middot; 436 matched precincts</p>
+    </div>
+
+    <!-- How the Model Performed -->
+    <div class="model-section model-performance-section">
+        <h2 class="model-section-heading">How the Model Performed</h2>
+        <p class="model-section-desc">Final results came in on March 17, 2026. Here's how the pre-election model's predictions compared to the actual vote.</p>
+
+        <div class="performance-callout">
+            <div class="performance-callout-inner">
+                <span class="performance-callout-label">Headline call</span>
+                <p class="performance-callout-body">The model assigned <strong>Daniel Biss</strong> a <strong>77.2%</strong> chance of winning the primary. He won with <strong>29.6%</strong> of the vote in a 15-candidate field.</p>
+            </div>
         </div>
 
-        <section class="model-page">
+        <div class="performance-grid-header">
+            <span>Candidate</span>
+            <span>Predicted</span>
+            <span>Actual</span>
+            <span>Error</span>
+        </div>
+        <div class="performance-grid">
+            <div class="perf-row">
+                <span class="perf-name" style="color: #a50034;">Biss</span>
+                <div class="perf-bar-cell">
+                    <div class="vs-track"><div class="vs-fill" style="width: 63.2%; background: #a50034; opacity: 0.55;"></div></div>
+                    <span class="perf-val">31.6%</span>
+                </div>
+                <div class="perf-bar-cell">
+                    <div class="vs-track"><div class="vs-fill" style="width: 59.2%; background: #a50034;"></div></div>
+                    <span class="perf-val">29.6%</span>
+                </div>
+                <span class="perf-err perf-err-neutral">&minus;2.0 pp</span>
+            </div>
+            <div class="perf-row">
+                <span class="perf-name" style="color: #228B22;">Abughazaleh</span>
+                <div class="perf-bar-cell">
+                    <div class="vs-track"><div class="vs-fill" style="width: 48.7%; background: #228B22; opacity: 0.55;"></div></div>
+                    <span class="perf-val">24.3%</span>
+                </div>
+                <div class="perf-bar-cell">
+                    <div class="vs-track"><div class="vs-fill" style="width: 51.8%; background: #228B22;"></div></div>
+                    <span class="perf-val">25.9%</span>
+                </div>
+                <span class="perf-err perf-err-neutral">+1.6 pp</span>
+            </div>
+            <div class="perf-row">
+                <span class="perf-name" style="color: #00008B;">Fine</span>
+                <div class="perf-bar-cell">
+                    <div class="vs-track"><div class="vs-fill" style="width: 39.4%; background: #00008B; opacity: 0.55;"></div></div>
+                    <span class="perf-val">19.7%</span>
+                </div>
+                <div class="perf-bar-cell">
+                    <div class="vs-track"><div class="vs-fill" style="width: 40.8%; background: #00008B;"></div></div>
+                    <span class="perf-val">20.4%</span>
+                </div>
+                <span class="perf-err perf-err-neutral">+0.7 pp</span>
+            </div>
+        </div>
 
-            <!-- Headline Win Probabilities -->
-            <div class="model-headline">
-                <div class="headline-meta">Pre-election forecast &middot; 100,000 simulations &middot; 436 precincts &middot; Published March 5, 2026</div>
-                <div class="win-prob-cards">
-                    <div class="win-prob-card">
-                        <div class="prob-bar" style="background: #a50034; width: 77.2%;"></div>
-                        <div class="prob-info">
-                            <span class="prob-name" style="color: #a50034;">Biss</span>
-                            <span class="prob-pct">77.2%</span>
-                        </div>
-                    </div>
-                    <div class="win-prob-card">
-                        <div class="prob-bar" style="background: #228B22; width: 15.6%;"></div>
-                        <div class="prob-info">
-                            <span class="prob-name" style="color: #228B22;">Abughazaleh</span>
-                            <span class="prob-pct">15.6%</span>
-                        </div>
-                    </div>
-                    <div class="win-prob-card">
-                        <div class="prob-bar" style="background: #00008B; width: 7.2%;"></div>
-                        <div class="prob-info">
-                            <span class="prob-name" style="color: #00008B;">Fine</span>
-                            <span class="prob-pct">7.2%</span>
-                        </div>
-                    </div>
+        <p class="performance-summary">The model called the correct winner, placed all three top finishers in the correct order, and landed within roughly two percentage points on every top-three vote share. Full 15-candidate breakdown wasn't cleanly available from open sources at time of archive; the remaining candidates split the final ~24%.</p>
+
+        <p class="performance-summary">For a longer retrospective on what worked, what didn't, and what it was like to build this, read the <a href="https://www.mccomb.ca/writing/il9cast-postmortem" target="_blank" rel="noopener noreferrer" style="color: var(--accent-blue); text-decoration: underline;">IL9Cast postmortem on mccomb.ca</a>.</p>
+
+        <p class="performance-note">Sections below are the original pre-election forecast, preserved as published on March 5, 2026.</p>
+    </div>
+
+    <!-- Average Vote Shares -->
+    <div class="model-section">
+        <h2 class="model-section-heading">Average Vote Share</h2>
+        <div class="vote-share-bars">
+            <div class="vs-row">
+                <span class="vs-name">Biss</span>
+                <div class="vs-track"><div class="vs-fill" style="width: 63.2%; background: #a50034;"></div></div>
+                <span class="vs-val">31.6%</span>
+            </div>
+            <div class="vs-row">
+                <span class="vs-name">Abughazaleh</span>
+                <div class="vs-track"><div class="vs-fill" style="width: 48.7%; background: #228B22;"></div></div>
+                <span class="vs-val">24.3%</span>
+            </div>
+            <div class="vs-row">
+                <span class="vs-name">Fine</span>
+                <div class="vs-track"><div class="vs-fill" style="width: 39.4%; background: #00008B;"></div></div>
+                <span class="vs-val">19.7%</span>
+            </div>
+            <div class="vs-row">
+                <span class="vs-name">Simmons</span>
+                <div class="vs-track"><div class="vs-fill" style="width: 18.0%; background: #FF8C00;"></div></div>
+                <span class="vs-val">9.0%</span>
+            </div>
+            <div class="vs-row">
+                <span class="vs-name">Amiwala</span>
+                <div class="vs-track"><div class="vs-fill" style="width: 12.0%; background: #800080;"></div></div>
+                <span class="vs-val">6.0%</span>
+            </div>
+            <div class="vs-row">
+                <span class="vs-name">Andrew</span>
+                <div class="vs-track"><div class="vs-fill" style="width: 10.0%; background: #C2B280;"></div></div>
+                <span class="vs-val">5.0%</span>
+            </div>
+            <div class="vs-row">
+                <span class="vs-name">Huynh</span>
+                <div class="vs-track"><div class="vs-fill" style="width: 8.0%; background: #008080;"></div></div>
+                <span class="vs-val">4.0%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest Poll -->
+    <div class="model-section">
+        <h2 class="model-section-heading">Latest Independent Poll</h2>
+        <p class="model-section-desc">Public Policy Polling / Evanston Roundtable &middot; February 20-21, 2026 &middot; n=501 likely voters</p>
+        <div class="poll-results">
+            <div class="poll-row"><span class="poll-name">Biss</span><div class="vs-track"><div class="vs-fill" style="width: 48.0%; background: #a50034;"></div></div><span class="vs-val">24%</span></div>
+            <div class="poll-row"><span class="poll-name">Undecided</span><div class="vs-track"><div class="vs-fill" style="width: 44.0%; background: #94a3b8;"></div></div><span class="vs-val">22%</span></div>
+            <div class="poll-row"><span class="poll-name">Abughazaleh</span><div class="vs-track"><div class="vs-fill" style="width: 34.0%; background: #228B22;"></div></div><span class="vs-val">17%</span></div>
+            <div class="poll-row"><span class="poll-name">Fine</span><div class="vs-track"><div class="vs-fill" style="width: 32.0%; background: #00008B;"></div></div><span class="vs-val">16%</span></div>
+            <div class="poll-row"><span class="poll-name">Simmons</span><div class="vs-track"><div class="vs-fill" style="width: 12.0%; background: #FF8C00;"></div></div><span class="vs-val">6%</span></div>
+            <div class="poll-row"><span class="poll-name">Andrew</span><div class="vs-track"><div class="vs-fill" style="width: 10.0%; background: #C2B280;"></div></div><span class="vs-val">5%</span></div>
+            <div class="poll-row"><span class="poll-name">Amiwala</span><div class="vs-track"><div class="vs-fill" style="width: 8.0%; background: #800080;"></div></div><span class="vs-val">4%</span></div>
+            <div class="poll-row"><span class="poll-name">Huynh</span><div class="vs-track"><div class="vs-fill" style="width: 4.0%; background: #008080;"></div></div><span class="vs-val">2%</span></div>
+        </div>
+        <p class="poll-note">First non-affiliated poll of the race &mdash; no candidate or party commissioned it. This poll carries 73% of the weight in the model's polling targets.</p>
+    </div>
+
+    <!-- Interactive Map -->
+    <div class="model-section model-map-section">
+        <div class="map-header">
+            <div>
+                <p class="data-panel__label">Precinct Forecast Map</p>
+                <p class="model-section-desc">Click a precinct to inspect detailed results. Switch layers to explore different views.</p>
+            </div>
+            <div class="layer-control" id="layerControl">
+                <div class="layer-control-label">Map layer</div>
+                <div class="layer-pills" role="tablist" aria-label="Map layer">
+                    <button type="button" class="layer-pill active" data-layer="winner" role="tab" aria-selected="true">Winner</button>
+                    <button type="button" class="layer-pill" data-layer="margin" role="tab" aria-selected="false">Margin</button>
+                    <button type="button" class="layer-pill" data-layer="competitive" role="tab" aria-selected="false">Competitive</button>
+                    <button type="button" class="layer-pill" data-layer="biss" role="tab" aria-selected="false">Biss</button>
+                    <button type="button" class="layer-pill" data-layer="fine" role="tab" aria-selected="false">Fine</button>
+                    <button type="button" class="layer-pill" data-layer="abughazaleh" role="tab" aria-selected="false">Abughazaleh</button>
+                </div>
+            </div>
+        </div>
+        <p class="map-viewport-note">Map visualization is optimized for desktop and tablet viewports.</p>
+        <div class="map-container">
+            <div class="map-toolbar">
+                <label class="map-search-wrap">
+                    <span class="sr-only">Find precinct</span>
+                    <input type="search" id="precinctMapSearch" placeholder="Find precinct…" autocomplete="off" spellcheck="false">
+                </label>
+                <button type="button" class="map-tool-btn" id="mapResetView" title="Reset map view">Reset view</button>
+            </div>
+            <div id="precinct-map"></div>
+            <div id="map-legend"></div>
+            <div id="info-panel">
+                <button type="button" id="close-info" aria-label="Close precinct details">&times;</button>
+                <h3 id="info-precinct"></h3>
+                <div class="winner-line" id="info-winner"></div>
+                <div id="info-bars"></div>
+                <div class="margin-line" id="info-margin"></div>
+                <div class="winrates" id="info-winrates"></div>
+            </div>
+            <div id="map-loading">Loading precinct data...</div>
+        </div>
+    </div>
+
+    <!-- Detailed Precinct Data -->
+    <div class="model-section nerd-section">
+        <button class="nerd-toggle" id="nerdToggle" onclick="toggleNerdSection()">
+            <div>
+                <h2 class="model-section-heading" style="margin:0;">Detailed Precinct Data</h2>
+                <p class="model-section-desc" style="margin:0.25rem 0 0;">Sortable table of all 436 precincts with simulation results, margins, and 2024 presidential vote.</p>
+            </div>
+            <span class="nerd-arrow" id="nerdArrow">+</span>
+        </button>
+        <div class="nerd-body" id="nerdBody">
+
+            <!-- Competitiveness Breakdown -->
+            <div class="nerd-summary">
+                <h3>Competitiveness Breakdown</h3>
+                <div class="comp-grid" id="compGrid"></div>
+            </div>
+
+            <!-- Top Battlegrounds -->
+            <div class="nerd-summary">
+                <h3>Top 10 Battleground Precincts</h3>
+                <p class="nerd-sub">Tightest margins across the district.</p>
+                <div class="mini-table-wrap">
+                    <table class="mini-table" id="battlegroundTable">
+                        <thead>
+                            <tr>
+                                <th>Precinct</th>
+                                <th>Winner</th>
+                                <th>Runner-Up</th>
+                                <th>Margin</th>
+                                <th>Biss Win %</th>
+                                <th>Fine Win %</th>
+                                <th>Abu. Win %</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- How the Model Performed -->
-            <div class="model-section model-performance-section">
-                <h2 class="model-section-heading">How the Model Performed</h2>
-                <p class="model-section-desc">Final results came in on March 17, 2026. Here's how the pre-election model's predictions compared to the actual vote.</p>
-
-                <div class="performance-callout">
-                    <div class="performance-callout-inner">
-                        <span class="performance-callout-label">Headline call</span>
-                        <p class="performance-callout-body">The model assigned <strong>Daniel Biss</strong> a <strong>77.2%</strong> chance of winning the primary. He won with <strong>29.6%</strong> of the vote in a 15-candidate field.</p>
-                    </div>
+            <!-- Full Precinct Table -->
+            <div class="nerd-summary">
+                <h3>All Precincts</h3>
+                <div class="table-controls">
+                    <input type="text" id="precinctSearch" placeholder="Search precincts..." class="precinct-search">
+                    <select id="winnerFilter" class="winner-filter">
+                        <option value="">All Winners</option>
+                        <option value="Biss">Biss</option>
+                        <option value="Fine">Fine</option>
+                        <option value="Abughazaleh">Abughazaleh</option>
+                    </select>
                 </div>
-
-                <div class="performance-grid-header">
-                    <span>Candidate</span>
-                    <span>Predicted</span>
-                    <span>Actual</span>
-                    <span>Error</span>
+                <div class="full-table-wrap">
+                    <table class="full-table" id="fullTable">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-col="JoinField">Precinct</th>
+                                <th class="sortable" data-col="winner">Winner</th>
+                                <th class="sortable sorted-desc" data-col="margin">Margin</th>
+                                <th class="sortable" data-col="runner_up">Runner-Up</th>
+                                <th class="sortable" data-col="avg_biss">Biss %</th>
+                                <th class="sortable" data-col="avg_fine">Fine %</th>
+                                <th class="sortable" data-col="avg_abughazaleh">Abu. %</th>
+                                <th class="sortable" data-col="avg_simmons">Sim. %</th>
+                                <th class="sortable" data-col="avg_andrew">And. %</th>
+                                <th class="sortable" data-col="avg_amiwala">Ami. %</th>
+                                <th class="sortable" data-col="avg_huynh">Huy. %</th>
+                                <th class="sortable" data-col="pct_biss_wins">Biss Win</th>
+                                <th class="sortable" data-col="pct_fine_wins">Fine Win</th>
+                                <th class="sortable" data-col="pct_abughazaleh_wins">Abu. Win</th>
+                                <th class="sortable" data-col="PresDem">'24 Dem</th>
+                                <th class="sortable" data-col="PresTot">'24 Total</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
-                <div class="performance-grid">
-                    <div class="perf-row">
-                        <span class="perf-name" style="color: #a50034;">Biss</span>
-                        <div class="perf-bar-cell">
-                            <div class="vs-track"><div class="vs-fill" style="width: 63.2%; background: #a50034; opacity: 0.55;"></div></div>
-                            <span class="perf-val">31.6%</span>
-                        </div>
-                        <div class="perf-bar-cell">
-                            <div class="vs-track"><div class="vs-fill" style="width: 59.2%; background: #a50034;"></div></div>
-                            <span class="perf-val">29.6%</span>
-                        </div>
-                        <span class="perf-err perf-err-good">&minus;2.0 pp</span>
-                    </div>
-                    <div class="perf-row">
-                        <span class="perf-name" style="color: #228B22;">Abughazaleh</span>
-                        <div class="perf-bar-cell">
-                            <div class="vs-track"><div class="vs-fill" style="width: 48.7%; background: #228B22; opacity: 0.55;"></div></div>
-                            <span class="perf-val">24.3%</span>
-                        </div>
-                        <div class="perf-bar-cell">
-                            <div class="vs-track"><div class="vs-fill" style="width: 51.8%; background: #228B22;"></div></div>
-                            <span class="perf-val">25.9%</span>
-                        </div>
-                        <span class="perf-err perf-err-good">+1.6 pp</span>
-                    </div>
-                    <div class="perf-row">
-                        <span class="perf-name" style="color: #00008B;">Fine</span>
-                        <div class="perf-bar-cell">
-                            <div class="vs-track"><div class="vs-fill" style="width: 39.4%; background: #00008B; opacity: 0.55;"></div></div>
-                            <span class="perf-val">19.7%</span>
-                        </div>
-                        <div class="perf-bar-cell">
-                            <div class="vs-track"><div class="vs-fill" style="width: 40.8%; background: #00008B;"></div></div>
-                            <span class="perf-val">20.4%</span>
-                        </div>
-                        <span class="perf-err perf-err-good">+0.7 pp</span>
-                    </div>
-                </div>
-
-                <p class="performance-summary">The model called the correct winner, placed all three top finishers in the correct order, and landed within roughly two percentage points on every top-three vote share. Full 15-candidate breakdown wasn't cleanly available from open sources at time of archive; the remaining candidates split the final ~24%.</p>
-
-                <p class="performance-summary">For a longer retrospective on what worked, what didn't, and what it was like to build this, read the <a href="https://www.mccomb.ca/writing/il9cast-postmortem" target="_blank" rel="noopener noreferrer" style="color: var(--accent-blue); text-decoration: underline;">IL9Cast postmortem on mccomb.ca</a>.</p>
-
-                <p class="performance-note">Sections below are the original pre-election forecast, preserved as published on March 5, 2026.</p>
+                <div class="table-footer" id="tableFooter">Showing 436 of 436 precincts</div>
             </div>
 
-            <!-- Average Vote Shares -->
-            <div class="model-section">
-                <h2 class="model-section-heading">Average Vote Share</h2>
-                <div class="vote-share-bars">
-                    <div class="vs-row">
-                        <span class="vs-name">Biss</span>
-                        <div class="vs-track"><div class="vs-fill" style="width: 63.2%; background: #a50034;"></div></div>
-                        <span class="vs-val">31.6%</span>
-                    </div>
-                    <div class="vs-row">
-                        <span class="vs-name">Abughazaleh</span>
-                        <div class="vs-track"><div class="vs-fill" style="width: 48.7%; background: #228B22;"></div></div>
-                        <span class="vs-val">24.3%</span>
-                    </div>
-                    <div class="vs-row">
-                        <span class="vs-name">Fine</span>
-                        <div class="vs-track"><div class="vs-fill" style="width: 39.4%; background: #00008B;"></div></div>
-                        <span class="vs-val">19.7%</span>
-                    </div>
-                    <div class="vs-row">
-                        <span class="vs-name">Simmons</span>
-                        <div class="vs-track"><div class="vs-fill" style="width: 18.0%; background: #FF8C00;"></div></div>
-                        <span class="vs-val">9.0%</span>
-                    </div>
-                    <div class="vs-row">
-                        <span class="vs-name">Amiwala</span>
-                        <div class="vs-track"><div class="vs-fill" style="width: 12.0%; background: #800080;"></div></div>
-                        <span class="vs-val">6.0%</span>
-                    </div>
-                    <div class="vs-row">
-                        <span class="vs-name">Andrew</span>
-                        <div class="vs-track"><div class="vs-fill" style="width: 10.0%; background: #C2B280;"></div></div>
-                        <span class="vs-val">5.0%</span>
-                    </div>
-                    <div class="vs-row">
-                        <span class="vs-name">Huynh</span>
-                        <div class="vs-track"><div class="vs-fill" style="width: 8.0%; background: #008080;"></div></div>
-                        <span class="vs-val">4.0%</span>
-                    </div>
-                </div>
-            </div>
+        </div>
+    </div>
 
-            <!-- Latest Poll -->
-            <div class="model-section">
-                <h2 class="model-section-heading">Latest Independent Poll</h2>
-                <p class="model-section-desc">Public Policy Polling / Evanston Roundtable &middot; February 20-21, 2026 &middot; n=501 likely voters</p>
-                <div class="poll-results">
-                    <div class="poll-row"><span class="poll-name">Biss</span><div class="vs-track"><div class="vs-fill" style="width: 48.0%; background: #a50034;"></div></div><span class="vs-val">24%</span></div>
-                    <div class="poll-row"><span class="poll-name">Undecided</span><div class="vs-track"><div class="vs-fill" style="width: 44.0%; background: #94a3b8;"></div></div><span class="vs-val">22%</span></div>
-                    <div class="poll-row"><span class="poll-name">Abughazaleh</span><div class="vs-track"><div class="vs-fill" style="width: 34.0%; background: #228B22;"></div></div><span class="vs-val">17%</span></div>
-                    <div class="poll-row"><span class="poll-name">Fine</span><div class="vs-track"><div class="vs-fill" style="width: 32.0%; background: #00008B;"></div></div><span class="vs-val">16%</span></div>
-                    <div class="poll-row"><span class="poll-name">Simmons</span><div class="vs-track"><div class="vs-fill" style="width: 12.0%; background: #FF8C00;"></div></div><span class="vs-val">6%</span></div>
-                    <div class="poll-row"><span class="poll-name">Andrew</span><div class="vs-track"><div class="vs-fill" style="width: 10.0%; background: #C2B280;"></div></div><span class="vs-val">5%</span></div>
-                    <div class="poll-row"><span class="poll-name">Amiwala</span><div class="vs-track"><div class="vs-fill" style="width: 8.0%; background: #800080;"></div></div><span class="vs-val">4%</span></div>
-                    <div class="poll-row"><span class="poll-name">Huynh</span><div class="vs-track"><div class="vs-fill" style="width: 4.0%; background: #008080;"></div></div><span class="vs-val">2%</span></div>
-                </div>
-                <p class="poll-note">First non-affiliated poll of the race -- no candidate or party commissioned it. This poll carries 73% of the weight in the model's polling targets.</p>
-            </div>
+    <!-- Model Visualizations -->
+    <div class="model-section">
+        <h2 class="model-section-heading">Model Visualizations</h2>
+        <p class="model-section-desc">Key outputs from the simulation. Click any chart to view full size.</p>
+        <div class="graph-grid">
+            <figure class="graph-figure">
+                <a href="{{ url_for('static', filename='model/confidence_ladder.png') }}" target="_blank" class="graph-img-link">
+                    <img src="{{ url_for('static', filename='model/confidence_ladder.png') }}" alt="Confidence Ladder" loading="lazy">
+                </a>
+                <figcaption class="graph-caption">Fig. 1 &mdash; Vote Share Confidence Intervals (50% / 90%)</figcaption>
+            </figure>
+            <figure class="graph-figure">
+                <a href="{{ url_for('static', filename='model/voteshare_density.png') }}" target="_blank" class="graph-img-link">
+                    <img src="{{ url_for('static', filename='model/voteshare_density.png') }}" alt="Vote Share Density" loading="lazy">
+                </a>
+                <figcaption class="graph-caption">Fig. 2 &mdash; Simulated Vote Share Distributions</figcaption>
+            </figure>
+            <figure class="graph-figure">
+                <a href="{{ url_for('static', filename='model/biss_vs_kat_margin.png') }}" target="_blank" class="graph-img-link">
+                    <img src="{{ url_for('static', filename='model/biss_vs_kat_margin.png') }}" alt="Biss vs Kat Head-to-Head Margin" loading="lazy">
+                </a>
+                <figcaption class="graph-caption">Fig. 3 &mdash; Biss vs Abughazaleh: Head-to-Head Margin</figcaption>
+            </figure>
+            <figure class="graph-figure">
+                <a href="{{ url_for('static', filename='model/margin_histogram.png') }}" target="_blank" class="graph-img-link">
+                    <img src="{{ url_for('static', filename='model/margin_histogram.png') }}" alt="Margin Histogram" loading="lazy">
+                </a>
+                <figcaption class="graph-caption">Fig. 4 &mdash; Winning Margin Distribution</figcaption>
+            </figure>
+            <figure class="graph-figure">
+                <a href="{{ url_for('static', filename='model/winprob_by_turnout.png') }}" target="_blank" class="graph-img-link">
+                    <img src="{{ url_for('static', filename='model/winprob_by_turnout.png') }}" alt="Win Probability by Turnout" loading="lazy">
+                </a>
+                <figcaption class="graph-caption">Fig. 5 &mdash; Win Probability by Turnout Quintile</figcaption>
+            </figure>
+            <figure class="graph-figure">
+                <a href="{{ url_for('static', filename='model/turnout_vs_voteshare.png') }}" target="_blank" class="graph-img-link">
+                    <img src="{{ url_for('static', filename='model/turnout_vs_voteshare.png') }}" alt="Turnout vs Vote Share" loading="lazy">
+                </a>
+                <figcaption class="graph-caption">Fig. 6 &mdash; Turnout vs Vote Share</figcaption>
+            </figure>
+            <figure class="graph-figure">
+                <a href="{{ url_for('static', filename='model/precinct_boxplot.png') }}" target="_blank" class="graph-img-link">
+                    <img src="{{ url_for('static', filename='model/precinct_boxplot.png') }}" alt="Precinct Vote Share Boxplot" loading="lazy">
+                </a>
+                <figcaption class="graph-caption">Fig. 7 &mdash; Precinct-Level Vote Share Distribution</figcaption>
+            </figure>
+            <figure class="graph-figure">
+                <a href="{{ url_for('static', filename='model/biss_vs_kat_precincts.png') }}" target="_blank" class="graph-img-link">
+                    <img src="{{ url_for('static', filename='model/biss_vs_kat_precincts.png') }}" alt="Biss vs Kat Precincts" loading="lazy">
+                </a>
+                <figcaption class="graph-caption">Fig. 8 &mdash; Precinct Leaders: Three-Way Scatter</figcaption>
+            </figure>
+            <figure class="graph-figure">
+                <a href="{{ url_for('static', filename='model/top3_by_geography.png') }}" target="_blank" class="graph-img-link">
+                    <img src="{{ url_for('static', filename='model/top3_by_geography.png') }}" alt="Top 3 by Geography" loading="lazy">
+                </a>
+                <figcaption class="graph-caption">Fig. 9 &mdash; Biss / Kat / Fine by Region</figcaption>
+            </figure>
+            <figure class="graph-figure">
+                <a href="{{ url_for('static', filename='model/progressive_gradient.png') }}" target="_blank" class="graph-img-link">
+                    <img src="{{ url_for('static', filename='model/progressive_gradient.png') }}" alt="Progressive Gradient" loading="lazy">
+                </a>
+                <figcaption class="graph-caption">Fig. 10 &mdash; Kat Advantage vs Precinct Partisanship</figcaption>
+            </figure>
+            <figure class="graph-figure">
+                <a href="{{ url_for('static', filename='model/kat_youth_scatter.png') }}" target="_blank" class="graph-img-link">
+                    <img src="{{ url_for('static', filename='model/kat_youth_scatter.png') }}" alt="Abughazaleh &amp; Youth Vote Scatter" loading="lazy">
+                </a>
+                <figcaption class="graph-caption">Fig. 11 &mdash; Abughazaleh Support by Youth Share</figcaption>
+            </figure>
+            <figure class="graph-figure">
+                <a href="{{ url_for('static', filename='model/county_winrates.png') }}" target="_blank" class="graph-img-link">
+                    <img src="{{ url_for('static', filename='model/county_winrates.png') }}" alt="County Win Rates" loading="lazy">
+                </a>
+                <figcaption class="graph-caption">Fig. 12 &mdash; Win Rates by County/Area</figcaption>
+            </figure>
+            <figure class="graph-figure">
+                <a href="{{ url_for('static', filename='model/precinct_competitiveness.png') }}" target="_blank" class="graph-img-link">
+                    <img src="{{ url_for('static', filename='model/precinct_competitiveness.png') }}" alt="Precinct Competitiveness" loading="lazy">
+                </a>
+                <figcaption class="graph-caption">Fig. 13 &mdash; Precinct Competitiveness Histogram</figcaption>
+            </figure>
+        </div>
+    </div>
 
-            <!-- Interactive Map -->
-            <div class="model-section model-map-section">
-                <div class="map-header">
-                    <div>
-                        <h2 class="model-section-heading">Precinct Map</h2>
-                        <p class="model-section-desc">Click a precinct to inspect detailed results. Switch layers to explore different views.</p>
-                    </div>
-                    <div class="layer-control" id="layerControl">
-                        <div class="layer-control-label">Map layer</div>
-                        <div class="layer-pills" role="tablist" aria-label="Map layer">
-                            <button type="button" class="layer-pill active" data-layer="winner" role="tab" aria-selected="true">Winner</button>
-                            <button type="button" class="layer-pill" data-layer="margin" role="tab" aria-selected="false">Margin</button>
-                            <button type="button" class="layer-pill" data-layer="competitive" role="tab" aria-selected="false">Competitive</button>
-                            <button type="button" class="layer-pill" data-layer="biss" role="tab" aria-selected="false">Biss</button>
-                            <button type="button" class="layer-pill" data-layer="fine" role="tab" aria-selected="false">Fine</button>
-                            <button type="button" class="layer-pill" data-layer="abughazaleh" role="tab" aria-selected="false">Abughazaleh</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="map-container">
-                    <div class="map-toolbar">
-                        <label class="map-search-wrap">
-                            <span class="sr-only">Find precinct</span>
-                            <input type="search" id="precinctMapSearch" placeholder="Find precinct…" autocomplete="off" spellcheck="false">
-                        </label>
-                        <button type="button" class="map-tool-btn" id="mapResetView" title="Reset map view">Reset view</button>
-                    </div>
-                    <div id="precinct-map"></div>
-                    <div id="map-legend"></div>
-                    <div id="info-panel">
-                        <button type="button" id="close-info" aria-label="Close precinct details">&times;</button>
-                        <h3 id="info-precinct"></h3>
-                        <div class="winner-line" id="info-winner"></div>
-                        <div id="info-bars"></div>
-                        <div class="margin-line" id="info-margin"></div>
-                        <div class="winrates" id="info-winrates"></div>
-                    </div>
-                    <div id="map-loading">Loading precinct data...</div>
-                </div>
-            </div>
-
-            <!-- Detailed Data (for nerds) -->
-            <div class="model-section nerd-section">
-                <button class="nerd-toggle" id="nerdToggle" onclick="toggleNerdSection()">
-                    <div>
-                        <h2 class="model-section-heading" style="margin:0;">Detailed Precinct Data</h2>
-                        <p class="model-section-desc" style="margin:0.25rem 0 0;">Sortable table of all 436 precincts with simulation results, margins, and 2024 presidential vote.</p>
-                    </div>
-                    <span class="nerd-arrow" id="nerdArrow">+</span>
-                </button>
-                <div class="nerd-body" id="nerdBody">
-
-                    <!-- Competitiveness Breakdown -->
-                    <div class="nerd-summary">
-                        <h3>Competitiveness Breakdown</h3>
-                        <div class="comp-grid" id="compGrid"></div>
-                    </div>
-
-                    <!-- Top Battlegrounds -->
-                    <div class="nerd-summary">
-                        <h3>Top 10 Battleground Precincts</h3>
-                        <p class="nerd-sub">Tightest margins across the district.</p>
-                        <div class="mini-table-wrap">
-                            <table class="mini-table" id="battlegroundTable">
-                                <thead>
-                                    <tr>
-                                        <th>Precinct</th>
-                                        <th>Winner</th>
-                                        <th>Runner-Up</th>
-                                        <th>Margin</th>
-                                        <th>Biss Win %</th>
-                                        <th>Fine Win %</th>
-                                        <th>Abu. Win %</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Full Precinct Table -->
-                    <div class="nerd-summary">
-                        <h3>All Precincts</h3>
-                        <div class="table-controls">
-                            <input type="text" id="precinctSearch" placeholder="Search precincts..." class="precinct-search">
-                            <select id="winnerFilter" class="winner-filter">
-                                <option value="">All Winners</option>
-                                <option value="Biss">Biss</option>
-                                <option value="Fine">Fine</option>
-                                <option value="Abughazaleh">Abughazaleh</option>
-                            </select>
-                        </div>
-                        <div class="full-table-wrap">
-                            <table class="full-table" id="fullTable">
-                                <thead>
-                                    <tr>
-                                        <th class="sortable" data-col="JoinField">Precinct</th>
-                                        <th class="sortable" data-col="winner">Winner</th>
-                                        <th class="sortable sorted-desc" data-col="margin">Margin</th>
-                                        <th class="sortable" data-col="runner_up">Runner-Up</th>
-                                        <th class="sortable" data-col="avg_biss">Biss %</th>
-                                        <th class="sortable" data-col="avg_fine">Fine %</th>
-                                        <th class="sortable" data-col="avg_abughazaleh">Abu. %</th>
-                                        <th class="sortable" data-col="avg_simmons">Sim. %</th>
-                                        <th class="sortable" data-col="avg_andrew">And. %</th>
-                                        <th class="sortable" data-col="avg_amiwala">Ami. %</th>
-                                        <th class="sortable" data-col="avg_huynh">Huy. %</th>
-                                        <th class="sortable" data-col="pct_biss_wins">Biss Win</th>
-                                        <th class="sortable" data-col="pct_fine_wins">Fine Win</th>
-                                        <th class="sortable" data-col="pct_abughazaleh_wins">Abu. Win</th>
-                                        <th class="sortable" data-col="PresDem">'24 Dem</th>
-                                        <th class="sortable" data-col="PresTot">'24 Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                        <div class="table-footer" id="tableFooter">Showing 436 of 436 precincts</div>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- Model Graphs -->
-            <div class="model-section">
-                <h2 class="model-section-heading">Model Visualizations</h2>
-                <p class="model-section-desc">Key outputs from the simulation. Click any chart to view full size.</p>
-                <div class="graph-grid">
-                    <!-- Simulation-level graphs -->
-                    <a href="{{ url_for('static', filename='model/confidence_ladder.png') }}" target="_blank" class="graph-card">
-                        <img src="{{ url_for('static', filename='model/confidence_ladder.png') }}" alt="Confidence Ladder" loading="lazy">
-                        <div class="graph-caption">Vote Share Confidence Intervals (50% / 90%)</div>
-                    </a>
-                    <a href="{{ url_for('static', filename='model/voteshare_density.png') }}" target="_blank" class="graph-card">
-                        <img src="{{ url_for('static', filename='model/voteshare_density.png') }}" alt="Vote Share Density" loading="lazy">
-                        <div class="graph-caption">Simulated Vote Share Distributions</div>
-                    </a>
-                    <a href="{{ url_for('static', filename='model/biss_vs_kat_margin.png') }}" target="_blank" class="graph-card">
-                        <img src="{{ url_for('static', filename='model/biss_vs_kat_margin.png') }}" alt="Biss vs Kat Head-to-Head Margin" loading="lazy">
-                        <div class="graph-caption">Biss vs Abughazaleh: Head-to-Head Margin</div>
-                    </a>
-                    <a href="{{ url_for('static', filename='model/margin_histogram.png') }}" target="_blank" class="graph-card">
-                        <img src="{{ url_for('static', filename='model/margin_histogram.png') }}" alt="Margin Histogram" loading="lazy">
-                        <div class="graph-caption">Winning Margin Distribution</div>
-                    </a>
-                    <a href="{{ url_for('static', filename='model/winprob_by_turnout.png') }}" target="_blank" class="graph-card">
-                        <img src="{{ url_for('static', filename='model/winprob_by_turnout.png') }}" alt="Win Probability by Turnout" loading="lazy">
-                        <div class="graph-caption">Win Probability by Turnout Quintile</div>
-                    </a>
-                    <a href="{{ url_for('static', filename='model/turnout_vs_voteshare.png') }}" target="_blank" class="graph-card">
-                        <img src="{{ url_for('static', filename='model/turnout_vs_voteshare.png') }}" alt="Turnout vs Vote Share" loading="lazy">
-                        <div class="graph-caption">Turnout vs Vote Share</div>
-                    </a>
-                    <!-- Precinct-level graphs -->
-                    <a href="{{ url_for('static', filename='model/precinct_boxplot.png') }}" target="_blank" class="graph-card">
-                        <img src="{{ url_for('static', filename='model/precinct_boxplot.png') }}" alt="Precinct Vote Share Boxplot" loading="lazy">
-                        <div class="graph-caption">Precinct-Level Vote Share Distribution</div>
-                    </a>
-                    <a href="{{ url_for('static', filename='model/biss_vs_kat_precincts.png') }}" target="_blank" class="graph-card">
-                        <img src="{{ url_for('static', filename='model/biss_vs_kat_precincts.png') }}" alt="Biss vs Kat Precincts" loading="lazy">
-                        <div class="graph-caption">Precinct Leaders: Three-Way Scatter</div>
-                    </a>
-                    <a href="{{ url_for('static', filename='model/top3_by_geography.png') }}" target="_blank" class="graph-card">
-                        <img src="{{ url_for('static', filename='model/top3_by_geography.png') }}" alt="Top 3 by Geography" loading="lazy">
-                        <div class="graph-caption">Biss / Kat / Fine by Region</div>
-                    </a>
-                    <a href="{{ url_for('static', filename='model/progressive_gradient.png') }}" target="_blank" class="graph-card">
-                        <img src="{{ url_for('static', filename='model/progressive_gradient.png') }}" alt="Progressive Gradient" loading="lazy">
-                        <div class="graph-caption">Kat Advantage vs Precinct Partisanship</div>
-                    </a>
-                    <a href="{{ url_for('static', filename='model/kat_youth_scatter.png') }}" target="_blank" class="graph-card">
-                        <img src="{{ url_for('static', filename='model/kat_youth_scatter.png') }}" alt="Abughazaleh &amp; Youth Vote Scatter" loading="lazy">
-                        <div class="graph-caption">Abughazaleh Support by Youth Share</div>
-                    </a>
-                    <a href="{{ url_for('static', filename='model/county_winrates.png') }}" target="_blank" class="graph-card">
-                        <img src="{{ url_for('static', filename='model/county_winrates.png') }}" alt="County Win Rates" loading="lazy">
-                        <div class="graph-caption">Win Rates by County/Area</div>
-                    </a>
-                    <a href="{{ url_for('static', filename='model/precinct_competitiveness.png') }}" target="_blank" class="graph-card">
-                        <img src="{{ url_for('static', filename='model/precinct_competitiveness.png') }}" alt="Precinct Competitiveness" loading="lazy">
-                        <div class="graph-caption">Precinct Competitiveness Histogram</div>
-                    </a>
-                </div>
-            </div>
-
-        </section>
+</section>
 {% endblock %}
 
 {% block page_styles %}
