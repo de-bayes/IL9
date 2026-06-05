@@ -1,748 +1,538 @@
-body {
-            font-family: var(--sans), -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            min-height: 100vh;
-        }
-
-        /* ===== TAB SWITCHER ===== */
-        .money-tab-bar {
-            display: flex;
-            justify-content: center;
-            gap: 0;
-            max-width: 600px;
-            margin: -1rem auto 2rem;
-            border: 2px solid var(--border-default);
-            border-radius: 8px;
-            overflow: hidden;
-            background: var(--bg-surface);
-        }
-
-        .money-tab {
-            flex: 1;
-            padding: 0.85rem 1.5rem;
-            font-family: var(--sans), -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 1rem;
-            font-weight: 600;
-            letter-spacing: 0.01em;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .money-tab:not(:last-child) {
-            border-right: 2px solid var(--border-default);
-        }
-
-        .money-tab:hover:not(.active) {
-            background: var(--bg-elevated);
-            color: var(--text-primary);
-        }
-
-        .money-tab.active {
-            background: var(--accent-blue);
-            color: #fff;
-        }
-
-        .money-tab-panel {
-            animation: fadeTabIn 0.25s ease;
-        }
-
-        @keyframes fadeTabIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 600px) {
-            .money-tab-bar {
-                margin: -0.5rem 1rem 1.5rem;
-                max-width: none;
-            }
-            .money-tab {
-                font-size: 0.85rem;
-                padding: 0.75rem 0.75rem;
-            }
-        }
-
-        .fundraising-content-page {
-            max-width: var(--width-wide);
-            margin: 0 auto 4rem;
-            padding: 0 2rem;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .fec-loading-section,
-        .fec-error-section {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            padding: 3rem;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .fec-loading-section h2,
-        .fec-error-section h2 {
-            font-family: var(--serif), Georgia, serif;
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--accent-blue);
-        }
-
-        .fec-error-section {
-            border-color: var(--border-subtle);
-        }
-
-        /* Live Money Ticker Styles */
-        .live-money-ticker {
-            background: var(--bg-surface);
-            border: 2px solid var(--border-default);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-
-        .ticker-header {
-            text-align: center;
-            margin-bottom: 1.25rem;
-        }
-
-        .ticker-header h2 {
-            font-family: var(--serif), Georgia, serif;
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 0 0 0.5rem 0;
-            color: var(--accent-blue);
-        }
-
-        .ticker-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin: 0;
-        }
-
-        .ticker-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .ticker-stat-card {
-            background: var(--bg-elevated);
-            border: 2px solid var(--border-default);
-            padding: 1.25rem;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .ticker-stat-card:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-
-        .ticker-stat-primary {
-            border-color: var(--border-default);
-            background: var(--bg-elevated);
-        }
-
-        .ticker-stat-secondary {
-            border-color: var(--border-default);
-            background: var(--bg-elevated);
-        }
-
-        .ticker-stat-live {
-            border-color: var(--border-default);
-            background: var(--bg-elevated);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .ticker-label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .ticker-value {
-            font-family: var(--sans), -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent-blue);
-            line-height: 1;
-            letter-spacing: -0.02em;
-        }
-
-        .ticker-stat-primary .ticker-value {
-            color: var(--accent-blue);
-        }
-
-        .ticker-stat-secondary .ticker-value {
-            color: var(--accent-blue);
-        }
-
-        .ticker-stat-live .ticker-value {
-            color: var(--accent-blue);
-            font-weight: 700;
-        }
-
-        .ticker-value-live {
-            /* Removed flickering animation */
-        }
-
-        .ticker-velocity {
-            margin-top: 0.75rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .ticker-note {
-            margin-top: 0.5rem;
-            font-size: 0.75rem;
-            color: var(--text-tertiary);
-            font-style: italic;
-        }
-
-        .live-pulse {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: var(--accent-blue);
-            border-radius: 50%;
-            box-shadow: 0 0 8px rgba(91, 155, 213, 0.6);
-            animation: pulse-dot 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse-dot {
-            0%, 100% {
-                opacity: 1;
-                transform: scale(1);
-                box-shadow: 0 0 8px rgba(91, 155, 213, 0.6);
-            }
-            50% {
-                opacity: 0.7;
-                transform: scale(1.15);
-                box-shadow: 0 0 12px rgba(91, 155, 213, 0.8);
-            }
-        }
-
-        .chart-section,
-        .comparison-table-section,
-        .burn-rate-section,
-        .candidate-links-section {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            padding: 2.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .chart-section h2,
-        .comparison-table-section h2,
-        .burn-rate-section h2,
-        .candidate-links-section h2 {
-            font-family: var(--serif), Georgia, serif;
-            font-size: 2rem;
-            font-weight: 600;
-            margin: 0 0 0.5rem 0;
-            color: var(--accent-blue);
-        }
-
-        .section-desc {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
-        }
-
-        .legend-hint {
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            font-style: italic;
-            margin: -1rem 0 1rem;
-        }
-
-        .chart-container-large {
-            position: relative;
-            height: 450px;
-            margin-top: 1.5rem;
-        }
-
-        /* Table Styles */
-        .table-responsive {
-            overflow-x: auto;
-            margin-top: 1.5rem;
-        }
-
-        .fec-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        .fec-table thead th {
-            background: var(--bg-elevated);
-            color: var(--accent-blue);
-            font-weight: 600;
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border-subtle);
-            white-space: nowrap;
-        }
-
-        .fec-table tbody td {
-            padding: 0.9rem 1rem;
-            border-bottom: 1px solid var(--border-subtle);
-            color: var(--accent-blue);
-        }
-
-        .fec-table tbody tr:hover {
-            background: rgba(91, 155, 213, 0.05);
-        }
-
-        .fec-table .candidate-name {
-            font-weight: 600;
-            color: var(--text-primary);
-            white-space: nowrap;
-        }
-
-        .fec-table .number-cell {
-            font-family: var(--sans), sans-serif; font-weight: 600;
-            font-size: 1.1rem;
-            text-align: right;
-        }
-
-        .table-note {
-            margin-top: 1.5rem;
-            padding: 1rem 1.5rem;
-            background: var(--bg-elevated);
-            border-left: 3px solid var(--border-default);
-            border-radius: 4px;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        .table-note strong {
-            color: var(--text-primary);
-        }
-
-
-        /* Candidate Links Grid */
-        .candidate-links-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .candidate-link-item {
-            display: block;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            padding: 1.2rem 1.5rem;
-            text-align: center;
-            color: var(--accent-blue);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .candidate-link-item:hover {
-            background: rgba(91, 155, 213, 0.1);
-            border-color: var(--border-default);
-            }
-
-        @media (max-width: 768px) {
-            .fundraising-content-page {
-                padding: 0 1rem;
-            }
-
-            .chart-container-large {
-                height: 350px;
-            }
-
-            .fec-table {
-                font-size: 0.8rem;
-            }
-
-            .fec-table thead th,
-            .fec-table tbody td {
-                padding: 0.7rem;
-            }
-
-            /* Mobile ticker adjustments */
-            .live-money-ticker {
-                padding: 1.5rem 1rem;
-            }
-
-            .ticker-header h2 {
-                font-size: 1.5rem;
-            }
-
-            .ticker-subtitle {
-                font-size: 0.8rem;
-            }
-
-            .ticker-stats-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .ticker-stat-card {
-                padding: 1.5rem 1rem;
-            }
-
-            .ticker-value {
-                font-size: 2.25rem;
-            }
-
-            .ticker-label {
-                font-size: 0.75rem;
-            }
-
-            .ticker-velocity {
-                font-size: 0.8rem;
-            }
-
-            .ticker-note {
-                font-size: 0.7rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .live-money-ticker {
-                padding: 1.25rem 0.75rem;
-                }
-
-            .ticker-header h2 {
-                font-size: 1.3rem;
-            }
-
-            .ticker-subtitle {
-                font-size: 0.75rem;
-            }
-
-            .ticker-stat-card {
-                padding: 1.25rem 0.75rem;
-            }
-
-            .ticker-value {
-                font-size: 1.9rem;
-            }
-
-            .ticker-label {
-                font-size: 0.7rem;
-                letter-spacing: 0.05em;
-            }
-
-            .ticker-velocity {
-                font-size: 0.75rem;
-            }
-
-            .ticker-note {
-                font-size: 0.65rem;
-            }
-        }
-
-        /* ===== INDEPENDENT EXPENDITURES SECTION ===== */
-        .ie-divider {
-            margin-top: 0;
-            padding-top: 0;
-            border-top: none;
-            text-align: center;
-        }
-
-        .ie-section-title {
-            font-family: var(--serif);
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin: 0 0 0.4rem;
-        }
-
-        .ie-section-subtitle {
-            font-family: var(--sans);
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            margin: 0 0 2rem;
-        }
-
-        .ie-inline { margin-bottom: 2rem; }
-
-        .ie-comparison {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .ie-box {
-            flex: 1;
-            padding: 1.75rem 1.25rem;
-            border: 1px solid var(--border-default);
-            background: var(--bg-surface);
-            text-align: center;
-        }
-
-        .ie-box-outside { border-left: 4px solid #ef4444; }
-        .ie-box-candidate { border-left: 4px solid #10b981; }
-
-        .ie-box-label {
-            font-family: var(--sans);
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--text-tertiary);
-            margin-bottom: 0.4rem;
-        }
-
-        .ie-box-value {
-            font-family: var(--serif);
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.2rem;
-        }
-
-        .ie-box-note {
-            font-family: var(--sans);
-            font-size: 0.78rem;
-            color: var(--text-tertiary);
-        }
-
-        .ie-vs {
-            font-family: var(--serif);
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-tertiary);
-            flex-shrink: 0;
-        }
-
-        .ie-subheading {
-            font-family: var(--serif);
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin: 0 0 0.3rem;
-        }
-
-        .ie-desc {
-            font-family: var(--sans);
-            font-size: 0.88rem;
-            color: var(--text-secondary);
-            margin: 0 0 1rem;
-        }
-
-        /* Diverging bar chart for Net IE */
-        .ie-diverging-chart {
-            display: flex;
-            flex-direction: column;
-            gap: 0.55rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .ie-div-row {
-            display: grid;
-            grid-template-columns: 120px 1fr;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .ie-div-name {
-            font-family: var(--sans);
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            text-align: right;
-        }
-
-        .ie-div-track {
-            height: 30px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            position: relative;
-        }
-
-        .ie-div-zero {
-            position: absolute;
-            left: 10%;
-            top: -2px;
-            bottom: -2px;
-            width: 1.5px;
-            background: var(--text-secondary);
-            z-index: 2;
-        }
-
-        .ie-div-bar {
-            position: absolute;
-            top: 0;
-            height: 100%;
-        }
-
-        .ie-div-pos {
-            background: rgba(16, 185, 129, 0.5);
-        }
-
-        .ie-div-neg {
-            background: rgba(239, 68, 68, 0.45);
-        }
-
-        .ie-div-label {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-family: var(--sans);
-            font-size: 0.72rem;
-            font-weight: 700;
-            white-space: nowrap;
-            z-index: 3;
-        }
-
-        .ie-div-label-pos {
-            color: var(--text-primary);
-        }
-
-        .ie-div-label-neg {
-            color: #ef4444;
-        }
-
-        .ie-div-label-inside {
-            color: #fff;
-            }
-
-        .ie-div-detail {
-            grid-column: 2;
-            font-family: var(--sans);
-            font-size: 0.7rem;
-            color: var(--text-tertiary);
-            margin-top: -0.15rem;
-            padding-left: 1px;
-        }
-
-        .ie-div-axis-row {
-            margin-top: -0.3rem;
-        }
-
-        .ie-div-axis {
-            position: relative;
-            height: 14px;
-        }
-
-        .ie-div-axis-label {
-            position: absolute;
-            transform: translateX(-50%);
-            font-family: var(--sans);
-            font-size: 0.65rem;
-            color: var(--text-tertiary);
-        }
-
-        .ie-group-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .ie-group-card {
-            border: 1px solid var(--border-default);
-            background: var(--bg-surface);
-        }
-
-        .ie-group-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.85rem 1.25rem;
-            border-bottom: 1px solid var(--border-default);
-        }
-
-        .ie-group-name {
-            font-family: var(--serif);
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .ie-group-amount {
-            font-family: var(--sans);
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            white-space: nowrap;
-        }
-
-        .ie-group-body { padding: 0; }
-
-        .ie-group-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 1.25rem;
-            border-bottom: 1px solid var(--border-subtle, var(--border-default));
-        }
-
-        .ie-group-row:last-child { border-bottom: none; }
-
-        .ie-group-label {
-            font-family: var(--sans);
-            font-size: 0.78rem;
-            color: var(--text-tertiary);
-        }
-
-        .ie-group-val {
-            font-family: var(--sans);
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            text-align: right;
-        }
-
-        .ie-val-support { color: #10b981; }
-        .ie-val-oppose { color: #ef4444; }
-
-        .ie-aipac-label {
-            font-family: var(--sans);
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #ef4444;
-            opacity: 0.85;
-        }
-
-        .ie-source-note {
-            font-family: var(--sans);
-            font-size: 0.78rem;
-            color: var(--text-tertiary);
-            font-style: italic;
-            margin-top: 1rem;
-        }
-
-        .ie-source-note a {
-            color: var(--accent-blue);
-            text-decoration: underline;
-        }
-
-        @media (max-width: 600px) {
-            .ie-comparison { flex-direction: column; gap: 0.75rem; }
-            .ie-vs { display: none; }
-            .ie-box { padding: 1rem; }
-            .ie-box-value { font-size: 1.6rem; }
-            .ie-div-row { grid-template-columns: 95px 1fr; gap: 0.5rem; }
-            .ie-div-name { font-size: 0.72rem; }
-            .ie-group-header { padding: 0.6rem 0.85rem; }
-            .ie-group-row { padding: 0.4rem 0.85rem; }
-            .ie-group-name { font-size: 0.82rem; }
-        }
+/* ===== FUNDRAISING PAGE — Archive Statistical Style ===== */
+
+.section-kicker {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 0.4rem;
+}
+
+/* ===== TAB SWITCHER ===== */
+.money-tab-bar {
+    display: flex;
+    justify-content: flex-start;
+    gap: 0;
+    max-width: var(--width-wide);
+    margin: 0 auto 2rem;
+    padding: 0 var(--page-gutter);
+    border-bottom: 1px solid var(--border-default);
+}
+
+.money-tab {
+    padding: 0.75rem 1.25rem;
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.money-tab:hover:not(.active) {
+    color: var(--text-primary);
+    border-bottom-color: var(--border-hover);
+}
+
+.money-tab.active {
+    color: var(--text-primary);
+    border-bottom-color: var(--accent-blue);
+}
+
+.money-tab-panel {
+    /* No animation — flat, immediate */
+}
+
+@media (max-width: 600px) {
+    .money-tab-bar {
+        padding: 0 1rem;
+    }
+    .money-tab {
+        font-size: 0.82rem;
+        padding: 0.65rem 0.85rem;
+    }
+}
+
+/* ===== PAGE CONTENT WRAPPER ===== */
+.fundraising-content-page {
+    max-width: var(--width-wide);
+    margin: 0 auto 4rem;
+    padding: 0 var(--page-gutter);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ===== LOADING / ERROR STATES ===== */
+.fec-loading-section,
+.fec-error-section {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.fec-error-section {
+    border-color: var(--border-default);
+}
+
+/* ===== SECTION PANELS (replaces chart-section, comparison-table-section, etc.) ===== */
+.fec-section-panel {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-desc {
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.chart-container-large {
+    position: relative;
+    height: 420px;
+    margin-top: 1.25rem;
+}
+
+/* ===== FEC DATA TABLES ===== */
+.table-responsive {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+.fec-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.fec-table thead th {
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-default);
+    white-space: nowrap;
+}
+
+.fec-table tbody td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-default);
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+.fec-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.fec-table .candidate-name {
+    font-family: var(--sans);
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.fec-table .number-cell {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.875rem;
+    text-align: right;
+    color: var(--text-primary);
+}
+
+.table-note {
+    margin-top: 1.25rem;
+    padding: 0.9rem 1.25rem;
+    background: var(--bg-elevated);
+    border-left: 2px solid var(--border-default);
+    font-size: 0.83rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.table-note strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* ===== CANDIDATE DIRECTORY LINKS ===== */
+.candidate-dir-links {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1rem;
+    border: 1px solid var(--border-default);
+}
+
+.candidate-dir-link-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--border-default);
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.88rem;
+}
+
+.candidate-dir-link-item:last-child {
+    border-bottom: none;
+}
+
+.candidate-dir-link-item:hover {
+    background: var(--bg-elevated);
+}
+
+.candidate-dir-link-item span {
+    color: var(--accent-blue);
+    font-size: 0.8rem;
+}
+
+/* ===== LIVE MONEY TICKER (archived summary) ===== */
+.live-money-ticker {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.ticker-header {
+    margin-bottom: 1rem;
+}
+
+.ticker-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.ticker-stats-grid {
+    display: none; /* replaced by .stat-dl in tickerStatsDl */
+}
+
+/* ===== INDEPENDENT EXPENDITURES SECTION ===== */
+.ie-divider {
+    margin: 0 0 1.5rem;
+    padding: 0;
+}
+
+.ie-section-subtitle {
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin: 0 0 1.5rem;
+    line-height: 1.5;
+}
+
+.ie-inline { margin-bottom: 2rem; }
+
+.ie-comparison {
+    display: flex;
+    align-items: stretch;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.ie-box {
+    flex: 1;
+    padding: 1.25rem;
+    border: 1px solid var(--border-default);
+    background: var(--bg-surface);
+}
+
+.ie-box-outside { border-left: 3px solid rgba(239, 68, 68, 0.5); }
+.ie-box-candidate { border-left: 3px solid rgba(16, 185, 129, 0.5); }
+
+.ie-box-label {
+    font-family: var(--sans);
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-tertiary);
+    margin-bottom: 0.5rem;
+}
+
+.ie-box-value {
+    font-family: var(--mono);
+    font-size: 1.75rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+    margin-bottom: 0.2rem;
+    line-height: 1.1;
+}
+
+.ie-box-note {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    line-height: 1.4;
+}
+
+.ie-vs {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.ie-subheading {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin: 0 0 0.35rem;
+}
+
+.ie-desc {
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin: 0 0 1rem;
+    line-height: 1.5;
+}
+
+/* Diverging bar chart for Net IE */
+.ie-diverging-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    margin-bottom: 2rem;
+}
+
+.ie-div-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.ie-div-name {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-align: right;
+}
+
+.ie-div-track {
+    height: 28px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    position: relative;
+}
+
+.ie-div-zero {
+    position: absolute;
+    left: 10%;
+    top: -2px;
+    bottom: -2px;
+    width: 1.5px;
+    background: var(--text-secondary);
+    z-index: 2;
+}
+
+.ie-div-bar {
+    position: absolute;
+    top: 0;
+    height: 100%;
+}
+
+.ie-div-pos {
+    background: rgba(16, 185, 129, 0.4);
+}
+
+.ie-div-neg {
+    background: rgba(239, 68, 68, 0.4);
+}
+
+.ie-div-label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    z-index: 3;
+}
+
+.ie-div-label-pos {
+    color: var(--text-primary);
+}
+
+.ie-div-label-neg {
+    color: #ef4444;
+}
+
+.ie-div-label-inside {
+    color: #fff;
+}
+
+.ie-div-detail {
+    grid-column: 2;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    margin-top: -0.15rem;
+}
+
+.ie-div-axis-row {
+    margin-top: -0.3rem;
+}
+
+.ie-div-axis {
+    position: relative;
+    height: 14px;
+}
+
+.ie-div-axis-label {
+    position: absolute;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text-tertiary);
+}
+
+.ie-group-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-default);
+}
+
+.ie-group-card {
+    border-bottom: 1px solid var(--border-default);
+    background: var(--bg-surface);
+}
+
+.ie-group-card:last-child {
+    border-bottom: none;
+}
+
+.ie-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--border-default);
+}
+
+.ie-group-name {
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.ie-group-amount {
+    font-family: var(--mono);
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.ie-group-body { padding: 0; }
+
+.ie-group-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.45rem 1.25rem;
+    border-bottom: 1px solid var(--border-default);
+}
+
+.ie-group-row:last-child { border-bottom: none; }
+
+.ie-group-label {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+}
+
+.ie-group-val {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-align: right;
+}
+
+.ie-val-support { color: rgba(16, 185, 129, 0.9); }
+.ie-val-oppose  { color: rgba(239, 68, 68, 0.9); }
+
+.ie-aipac-label {
+    font-family: var(--sans);
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: rgba(239, 68, 68, 0.8);
+}
+
+.ie-source-note {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    margin-top: 1rem;
+    line-height: 1.5;
+}
+
+.ie-source-note a {
+    color: var(--accent-blue);
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .fundraising-content-page {
+        padding: 0 1rem;
+    }
+    .chart-container-large {
+        height: 320px;
+    }
+    .fec-table {
+        font-size: 0.8rem;
+    }
+    .fec-table thead th,
+    .fec-table tbody td {
+        padding: 0.6rem 0.75rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .ie-comparison { flex-direction: column; gap: 0.75rem; }
+    .ie-vs { display: none; }
+    .ie-box { padding: 1rem; }
+    .ie-box-value { font-size: 1.4rem; }
+    .ie-div-row { grid-template-columns: 95px 1fr; gap: 0.5rem; }
+    .ie-div-name { font-size: 0.72rem; }
+    .ie-group-header { padding: 0.6rem 0.85rem; }
+    .ie-group-row { padding: 0.4rem 0.85rem; }
+}

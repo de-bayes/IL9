@@ -12,10 +12,11 @@
 {% endblock %}
 
 {% block content %}
-<section class="hero">
-            <h1>Money in the Race</h1>
-            <p class="subtitle">Campaign fundraising &amp; independent expenditures in the IL-9 primary</p>
-        </section>
+<header class="archive-page-header">
+    <p class="archive-page-header__kicker">IL-09 Democratic Primary · Archive</p>
+    <h1 class="archive-page-header__title">Money in the Race</h1>
+    <p class="archive-page-header__meta">FEC pre-primary filings · Jan 30 – Mar 17, 2026 · Figures frozen as of March 17, 2026</p>
+</header>
 
         <!-- Section Tab Switcher -->
         <div class="money-tab-bar">
@@ -34,55 +35,51 @@
             <!-- Final Campaign Finance Summary (archived) -->
             <article class="live-money-ticker hidden" id="liveMoneyTicker">
                 <div class="ticker-header">
-                    <h2>Campaign Finance &mdash; Final Filing</h2>
+                    <p class="section-kicker">Campaign Finance &mdash; Final Filing</p>
                     <p class="ticker-subtitle">Pre-primary FEC filings (through Feb 25, 2026) for all candidates. Figures frozen as of March 17, 2026.</p>
                 </div>
 
-                <div class="ticker-stats-grid">
-                    <div class="ticker-stat-card ticker-stat-primary">
-                        <div class="ticker-label">Total Raised (All Candidates)</div>
-                        <div class="ticker-value" id="totalRaisedDisplay">$0</div>
-                        <div class="ticker-note">Cycle-to-date at final filing</div>
+                <dl class="stat-dl" id="tickerStatsDl">
+                    <div class="stat-dl__row">
+                        <dt class="stat-dl__label">Total Raised (All Candidates)</dt>
+                        <dd class="stat-dl__value" id="totalRaisedDisplay">$0</dd>
                     </div>
-
-                    <div class="ticker-stat-card ticker-stat-secondary">
-                        <div class="ticker-label">Total Spent (All Candidates)</div>
-                        <div class="ticker-value" id="totalSpentDisplay">$0</div>
-                        <div class="ticker-note">Cycle-to-date at final filing</div>
+                    <div class="stat-dl__row">
+                        <dt class="stat-dl__label">Total Spent (All Candidates)</dt>
+                        <dd class="stat-dl__value" id="totalSpentDisplay">$0</dd>
                     </div>
-                </div>
+                </dl>
             </article>
 
             <!-- Loading State -->
             <article class="fec-loading-section" id="loadingSection">
-                <h2>Loading FEC Data...</h2>
+                <p class="section-kicker">Loading FEC Data&hellip;</p>
                 <p>Fetching campaign finance information from the Federal Election Commission.</p>
             </article>
 
             <!-- Error/Not Available State -->
             <article class="fec-error-section hidden" id="errorSection">
-                <h2>Data Not Yet Available</h2>
+                <p class="section-kicker">Data Not Yet Available</p>
                 <p id="errorMessage">FEC fundraising data is temporarily unavailable. Please try again shortly.</p>
                 <div style="margin-top: 1.5rem;">
-                    <a href="/markets" class="btn">View Live Market Data</a>
+                    <a href="/markets" class="btn">View Market Data</a>
                 </div>
             </article>
 
             <!-- Data Container -->
             <div id="fecDataContainer" class="hidden">
                 <!-- Spending Comparison Chart -->
-                <article class="chart-section">
-                    <h2>Fundraising & Spending Comparison</h2>
-                    <p class="section-desc">Dual-axis chart: Wide bars = total raised (left $-axis), Narrow bars nested inside = spent % of raised (right %-axis).</p>
-                    <p class="legend-hint">Click a legend item to toggle it on or off</p>
+                <article class="fec-section-panel">
+                    <p class="section-kicker">Fundraising &amp; Spending Comparison</p>
+                    <p class="section-desc">Dual-axis chart: Wide bars = total raised (left $-axis), Narrow bars nested inside = spent % of raised (right %-axis). Click a legend item to toggle.</p>
                     <div class="chart-container-large">
                         <canvas id="spendingChart"></canvas>
                     </div>
                 </article>
 
                 <!-- Comparison Table -->
-                <article class="comparison-table-section">
-                    <h2>Financial Metrics Comparison</h2>
+                <article class="fec-section-panel">
+                    <p class="section-kicker">Financial Metrics Comparison</p>
                     <p class="section-desc">Comprehensive breakdown of campaign finance data</p>
                     <div class="table-responsive">
                         <table class="fec-table" id="comparisonTable">
@@ -103,14 +100,12 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="table-note">
-                        <strong>Note:</strong> "Small $%" represents the percentage of individual contributions from donations under $200 (FEC definition of small-dollar/grassroots donations). Donor counts are estimated based on contribution amounts.
-                    </div>
+                    <p class="table-note"><strong>Note:</strong> "Small $%" represents the percentage of individual contributions from donations under $200 (FEC definition of small-dollar/grassroots donations). Donor counts are estimated based on contribution amounts.</p>
                 </article>
 
                 <!-- Burn Rate Analysis -->
-                <article class="burn-rate-section">
-                    <h2>Burn Rate Analysis</h2>
+                <article class="fec-section-panel">
+                    <p class="section-kicker">Burn Rate Analysis</p>
                     <p class="section-desc">Monthly spending and fundraising rates calculated from most recent FEC filing period</p>
                     <div class="table-responsive">
                         <table class="fec-table" id="burnRateTable">
@@ -128,16 +123,14 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="table-note">
-                        <strong>Note:</strong> Burn and raise rates use disbursements and receipts from the Jan 1 &ndash; Feb 25, 2026 filing period only (56 days), converted to a monthly rate (amount &divide; 56 &times; 30.44). These are period-specific figures, <em>not</em> derived from cumulative totals. Cash runway = cash on hand &divide; monthly burn rate.
-                    </div>
+                    <p class="table-note"><strong>Note:</strong> Burn and raise rates use disbursements and receipts from the Jan 1 &ndash; Feb 25, 2026 filing period only (56 days), converted to a monthly rate (amount &divide; 56 &times; 30.44). These are period-specific figures, <em>not</em> derived from cumulative totals. Cash runway = cash on hand &divide; monthly burn rate.</p>
                 </article>
 
                 <!-- Individual Candidate Links -->
-                <article class="candidate-links-section">
-                    <h2>Detailed Candidate Profiles</h2>
-                    <p class="section-desc">View in-depth fundraising analysis for each candidate</p>
-                    <div class="candidate-links-grid" id="candidateLinksGrid">
+                <article class="fec-section-panel">
+                    <p class="section-kicker">Candidate Finance Reports</p>
+                    <p class="section-desc">Detailed fundraising data for each candidate</p>
+                    <div id="candidateLinksGrid" class="candidate-dir-links">
                         <!-- Populated by JavaScript -->
                     </div>
                 </article>
@@ -150,7 +143,7 @@
 
             <!-- Independent Expenditures Section -->
             <div id="independent-expenditures" class="ie-divider">
-                <h2 class="ie-section-title">Independent Expenditures</h2>
+                <p class="section-kicker">Independent Expenditures</p>
                 <p class="ie-section-subtitle">Super PAC and outside spending in the IL-9 Democratic primary</p>
             </div>
 
@@ -374,4 +367,16 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/fundraising.css') }}">
 {% endblock %}
 
+{% block page_scripts %}
+<script>
+function switchMoneyTab(tab) {
+    document.querySelectorAll('.money-tab').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+    });
+    document.querySelectorAll('.money-tab-panel').forEach(function(panel) {
+        panel.style.display = panel.id === 'tab-' + tab ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}
 

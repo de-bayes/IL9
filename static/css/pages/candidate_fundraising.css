@@ -1,175 +1,55 @@
-body {
-            font-family: var(--sans), -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            min-height: 100vh;
-        }
+/* ===== CANDIDATE FUNDRAISING DETAIL PAGE — Archive Statistical Style ===== */
 
-        .fundraising-content-page {
-            max-width: 1200px;
-            margin: 0 auto 4rem;
-            padding: 0 2rem;
-        }
+.fundraising-content-page {
+    max-width: var(--width-wide);
+    margin: 0 auto 4rem;
+    padding: 0 var(--page-gutter);
+}
 
-        .back-link-container {
-            margin-bottom: 2rem;
-        }
+.back-link-container {
+    margin-bottom: 1.5rem;
+}
 
-        .back-link {
-            color: var(--accent-blue);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: opacity 0.3s ease;
-        }
+.back-link {
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+}
 
-        .back-link:hover {
-            opacity: 0.7;
-        }
+.back-link:hover {
+    color: var(--text-primary);
+}
 
-        .hidden {
-            display: none !important;
-        }
+.hidden {
+    display: none !important;
+}
 
-        .fec-loading-section,
-        .fec-error-section {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            padding: 3rem;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
+/* ===== LOADING / ERROR STATES ===== */
+.fec-loading-section,
+.fec-error-section {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
 
-        .fec-loading-section h2,
-        .fec-error-section h2 {
-            font-family: var(--serif), Georgia, serif;
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--accent-blue);
-        }
+.fec-state-label {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 0.4rem;
+}
 
-        .fec-error-section {
-            border-color: rgba(239, 68, 68, 0.5);
-        }
-
-        .fec-error-section h2 {
-            color: var(--accent-red);
-        }
-
-        .finance-summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .finance-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .finance-card h3 {
-            font-family: var(--sans), -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin: 0 0 1rem 0;
-            color: var(--text-secondary);
-        }
-
-        .finance-value {
-            font-family: var(--sans), sans-serif; font-weight: 600;
-            font-size: 2.5rem;
-            font-weight: 600;
-            margin: 0;
-            color: var(--accent-blue);
-        }
-
-        .burn-rate-section,
-        .additional-metrics-section {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            padding: 2.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .burn-rate-section h2,
-        .additional-metrics-section h2 {
-            font-family: var(--serif), Georgia, serif;
-            font-size: 2rem;
-            font-weight: 600;
-            margin: 0 0 0.5rem 0;
-            color: var(--accent-blue);
-        }
-
-        .section-desc {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
-        }
-
-        .burn-rate-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .burn-rate-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .burn-rate-card h3 {
-            font-family: var(--sans), -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin: 0 0 1rem 0;
-            color: var(--accent-blue);
-        }
-
-        .burn-rate-value {
-            font-family: var(--sans), sans-serif; font-weight: 600;
-            font-size: 2rem;
-            font-weight: 600;
-            margin: 0 0 0.5rem 0;
-            color: var(--accent-blue);
-        }
-
-        .burn-rate-desc {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin: 0;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.25rem;
-        }
-
-        .metric-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 1.5rem;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-        }
-
-        .metric-label {
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-
-        .metric-value {
-            font-family: var(--sans), sans-serif; font-weight: 600;
-            font-size: 1.3rem;
-            color: var(--accent-blue);
-            font-weight: 600;
-        }
+@media (max-width: 768px) {
+    .fundraising-content-page {
+        padding: 0 1rem;
+    }
+}

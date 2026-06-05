@@ -1,276 +1,159 @@
-body {
-            font-family: var(--sans), -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            min-height: 100vh;
-        }
+/* ===== CANDIDATES DIRECTORY PAGE — Archive Statistical Style ===== */
 
-        .candidates-grid {
-            max-width: var(--width-wide);
-            margin: 0 auto 4rem;
-            padding: 0 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
-            gap: 2.5rem;
-        }
+.candidates-directory-section {
+    max-width: var(--width-wide);
+    margin: 0 auto 4rem;
+    padding: 0 var(--page-gutter);
+}
 
-        @media (max-width: var(--width-data)) {
-            .candidates-grid {
-                grid-template-columns: 1fr;
-                max-width: 650px;
-            }
-        }
+.candidate-directory-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--border-default);
+    font-size: 0.9rem;
+}
 
-        @media (max-width: 768px) {
-            .candidates-grid {
-                padding: 0 1.5rem;
-                gap: 2rem;
-            }
+.candidate-directory-table thead th {
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-family: var(--sans);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.75rem 1.25rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-default);
+    white-space: nowrap;
+}
 
-            .candidate-header {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                gap: 1.25rem;
-            }
+.cdt-col-name  { width: 22%; }
+.cdt-col-title { width: 35%; }
+.cdt-col-share { width: 18%; }
+.cdt-col-links { width: 25%; }
 
-            .candidate-photo-container {
-                width: 150px;
-                height: 150px;
-            }
+.cdt-row td {
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid var(--border-default);
+    vertical-align: middle;
+}
 
-            .candidate-info h2 {
-                font-size: 1.75rem;
-            }
+.cdt-row:last-child td {
+    border-bottom: none;
+}
 
-            .issue-tags {
-                justify-content: center;
-            }
-        }
+.cdt-row:hover td {
+    background: var(--bg-surface);
+}
 
-        .candidate-card {
-            background: var(--bg-surface);
-            -webkit-border: 1px solid var(--border-default);
-            padding: 0;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: none;
-            display: flex;
-            flex-direction: column;
-        }
+.cdt-name-cell {
+    white-space: nowrap;
+}
 
-        .candidate-card:hover {
-            border-color: rgba(160, 160, 160, 0.6);
-            }
+.cdt-name-link {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-decoration: none;
+}
 
-        .candidate-header {
-            display: flex;
-            gap: 1.75rem;
-            padding: 2.25rem 2rem;
-            background: linear-gradient(135deg, rgba(160, 160, 160, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%);
-            border-bottom: 2px solid rgba(160, 160, 160, 0.18);
-        }
+.cdt-name-link:hover {
+    color: var(--accent-blue);
+    text-decoration: underline;
+}
 
-        .candidate-photo-container {
-            position: relative;
-            width: 130px;
-            height: 130px;
-            flex-shrink: 0;
-        }
+.cdt-title-cell {
+    font-family: var(--sans);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
 
-        .candidate-photo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border: 1px solid rgba(160, 160, 160, 0.3);
-            box-shadow: none;
-        }
+.cdt-share-cell {
+    white-space: nowrap;
+}
 
-        .candidate-photo-fallback {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-elevated);
-            font-size: 2.8rem;
-            font-weight: 600;
-            color: #fff;
-            border: 1px solid rgba(160, 160, 160, 0.3);
-            box-shadow: none;
-        }
+.cdt-share-value {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+}
 
-        .candidate-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+.cdt-share-sub {
+    display: block;
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    color: var(--text-tertiary);
+    margin-top: 0.15rem;
+}
 
-        .candidate-info h2 {
-            font-family: var(--serif), Georgia, serif;
-            font-size: 2rem;
-            font-weight: 600;
-            margin: 0 0 0.4rem 0;
-            color: var(--accent-blue);
-            letter-spacing: 0.5px;
-        }
+.cdt-links-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
 
-        .candidate-title {
-            font-size: 0.98rem;
-            color: var(--text-secondary);
-            margin: 0 0 1.2rem 0;
-            font-weight: 500;
-        }
+.cdt-action-link {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    color: var(--accent-blue);
+    text-decoration: none;
+    padding: 0.2rem 0;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s ease;
+}
 
-        .candidate-odds {
-            display: flex;
-            align-items: baseline;
-            gap: 0.65rem;
-            margin-top: auto;
-        }
+.cdt-action-link:hover {
+    border-bottom-color: var(--accent-blue);
+}
 
-        .odds-value {
-            font-family: var(--sans), sans-serif; font-weight: 600;
-            font-size: 2.3rem;
-            color: var(--accent-blue);
-            font-weight: 600;
-            line-height: 1;
-        }
+.cdt-action-link--ext {
+    color: var(--text-secondary);
+}
 
-        .odds-label {
-            font-size: 0.88rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
+.cdt-action-link--ext:hover {
+    color: var(--text-primary);
+    border-bottom-color: var(--border-hover);
+}
 
-        .candidate-bio {
-            padding: 2rem 2rem;
-            border-bottom: 1px solid var(--border-subtle);
-        }
+@media (max-width: 768px) {
+    .candidates-directory-section {
+        padding: 0 1rem;
+    }
 
-        .candidate-bio p {
-            margin: 0;
-            line-height: 1.8;
-            color: var(--accent-blue);
-            font-size: 0.95rem;
-        }
+    .candidate-directory-table {
+        font-size: 0.82rem;
+    }
 
-        .candidate-endorsements {
-            padding: 1.75rem 2rem;
-            border-bottom: 1px solid var(--border-subtle);
-        }
+    .cdt-col-title {
+        display: none;
+    }
 
-        .candidate-endorsements h3 {
-            font-family: var(--serif), Georgia, serif;
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin: 0 0 1rem 0;
-            color: var(--accent-blue);
-            letter-spacing: 0.3px;
-        }
+    .candidate-directory-table thead th.cdt-col-title {
+        display: none;
+    }
 
-        .candidate-endorsements ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: grid;
-            gap: 0.5rem;
-        }
+    .cdt-row td.cdt-title-cell {
+        display: none;
+    }
 
-        .candidate-endorsements li {
-            padding: 0.5rem 0 0.5rem 1.5rem;
-            position: relative;
-            color: var(--text-secondary);
-            font-size: 0.93rem;
-            line-height: 1.5;
-        }
+    .cdt-col-name  { width: 35%; }
+    .cdt-col-share { width: 25%; }
+    .cdt-col-links { width: 40%; }
 
-        .candidate-endorsements li:before {
-            content: "\2192";
-            position: absolute;
-            left: 0;
-            color: var(--accent-blue);
-            font-size: 1.1rem;
-        }
+    .cdt-row td {
+        padding: 0.75rem 0.85rem;
+    }
+}
 
-        .candidate-issues {
-            padding: 1.75rem 2rem;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .candidate-issues h3 {
-            font-family: var(--serif), Georgia, serif;
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin: 0 0 1rem 0;
-            color: var(--accent-blue);
-            letter-spacing: 0.3px;
-        }
-
-        .issue-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-        }
-
-        .issue-tag {
-            background: rgba(160, 160, 160, 0.12);
-            border: 1px solid var(--border-default);
-            padding: 0.5rem 0.95rem;
-            font-size: 0.88rem;
-            color: var(--accent-blue);
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .issue-tag:hover {
-            background: rgba(160, 160, 160, 0.18);
-            border-color: rgba(160, 160, 160, 0.25);
-        }
-
-        .candidate-links {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0;
-            border-top: 1px solid var(--border-subtle);
-            margin-top: auto;
-        }
-
-        .fundraising-link,
-        .campaign-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.25rem 1.5rem;
-            text-align: center;
-            color: var(--accent-blue);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            background: rgba(160, 160, 160, 0.04);
-        }
-
-        .fundraising-link {
-            border-right: 1px solid var(--border-subtle);
-        }
-
-        .fundraising-link:hover,
-        .campaign-link:hover {
-            background: rgba(160, 160, 160, 0.12);
-            color: var(--accent-blue);
-        }
-
-        @media (max-width: 768px) {
-            .candidate-links {
-                grid-template-columns: 1fr;
-            }
-
-            .fundraising-link {
-                border-right: none;
-                border-bottom: 1px solid var(--border-subtle);
-            }
-        }
+@media (max-width: 480px) {
+    .cdt-links-cell {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}
