@@ -6,36 +6,36 @@
 {% endblock %}
 
 {% block content %}
-<section class="hero">
-            <h1>Race Updates</h1>
-            <p class="subtitle">Live from X on the IL-9 primary</p>
-        </section>
+<header class="archive-page-header">
+            <p class="archive-page-header__kicker">IL-09 Democratic Primary · Archive</p>
+            <h1 class="archive-page-header__title">Race Updates</h1>
+            <p class="archive-page-header__meta">Coverage: Jan 30 – Mar 17, 2026</p>
+        </header>
 
         <section class="updates-content-page">
-            <article class="updates-coming-soon">
-                <h2>Coming Soon</h2>
-                <p>We're building a live feed that aggregates posts from journalists and candidates covering the IL-9 Democratic primary. The feed will pull from X (Twitter) using hashtags like <strong>#IL09</strong> and from accounts covering the race in real time.</p>
-                <div class="updates-features">
-                    <div class="updates-feature">
-                        <span class="feature-label">Candidate Posts</span>
-                        <span class="feature-desc">Official accounts from declared candidates</span>
+            <div class="data-panel">
+                <p class="data-panel__label">Archive Notice</p>
+                <p>The Illinois 9th District Democratic Primary was held on March 17, 2026. This page was planned as a live feed of campaign coverage from journalists and candidates on X, pulling from accounts and hashtags like <strong>#IL09</strong>. The feed was not completed before the primary concluded.</p>
+                <p>For historical coverage of the race, the following sources tracked it directly:</p>
+                <div class="updates-sources">
+                    <div class="updates-source">
+                        <span class="source-label">Evanston RoundTable</span>
+                        <span class="source-desc">Local coverage of the 9th District candidates</span>
                     </div>
-                    <div class="updates-feature">
-                        <span class="feature-label">Journalist Coverage</span>
-                        <span class="feature-desc">Chicago political reporters and local news</span>
+                    <div class="updates-source">
+                        <span class="source-label">Capitol Fax</span>
+                        <span class="source-desc">Illinois political newsletter</span>
                     </div>
-                    <div class="updates-feature">
-                        <span class="feature-label">Hashtag Tracking</span>
-                        <span class="feature-desc">Posts tagged #IL09 and related terms</span>
+                    <div class="updates-source">
+                        <span class="source-label">FOIA Gras</span>
+                        <span class="source-desc">IL-9 poll results and analysis</span>
                     </div>
                 </div>
-                <p class="updates-check-back">Check back soon.</p>
-            </article>
+            </div>
         </section>
 {% endblock %}
 
 {% block page_styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/updates.css') }}">
 {% endblock %}
-
 

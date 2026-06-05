@@ -4,50 +4,7 @@
             padding: 0 2rem;
         }
 
-        /* ===== COMING SOON BLOCK ===== */
-        .coming-soon-block {
-            text-align: center;
-            padding: 2rem 1rem;
-        }
-
-        .coming-soon-icon {
-            font-size: 2.5rem;
-            display: block;
-            margin-bottom: 0.8rem;
-            opacity: 0.4;
-        }
-
-        .coming-soon-block h3 {
-            font-family: var(--serif);
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-tertiary);
-            margin-bottom: 0.8rem;
-        }
-
-        .coming-soon-block p {
-            font-family: var(--sans);
-            color: var(--text-tertiary);
-            max-width: 550px;
-            margin: 0 auto;
-            line-height: 1.7;
-        }
-
-        .coming-soon-block a {
-            color: var(--accent-blue);
-            text-decoration: underline;
-        }
-
         /* ===== INNER CONTENT STYLES ===== */
-        .foldout-inner h3 {
-            font-family: var(--serif);
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
         .foldout-inner p {
             font-family: var(--sans);
             margin-bottom: 1rem;
@@ -73,55 +30,67 @@
         .method-list li {
             font-family: var(--sans);
             margin-bottom: 0.8rem;
-            padding-left: 1.5rem;
+            padding-left: 1.25rem;
             position: relative;
             line-height: 1.6;
             color: var(--text-secondary);
         }
 
         .method-list li:before {
-            content: "\2192";
+            content: "\2013";
             position: absolute;
             left: 0;
-            color: var(--accent-gold);
+            color: var(--text-tertiary);
         }
 
         .formula-box {
-            font-family: var(--sans);
-            font-weight: 600;
-            background: var(--bg-elevated, rgba(0,0,0,0.03));
-            border-left: 3px solid var(--accent-gold);
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            font-size: 1.1rem;
-            color: var(--text-primary);
+            font-family: var(--mono);
+            font-weight: 400;
+            background: var(--bg-elevated);
+            border-left: 3px solid var(--border-hover);
+            padding: 1.25rem 1.5rem;
+            margin: 1.25rem 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .formula-box code {
+            font-family: var(--mono);
         }
 
         /* ===== CONTACT SECTION ===== */
         .method-section {
             background: var(--bg-surface);
             border: 1px solid var(--border-default);
-            padding: 2.5rem;
+            padding: 2rem 2.5rem;
             margin-bottom: 2rem;
         }
 
-        .method-section h2 {
-            font-family: var(--serif);
-            font-size: 2rem;
+        .method-section__label {
+            font-family: var(--sans);
+            font-size: 0.7rem;
             font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: var(--text-primary);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin: 0 0 1rem;
         }
 
         .method-section p {
             font-family: var(--sans);
-            margin-bottom: 1rem;
-            line-height: 1.8;
+            margin-bottom: 0.75rem;
+            line-height: 1.75;
             color: var(--text-secondary);
         }
 
-        .contact-section {
-            border-left: 3px solid var(--accent-gold);
+        .method-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .method-section a {
+            color: var(--accent-blue);
+            text-decoration: underline;
         }
 
         /* ===== RESPONSIVE ===== */
@@ -131,7 +100,7 @@
                 padding: 1.2rem 1.4rem;
             }
             .foldout-trigger h2 {
-                font-size: 1.25rem;
+                font-size: 1.05rem;
             }
             .foldout-inner {
                 padding: 0 1.4rem;

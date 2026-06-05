@@ -6,18 +6,19 @@
 {% endblock %}
 
 {% block content %}
-<section class="hero">
-            <h1>404</h1>
-            <p class="hero-subtitle">Well&hellip; time to update your prior on whether Ryan is a good programmer.</p>
-        </section>
+<header class="archive-page-header">
+            <p class="archive-page-header__kicker">IL-09 Democratic Primary · Archive</p>
+            <h1 class="archive-page-header__title">404 — Page Not Found</h1>
+            <p class="archive-page-header__meta">Well&hellip; time to update your prior on whether Ryan is a good programmer.</p>
+        </header>
 
         <section class="error-content">
-            <div class="bayes-card">
-                <h2>Bayes' Theorem</h2>
+            <div class="data-panel">
+                <p class="data-panel__label">Bayes&rsquo; Theorem</p>
                 <div class="bayes-equation">
                     P(H|E) = <span class="frac"><span class="num">P(E|H) &middot; P(H)</span><span class="den">P(E|H) &middot; P(H) + P(E|&not;H) &middot; P(&not;H)</span></span>
                 </div>
-                <p class="bayes-where">where <em>H</em> = "Ryan is a good programmer" and <em>E</em> = "you just got a 404"</p>
+                <p class="bayes-where">where <em>H</em> = &ldquo;Ryan is a good programmer&rdquo; and <em>E</em> = &ldquo;you just got a 404&rdquo;</p>
 
                 <div class="bayes-breakdown">
                     <div class="bayes-terms">
@@ -51,7 +52,7 @@
 
             <div class="error-nav">
                 <div class="error-links">
-                    <a href="/" class="btn-primary">Update Your Posterior &rarr; Home</a>
+                    <a href="/" class="btn-primary">Update Your Posterior &mdash; Home</a>
                 </div>
             </div>
         </section>
@@ -60,5 +61,4 @@
 {% block page_styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/404.css') }}">
 {% endblock %}
-
 

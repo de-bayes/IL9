@@ -6,10 +6,11 @@
 {% endblock %}
 
 {% block content %}
-<section class="hero">
-            <h1>Methodology</h1>
-            <p class="subtitle">How IL9Cast generates its forecasts</p>
-        </section>
+<header class="archive-page-header">
+            <p class="archive-page-header__kicker">IL-09 Democratic Primary · Archive</p>
+            <h1 class="archive-page-header__title">Methodology</h1>
+            <p class="archive-page-header__meta">Prediction market aggregation · Precinct model · FEC fundraising analysis · Infrastructure</p>
+        </header>
 
         <section class="methodology-content-page">
 
@@ -175,11 +176,11 @@
                 <div class="foldout-body" id="foldout-body-model">
                     <div class="foldout-inner">
                         <p>Our precinct-level election model is built in Stata and produces precinct-by-precinct projections displayed on an interactive map on the <a href="/odds">Model page</a>. The full methodology is documented in the paper linked below.</p>
-                        <p style="margin-top: 1rem;"><a href="/model/methodology" target="_blank" style="color: var(--accent-blue); text-decoration: underline; font-weight: 600;">Read the full methodology (PDF) &rarr;</a></p>
+                        <p style="margin-top: 1rem;"><a href="/model/methodology" target="_blank" style="color: var(--accent-blue); text-decoration: underline; font-weight: 600;">Read the full methodology (PDF)</a></p>
                         <p style="margin-top: 0.5rem; font-size: 0.82rem; color: var(--text-tertiary); font-style: italic;">Note: The PDF documents the February 2026 model architecture. See v3.1 updates below.</p>
 
-                        <div style="margin-top: 2rem; padding: 1.5rem; background: var(--bg-elevated); border-left: 3px solid var(--accent-gold);">
-                            <h3 style="margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--text-primary);">Model v3.1 Update (March 5, 2026)</h3>
+                        <div style="margin-top: 2rem; padding: 1.5rem; background: var(--bg-elevated); border-left: 3px solid var(--border-hover);">
+                            <h3 style="margin: 0 0 0.75rem; font-size: 1rem; font-family: var(--sans); color: var(--text-primary);">Model v3.1 Update (March 5, 2026)</h3>
                             <p style="font-size: 0.88rem; color: var(--text-secondary); margin: 0 0 0.75rem;">Key changes from the February model:</p>
                             <ul style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; padding-left: 1.25rem; line-height: 1.7;">
                                 <li><strong>New poll integrated:</strong> PPP/Evanston Roundtable poll (Feb 20&ndash;21, n=501 likely voters). First non-affiliated poll of the race &mdash; no candidate or party commissioned it. Weighted at 73% in the polling composite.</li>
@@ -187,7 +188,7 @@
                                 <li><strong>Wider polling uncertainty:</strong> Polling error sigma increased from 7 to 8 percentage points, reflecting the genuine uncertainty with only two independent polls.</li>
                                 <li><strong>Abughazaleh progressive lane loading:</strong> Increased from 0.6 to 0.75, reflecting stronger youth/progressive constituency alignment observed in the PPP data.</li>
                                 <li><strong>Updated results:</strong> Biss 77.2% win probability (was ~81%), Abughazaleh 15.6% (was ~13%), Fine 7.2% (was ~6%).</li>
-                                <li><strong>5 new visualization graphs</strong> added to the <a href="/odds" style="color: var(--accent-blue); text-decoration: underline;">Model page</a>.</li>
+                                <li><strong>5 new visualization graphs</strong> added to the <a href="/odds">Model page</a>.</li>
                             </ul>
                         </div>
                     </div>
@@ -388,11 +389,11 @@
                 </div>
             </div>
 
-            <article class="method-section contact-section">
-                <h2>Questions?</h2>
-                <p>IL9Cast's prediction market aggregation is maintained by <strong>Ryan McComb</strong>, a student at ETHS, as an educational project to help voters understand real-time sentiment in the Illinois 9th Democratic Primary race.</p>
-                <p>For questions about the market aggregation methodology or to report data issues, please reach out directly.</p>
-            </article>
+            <div class="method-section contact-section">
+                <p class="method-section__label">Contact</p>
+                <p>IL9Cast was built by <strong>Ryan McComb</strong> as an educational project tracking the Illinois 9th Congressional District Democratic Primary.</p>
+                <p>For questions about the methodology or to report data issues, reach out at <a href="mailto:IL9Cast@icloud.com">IL9Cast@icloud.com</a>.</p>
+            </div>
         </section>
 {% endblock %}
 

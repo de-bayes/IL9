@@ -4,31 +4,40 @@
             padding: 0 2rem;
         }
 
-        /* Lead intro - no box, editorial feel */
+        /* Project intro */
         .about-intro {
-            margin-bottom: 2.5rem;
-            padding-bottom: 2.5rem;
+            margin-bottom: 1.5rem;
+            padding: 2rem 0 2rem;
             border-bottom: 1px solid var(--border-default);
         }
 
-        .about-intro h2 {
-            font-family: var(--serif);
-            font-size: 1.8rem;
+        .about-intro__label {
+            font-family: var(--sans);
+            font-size: 0.7rem;
             font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin: 0 0 1rem;
         }
 
         .about-intro p {
             font-family: var(--sans);
-            font-size: 1.05rem;
-            line-height: 1.85;
+            font-size: 0.95rem;
+            line-height: 1.8;
             color: var(--text-secondary);
-            margin-bottom: 1rem;
+            margin-bottom: 0.85rem;
+            max-width: 68ch;
         }
 
         .about-intro p:last-child {
             margin-bottom: 0;
+        }
+
+        .about-intro__disclosure {
+            font-size: 0.82rem !important;
+            color: var(--text-tertiary) !important;
+            font-style: italic;
         }
 
         .about-intro a {
@@ -44,7 +53,9 @@
         .about-columns {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
+            gap: 1px;
+            background: var(--border-default);
+            border: 1px solid var(--border-default);
             margin-bottom: 1.5rem;
         }
 
@@ -58,25 +69,34 @@
 
         .about-columns .about-card {
             margin-bottom: 0;
+            border: none;
         }
 
-        .about-card h3 {
-            font-family: var(--serif);
-            font-size: 1.3rem;
+        .about-card__label {
+            font-family: var(--sans);
+            font-size: 0.7rem;
             font-weight: 700;
-            margin-bottom: 1.25rem;
-            color: var(--text-primary);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin: 0 0 1.25rem;
         }
 
         .about-card p {
             font-family: var(--sans);
-            margin-bottom: 1rem;
-            line-height: 1.8;
+            font-size: 0.92rem;
+            margin-bottom: 0.85rem;
+            line-height: 1.75;
             color: var(--text-secondary);
         }
 
         .about-card p:last-child {
             margin-bottom: 0;
+        }
+
+        .about-card a {
+            color: var(--accent-blue);
+            text-decoration: underline;
         }
 
         /* Press */
@@ -92,8 +112,9 @@
         }
 
         .press-note {
-            font-size: 0.92rem;
+            font-size: 0.88rem;
             margin-bottom: 0.6rem !important;
+            color: var(--text-secondary) !important;
         }
 
         .press-note:last-child {
@@ -113,7 +134,7 @@
         .contact-list {
             list-style: none;
             padding: 0;
-            margin: 0 0 1.75rem;
+            margin: 0;
         }
 
         .contact-list li {
@@ -123,7 +144,7 @@
             padding: 0.6rem 0;
             border-bottom: 1px solid var(--border-subtle);
             font-family: var(--sans);
-            font-size: 0.95rem;
+            font-size: 0.92rem;
         }
 
         .contact-list li:last-child {
@@ -132,10 +153,10 @@
 
         .contact-label {
             color: var(--text-tertiary);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.06em;
             min-width: 70px;
             flex-shrink: 0;
         }
@@ -149,55 +170,11 @@
             text-decoration: underline;
         }
 
-        /* Inspiration */
-        .inspiration-heading {
-            margin-top: 0.5rem;
-        }
-
-        .inspiration-text {
-            font-size: 0.95rem;
-            line-height: 1.75;
-        }
-
-        /* Lunch table */
-        .lunch-table-card {
-            border-left: 3px solid var(--accent-blue);
-        }
-
-        .lunch-names {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        /* Support */
-        .support-card {
-            border-left: 3px solid var(--accent-gold);
-            text-align: center;
-        }
-
-        .support-card p {
-            text-align: left;
-        }
-
-        .support-button {
-            display: inline-block;
-            padding: 0.75rem 1.75rem;
-            background: var(--text-primary);
-            color: var(--bg-primary);
-            text-decoration: none;
-            font-family: var(--sans);
-            font-weight: 600;
-            font-size: 0.875rem;
-            transition: opacity 0.15s ease;
-        }
-
-        .support-button:hover {
-            opacity: 0.8;
-        }
-
         @media (max-width: 700px) {
             .about-content-page { padding: 0 1.25rem; }
-            .about-columns { grid-template-columns: 1fr; }
+            .about-columns {
+                grid-template-columns: 1fr;
+                gap: 1px;
+            }
             .about-card { padding: 1.75rem 1.25rem; }
-            .about-intro h2 { font-size: 1.5rem; }
         }

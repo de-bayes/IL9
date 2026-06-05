@@ -7,16 +7,11 @@
 
 {% block content %}
 <article class="case-study-page">
-            <div class="case-study-meta">
-                <a href="/" class="case-study-back">&larr; Back to IL9Cast</a>
-                <div class="case-study-meta-row">
-                    <span class="case-study-tag">Analysis</span>
-                    <span class="case-study-date">February 2026</span>
-                </div>
-            </div>
-
-            <h1 class="case-study-headline">Bid-Ask Spreads Even Moses Can't Part</h1>
-            <p class="case-study-dek">How one outsized Kalshi trade exposed the flaw in raw prediction market data, and why IL9Cast didn't flinch.</p>
+            <header class="archive-page-header">
+                <p class="archive-page-header__kicker">Analysis &middot; February 2026</p>
+                <h1 class="archive-page-header__title">Bid-Ask Spreads Even Moses Can&rsquo;t Part</h1>
+                <p class="archive-page-header__meta">How one outsized Kalshi trade exposed the flaw in raw prediction market data, and why IL9Cast didn&rsquo;t flinch.</p>
+            </header>
 
             <div class="case-study-body">
                 <p class="case-study-lede">Moses parted the Red Sea and walked through on dry ground. Last week, a trader on Kalshi tried something similar, parting right through Laura Fine's bid-ask spread and keeping going.</p>
@@ -73,14 +68,14 @@
 
                 <p>Every prediction market has these moments. A big order sweeps the book, the headline number lurches, and a thousand dashboards parrot the spike as if it's gospel. The spread is still sitting there, quietly telling you the truth.</p>
 
-                <div class="case-study-callout case-study-callout-teal">
+                <div class="case-study-callout">
                     <div class="case-study-callout-label">The takeaway</div>
                     <p>Raw prediction market prices tell you what happened last. IL9Cast tells you what the market actually thinks <em>right now</em>. The difference matters most exactly when the stakes are highest &mdash; when a single trade tries to part the sea.</p>
                 </div>
 
                 <div class="case-study-footer-nav">
-                    <a href="/methodology" class="btn-secondary">Read our full methodology &rarr;</a>
-                    <a href="/markets" class="btn-primary">View live markets &rarr;</a>
+                    <a href="/methodology" class="btn-secondary">Read our full methodology</a>
+                    <a href="/markets" class="btn-primary">View markets archive</a>
                 </div>
             </div>
         </article>
@@ -89,5 +84,4 @@
 {% block page_styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/case_study.css') }}">
 {% endblock %}
-
 
