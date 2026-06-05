@@ -1,0 +1,180 @@
+.about-content-page {
+            max-width: var(--width-editorial);
+            margin: 0 auto 4rem;
+            padding: 0 2rem;
+        }
+
+        /* Project intro */
+        .about-intro {
+            margin-bottom: 1.5rem;
+            padding: 2rem 0 2rem;
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .about-intro__label {
+            font-family: var(--sans);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin: 0 0 1rem;
+        }
+
+        .about-intro p {
+            font-family: var(--sans);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 0.85rem;
+            max-width: 68ch;
+        }
+
+        .about-intro p:last-child {
+            margin-bottom: 0;
+        }
+
+        .about-intro__disclosure {
+            font-size: 0.82rem !important;
+            color: var(--text-tertiary) !important;
+            font-style: italic;
+        }
+
+        .about-intro a {
+            color: var(--accent-blue);
+            text-decoration: underline;
+        }
+
+        .about-intro a:hover {
+            opacity: 0.8;
+        }
+
+        /* Two-column layout */
+        .about-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: var(--border-default);
+            border: 1px solid var(--border-default);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Shared card style */
+        .about-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            padding: 2rem 2.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-columns .about-card {
+            margin-bottom: 0;
+            border: none;
+        }
+
+        .about-card__label {
+            font-family: var(--sans);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin: 0 0 1.25rem;
+        }
+
+        .about-card p {
+            font-family: var(--sans);
+            font-size: 0.92rem;
+            margin-bottom: 0.85rem;
+            line-height: 1.75;
+            color: var(--text-secondary);
+        }
+
+        .about-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .about-card a {
+            color: var(--accent-blue);
+            text-decoration: underline;
+        }
+
+        /* Press */
+        .tweet-embed {
+            max-width: 100%;
+            margin: 0 0 1.25rem;
+        }
+
+        .tweet-embed iframe {
+            width: 100%;
+            min-height: 380px;
+            border: 0;
+        }
+
+        .press-note {
+            font-size: 0.88rem;
+            margin-bottom: 0.6rem !important;
+            color: var(--text-secondary) !important;
+        }
+
+        .press-note:last-child {
+            margin-bottom: 0 !important;
+        }
+
+        .press-note a {
+            color: var(--accent-blue);
+            text-decoration: underline;
+        }
+
+        .press-note a:hover {
+            opacity: 0.85;
+        }
+
+        /* Contact list */
+        .contact-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .contact-list li {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--border-subtle);
+            font-family: var(--sans);
+            font-size: 0.92rem;
+        }
+
+        .contact-list li:last-child {
+            border-bottom: none;
+        }
+
+        .contact-label {
+            color: var(--text-tertiary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            min-width: 70px;
+            flex-shrink: 0;
+        }
+
+        .contact-list a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .contact-list a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 700px) {
+            .about-content-page { padding: 0 1.25rem; }
+            .about-columns {
+                grid-template-columns: 1fr;
+                gap: 1px;
+            }
+            .about-card { padding: 1.75rem 1.25rem; }
+        }

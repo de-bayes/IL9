@@ -1,240 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="IL9Cast - Race Updates from X/Twitter for the Illinois 9th District Primary">
-    <title>Race Updates - IL9Cast</title>
-    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+{% extends "landing_base.html" %}
 
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WVTWQBBG8S"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-WVTWQBBG8S');
-    </script>
-</head>
-<script>
-    (function() {
-        var t = localStorage.getItem('il9-theme');
-        if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
-    })();
-</script>
-<body>
-    <div class="site-content">
-        <header>
-            <a href="/" class="logo">IL9<span>Cast</span></a>
-            <nav class="desktop-nav">
-                <a href="/markets">Markets</a>
-                <a href="/odds">Model</a>
-                <a href="/money">Money</a>
-                <a href="/candidates">Candidates</a>
-                <a href="/methodology">Methodology</a>
-                <a href="/about">About</a>
-            </nav>
-            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
-                <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-            </button>
-            <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav class="mobile-nav" id="mobileNav">
-                <a href="/markets">Markets</a>
-                <a href="/odds">Model</a>
-                <a href="/money">Money</a>
-                <a href="/candidates">Candidates</a>
-                <a href="/methodology">Methodology</a>
-                <a href="/about">About</a>
-            </nav>
+{% block meta %}
+<meta name="description" content="IL9Cast - Race Updates from X/Twitter for the Illinois 9th District Primary">
+    <title>Race Updates - IL9Cast</title>
+{% endblock %}
+
+{% block content %}
+<header class="archive-page-header">
+            <p class="archive-page-header__kicker">IL-09 Democratic Primary · Archive</p>
+            <h1 class="archive-page-header__title">Race Updates</h1>
+            <p class="archive-page-header__meta">Coverage: Jan 30 – Mar 17, 2026</p>
         </header>
 
-        <section class="hero">
-            <h1>Race Updates</h1>
-            <p class="subtitle">Live from X on the IL-9 primary</p>
-        </section>
-
         <section class="updates-content-page">
-            <article class="updates-coming-soon">
-                <h2>Coming Soon</h2>
-                <p>We're building a live feed that aggregates posts from journalists and candidates covering the IL-9 Democratic primary. The feed will pull from X (Twitter) using hashtags like <strong>#IL09</strong> and from accounts covering the race in real time.</p>
-                <div class="updates-features">
-                    <div class="updates-feature">
-                        <span class="feature-label">Candidate Posts</span>
-                        <span class="feature-desc">Official accounts from declared candidates</span>
+            <div class="data-panel">
+                <p class="data-panel__label">Archive Notice</p>
+                <p>The Illinois 9th District Democratic Primary was held on March 17, 2026. This page was planned as a live feed of campaign coverage from journalists and candidates on X, pulling from accounts and hashtags like <strong>#IL09</strong>. The feed was not completed before the primary concluded.</p>
+                <p>For historical coverage of the race, the following sources tracked it directly:</p>
+                <div class="updates-sources">
+                    <div class="updates-source">
+                        <span class="source-label">Evanston RoundTable</span>
+                        <span class="source-desc">Local coverage of the 9th District candidates</span>
                     </div>
-                    <div class="updates-feature">
-                        <span class="feature-label">Journalist Coverage</span>
-                        <span class="feature-desc">Chicago political reporters and local news</span>
+                    <div class="updates-source">
+                        <span class="source-label">Capitol Fax</span>
+                        <span class="source-desc">Illinois political newsletter</span>
                     </div>
-                    <div class="updates-feature">
-                        <span class="feature-label">Hashtag Tracking</span>
-                        <span class="feature-desc">Posts tagged #IL09 and related terms</span>
+                    <div class="updates-source">
+                        <span class="source-label">FOIA Gras</span>
+                        <span class="source-desc">IL-9 poll results and analysis</span>
                     </div>
                 </div>
-                <p class="updates-check-back">Check back soon.</p>
-            </article>
+            </div>
         </section>
+{% endblock %}
 
-        <footer class="site-footer">
-            <hr class="footer-rule">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Navigate</h4>
-                    <ul>
-                        <li><a href="/markets">Markets</a></li>
-                        <li><a href="/candidates">Candidates</a></li>
-                        <li><a href="/money">Money</a></li>
-                        <li><a href="/updates">Updates</a></li>
-                        <li><a href="/methodology">Methodology</a></li>
-                        <li><a href="/about">About</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Resources</h4>
-                    <ul>
-                        <li><a href="/api/download/snapshots">Download Data</a></li>
-                        <li><a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-                        <li><a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer">Support This Project</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Disclaimer</h4>
-                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data for informational purposes only.</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <span>&copy; 2026 IL9Cast. Built with open data.</span>
-                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a>
-            </div>
-        </footer>
-        <div class="flag-footer-image">
-            <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer" loading="lazy" decoding="async">
-        </div>
-    </div>
+{% block page_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/updates.css') }}">
+{% endblock %}
 
-    <style>
-        .updates-content-page {
-            max-width: 700px;
-            margin: 0 auto 4rem;
-            padding: 0 2rem;
-        }
-
-        .updates-coming-soon {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            padding: 3rem;
-            text-align: center;
-        }
-
-        .updates-coming-soon h2 {
-            font-family: var(--serif);
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin: 0 0 1rem;
-        }
-
-        .updates-coming-soon p {
-            font-family: var(--sans);
-            font-size: 1rem;
-            line-height: 1.8;
-            color: var(--text-secondary);
-            max-width: 560px;
-            margin: 0 auto 2rem;
-        }
-
-        .updates-features {
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-            background: var(--border-default);
-            border: 1px solid var(--border-default);
-            margin: 0 auto 2rem;
-            max-width: 480px;
-        }
-
-        .updates-feature {
-            display: flex;
-            flex-direction: column;
-            padding: 1rem 1.25rem;
-            background: var(--bg-surface);
-        }
-
-        .feature-label {
-            font-family: var(--sans);
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            margin-bottom: 0.2rem;
-        }
-
-        .feature-desc {
-            font-family: var(--sans);
-            font-size: 0.9rem;
-            color: var(--text-tertiary);
-        }
-
-        .updates-check-back {
-            font-style: italic;
-            color: var(--text-tertiary) !important;
-            font-size: 0.95rem !important;
-            margin-bottom: 0 !important;
-        }
-
-        @media (max-width: 600px) {
-            .updates-content-page { padding: 0 1.25rem; }
-        }
-    </style>
-
-    <!-- Twitter widget script (uncomment when feed goes live)
-    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-    -->
-    <script>
-        function toggleTheme() {
-            var isLight = document.documentElement.getAttribute('data-theme') === 'light';
-            if (isLight) {
-                document.documentElement.removeAttribute('data-theme');
-                localStorage.setItem('il9-theme', 'dark');
-            } else {
-                document.documentElement.setAttribute('data-theme', 'light');
-                localStorage.setItem('il9-theme', 'light');
-            }
-        }
-
-        function toggleMobileMenu() {
-            const hamburger = document.getElementById('hamburger');
-            const mobileNav = document.getElementById('mobileNav');
-            hamburger.classList.toggle('active');
-            mobileNav.classList.toggle('active');
-        }
-
-        document.querySelectorAll('#mobileNav a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('hamburger').classList.remove('active');
-                document.getElementById('mobileNav').classList.remove('active');
-            });
-        });
-
-        document.addEventListener('click', (e) => {
-            const hamburger = document.getElementById('hamburger');
-            const mobileNav = document.getElementById('mobileNav');
-            if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) {
-                hamburger.classList.remove('active');
-                mobileNav.classList.remove('active');
-            }
-        });
-    </script>
-    <script src="{{ url_for('static', filename='site.js') }}"></script>
-</body>
-</html>

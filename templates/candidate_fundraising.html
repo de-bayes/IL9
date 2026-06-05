@@ -1,360 +1,122 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="IL9Cast - {{ candidate.name }} Fundraising">
-    <title>{{ candidate.name }} - Fundraising - IL9Cast</title>
-    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<script>
-    (function() {
-        var t = localStorage.getItem('il9-theme');
-        if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
-    })();
-</script>
-<body>
-    <div class="site-content">
-        <header>
-            <a href="/" class="logo">IL9<span>Cast</span></a>
-            <nav class="desktop-nav">
-                <a href="/markets">Markets</a>
-                <a href="/odds">Model</a>
-                <a href="/money" class="active">Money</a>
-                <a href="/candidates">Candidates</a>
-                <a href="/methodology">Methodology</a>
-                <a href="/about">About</a>
-            </nav>
-            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
-                <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-            </button>
-            <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav class="mobile-nav" id="mobileNav">
-                <a href="/markets">Markets</a>
-                <a href="/odds">Model</a>
-                <a href="/money" class="active">Money</a>
-                <a href="/candidates">Candidates</a>
-                <a href="/methodology">Methodology</a>
-                <a href="/about">About</a>
-            </nav>
-        </header>
+{% extends "landing_base.html" %}
 
-        <section class="hero">
-            <h1>{{ candidate.name }}</h1>
-            <p class="subtitle">Campaign Finance Data from FEC Filings</p>
-        </section>
+{% block meta %}
+<meta name="description" content="IL9Cast - {{ candidate.name }} Fundraising">
+    <title>{{ candidate.name }} - Fundraising - IL9Cast</title>
+    
+    
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<header class="archive-page-header">
+    <p class="archive-page-header__kicker">IL-09 Democratic Primary · Campaign Finance</p>
+    <h1 class="archive-page-header__title">{{ candidate.name }}</h1>
+    <p class="archive-page-header__meta">FEC filings · Cycle through Feb 25, 2026 · Figures frozen as of March 17, 2026</p>
+</header>
 
         <section class="fundraising-content-page">
             <div class="back-link-container">
-                <a href="/candidates" class="back-link">← Back to All Candidates</a>
+                <a href="/candidates" class="back-link">← All Candidates</a>
             </div>
 
             <article class="fec-loading-section" id="loadingSection">
-                <h2>Loading FEC Data...</h2>
+                <p class="fec-state-label">Loading FEC Data&hellip;</p>
                 <p>Fetching campaign finance information from the Federal Election Commission.</p>
             </article>
 
             <article class="fec-error-section hidden" id="errorSection">
-                <h2>Data Unavailable</h2>
+                <p class="fec-state-label">Data Unavailable</p>
                 <p id="errorMessage">Unable to load FEC data at this time. The candidate may not have filed reports yet, or there may be a temporary issue with the FEC API.</p>
             </article>
 
             <div id="fecDataContainer" class="hidden">
-                <!-- Summary Cards -->
-                <div class="finance-summary-grid">
-                    <div class="finance-card">
-                        <h3>Total Raised</h3>
-                        <p class="finance-value" id="totalRaised">--</p>
-                    </div>
-                    <div class="finance-card">
-                        <h3>Total Spent</h3>
-                        <p class="finance-value" id="totalSpent">--</p>
-                    </div>
-                    <div class="finance-card">
-                        <h3>Cash on Hand</h3>
-                        <p class="finance-value" id="cashOnHand">--</p>
-                    </div>
-                    <div class="finance-card">
-                        <h3>Total Donors</h3>
-                        <p class="finance-value" id="totalDonors">--</p>
-                    </div>
-                </div>
 
-                <!-- Burn Rate Section -->
-                <article class="burn-rate-section">
-                    <h2>Burn Rate Analysis</h2>
-                    <p class="section-desc">Monthly rates calculated from most recent FEC filing period</p>
-                    <div class="burn-rate-grid">
-                        <div class="burn-rate-card">
-                            <h3>Monthly Burn Rate</h3>
-                            <p class="burn-rate-value" id="burnRateMonthly">--</p>
-                            <p class="burn-rate-desc" id="burnPeriodLabel">Filing period</p>
+                <!-- Summary financials as report rows -->
+                <section class="data-report-section">
+                    <h2 class="data-report-section__title">Campaign Financials</h2>
+                    <p class="data-report-section__desc">Cumulative totals from FEC cycle filings</p>
+                    <dl class="stat-dl">
+                        <div class="stat-dl__row">
+                            <dt class="stat-dl__label">Total Raised</dt>
+                            <dd class="stat-dl__value" id="totalRaised">--</dd>
                         </div>
-                        <div class="burn-rate-card">
-                            <h3>Monthly Raise Rate</h3>
-                            <p class="burn-rate-value" id="raiseRateMonthly">--</p>
-                            <p class="burn-rate-desc">Receipts per month</p>
+                        <div class="stat-dl__row">
+                            <dt class="stat-dl__label">Total Spent</dt>
+                            <dd class="stat-dl__value" id="totalSpent">--</dd>
                         </div>
-                        <div class="burn-rate-card">
-                            <h3>Cash Runway</h3>
-                            <p class="burn-rate-value" id="cashRunwayCard">--</p>
-                            <p class="burn-rate-desc">COH &divide; monthly burn</p>
+                        <div class="stat-dl__row">
+                            <dt class="stat-dl__label">Cash on Hand</dt>
+                            <dd class="stat-dl__value" id="cashOnHand">--</dd>
                         </div>
-                    </div>
-                </article>
+                        <div class="stat-dl__row">
+                            <dt class="stat-dl__label">Total Donors</dt>
+                            <dd class="stat-dl__value" id="totalDonors">--</dd>
+                        </div>
+                    </dl>
+                </section>
 
-                <!-- Additional Metrics -->
-                <article class="additional-metrics-section">
-                    <h2>Additional Metrics</h2>
-                    <div class="metrics-grid">
-                        <div class="metric-item">
-                            <span class="metric-label">Average Contribution:</span>
-                            <span class="metric-value" id="avgContribution">--</span>
+                <!-- Burn Rate section -->
+                <section class="data-report-section">
+                    <h2 class="data-report-section__title">Burn Rate Analysis</h2>
+                    <p class="data-report-section__desc">Monthly rates from most recent FEC filing period (Jan 1 – Feb 25, 2026)</p>
+                    <dl class="stat-dl">
+                        <div class="stat-dl__row">
+                            <dt class="stat-dl__label">Monthly Burn Rate</dt>
+                            <dd class="stat-dl__value" id="burnRateMonthly">--</dd>
                         </div>
-                        <div class="metric-item">
-                            <span class="metric-label">Spending Rate:</span>
-                            <span class="metric-value" id="spendingRate">--</span>
+                        <div class="stat-dl__row">
+                            <dt class="stat-dl__label">Monthly Raise Rate</dt>
+                            <dd class="stat-dl__value" id="raiseRateMonthly">--</dd>
                         </div>
-                        <div class="metric-item">
-                            <span class="metric-label">Cash Runway:</span>
-                            <span class="metric-value" id="cashRunway">--</span>
+                        <div class="stat-dl__row">
+                            <dt class="stat-dl__label">Cash Runway</dt>
+                            <dd class="stat-dl__value" id="cashRunwayCard">--</dd>
                         </div>
-                        <div class="metric-item">
-                            <span class="metric-label">Small Dollar %:</span>
-                            <span class="metric-value" id="smallDollarPct">--</span>
+                        <div class="stat-dl__row">
+                            <dt class="stat-dl__label">Filing Period</dt>
+                            <dd class="stat-dl__value stat-dl__value--text" id="burnPeriodLabel">--</dd>
                         </div>
-                    </div>
-                </article>
+                    </dl>
+                </section>
+
+                <!-- Additional Metrics section -->
+                <section class="data-report-section">
+                    <h2 class="data-report-section__title">Additional Metrics</h2>
+                    <dl class="stat-dl">
+                        <div class="stat-dl__row">
+                            <dt class="stat-dl__label">Average Contribution</dt>
+                            <dd class="stat-dl__value" id="avgContribution">--</dd>
+                        </div>
+                        <div class="stat-dl__row">
+                            <dt class="stat-dl__label">Spending Rate</dt>
+                            <dd class="stat-dl__value" id="spendingRate">--</dd>
+                        </div>
+                        <div class="stat-dl__row">
+                            <dt class="stat-dl__label">Cash Runway</dt>
+                            <dd class="stat-dl__value" id="cashRunway">--</dd>
+                        </div>
+                        <div class="stat-dl__row">
+                            <dt class="stat-dl__label">Small Dollar %</dt>
+                            <dd class="stat-dl__value" id="smallDollarPct">--</dd>
+                        </div>
+                    </dl>
+                </section>
+
             </div>
         </section>
+{% endblock %}
 
-        <footer class="site-footer">
-            <hr class="footer-rule">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Navigate</h4>
-                    <ul>
-                        <li><a href="/markets">Markets</a></li>
-                        <li><a href="/candidates">Candidates</a></li>
-                        <li><a href="/money">Money</a></li>
-                        <li><a href="/methodology">Methodology</a></li>
-                        <li><a href="/about">About</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Resources</h4>
-                    <ul>
-                        <li><a href="/api/download/snapshots">Download Data</a></li>
-                        <li><a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-                        <li><a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer">Support This Project</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Disclaimer</h4>
-                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data for informational purposes only.</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <span>&copy; 2026 IL9Cast. Built with open data.</span>
-                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a>
-            </div>
-        </footer>
-    </div>
-    <div class="flag-footer-image">
-        <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer" loading="lazy" decoding="async">
-    </div>
+{% block page_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/candidate_fundraising.css') }}">
+{% endblock %}
 
-    <style>
-        body {
-            font-family: var(--sans), -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            min-height: 100vh;
-        }
-
-        .fundraising-content-page {
-            max-width: 1200px;
-            margin: 0 auto 4rem;
-            padding: 0 2rem;
-        }
-
-        .back-link-container {
-            margin-bottom: 2rem;
-        }
-
-        .back-link {
-            color: var(--accent-blue);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: opacity 0.3s ease;
-        }
-
-        .back-link:hover {
-            opacity: 0.7;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .fec-loading-section,
-        .fec-error-section {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            padding: 3rem;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .fec-loading-section h2,
-        .fec-error-section h2 {
-            font-family: var(--serif), Georgia, serif;
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--accent-blue);
-        }
-
-        .fec-error-section {
-            border-color: rgba(239, 68, 68, 0.5);
-        }
-
-        .fec-error-section h2 {
-            color: var(--accent-red);
-        }
-
-        .finance-summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .finance-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .finance-card h3 {
-            font-family: var(--sans), -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin: 0 0 1rem 0;
-            color: var(--text-secondary);
-        }
-
-        .finance-value {
-            font-family: var(--sans), sans-serif; font-weight: 600;
-            font-size: 2.5rem;
-            font-weight: 600;
-            margin: 0;
-            color: var(--accent-blue);
-        }
-
-        .burn-rate-section,
-        .additional-metrics-section {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            padding: 2.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .burn-rate-section h2,
-        .additional-metrics-section h2 {
-            font-family: var(--serif), Georgia, serif;
-            font-size: 2rem;
-            font-weight: 600;
-            margin: 0 0 0.5rem 0;
-            color: var(--accent-blue);
-        }
-
-        .section-desc {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
-        }
-
-        .burn-rate-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .burn-rate-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .burn-rate-card h3 {
-            font-family: var(--sans), -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin: 0 0 1rem 0;
-            color: var(--accent-blue);
-        }
-
-        .burn-rate-value {
-            font-family: var(--sans), sans-serif; font-weight: 600;
-            font-size: 2rem;
-            font-weight: 600;
-            margin: 0 0 0.5rem 0;
-            color: var(--accent-blue);
-        }
-
-        .burn-rate-desc {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin: 0;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.25rem;
-        }
-
-        .metric-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 1.5rem;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-        }
-
-        .metric-label {
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-
-        .metric-value {
-            font-family: var(--sans), sans-serif; font-weight: 600;
-            font-size: 1.3rem;
-            color: var(--accent-blue);
-            font-weight: 600;
-        }
-    </style>
-
-    <script src="{{ url_for('static', filename='site.js') }}"></script>
-    <script>
-        // FEC DATA FETCHING
+{% block page_scripts %}
+<script>
+// FEC DATA FETCHING
         (function() {
             const candidate = {{ candidate | tojson }};
 
@@ -407,6 +169,5 @@
                     'FEC data not yet available for this candidate. Check back after the next filing deadline.';
             }
         })();
-    </script>
-</body>
-</html>
+</script>
+{% endblock %}

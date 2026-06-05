@@ -1,93 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="IL9Cast - About">
+{% extends "landing_base.html" %}
+
+{% block meta %}
+<meta name="description" content="IL9Cast - About">
     <title>About - IL9Cast</title>
-    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+{% endblock %}
 
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WVTWQBBG8S"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-WVTWQBBG8S');
-    </script>
-</head>
-<script>
-    (function() {
-        var t = localStorage.getItem('il9-theme');
-        if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
-    })();
-</script>
-<body>
-    <div class="site-content">
-        <header>
-            <a href="/" class="logo">IL9<span>Cast</span></a>
-            <nav class="desktop-nav">
-                <a href="/markets">Markets</a>
-                <a href="/odds">Model</a>
-                <a href="/money">Money</a>
-                <a href="/candidates">Candidates</a>
-                <a href="/methodology">Methodology</a>
-                <a href="/about" class="active">About</a>
-            </nav>
-            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
-                <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-            </button>
-            <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav class="mobile-nav" id="mobileNav">
-                <a href="/markets">Markets</a>
-                <a href="/odds">Model</a>
-                <a href="/money">Money</a>
-                <a href="/candidates">Candidates</a>
-                <a href="/methodology">Methodology</a>
-                <a href="/about" class="active">About</a>
-            </nav>
+{% block content %}
+<header class="archive-page-header">
+            <p class="archive-page-header__kicker">IL-09 Democratic Primary · Archive</p>
+            <h1 class="archive-page-header__title">About IL9Cast</h1>
+            <p class="archive-page-header__meta">Illinois 9th Congressional District Democratic Primary · March 17, 2026</p>
         </header>
-
-        <section class="hero">
-            <h1>About IL9Cast</h1>
-            <p class="subtitle">Archive &middot; the Illinois 9th District Democratic primary was held March 17, 2026.</p>
-        </section>
 
         <section class="about-content-page">
 
-            <!-- Lead intro -->
+            <!-- Project description -->
             <div class="about-intro">
-                <h2>Hi, I'm Ryan McComb.</h2>
-                <p>I'm a student at Evanston Township High School with a passion for politics, data science, and prediction markets. I built IL9Cast because I wanted to see real-time market sentiment for the IL-9 primary race and figured some others might find it useful too.</p>
-                <p>IL9Cast was a real-time forecasting platform for the Illinois 9th Congressional District Democratic Primary on March 17, 2026. It aggregated live prediction market data from <a href="https://manifold.markets/JeromeHPowell/who-will-win-the-democratic-primary-RZdcps6dL9" target="_blank">Manifold Markets</a> and <a href="https://kalshi.com/markets/kxil9d/il-9-democratic-primary/kxil9d-26" target="_blank">Kalshi</a>, published a precinct-level election model with 436 precincts and 100,000 Monte Carlo simulations, and updated every 3 minutes around the clock. It now lives on as an archive &mdash; see the <a href="/odds">Model</a> page for how the forecast compared to actual results.</p>
-                <p>In all transparency, I have done some volunteer work for Daniel Biss, but that has not influenced the data or methodology presented here. If you want me to build a race forecast like this for your district, I would love to.</p>
+                <p class="about-intro__label">Project Overview</p>
+                <p>IL9Cast was a real-time forecasting platform for the Illinois 9th Congressional District Democratic Primary on March 17, 2026. It aggregated live prediction market data from <a href="https://manifold.markets/JeromeHPowell/who-will-win-the-democratic-primary-RZdcps6dL9" target="_blank">Manifold Markets</a> and <a href="https://kalshi.com/markets/kxil9d/il-9-democratic-primary/kxil9d-26" target="_blank">Kalshi</a>, published a precinct-level election model covering 436 precincts with 100,000 Monte Carlo simulations, and collected snapshots every 3 minutes throughout the race.</p>
+                <p>The site now operates as a static archive. Historical prediction market data, the precinct model, and fundraising analysis remain accessible. See the <a href="/odds">Model</a> page for how the forecast compared to actual results.</p>
+                <p class="about-intro__disclosure">Disclosure: The author completed volunteer work for the Biss campaign. This did not influence the data or methodology presented here.</p>
             </div>
 
-            <!-- The Lunch Table -->
-            <article class="about-card lunch-table-card">
-                <h3>The Lunch Table</h3>
-                <p>This whole thing pretty much runs out of a lunch table at ETHS. Every day my friends sit there while I talk about polling averages and precinct maps instead of normal stuff. They've watched me pull up the site on my phone a hundred times, told me when something looked weird, and somehow kept showing up even though I've definitely bored them half to death. This has been one of the coolest projects of my life. Not because of the model or the data -- because of the people who let me be way too excited about a congressional primary, never made it weird, and never got annoyed. They believed in it before anyone else did, and that matters more than they probably realize.</p>
-                <p class="lunch-names">Sammy Jain, Teddy Gutstein, Vikram Kelly, Nathan Gregory, Ido Salant, John Spyrson, and Nick Jackson.</p>
-                <p>There were a lot of late nights. The time Railway deleted the entire data volume at 3am and I had to rebuild everything from CSV backups. The nights spent staring at chart smoothing algorithms trying to figure out why the lines looked wrong. Refreshing the site over and over after a deploy hoping nothing broke. My parents never once told me to stop, even when I was clearly up way too late on a school night working on a congressional forecast that nobody asked me to build. Thank you for that.</p>
-                <p>Shout-out to <strong>Elle Zebala</strong>, who I've been going back and forth with about politics since middle school. She'll listen to whatever half-baked theory I have that week and then tell me exactly why I'm wrong. Wouldn't have it any other way -- a lot of how I think about this stuff comes from those conversations.</p>
-                <p>Thank you to <strong>Mr. Patel</strong>, my AP Gov teacher, and to <strong>Julian Cronin</strong>.</p>
-                <p>And to <strong>Matthew Eadie</strong>, the local reporter whose tweet about IL9Cast kind of started all of this.</p>
-                <p>To everyone else at school who's checked out the site, sent me a tip, argued with me about the race, or just let me ramble at them -- thanks. You know who you are.</p>
+            <!-- Acknowledgments -->
+            <article class="about-card">
+                <p class="about-card__label">Acknowledgments</p>
+                <p>This project would not have been possible without the support of friends at ETHS who engaged with it seriously from the beginning — Sammy Jain, Teddy Gutstein, Vikram Kelly, Nathan Gregory, Ido Salant, John Spyrson, and Nick Jackson.</p>
+                <p>Thank you to <strong>Mr. Patel</strong> (AP Gov), <strong>Julian Cronin</strong>, <strong>Elle Zebala</strong>, and <strong>Matthew Eadie</strong>, the local reporter whose coverage brought wider attention to the project.</p>
+                <p>Built on the shoulders of <strong>Nate Silver</strong>, <strong>FiveThirtyEight</strong>, and <strong>Galen Druke</strong> — the people who proved data-driven election forecasting could work.</p>
             </article>
 
             <!-- Two-column: Press + Contact -->
             <div class="about-columns">
                 <article class="about-card">
-                    <h3>Press</h3>
+                    <p class="about-card__label">Press</p>
                     <div class="tweet-embed">
                         <iframe
                             src="https://platform.twitter.com/embed/Tweet.html?id=2019934482942586970"
@@ -102,7 +48,7 @@
                     <p class="press-note">FOIA Gras: <a href="https://foiagras.com/p/il9-poll-results" target="_blank" rel="noopener noreferrer">IL-9 Poll Results</a></p>
                 </article>
                 <article class="about-card">
-                    <h3>Get in Touch</h3>
+                    <p class="about-card__label">Contact</p>
                     <ul class="contact-list">
                         <li><span class="contact-label">Email</span><a href="mailto:IL9Cast@icloud.com">IL9Cast@icloud.com</a></li>
                         <li><span class="contact-label">X / Twitter</span><a href="https://x.com/bayes_pr" target="_blank" rel="noopener noreferrer">@bayes_pr</a></li>
@@ -110,299 +56,13 @@
                         <li><span class="contact-label">Manifold</span><a href="https://manifold.markets/JeromeHPowell" target="_blank" rel="noopener noreferrer">@JeromeHPowell</a></li>
                         <li><span class="contact-label">Metaculus</span><a href="https://www.metaculus.com/accounts/profile/238376/" target="_blank" rel="noopener noreferrer">Profile #238376</a></li>
                     </ul>
-                    <h3 class="inspiration-heading">Inspiration</h3>
-                    <p class="inspiration-text">Built on the shoulders of <strong>Nate Silver</strong>, <strong>FiveThirtyEight</strong>, <strong>The Silver Bulletin</strong>, and <strong>Galen Druke</strong> -- the people who proved data-driven election forecasting could work.</p>
                 </article>
             </div>
 
-            <!-- Support CTA -->
-            <article class="about-card support-card">
-                <h3>Support IL9Cast</h3>
-                <p>IL9Cast runs on real-time data collection every 3 minutes, persistent data storage, and continuous server infrastructure. If you find this forecast useful, consider helping cover the hosting and operational costs.</p>
-                <div style="text-align: center; margin-top: 1.5rem;">
-                    <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="support-button">Support This Project</a>
-                </div>
-            </article>
-
         </section>
+{% endblock %}
 
-        <footer class="site-footer">
-            <hr class="footer-rule">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Navigate</h4>
-                    <ul>
-                        <li><a href="/markets">Markets</a></li>
-                        <li><a href="/candidates">Candidates</a></li>
-                        <li><a href="/money">Money</a></li>
-                        <li><a href="/methodology">Methodology</a></li>
-                        <li><a href="/about">About</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Resources</h4>
-                    <ul>
-                        <li><a href="/api/download/snapshots">Download Data</a></li>
-                        <li><a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-                        <li><a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer">Support This Project</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Disclaimer</h4>
-                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data and presents model-based projections for informational purposes only.</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <span>&copy; 2026 IL9Cast. Built with open data.</span>
-                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a>
-            </div>
-        </footer>
-        <div class="flag-footer-image">
-            <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer" loading="lazy" decoding="async">
-        </div>
-    </div>
+{% block page_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/about.css') }}">
+{% endblock %}
 
-    <style>
-        .about-content-page {
-            max-width: 860px;
-            margin: 0 auto 4rem;
-            padding: 0 2rem;
-        }
-
-        /* Lead intro - no box, editorial feel */
-        .about-intro {
-            margin-bottom: 2.5rem;
-            padding-bottom: 2.5rem;
-            border-bottom: 1px solid var(--border-default);
-        }
-
-        .about-intro h2 {
-            font-family: var(--serif);
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
-        .about-intro p {
-            font-family: var(--sans);
-            font-size: 1.05rem;
-            line-height: 1.85;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        .about-intro p:last-child {
-            margin-bottom: 0;
-        }
-
-        .about-intro a {
-            color: var(--accent-blue);
-            text-decoration: underline;
-        }
-
-        .about-intro a:hover {
-            opacity: 0.8;
-        }
-
-        /* Two-column layout */
-        .about-columns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Shared card style */
-        .about-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            padding: 2rem 2.25rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .about-columns .about-card {
-            margin-bottom: 0;
-        }
-
-        .about-card h3 {
-            font-family: var(--serif);
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 1.25rem;
-            color: var(--text-primary);
-        }
-
-        .about-card p {
-            font-family: var(--sans);
-            margin-bottom: 1rem;
-            line-height: 1.8;
-            color: var(--text-secondary);
-        }
-
-        .about-card p:last-child {
-            margin-bottom: 0;
-        }
-
-        /* Press */
-        .tweet-embed {
-            max-width: 100%;
-            margin: 0 0 1.25rem;
-        }
-
-        .tweet-embed iframe {
-            width: 100%;
-            min-height: 380px;
-            border: 0;
-        }
-
-        .press-note {
-            font-size: 0.92rem;
-            margin-bottom: 0.6rem !important;
-        }
-
-        .press-note:last-child {
-            margin-bottom: 0 !important;
-        }
-
-        .press-note a {
-            color: var(--accent-blue);
-            text-decoration: underline;
-        }
-
-        .press-note a:hover {
-            opacity: 0.85;
-        }
-
-        /* Contact list */
-        .contact-list {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 1.75rem;
-        }
-
-        .contact-list li {
-            display: flex;
-            align-items: baseline;
-            gap: 0.75rem;
-            padding: 0.6rem 0;
-            border-bottom: 1px solid var(--border-subtle);
-            font-family: var(--sans);
-            font-size: 0.95rem;
-        }
-
-        .contact-list li:last-child {
-            border-bottom: none;
-        }
-
-        .contact-label {
-            color: var(--text-tertiary);
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            min-width: 70px;
-            flex-shrink: 0;
-        }
-
-        .contact-list a {
-            color: var(--accent-blue);
-            text-decoration: none;
-        }
-
-        .contact-list a:hover {
-            text-decoration: underline;
-        }
-
-        /* Inspiration */
-        .inspiration-heading {
-            margin-top: 0.5rem;
-        }
-
-        .inspiration-text {
-            font-size: 0.95rem;
-            line-height: 1.75;
-        }
-
-        /* Lunch table */
-        .lunch-table-card {
-            border-left: 3px solid var(--accent-blue);
-        }
-
-        .lunch-names {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        /* Support */
-        .support-card {
-            border-left: 3px solid var(--accent-gold);
-            text-align: center;
-        }
-
-        .support-card p {
-            text-align: left;
-        }
-
-        .support-button {
-            display: inline-block;
-            padding: 0.75rem 1.75rem;
-            background: var(--text-primary);
-            color: var(--bg-primary);
-            text-decoration: none;
-            font-family: var(--sans);
-            font-weight: 600;
-            font-size: 0.875rem;
-            transition: opacity 0.15s ease;
-        }
-
-        .support-button:hover {
-            opacity: 0.8;
-        }
-
-        @media (max-width: 700px) {
-            .about-content-page { padding: 0 1.25rem; }
-            .about-columns { grid-template-columns: 1fr; }
-            .about-card { padding: 1.75rem 1.25rem; }
-            .about-intro h2 { font-size: 1.5rem; }
-        }
-    </style>
-
-    <script>
-        function toggleTheme() {
-            var isLight = document.documentElement.getAttribute('data-theme') === 'light';
-            if (isLight) {
-                document.documentElement.removeAttribute('data-theme');
-                localStorage.setItem('il9-theme', 'dark');
-            } else {
-                document.documentElement.setAttribute('data-theme', 'light');
-                localStorage.setItem('il9-theme', 'light');
-            }
-        }
-
-        function toggleMobileMenu() {
-            const hamburger = document.getElementById('hamburger');
-            const mobileNav = document.getElementById('mobileNav');
-            hamburger.classList.toggle('active');
-            mobileNav.classList.toggle('active');
-        }
-
-        document.querySelectorAll('#mobileNav a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('hamburger').classList.remove('active');
-                document.getElementById('mobileNav').classList.remove('active');
-            });
-        });
-
-        document.addEventListener('click', (e) => {
-            const hamburger = document.getElementById('hamburger');
-            const mobileNav = document.getElementById('mobileNav');
-            if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) {
-                hamburger.classList.remove('active');
-                mobileNav.classList.remove('active');
-            }
-        });
-    </script>
-    <script src="{{ url_for('static', filename='site.js') }}"></script>
-</body>
-</html>

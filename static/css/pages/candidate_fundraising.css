@@ -1,0 +1,55 @@
+/* ===== CANDIDATE FUNDRAISING DETAIL PAGE — Archive Statistical Style ===== */
+
+.fundraising-content-page {
+    max-width: var(--width-wide);
+    margin: 0 auto 4rem;
+    padding: 0 var(--page-gutter);
+}
+
+.back-link-container {
+    margin-bottom: 1.5rem;
+}
+
+.back-link {
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+}
+
+.back-link:hover {
+    color: var(--text-primary);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ===== LOADING / ERROR STATES ===== */
+.fec-loading-section,
+.fec-error-section {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.fec-state-label {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 0.4rem;
+}
+
+@media (max-width: 768px) {
+    .fundraising-content-page {
+        padding: 0 1rem;
+    }
+}

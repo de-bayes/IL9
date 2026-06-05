@@ -1,448 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="IL9Cast - Candidate Profiles">
+{% extends "landing_base.html" %}
+
+{% block meta %}
+<meta name="description" content="IL9Cast - Candidate Profiles">
     <title>Candidates - IL9Cast</title>
-    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
+{% endblock %}
 
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WVTWQBBG8S"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-WVTWQBBG8S');
-    </script>
-</head>
-<script>
-    (function() {
-        var t = localStorage.getItem('il9-theme');
-        if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
-    })();
-</script>
-<body>
+{% block content %}
+<header class="archive-page-header">
+    <p class="archive-page-header__kicker">IL-09 Democratic Primary · Archive</p>
+    <h1 class="archive-page-header__title">Candidate Directory</h1>
+    <p class="archive-page-header__meta">Illinois 9th District · Democratic Primary · March 17, 2026 · Certified final results</p>
+</header>
 
-
-    <div class="site-content">
-        <header>
-            <a href="/" class="logo">IL9<span>Cast</span></a>
-            <nav class="desktop-nav">
-                <a href="/markets">Markets</a>
-                <a href="/odds">Model</a>
-                <a href="/money">Money</a>
-                <a href="/candidates" class="active">Candidates</a>
-                <a href="/methodology">Methodology</a>
-                <a href="/about">About</a>
-            </nav>
-            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
-                <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-            </button>
-            <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav class="mobile-nav" id="mobileNav">
-                <a href="/markets">Markets</a>
-                <a href="/odds">Model</a>
-                <a href="/money">Money</a>
-                <a href="/candidates" class="active">Candidates</a>
-                <a href="/methodology">Methodology</a>
-                <a href="/about">About</a>
-            </nav>
-        </header>
-
-        <section class="hero">
-            <h1>Candidate Profiles</h1>
-            <p class="subtitle">Illinois 9th District Democratic Primary &middot; March 17, 2026 &middot; Final Results</p>
+        <section class="candidates-directory-section">
+            <table class="candidate-directory-table">
+                <thead>
+                    <tr>
+                        <th class="cdt-col-name">Candidate</th>
+                        <th class="cdt-col-title">Background</th>
+                        <th class="cdt-col-share">Final Result</th>
+                        <th class="cdt-col-links">Links</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for candidate in candidates %}
+                    <tr class="cdt-row">
+                        <td class="cdt-name-cell">
+                            <a href="/money/{{ candidate.slug }}" class="cdt-name-link">{{ candidate.name }}</a>
+                        </td>
+                        <td class="cdt-title-cell">{{ candidate.title }}</td>
+                        <td class="cdt-share-cell">
+                            <span class="cdt-share-value">{% if candidate.result_label %}{{ candidate.result_label }}{% else %}{{ "%.1f"|format(candidate.current_odds) }}%{% endif %}</span>
+                            {% if candidate.result_sublabel %}
+                            <span class="cdt-share-sub">{{ candidate.result_sublabel }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="cdt-links-cell">
+                            <a href="/money/{{ candidate.slug }}" class="cdt-action-link">Finance data</a>
+                            {% if candidate.campaign_url and candidate.campaign_url != '#' %}
+                            <a href="{{ candidate.campaign_url }}" target="_blank" rel="noopener noreferrer" class="cdt-action-link cdt-action-link--ext">Campaign ↗</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </section>
+{% endblock %}
 
-        <section class="candidates-grid">
-            {% for candidate in candidates %}
-            <article class="candidate-card">
-                <div class="candidate-header">
-                    <div class="candidate-photo-container">
-                        <img src="{{ url_for('static', filename=candidate.photo) }}" alt="{{ candidate.name }}" class="candidate-photo" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="candidate-photo-fallback" style="display: none;">
-                            <span>{{ candidate.name.split()[0][0] }}{{ candidate.name.split()[-1][0] }}</span>
-                        </div>
-                    </div>
-                    <div class="candidate-info">
-                        <h2>{{ candidate.name }}</h2>
-                        <p class="candidate-title">{{ candidate.title }}</p>
-                        <div class="candidate-odds">
-                            <span class="odds-value">{% if candidate.result_label %}{{ candidate.result_label }}{% else %}{{ "%.1f"|format(candidate.current_odds) }}%{% endif %}</span>
-                            <span class="odds-label">{% if candidate.result_sublabel %}{{ candidate.result_sublabel }}{% else %}Final Vote Share{% endif %}</span>
-                        </div>
-                    </div>
-                </div>
+{% block page_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/candidates.css') }}">
+{% endblock %}
 
-                <div class="candidate-bio">
-                    <p>{{ candidate.bio }}</p>
-                </div>
-
-                {% if candidate.endorsements %}
-                <div class="candidate-endorsements">
-                    <h3>Key Endorsements</h3>
-                    <ul>
-                        {% for endorsement in candidate.endorsements %}
-                        <li>{{ endorsement }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-
-                {% if candidate.key_issues %}
-                <div class="candidate-issues">
-                    <h3>Key Issues</h3>
-                    <div class="issue-tags">
-                        {% for issue in candidate.key_issues %}
-                        <span class="issue-tag">{{ issue }}</span>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-
-                <div class="candidate-links">
-                    <a href="/money/{{ candidate.slug }}" class="fundraising-link">
-                        View Fundraising Data →
-                    </a>
-                    {% if candidate.campaign_url and candidate.campaign_url != '#' %}
-                    <a href="{{ candidate.campaign_url }}" target="_blank" rel="noopener noreferrer" class="campaign-link">
-                        Visit Campaign Site →
-                    </a>
-                    {% endif %}
-                </div>
-            </article>
-            {% endfor %}
-        </section>
-
-        <footer class="site-footer">
-            <hr class="footer-rule">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Navigate</h4>
-                    <ul>
-                        <li><a href="/markets">Markets</a></li>
-                        <li><a href="/candidates">Candidates</a></li>
-                        <li><a href="/money">Money</a></li>
-                        <li><a href="/methodology">Methodology</a></li>
-                        <li><a href="/about">About</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Resources</h4>
-                    <ul>
-                        <li><a href="/api/download/snapshots">Download Data</a></li>
-                        <li><a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-                        <li><a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer">Support This Project</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Disclaimer</h4>
-                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data for informational purposes only.</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <span>&copy; 2026 IL9Cast. Built with open data.</span>
-                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a>
-            </div>
-        </footer>
-    </div>
-    <div class="flag-footer-image">
-        <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer" loading="lazy" decoding="async">
-    </div>
-
-    <style>
-        body {
-            font-family: var(--sans), -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            min-height: 100vh;
-        }
-
-        .candidates-grid {
-            max-width: 1450px;
-            margin: 0 auto 4rem;
-            padding: 0 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
-            gap: 2.5rem;
-        }
-
-        @media (max-width: 1100px) {
-            .candidates-grid {
-                grid-template-columns: 1fr;
-                max-width: 650px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .candidates-grid {
-                padding: 0 1.5rem;
-                gap: 2rem;
-            }
-
-            .candidate-header {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                gap: 1.25rem;
-            }
-
-            .candidate-photo-container {
-                width: 150px;
-                height: 150px;
-            }
-
-            .candidate-info h2 {
-                font-size: 1.75rem;
-            }
-
-            .issue-tags {
-                justify-content: center;
-            }
-        }
-
-        .candidate-card {
-            background: var(--bg-surface);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--border-default);
-            padding: 0;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: none;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .candidate-card:hover {
-            border-color: rgba(160, 160, 160, 0.6);
-            transform: translateY(-4px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .candidate-header {
-            display: flex;
-            gap: 1.75rem;
-            padding: 2.25rem 2rem;
-            background: linear-gradient(135deg, rgba(160, 160, 160, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%);
-            border-bottom: 2px solid rgba(160, 160, 160, 0.18);
-        }
-
-        .candidate-photo-container {
-            position: relative;
-            width: 130px;
-            height: 130px;
-            flex-shrink: 0;
-        }
-
-        .candidate-photo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border: 1px solid rgba(160, 160, 160, 0.3);
-            box-shadow: none;
-        }
-
-        .candidate-photo-fallback {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-elevated);
-            font-size: 2.8rem;
-            font-weight: 600;
-            color: #fff;
-            border: 1px solid rgba(160, 160, 160, 0.3);
-            box-shadow: none;
-        }
-
-        .candidate-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .candidate-info h2 {
-            font-family: var(--serif), Georgia, serif;
-            font-size: 2rem;
-            font-weight: 600;
-            margin: 0 0 0.4rem 0;
-            color: var(--accent-blue);
-            letter-spacing: 0.5px;
-        }
-
-        .candidate-title {
-            font-size: 0.98rem;
-            color: var(--text-secondary);
-            margin: 0 0 1.2rem 0;
-            font-weight: 500;
-        }
-
-        .candidate-odds {
-            display: flex;
-            align-items: baseline;
-            gap: 0.65rem;
-            margin-top: auto;
-        }
-
-        .odds-value {
-            font-family: var(--sans), sans-serif; font-weight: 600;
-            font-size: 2.3rem;
-            color: var(--accent-blue);
-            font-weight: 600;
-            line-height: 1;
-        }
-
-        .odds-label {
-            font-size: 0.88rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .candidate-bio {
-            padding: 2rem 2rem;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .candidate-bio p {
-            margin: 0;
-            line-height: 1.8;
-            color: var(--accent-blue);
-            font-size: 0.95rem;
-        }
-
-        .candidate-endorsements {
-            padding: 1.75rem 2rem;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .candidate-endorsements h3 {
-            font-family: var(--serif), Georgia, serif;
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin: 0 0 1rem 0;
-            color: var(--accent-blue);
-            letter-spacing: 0.3px;
-        }
-
-        .candidate-endorsements ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: grid;
-            gap: 0.5rem;
-        }
-
-        .candidate-endorsements li {
-            padding: 0.5rem 0 0.5rem 1.5rem;
-            position: relative;
-            color: var(--text-secondary);
-            font-size: 0.93rem;
-            line-height: 1.5;
-        }
-
-        .candidate-endorsements li:before {
-            content: "\2192";
-            position: absolute;
-            left: 0;
-            color: var(--accent-blue);
-            font-size: 1.1rem;
-        }
-
-        .candidate-issues {
-            padding: 1.75rem 2rem;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .candidate-issues h3 {
-            font-family: var(--serif), Georgia, serif;
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin: 0 0 1rem 0;
-            color: var(--accent-blue);
-            letter-spacing: 0.3px;
-        }
-
-        .issue-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-        }
-
-        .issue-tag {
-            background: rgba(160, 160, 160, 0.12);
-            border: 1px solid var(--border-default);
-            padding: 0.5rem 0.95rem;
-            font-size: 0.88rem;
-            color: var(--accent-blue);
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .issue-tag:hover {
-            background: rgba(160, 160, 160, 0.18);
-            border-color: rgba(160, 160, 160, 0.25);
-        }
-
-        .candidate-links {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0;
-            border-top: 1px solid var(--border-subtle);
-            margin-top: auto;
-        }
-
-        .fundraising-link,
-        .campaign-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.25rem 1.5rem;
-            text-align: center;
-            color: var(--accent-blue);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            background: rgba(160, 160, 160, 0.04);
-        }
-
-        .fundraising-link {
-            border-right: 1px solid var(--border-subtle);
-        }
-
-        .fundraising-link:hover,
-        .campaign-link:hover {
-            background: rgba(160, 160, 160, 0.12);
-            color: var(--accent-blue);
-        }
-
-        @media (max-width: 768px) {
-            .candidate-links {
-                grid-template-columns: 1fr;
-            }
-
-            .fundraising-link {
-                border-right: none;
-                border-bottom: 1px solid var(--border-subtle);
-            }
-        }
-    </style>
-
-    <script src="{{ url_for('static', filename='site.js') }}"></script>
-</body>
-</html>

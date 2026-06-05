@@ -1,6 +1,7 @@
         <footer class="site-footer">
-            <div class="footer-grid">
-                <div class="footer-col">
+            <hr class="footer-rule">
+            <div class="footer-content">
+                <div class="footer-section">
                     <h4>Navigate</h4>
                     <ul>
                         <li><a href="/markets">Markets</a></li>
@@ -10,18 +11,24 @@
                         <li><a href="/about">About</a></li>
                     </ul>
                 </div>
-                <div class="footer-col">
+                <div class="footer-section">
                     <h4>Resources</h4>
                     <ul>
-                        <li><a href="/api/download/snapshots">Download Data (JSONL)</a></li>
-                        <li><a href="/api/download/snapshots/csv">Download Data (CSV)</a></li>
+                        <li><a href="https://www.mccomb.ca/writing/il9cast-postmortem" target="_blank" rel="noopener noreferrer">Postmortem</a></li>
+                        <li><a href="/api/download/snapshots">Download Data</a></li>
+                        <li><a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                        <li><a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer">Support This Project</a></li>
                     </ul>
                 </div>
+                <div class="footer-section">
+                    <h4>Disclaimer</h4>
+                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data and presents model-based projections for informational purposes only.</p>
+                </div>
             </div>
-            <p class="footer-disclaimer">
-                IL9Cast is an independent archive of prediction market data for the IL-9 Democratic primary.
-                Not affiliated with any campaign or party committee.
-            </p>
+            <div class="footer-bottom">
+                <span>&copy; 2026 IL9Cast. Built with open data.</span>
+                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a>
+            </div>
         </footer>
         <div class="flag-footer-image">
             <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="" width="1920" height="120" loading="lazy" decoding="async">

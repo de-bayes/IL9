@@ -1,0 +1,21 @@
+.unsub-page {
+    max-width: var(--width-editorial);
+    margin: 0 auto 4rem;
+    padding: 0 var(--page-gutter);
+}
+
+.unsub-message {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0 0 1rem;
+    color: var(--text-secondary);
+}
+
+.unsub-success {
+    color: var(--text-primary);
+}
+
+.unsub-error {
+    color: var(--accent-red);
+}

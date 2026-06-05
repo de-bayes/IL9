@@ -1,8 +1,10 @@
 /**
  * Shared IL9Cast UI helpers (theme + mobile nav).
- * Include once per page: <script src="{{ url_for('static', filename='site.js') }}"></script>
+ * Pages may set window.onThemeChange before or after load for chart/map re-render.
  */
 (function () {
+  window.onThemeChange = window.onThemeChange || null;
+
   function toggleTheme() {
     var html = document.documentElement;
     var isLight = html.getAttribute('data-theme') === 'light';
@@ -12,6 +14,9 @@
     } else {
       html.setAttribute('data-theme', 'light');
       localStorage.setItem('il9-theme', 'light');
+    }
+    if (typeof window.onThemeChange === 'function') {
+      window.onThemeChange();
     }
   }
 

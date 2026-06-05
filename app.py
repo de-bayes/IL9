@@ -15,6 +15,8 @@ import time as _time
 import shutil
 import gzip
 
+from il9cast.domain_data import CANDIDATE_PROFILES, FINAL_VOTE_SHARES, fetch_all_fec_data
+
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400  # Cache static files for 1 day (safe due to ?v= cache-buster)
 
@@ -980,126 +982,6 @@ View Live Markets: {SITE_BASE_URL}markets
 
 # ===== FEC API FUNCTIONS =====
 
-def fetch_all_fec_data():
-    """
-    Returns hardcoded FEC data for all IL-09 2026 candidates.
-
-    Source: Pre-Primary FEC filings (coverage through Feb 25, 2026).
-    Filed March 5, 2026. Retrieved March 6, 2026.
-
-    Field definitions:
-      - total_raised: Cumulative receipts (FEC Line 11e, Column B - total)
-      - total_spent: Cumulative disbursements (FEC Line 22, Column B - total)
-      - cash_on_hand: FEC-reported COH (Line 27). May differ from
-        total_raised - total_spent due to beginning balance, loans, refunds.
-      - total_donors: Estimated donor count from contribution data
-      - small_dollar_amount: Unitemized individual contributions (under $200)
-      - individual_total: Total individual contributions (itemized + unitemized)
-      - burn_rate_monthly: Period disbursements (Column A, Jan 1-Feb 25 only,
-        56 days) converted to monthly: amount / (56 / 30.44).
-        Uses period-specific disbursements, NOT cumulative total_spent.
-      - raise_rate_monthly: Period receipts (Column A, Jan 1-Feb 25 only,
-        56 days) converted to monthly: amount / (56 / 30.44).
-        Uses period-specific receipts, NOT cumulative total_raised.
-      - cash_runway_months: cash_on_hand / burn_rate_monthly
-      - spent_pct_of_raised: (total_spent / total_raised) * 100
-      - avg_contribution: individual_total / total_donors
-      - small_dollar_pct: (small_dollar_amount / individual_total) * 100
-    """
-    return [
-        {
-            "name": "Daniel Biss",
-            "total_raised": 2539961.32,
-            "total_spent": 1894041.97,
-            "cash_on_hand": 645919.35,
-            "total_donors": 5590,
-            "small_dollar_amount": 127957.89,
-            "individual_total": 2425950.53,
-            "coverage_end_date": "2026-02-25T00:00:00",
-            "committee_id": "C00905307",
-            "burn_rate_monthly": 698917,
-            "raise_rate_monthly": 301912,
-            "cash_runway_months": 0.9,
-            "burn_period_label": "Jan 1 – Feb 25, 2026",
-            "spent_pct_of_raised": 74.57,
-            "avg_contribution": 433.98,
-            "small_dollar_pct": 5.27
-        },
-        {
-            "name": "Kat Abugazaleh",
-            "total_raised": 3359172.06,
-            "total_spent": 2977254.36,
-            "cash_on_hand": 382621.26,  # FEC Line 27 (differs from receipts-disbursements by $703.56 due to prior balance)
-            "total_donors": 49100,
-            "small_dollar_amount": 2247721.60,
-            "individual_total": 3356755.42,
-            "coverage_end_date": "2026-02-25T00:00:00",
-            "committee_id": "C00900449",
-            "burn_rate_monthly": 588811,
-            "raise_rate_monthly": 355958,
-            "cash_runway_months": 0.6,
-            "burn_period_label": "Jan 1 – Feb 25, 2026",
-            "spent_pct_of_raised": 88.63,
-            "avg_contribution": 68.37,
-            "small_dollar_pct": 66.96
-        },
-        {
-            "name": "Laura Fine",
-            "total_raised": 2555781.35,
-            "total_spent": 2095128.95,
-            "cash_on_hand": 461679.43,  # FEC Line 27 (differs from receipts-disbursements by $1,027.03 due to prior balance)
-            "total_donors": 6443,
-            "small_dollar_amount": 76381.76,
-            "individual_total": 2517581.35,
-            "coverage_end_date": "2026-02-25T00:00:00",
-            "committee_id": "C00904326",
-            "burn_rate_monthly": 877360,
-            "raise_rate_monthly": 345467,
-            "cash_runway_months": 0.5,
-            "burn_period_label": "Jan 1 – Feb 25, 2026",
-            "spent_pct_of_raised": 81.98,
-            "avg_contribution": 390.75,
-            "small_dollar_pct": 3.03
-        },
-        {
-            "name": "Mike Simmons",
-            "total_raised": 414048.31,
-            "total_spent": 278898.27,
-            "cash_on_hand": 135150.04,
-            "total_donors": 1384,
-            "small_dollar_amount": 60601.58,
-            "individual_total": 393748.31,
-            "coverage_end_date": "2026-02-25T00:00:00",
-            "committee_id": "C00910976",
-            "burn_rate_monthly": 48470,
-            "raise_rate_monthly": 48469,
-            "cash_runway_months": 2.8,
-            "burn_period_label": "Jan 1 – Feb 25, 2026",
-            "spent_pct_of_raised": 67.36,
-            "avg_contribution": 284.50,
-            "small_dollar_pct": 15.39
-        },
-        {
-            "name": "Phil Andrew",
-            "total_raised": 1339123.10,
-            "total_spent": 1166047.75,
-            "cash_on_hand": 173075.35,
-            "total_donors": 2367,
-            "small_dollar_amount": 65993.06,
-            "individual_total": 926762.57,
-            "coverage_end_date": "2026-02-25T00:00:00",
-            "committee_id": "C00911024",
-            "burn_rate_monthly": 498266,
-            "raise_rate_monthly": 69759,
-            "cash_runway_months": 0.3,
-            "burn_period_label": "Jan 1 – Feb 25, 2026",
-            "spent_pct_of_raised": 87.08,
-            "avg_contribution": 391.53,
-            "small_dollar_pct": 7.12
-        }
-    ]
-
-
 # ===== INITIALIZATION =====
 
 def initialize_data():
@@ -1346,86 +1228,6 @@ else:
     purge_old_data()
     repair_snapshots_jsonl(HISTORICAL_DATA_PATH)
 
-# Real IL-9 Candidate Profiles
-CANDIDATE_PROFILES = [
-    {
-        "name": "Daniel Biss",
-        "slug": "daniel-biss",
-        "title": "Mayor of Evanston",
-        "photo": "images/candidates/biss.jpg",
-        "campaign_url": "https://www.danielbiss.com",
-        "bio": "Mayor of Evanston and former Illinois State Senator. Proven progressive with a legislative track record protecting healthcare, defending immigrants, and advocating for economic justice.",
-        "endorsements": [
-            "Rep. Jan Schakowsky",
-            "Sen. Elizabeth Warren",
-            "Illinois AFL-CIO",
-            "SEIU Illinois State Council",
-            "Illinois Federation of Teachers",
-            "Congressional Progressive Caucus PAC"
-        ],
-        "key_issues": ["Medicare for All", "Wealth tax on billionaires", "Ban on mass deportations", "Cease-fire in Gaza"]
-    },
-    {
-        "name": "Kat Abugazaleh",
-        "slug": "kat-abugazaleh",
-        "title": "Former Media Matters Researcher",
-        "photo": "images/candidates/katabu.jpg",
-        "campaign_url": "https://www.katforillinois.com/",
-        "bio": "Media critic and researcher focused on combating right-wing disinformation. Running an anti-establishment campaign centered on breaking the status quo and transparent grassroots fundraising.",
-        "endorsements": [
-            "Rep. Ro Khanna",
-            "Former Rep. Jamaal Bowman",
-            "Sunrise Movement",
-            "Peace Action"
-        ],
-        "key_issues": ["Rejecting corporate PAC money", "Media transparency", "Combating disinformation", "Breaking the status quo"]
-    },
-    {
-        "name": "Laura Fine",
-        "slug": "laura-fine",
-        "title": "State Senator",
-        "photo": "images/candidates/fine.jpg",
-        "campaign_url": "https://www.laurafineforcongress.org/",
-        "bio": "Illinois State Senator and champion for families. Recently passed laws banning prior authorization for mental health services, requiring insurance coverage for emergency neonatal intensive care, and mandating toxic metal testing in baby food.",
-        "endorsements": [
-            "Rep. Brad Schneider (IL-10)",
-            "Rep. Lois Frankel (FL-22)",
-            "Rep. Norma Torres (CA-25)",
-            "State Rep. Tracy Katz Muhl (IL-57)",
-            "State Sen. Laura Murphy (IL-28)",
-            "Chicago Tribune",
-            "Maine Township Democrats"
-        ],
-        "key_issues": ["Mental health access", "Insurance reform", "Family healthcare", "Toxic metal testing in baby food"]
-    },
-    {
-        "name": "Mike Simmons",
-        "slug": "mike-simmons",
-        "title": "State Senator",
-        "photo": "images/candidates/simmons.jpg",
-        "campaign_url": "https://www.mikesimmons.org/",
-        "bio": "First openly LGBTQ+ and Ethiopian-American Illinois State Senator. Passed the Jett Hawkins Act banning hair discrimination and championed the Patient and Provider Protection Act protecting gender-affirming care.",
-        "endorsements": [
-            "Equality PAC",
-            "LGBTQ+ Victory Fund"
-        ],
-        "key_issues": ["Gender-affirming care", "Public transit expansion", "Affordable housing", "Permanent child tax credits"]
-    },
-    {
-        "name": "Phil Andrew",
-        "slug": "phil-andrew",
-        "title": "Former FBI Agent",
-        "photo": "images/candidates/philandrew.jpg",
-        "campaign_url": "https://www.philandrewforcongress.com/",
-        "bio": "Former FBI special agent and hostage negotiator with 21 years of service. Gun violence survivor shot by Laurie Dann in 1988, advocating for evidence-based community safety strategies.",
-        "endorsements": [
-            "Brady PAC"
-        ],
-        "key_issues": ["Gun violence prevention", "Community safety", "Political independence", "Refusing PAC money"]
-    },
-    # Bushra Amiwala removed — no pre-primary filing available
-]
-
 # Routes
 @app.route('/healthz')
 def healthz():
@@ -1443,7 +1245,7 @@ def rjmc_preview():
 
 @app.route('/odds')
 def odds():
-    return render_template('odds.html')
+    return render_template('odds.html', nav_active='model')
 
 
 @app.route('/api/model/precincts')
@@ -1477,19 +1279,19 @@ def model_methodology():
 
 @app.route('/methodology')
 def methodology():
-    return render_template('methodology.html')
+    return render_template('methodology.html', nav_active='methodology')
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    return render_template('about.html', nav_active='about')
 
 @app.route('/markets')
 def markets():
-    return render_template('markets.html')
+    return render_template('markets.html', nav_active='markets')
 
 @app.route('/money')
 def fundraising():
-    return render_template('fundraising.html')
+    return render_template('fundraising.html', nav_active='money')
 
 @app.route('/fundraising')
 def fundraising_redirect():
@@ -1504,22 +1306,11 @@ def outside_money():
 
 @app.route('/updates')
 def updates():
-    return render_template('updates.html')
+    return render_template('updates.html', nav_active='updates')
 
 @app.route('/case-study/bid-ask-spreads')
 def case_study_bid_ask():
     return render_template('case_study_bid_ask.html')
-
-# Certified final vote shares for the March 17, 2026 IL-9 Democratic primary.
-# Top-three numbers are from Ballotpedia / AP reporting; candidates below that
-# did not have cleanly reported per-candidate tallies in open sources, so they
-# are shown as a grouped bucket rather than fabricated.
-FINAL_VOTE_SHARES = {
-    'Daniel Biss':        {'share': 29.6, 'label': '29.6%', 'sublabel': 'Final Vote Share',     'sort_rank': 1},
-    'Kat Abugazaleh':     {'share': 25.9, 'label': '25.9%', 'sublabel': 'Final Vote Share',     'sort_rank': 2},
-    'Laura Fine':         {'share': 20.4, 'label': '20.4%', 'sublabel': 'Final Vote Share',     'sort_rank': 3},
-}
-
 
 @app.route('/candidates')
 def candidates():
@@ -1545,7 +1336,7 @@ def candidates():
     # Top 3 in result order, then everyone else in profile order.
     candidates_data.sort(key=lambda x: (x['_sort_rank'], x.get('name', '')))
 
-    return render_template('candidates.html', candidates=candidates_data)
+    return render_template('candidates.html', candidates=candidates_data, nav_active='candidates')
 
 @app.route('/sitemap.xml')
 def sitemap():
@@ -1601,7 +1392,7 @@ def candidate_fundraising(candidate_slug):
     if fec_data:
         candidate.update(fec_data)
 
-    return render_template('candidate_fundraising.html', candidate=candidate)
+    return render_template('candidate_fundraising.html', candidate=candidate, nav_active='money')
 
 # API Endpoints
 
