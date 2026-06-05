@@ -6,11 +6,16 @@
 {% endblock %}
 
 {% block content %}
+<header class="archive-page-header">
+    <p class="archive-page-header__kicker">IL-09 Democratic Primary · Archive</p>
+    <h1 class="archive-page-header__title">{% if success %}Unsubscribed{% else %}Unsubscribe Error{% endif %}</h1>
+    <p class="archive-page-header__meta">Email alert management · IL9Cast archive</p>
+</header>
+
 <section class="unsub-page">
-    <div class="unsub-card">
-        <h1>{% if success %}Unsubscribed{% else %}Error{% endif %}</h1>
+    <div class="data-panel">
         <p class="unsub-message {% if success %}unsub-success{% else %}unsub-error{% endif %}">{{ message }}</p>
-        <a href="/" class="btn-primary">Back to IL9Cast</a>
+        <p><a href="/" class="archive-index__label" style="text-decoration: underline;">Return to archive index</a></p>
     </div>
 </section>
 {% endblock %}

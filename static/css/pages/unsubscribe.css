@@ -1,38 +1,19 @@
 .unsub-page {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 60vh;
-    padding: 2rem var(--page-gutter);
-}
-
-.unsub-card {
-    max-width: 480px;
-    width: 100%;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-default);
-    padding: 2.5rem;
-    text-align: center;
-}
-
-.unsub-card h1 {
-    font-family: var(--serif);
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
+    max-width: var(--width-editorial);
+    margin: 0 auto 4rem;
+    padding: 0 var(--page-gutter);
 }
 
 .unsub-message {
     font-family: var(--sans);
-    font-size: 1rem;
+    font-size: 0.95rem;
     line-height: 1.6;
-    margin-bottom: 2rem;
+    margin: 0 0 1rem;
     color: var(--text-secondary);
 }
 
 .unsub-success {
-    color: var(--accent-green);
+    color: var(--text-primary);
 }
 
 .unsub-error {
