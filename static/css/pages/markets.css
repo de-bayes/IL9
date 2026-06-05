@@ -1,1174 +1,745 @@
-/* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .leader-featured,
-        .big-odds-display,
-        .market-chart-section,
-        .additional-markets {
-            animation: fadeInUp 0.7s ease-out;
-        }
-
-        .markets-content-page {
-            max-width: var(--width-editorial);
-            margin: 0 auto 4rem;
-            padding: 0 2rem;
-            position: relative;
-        }
-
-        /* Share Button */
-        .share-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            background: var(--text-primary);
-            color: var(--bg-primary);
-            border: none;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.15s ease;
-            font-family: var(--sans);
-        }
-
-        .share-button:hover { opacity: 0.8; }
-        .share-button:active { transform: translateY(0); }
-        .share-icon { font-size: 1.1rem; }
-
-        @media (max-width: 480px) {
-            .share-button {
-                font-size: 0.85rem;
-                padding: 0.65rem 1.2rem;
-            }
-        }
-
-        /* Leader Featured Card */
-        .leader-featured {
-            margin: 0 0 2rem 0;
-        }
-
-        .leader-card {
-            display: flex;
-            gap: 2rem;
-            padding: 2.5rem;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-        }
-
-        .leader-photo {
-            width: 140px;
-            height: 140px;
-            border-radius: 8px;
-            object-fit: cover;
-            flex-shrink: 0;
-            opacity: 0.95;
-        }
-
-        .leader-info {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            flex: 1;
-        }
-
-        .leader-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.15em;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
-        }
-
-        .leader-name {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            font-family: var(--serif);
-            margin-bottom: 1rem;
-        }
-
-        .leader-main-stat {
-            margin-top: 0.5rem;
-        }
-
-        .leader-main-label {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            margin-bottom: 0.25rem;
-        }
-
-        .leader-main-value {
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: var(--accent-blue);
-            font-family: var(--sans);
-            line-height: 1;
-            letter-spacing: -0.02em;
-        }
-
-        .leader-divider {
-            width: 100%;
-            height: 1px;
-            background: var(--border-subtle);
-            margin: 1rem 0;
-        }
-
-        .leader-sub-stats {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.25rem 2rem;
-        }
-
-        .leader-sub-stat {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .leader-sub-label {
-            font-size: 0.6rem;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            margin-bottom: 0.2rem;
-            opacity: 0.7;
-        }
-
-        .leader-sub-value {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--accent-blue);
-            font-family: var(--sans);
-            line-height: 1;
-        }
-
-        /* Tablet and large phone landscape */
-        @media (max-width: 768px) {
-            .markets-content-page {
-                padding: 0 1.5rem;
-            }
-
-            .leader-card {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                padding: 2rem;
-            }
-
-            .leader-photo {
-                width: 120px;
-                height: 120px;
-            }
-
-            .leader-name {
-                font-size: 2rem;
-            }
-
-            .leader-main-value {
-                font-size: 3rem;
-            }
-
-            .leader-sub-stats {
-                justify-content: center;
-                gap: 1.25rem 1.75rem;
-            }
-
-            .big-odds-display {
-                grid-template-columns: repeat(3, 1fr);
-            }
-
-            .market-chart-section h2 {
-                font-size: 1.5rem;
-            }
-
-            .market-chart-section .chart-wrapper {
-                height: 280px;
-            }
-        }
-
-        /* Large phones */
-        @media (max-width: 600px) {
-            .leader-card {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                padding: 1.5rem;
-            }
-            .leader-photo {
-                width: 100px;
-                height: 100px;
-            }
-            .leader-name {
-                font-size: 1.6rem;
-            }
-            .leader-main-value {
-                font-size: 2.5rem;
-            }
-            .leader-sub-stats {
-                justify-content: center;
-                gap: 1rem 1.5rem;
-            }
-            .leader-sub-value {
-                font-size: 1.1rem;
-            }
-            .market-chart-section {
-                padding: 1.5rem;
-            }
-            .market-chart-section h2 {
-                font-size: 1.4rem;
-                margin-bottom: 1rem;
-            }
-            .market-chart-section .chart-wrapper {
-                height: 240px;
-            }
-            .chart-toggle {
-                gap: 0.2rem;
-            }
-            .toggle-btn {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.8rem;
-            }
-            .chart-subtitle {
-                font-size: 0.75rem;
-                margin-top: 0.75rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero h1 {
-                font-size: 1.8rem;
-            }
-
-            .hero .subtitle {
-                font-size: 0.9rem;
-            }
-
-            .markets-content-page {
-                padding: 1rem;
-            }
-
-            .leader-card {
-                padding: 1rem;
-                gap: 1rem;
-            }
-
-            .leader-photo {
-                width: 80px;
-                height: 80px;
-            }
-
-            .leader-label {
-                font-size: 0.65rem;
-                letter-spacing: 0.06em;
-            }
-
-            .leader-name {
-                font-size: 1.35rem;
-            }
-
-            .leader-main-label {
-                font-size: 0.6rem;
-            }
-
-            .leader-main-value {
-                font-size: 2rem;
-            }
-
-            .leader-sub-stats {
-                gap: 0.8rem 1rem;
-            }
-
-            .leader-sub-label {
-                font-size: 0.55rem;
-            }
-
-            .leader-sub-value {
-                font-size: 0.95rem;
-            }
-
-            .big-odds-display {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.75rem;
-                margin-bottom: 1.5rem;
-            }
-
-            .big-odds-candidate {
-                padding: 1rem 0.4rem;
-            }
-
-            .big-percent {
-                font-size: 2rem;
-                margin-bottom: 0.4rem;
-            }
-
-            .big-name {
-                font-size: 0.8rem;
-            }
-
-            .market-chart-section {
-                padding: 1.25rem;
-                margin-bottom: 1.5rem;
-            }
-
-            .market-chart-section h2 {
-                font-size: 1.2rem;
-                margin-bottom: 0.75rem;
-            }
-
-            .market-chart-section .chart-wrapper {
-                height: 200px;
-            }
-
-            .chart-toggle {
-                gap: 0.15rem;
-            }
-
-            .toggle-btn {
-                padding: 0.35rem 0.65rem;
-                font-size: 0.75rem;
-            }
-
-            .chart-subtitle {
-                font-size: 0.7rem;
-                margin-top: 0.6rem;
-            }
-
-            .market-chart-section > div {
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-        }
-
-        @media (max-width: 375px) {
-            .hero h1 {
-                font-size: 1.5rem;
-            }
-
-            .hero .subtitle {
-                font-size: 0.8rem;
-            }
-
-            .markets-content-page {
-                padding: 0.75rem;
-            }
-
-            .leader-featured {
-                margin-bottom: 1rem;
-            }
-
-            .leader-card {
-                padding: 0.75rem;
-            }
-
-            .leader-photo {
-                width: 70px;
-                height: 70px;
-            }
-
-            .leader-name {
-                font-size: 1.2rem;
-            }
-
-            .leader-main-value {
-                font-size: 1.75rem;
-            }
-
-            .leader-sub-value {
-                font-size: 0.85rem;
-            }
-
-            .big-odds-display {
-                gap: 0.6rem;
-                margin-bottom: 1.25rem;
-            }
-
-            .big-odds-candidate {
-                padding: 0.75rem 0.35rem;
-            }
-
-            .big-percent {
-                font-size: 1.75rem;
-                margin-bottom: 0.3rem;
-            }
-
-            .big-name {
-                font-size: 0.75rem;
-            }
-
-            .market-chart-section {
-                padding: 1rem;
-                margin-bottom: 1.25rem;
-            }
-
-            .market-chart-section h2 {
-                font-size: 1rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .market-chart-section .chart-wrapper {
-                height: 180px;
-            }
-
-            .toggle-btn {
-                padding: 0.3rem 0.5rem;
-                font-size: 0.7rem;
-            }
-        }
-
-        /* Chart Section */
-        .market-chart-section {
-            padding: 2rem;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            margin-bottom: 2rem;
-        }
-
-        .chart-subtitle {
-            margin-top: 1rem;
-            font-size: 0.8rem;
-            color: var(--text-tertiary);
-            font-style: italic;
-            text-align: center;
-        }
-
-        .market-chart-section h2 {
-            margin-bottom: 1.5rem;
-            font-size: 1.6rem;
-            color: var(--accent-blue);
-            font-family: var(--serif);
-            font-weight: 700;
-        }
-
-        .market-chart-section .chart-wrapper {
-            height: 320px;
-            position: relative;
-            padding: 0.5rem 0;
-            width: 100%;
-        }
-
-        .chart-toggle {
-            display: flex;
-            gap: 0.25rem;
-            background: var(--bg-elevated);
-            padding: 4px;
-            border: 1px solid var(--border-default);
-            flex-wrap: wrap;
-            justify-content: center;
-            width: auto;
-        }
-
-        .toggle-btn {
-            padding: 0.5rem 1.25rem;
-            background: transparent;
-            border: none;
-            color: var(--text-tertiary);
-            border-radius: 6px;
-            white-space: nowrap;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 700;
-            font-family: var(--sans);
-            transition: all 0.25s ease;
-        }
-
-        .toggle-btn:hover {
-            color: var(--text-secondary);
-            background: var(--bg-surface-hover);
-        }
-
-        .toggle-btn:active {
-            transform: scale(0.96);
-        }
-
-        .toggle-btn.active {
-            background: var(--bg-surface);
-            color: var(--text-primary);
-            border: 1px solid var(--border-default);
-        }
-
-        /* Methodology Foldout */
-        /* Calculation Breakdown */
-        .donation-section {
-            text-align: center;
-            padding: 1.5rem 2rem;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            border-left: 3px solid var(--accent-gold);
-            margin-bottom: 2rem;
-        }
-
-        .donation-text {
-            margin: 0;
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        .donation-link {
-            display: inline-block;
-            margin-left: 0.75rem;
-            padding: 0.5rem 1.25rem;
-            background: var(--text-primary);
-            color: var(--bg-primary);
-            border: none;
-            text-decoration: none;
-            font-weight: 600;
-            transition: opacity 0.15s ease;
-        }
-
-        .donation-link:hover {
-            opacity: 0.8;
-            color: var(--bg-primary);
-        }
-
-        /* ===== CALCULATION BREAKDOWN FOLDOUT ===== */
-        .calculation-breakdown.method-foldout {
-            background: var(--bg-surface);
-            border: 2px solid var(--border-default);
-            margin-bottom: 2rem;
-            overflow: hidden;
-            padding: 0;
-        }
-
-        .calculation-breakdown.method-foldout.active {
-            border-color: var(--border-hover);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
-
-        .calculation-breakdown .foldout-trigger {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1.8rem 2.2rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            text-align: left;
-            color: inherit;
-            transition: background 0.3s ease;
-        }
-
-        .calculation-breakdown .foldout-trigger:hover {
-            background: var(--bg-surface-hover);
-        }
-
-        .calculation-breakdown .foldout-trigger-left {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-        }
-
-        .calculation-breakdown .foldout-trigger h2 {
-            margin-bottom: 0;
-            font-size: 1.6rem;
-            font-family: var(--serif);
-            font-weight: 700;
-            color: var(--accent-blue);
-            line-height: 1.3;
-        }
-
-        .calculation-breakdown .foldout-desc {
-            font-size: 0.85rem;
-            color: var(--text-tertiary);
-            margin: 0.2rem 0 0 0;
-            line-height: 1.4;
-        }
-
-        .calculation-breakdown .foldout-arrow {
-            font-family: var(--sans);
-            font-size: 1.6rem;
-            font-weight: 300;
-            color: var(--accent-gold);
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            flex-shrink: 0;
-            width: 30px;
-            text-align: center;
-            line-height: 1;
-        }
-
-        .calculation-breakdown .foldout-arrow.open {
-            transform: rotate(45deg);
-        }
-
-        .calculation-breakdown .foldout-body {
-            display: grid;
-            grid-template-rows: 0fr;
-            transition: grid-template-rows 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-                        opacity 0.4s ease;
-            opacity: 0;
-        }
-
-        .calculation-breakdown .foldout-body.open {
-            grid-template-rows: 1fr;
-            opacity: 1;
-        }
-
-        .calculation-breakdown .foldout-inner {
-            overflow: hidden;
-            padding: 0 2.2rem;
-        }
-
-        .calculation-breakdown .foldout-body.open .foldout-inner {
-            padding-bottom: 2.2rem;
-        }
-
-        .calculation-breakdown .foldout-body .foldout-inner {
-            border-top: 1px solid var(--border-default);
-            padding-top: 0;
-            transition: padding-top 0.4s ease;
-        }
-
-        .calculation-breakdown .foldout-body.open .foldout-inner {
-            padding-top: 1.8rem;
-        }
-
-        /* ===== RESULTS HEATMAP CALLOUT ===== */
-        .heatmap-callout {
-            background: var(--bg-surface);
-            border: 2px solid var(--border-default);
-            margin-bottom: 2rem;
-            overflow: hidden;
-        }
-
-        .heatmap-callout-header {
-            padding: 1.8rem 2.2rem 0;
-        }
-
-        .heatmap-callout-header h2 {
-            margin: 0 0 0.2rem 0;
-            font-size: 1.6rem;
-            font-family: var(--serif);
-            font-weight: 700;
-            color: var(--accent-blue);
-            line-height: 1.3;
-        }
-
-        .heatmap-callout-desc {
-            font-size: 0.85rem;
-            color: var(--text-tertiary);
-            margin: 0;
-            line-height: 1.4;
-        }
-
-        .heatmap-callout-body {
-            padding: 1.6rem 2.2rem 2.2rem;
-        }
-
-        /* ===== HEATMAP TABLE ===== */
-        .heatmap-wrapper {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .heatmap-table {
-            border-collapse: separate;
-            border-spacing: 3px;
-            width: 100%;
-            min-width: 480px;
-            font-family: var(--sans);
-            font-size: 0.82rem;
-        }
-
-        .heatmap-table th {
-            padding: 0.6rem 0.5rem;
-            font-weight: 600;
-            font-size: 0.78rem;
-            color: var(--text-secondary);
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        .heatmap-table th.heatmap-corner {
-            background: transparent;
-        }
-
-        .heatmap-table th.heatmap-col-header {
-            writing-mode: vertical-lr;
-            transform: rotate(180deg);
-            height: 85px;
-            vertical-align: bottom;
-            padding-bottom: 0.5rem;
-            font-size: 0.78rem;
-            letter-spacing: 0.02em;
-        }
-
-        .heatmap-table th.heatmap-row-header {
-            text-align: right;
-            padding-right: 0.9rem;
-            color: var(--text-primary);
-            white-space: nowrap;
-            font-size: 0.78rem;
-            letter-spacing: 0.02em;
-        }
-
-        .heatmap-table td {
-            text-align: center;
-            padding: 0.6rem 0.45rem;
-            font-size: 0.82rem;
-            font-weight: 600;
-            border-radius: 4px;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-            cursor: default;
-            position: relative;
-        }
-
-        .heatmap-table td:hover:not(.heatmap-diagonal) {
-            transform: scale(1.06);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            z-index: 1;
-        }
-
-        .heatmap-table td.heatmap-diagonal {
-            background: var(--bg-surface-hover);
-            color: var(--text-tertiary);
-            font-size: 0.7rem;
-            font-weight: 400;
-        }
-
-        .heatmap-label-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.6rem;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .heatmap-axis-label {
-            font-size: 0.72rem;
-            color: var(--accent-blue);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            font-family: var(--sans);
-        }
-
-        @media (max-width: 600px) {
-            .heatmap-callout-header {
-                padding: 1.2rem 1.2rem 0;
-            }
-            .heatmap-callout-body {
-                padding: 1rem 1.2rem 1.4rem;
-            }
-            .heatmap-table th.heatmap-col-header {
-                height: 65px;
-                font-size: 0.65rem;
-            }
-            .heatmap-table th.heatmap-row-header {
-                font-size: 0.65rem;
-                padding-right: 0.4rem;
-            }
-            .heatmap-table td {
-                font-size: 0.7rem;
-                padding: 0.4rem 0.25rem;
-            }
-        }
-
-        .breakdown-desc {
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .breakdown-desc:last-of-type {
-            margin-bottom: 1.5rem;
-            padding: 0.75rem 1rem;
-            background: var(--bg-elevated);
-            border-left: 3px solid var(--accent-gold);
-            margin-left: 0;
-            font-size: 0.85rem;
-        }
-
-        .candidate-breakdown {
-            margin-bottom: 0.75rem;
-            background: var(--bg-elevated);
-            border-left: 3px solid var(--accent-blue);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .breakdown-toggle {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1rem 1.5rem;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            color: var(--text-primary);
-            font-family: inherit;
-            text-align: left;
-            gap: 1rem;
-        }
-
-        .breakdown-toggle:hover {
-            background: var(--bg-surface-hover);
-        }
-
-        .breakdown-header {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            flex: 1;
-        }
-
-        .breakdown-preview {
-            font-size: 0.95rem;
-            color: var(--accent-blue);
-            font-weight: 700;
-            min-width: 60px;
-            text-align: right;
-        }
-
-        .breakdown-icon {
-            font-size: 1.5rem;
-            color: var(--accent-blue);
-            transition: transform 0.3s ease;
-        }
-
-        .candidate-breakdown.open .breakdown-icon {
-            transform: rotate(45deg);
-        }
-
-        .breakdown-details {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease, padding 0.3s ease;
-            padding: 0 1.5rem;
-        }
-
-        .candidate-breakdown.open .breakdown-details {
-            max-height: 400px;
-            padding: 0 1.5rem 1.5rem;
-        }
-
-        .breakdown-line {
-            font-size: 0.85rem;
-            line-height: 1.6;
-            color: var(--text-secondary);
-            margin-bottom: 0.4rem;
-        }
-
-        .breakdown-line strong {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .breakdown-result {
-            margin-top: 0.8rem;
-            padding-top: 0.8rem;
-            border-top: 1px solid var(--border-default);
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--accent-blue);
-        }
-
-        /* Market Sources */
-        .additional-markets {
-            margin-bottom: 2rem;
-        }
-
-        .additional-markets h2 {
-            margin-bottom: 1rem;
-            font-size: 2rem;
-            font-family: var(--serif);
-            font-weight: 700;
-            color: var(--accent-blue);
-        }
-
-        .expandable-market {
-            margin-bottom: 1rem;
-            border: 1px solid var(--border-default);
-            overflow: hidden;
-            background: var(--bg-surface);
-            transition: border-color 0.2s ease, background 0.2s ease;
-        }
-
-        .expandable-market:hover {
-            border-color: var(--border-hover);
-            background: var(--bg-surface-hover);
-        }
-
-        .market-header-row {
-            display: flex;
-            align-items: stretch;
-        }
-
-        .market-header-row .expand-toggle {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .market-header-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 1rem;
-            color: var(--accent-blue);
-            text-decoration: none;
-            font-size: 1.1rem;
-            border-left: 1px solid var(--border-default);
-            transition: background 0.2s ease, color 0.2s ease;
-        }
-
-        .market-header-link:hover {
-            background: var(--bg-surface-hover);
-            color: var(--accent-teal);
-        }
-
-        .expand-toggle {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1.25rem 1.5rem;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 1rem;
-            transition: background 0.2s ease;
-            gap: 2rem;
-        }
-
-        .expand-toggle:hover {
-            background: var(--bg-surface-hover);
-        }
-
-        .market-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-            min-width: 140px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .market-preview {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            flex: 1;
-            text-align: left;
-        }
-
-        .expand-icon {
-            font-size: 1.5rem;
-            color: var(--accent-blue);
-            transition: transform 0.3s ease;
-        }
-
-        .expandable-market.open .expand-icon {
-            transform: rotate(45deg);
-        }
-
-        .expand-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease, padding 0.3s ease;
-            padding: 0 1.5rem;
-        }
-
-        .expandable-market.open .expand-content {
-            max-height: 500px;
-            padding: 1rem 1.5rem 1.5rem;
-            border-top: 1px solid var(--border-subtle);
-        }
-
-        .expand-content .market-candidates {
-            margin-bottom: 1rem;
-        }
-
-        .expand-content .market-candidate {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.6rem 0;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .expand-content .market-candidate:last-child {
-            border-bottom: none;
-        }
-
-        .expand-content .market-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-default);
-            margin-top: 0.5rem;
-        }
-
-        .market-link {
-            color: var(--accent-blue);
-            text-decoration: underline;
-            font-size: 0.9rem;
-        }
-
-        .market-link:hover {
-            opacity: 0.8;
-        }
-
-        /* Download Section */
-        .download-data-section {
-            padding: 2.5rem;
-            background: var(--bg-surface);
-            border: 2px solid var(--border-default);
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .download-data-section h2 {
-            margin-bottom: 0.5rem;
-            font-size: 2rem;
-            font-family: var(--serif);
-            font-weight: 700;
-            color: var(--accent-blue);
-        }
-
-        .download-description {
-            margin-bottom: 1.5rem;
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        .download-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .download-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            background: var(--text-primary);
-            color: var(--bg-primary);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: opacity 0.15s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .download-button:hover {
-            opacity: 0.8;
-        }
-
-        .download-icon {
-            font-size: 1.2rem;
-        }
-
-        .download-button-secondary {
-            background: transparent;
-            border: 2px solid var(--text-primary);
-            color: var(--text-primary);
-        }
-
-        .download-button-secondary:hover {
-            background: var(--bg-surface-hover);
-            opacity: 1;
-        }
-
-        /* Email Alerts Section */
-        .email-alerts-section {
-            padding: 2.5rem;
-            background: var(--bg-surface);
-            border: 2px solid var(--border-default);
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .email-alerts-section h2 {
-            margin-bottom: 0.5rem;
-            font-size: 2rem;
-            font-family: var(--serif);
-            font-weight: 700;
-            color: var(--accent-blue);
-        }
-
-        .alerts-description {
-            margin-bottom: 1.5rem;
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        .last-updated {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
-
-        .candidate-odds {
-            color: var(--accent-blue);
-            font-weight: 700;
-            font-family: var(--sans);
-        }
-
-        /* Odds Grid */
-        .big-odds-display {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
-            gap: 1rem;
-            margin: 0 0 2rem 0;
-            text-align: center;
-        }
-
-        .big-odds-candidate {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 1.5rem 0.5rem;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-        }
-
-        .big-percent {
-            font-size: 3.5rem;
-            font-weight: 700;
-            font-family: var(--sans);
-            color: var(--accent-blue);
-            line-height: 1;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.02em;
-        }
-
-        .big-name {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        @media (max-width: var(--width-editorial)) {
-            .big-odds-display {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width: 500px) {
-            .big-odds-display {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .big-percent {
-                font-size: 2.5rem;
-            }
-        }
+/* Markets page — archive design
+   Consumed by /markets. Depends on components.css for
+   .archive-page-header, .data-panel, .stat-table, .prose-block.
+   ============================================================= */
+
+.markets-content-page {
+    max-width: var(--width-editorial);
+    margin: 0 auto 4rem;
+    padding: 0 var(--page-gutter);
+}
+
+/* Results Summary Table */
+.results-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+}
+
+.results-summary-table {
+    min-width: 480px;
+}
+
+.results-candidate-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.results-leader-photo {
+    width: 28px;
+    height: 28px;
+    object-fit: cover;
+    flex-shrink: 0;
+    display: none; /* JS sets display:block when image is available */
+}
+
+.markets-archive-note {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+    line-height: 1.5;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-subtle);
+}
+
+/* Other Candidates — mono stat row */
+.big-odds-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 0;
+}
+
+.big-odds-candidate {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 1.25rem;
+    border-right: 1px solid var(--border-default);
+    border-bottom: 1px solid var(--border-subtle);
+    min-width: 110px;
+}
+
+.big-odds-candidate:first-child {
+    padding-left: 0;
+}
+
+.big-percent {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    line-height: 1;
+    margin-bottom: 0.3rem;
+    letter-spacing: -0.01em;
+}
+
+.big-name {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    line-height: 1.3;
+}
+
+/* Chart Section */
+.market-chart-section {
+    margin-bottom: 1.5rem;
+}
+
+.market-chart-section .chart-wrapper {
+    height: 320px;
+    position: relative;
+    padding: 0.5rem 0;
+    width: 100%;
+}
+
+.chart-subtitle {
+    margin-top: 1rem;
+    font-size: 0.78rem;
+    color: var(--text-tertiary);
+    line-height: 1.6;
+}
+
+.chart-actions {
+    margin-top: 1.25rem;
+}
+
+.chart-method-note {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-default);
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+    line-height: 1.5;
+}
+
+.chart-method-note a {
+    color: var(--accent-blue);
+    text-decoration: underline;
+}
+
+.chart-method-note a:hover {
+    opacity: 0.8;
+}
+
+/* Share Button */
+.share-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-default);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.share-button:hover {
+    border-color: var(--border-hover);
+    color: var(--text-primary);
+}
+
+/* Chart Toggle */
+.chart-toggle {
+    display: flex;
+    gap: 0.25rem;
+    background: var(--bg-elevated);
+    padding: 4px;
+    border: 1px solid var(--border-default);
+    flex-wrap: wrap;
+}
+
+.toggle-btn {
+    padding: 0.45rem 1rem;
+    background: transparent;
+    border: none;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: var(--sans);
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.toggle-btn:hover {
+    color: var(--text-secondary);
+}
+
+.toggle-btn.active {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-default);
+}
+
+/* Heatmap Callout */
+.heatmap-callout {
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.heatmap-callout-desc {
+    font-size: 0.85rem;
+    color: var(--text-tertiary);
+    margin: 0 0 1.25rem 0;
+    line-height: 1.4;
+}
+
+.heatmap-callout-body {
+    margin-top: 0;
+}
+
+.heatmap-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.heatmap-table {
+    border-collapse: separate;
+    border-spacing: 3px;
+    width: 100%;
+    min-width: 480px;
+    font-family: var(--sans);
+    font-size: 0.82rem;
+}
+
+.heatmap-table th {
+    padding: 0.6rem 0.5rem;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.heatmap-table th.heatmap-corner {
+    background: transparent;
+}
+
+.heatmap-table th.heatmap-col-header {
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+    height: 85px;
+    vertical-align: bottom;
+    padding-bottom: 0.5rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+}
+
+.heatmap-table th.heatmap-row-header {
+    text-align: right;
+    padding-right: 0.9rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+}
+
+.heatmap-table td {
+    text-align: center;
+    padding: 0.6rem 0.45rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: default;
+    position: relative;
+}
+
+.heatmap-table td.heatmap-diagonal {
+    background: var(--bg-surface-hover);
+    color: var(--text-tertiary);
+    font-size: 0.7rem;
+    font-weight: 400;
+}
+
+.heatmap-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.heatmap-axis-label {
+    font-size: 0.72rem;
+    color: var(--text-tertiary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: var(--sans);
+}
+
+/* Calculation Breakdown Foldout */
+.calculation-breakdown.method-foldout {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    padding: 0;
+}
+
+.calculation-breakdown .foldout-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    color: inherit;
+    transition: background 0.2s ease;
+}
+
+.calculation-breakdown .foldout-trigger:hover {
+    background: var(--bg-surface-hover);
+}
+
+.calculation-breakdown .foldout-trigger-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.calculation-breakdown .foldout-trigger h2 {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.calculation-breakdown .foldout-desc {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+    margin: 0.15rem 0 0 0;
+    line-height: 1.4;
+}
+
+.calculation-breakdown .foldout-arrow {
+    font-family: var(--sans);
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: var(--text-tertiary);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    width: 28px;
+    text-align: center;
+    line-height: 1;
+}
+
+.calculation-breakdown .foldout-arrow.open {
+    transform: rotate(45deg);
+}
+
+.calculation-breakdown .foldout-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.25s ease;
+    opacity: 0;
+}
+
+.calculation-breakdown .foldout-body.open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+.calculation-breakdown .foldout-inner {
+    overflow: hidden;
+    padding: 0 2rem;
+}
+
+.calculation-breakdown .foldout-body .foldout-inner {
+    border-top: 1px solid var(--border-default);
+    padding-top: 0;
+    transition: padding-top 0.25s ease;
+}
+
+.calculation-breakdown .foldout-body.open .foldout-inner {
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+}
+
+.breakdown-desc {
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.breakdown-desc:last-of-type {
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-elevated);
+    border-left: 2px solid var(--border-default);
+    font-size: 0.85rem;
+}
+
+.candidate-breakdown {
+    margin-bottom: 0.75rem;
+    background: var(--bg-elevated);
+    border-left: 2px solid var(--border-default);
+    overflow: hidden;
+}
+
+.breakdown-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.25rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-family: inherit;
+    text-align: left;
+    gap: 1rem;
+}
+
+.breakdown-toggle:hover {
+    background: var(--bg-surface-hover);
+}
+
+.breakdown-header {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+}
+
+.breakdown-preview {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    min-width: 60px;
+    text-align: right;
+}
+
+.breakdown-icon {
+    font-size: 1.25rem;
+    color: var(--text-tertiary);
+    transition: transform 0.2s ease;
+}
+
+.candidate-breakdown.open .breakdown-icon {
+    transform: rotate(45deg);
+}
+
+.breakdown-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 1.25rem;
+}
+
+.candidate-breakdown.open .breakdown-details {
+    max-height: 400px;
+    padding: 0 1.25rem 1.25rem;
+}
+
+.breakdown-line {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 0.4rem;
+}
+
+.breakdown-line strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.breakdown-result {
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--border-default);
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+/* Market Sources */
+.additional-markets {
+    margin-bottom: 1.5rem;
+}
+
+.additional-markets .data-panel__label {
+    margin-bottom: 0.75rem;
+}
+
+.expandable-market {
+    margin-bottom: 1px;
+    border: 1px solid var(--border-default);
+    overflow: hidden;
+    background: var(--bg-surface);
+    transition: border-color 0.15s ease;
+}
+
+.expandable-market:hover {
+    border-color: var(--border-hover);
+}
+
+.market-header-row {
+    display: flex;
+    align-items: stretch;
+}
+
+.market-header-row .expand-toggle {
+    flex: 1;
+    min-width: 0;
+}
+
+.market-header-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem;
+    color: var(--text-tertiary);
+    text-decoration: none;
+    font-size: 1rem;
+    border-left: 1px solid var(--border-default);
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.market-header-link:hover {
+    background: var(--bg-surface-hover);
+    color: var(--text-secondary);
+}
+
+.expand-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: background 0.15s ease;
+    gap: 1.5rem;
+}
+
+.expand-toggle:hover {
+    background: var(--bg-surface-hover);
+}
+
+.market-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    min-width: 120px;
+}
+
+.market-preview {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    flex: 1;
+    text-align: left;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+}
+
+.expand-icon {
+    font-size: 1.25rem;
+    color: var(--text-tertiary);
+    transition: transform 0.25s ease;
+}
+
+.expandable-market.open .expand-icon {
+    transform: rotate(45deg);
+}
+
+.expand-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 1.5rem;
+}
+
+.expandable-market.open .expand-content {
+    max-height: 500px;
+    padding: 1rem 1.5rem 1.5rem;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.expand-content .market-candidates {
+    margin-bottom: 1rem;
+}
+
+.expand-content .market-candidate {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 0.875rem;
+}
+
+.expand-content .market-candidate:last-child {
+    border-bottom: none;
+}
+
+.expand-content .market-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-default);
+    margin-top: 0.5rem;
+}
+
+.market-link {
+    color: var(--accent-blue);
+    text-decoration: underline;
+    font-size: 0.85rem;
+}
+
+.market-link:hover {
+    opacity: 0.8;
+}
+
+.last-updated {
+    color: var(--text-tertiary);
+    font-size: 0.8rem;
+}
+
+.candidate-odds {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+/* Download Section */
+.download-data-section {
+    margin-bottom: 1.5rem;
+}
+
+.download-description {
+    margin-bottom: 1.25rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.download-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.download-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.25rem;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    font-family: var(--sans);
+    transition: opacity 0.15s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.download-button:hover {
+    opacity: 0.8;
+}
+
+.download-button-secondary {
+    background: transparent;
+    border: 1px solid var(--border-default);
+    color: var(--text-secondary);
+}
+
+.download-button-secondary:hover {
+    background: var(--bg-surface-hover);
+    opacity: 1;
+    border-color: var(--border-hover);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .markets-content-page {
+        padding: 0 1.25rem;
+    }
+    .heatmap-callout {
+        padding: 1.25rem 1.25rem;
+    }
+    .market-chart-section .chart-wrapper {
+        height: 260px;
+    }
+    .big-odds-display {
+        flex-wrap: wrap;
+    }
+    .big-odds-candidate {
+        min-width: 90px;
+    }
+}
+
+@media (max-width: 600px) {
+    .results-summary-table {
+        font-size: 0.78rem;
+    }
+    .market-chart-section .chart-wrapper {
+        height: 220px;
+    }
+    .chart-toggle {
+        flex-wrap: wrap;
+    }
+    .toggle-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.75rem;
+    }
+    .heatmap-table th.heatmap-col-header {
+        height: 65px;
+        font-size: 0.65rem;
+    }
+    .heatmap-table th.heatmap-row-header {
+        font-size: 0.65rem;
+        padding-right: 0.4rem;
+    }
+    .heatmap-table td {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.25rem;
+    }
+    .big-percent {
+        font-size: 1rem;
+    }
+    .big-odds-candidate {
+        min-width: 80px;
+        padding: 0.6rem 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .markets-content-page {
+        padding: 0 1rem;
+    }
+    .calculation-breakdown .foldout-trigger {
+        padding: 1.25rem 1.25rem;
+    }
+    .calculation-breakdown .foldout-inner {
+        padding: 0 1.25rem;
+    }
+    .market-chart-section .chart-wrapper {
+        height: 190px;
+    }
+}

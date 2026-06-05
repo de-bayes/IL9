@@ -34,205 +34,192 @@
 {% endblock %}
 
 {% block content %}
-<section class="hero">
-            <h1>Prediction Markets <em>(Archived)</em></h1>
-            <p class="subtitle">Weighted aggregation of Manifold Markets &amp; Kalshi through the March 17, 2026 primary</p>
-        </section>
+<header class="archive-page-header">
+    <p class="archive-page-header__kicker">IL-09 Democratic Primary &middot; Prediction Markets &middot; Archive</p>
+    <h1 class="archive-page-header__title">Prediction Markets</h1>
+    <p class="archive-page-header__meta">Coverage: Jan 30 &ndash; Mar 17, 2026 &middot; Weighted aggregation of Manifold Markets &amp; Kalshi</p>
+</header>
 
-        <section class="markets-content-page">
-            <section class="leader-featured" id="leaderFeatured">
-                <div class="leader-card">
-                    <img src="" alt="" class="leader-photo" id="leaderPhoto" decoding="async">
-                    <div class="leader-info">
-                        <span class="leader-label">WINNER</span>
-                        <span class="leader-name" id="leaderName">Loading...</span>
-                        <div class="leader-main-stat">
-                            <span class="leader-main-label">AGGREGATE PROBABILITY</span>
-                            <span class="leader-main-value" id="leaderAggregate">--%</span>
-                        </div>
-                        <div class="leader-divider"></div>
-                        <div class="leader-sub-stats">
-                            <div class="leader-sub-stat">
-                                <span class="leader-sub-label">Manifold</span>
-                                <span class="leader-sub-value" id="leaderManifold">--%</span>
-                            </div>
-                            <div class="leader-sub-stat">
-                                <span class="leader-sub-label">Kalshi Last</span>
-                                <span class="leader-sub-value" id="leaderKalshiLast">--%</span>
-                            </div>
-                            <div class="leader-sub-stat">
-                                <span class="leader-sub-label">Kalshi Mid</span>
-                                <span class="leader-sub-value" id="leaderKalshiMid">--%</span>
-                            </div>
-                            <div class="leader-sub-stat">
-                                <span class="leader-sub-label">Kalshi Liq</span>
-                                <span class="leader-sub-value" id="leaderKalshiLiq">--%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+<div class="markets-content-page">
 
-            <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin: -0.5rem 0 1rem; line-height: 1.5;">
-                Manifold Markets stopped trading as polls closed. Final odds reflect Kalshi data only.
+    <!-- Final Results Summary -->
+    <div class="data-panel" id="leaderFeatured">
+        <p class="data-panel__label">Final Aggregate &mdash; March 17, 2026</p>
+        <div class="results-table-wrap">
+            <table class="stat-table results-summary-table">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Aggregate</th>
+                        <th>Manifold</th>
+                        <th>Kalshi Last</th>
+                        <th>Kalshi Mid</th>
+                        <th>Kalshi Liq</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="results-candidate-cell">
+                            <img id="leaderPhoto" src="" alt="" class="results-leader-photo" decoding="async">
+                            <span id="leaderName">Loading&hellip;</span>
+                        </td>
+                        <td class="stat-table__value" id="leaderAggregate">--</td>
+                        <td class="stat-table__value" id="leaderManifold">--</td>
+                        <td class="stat-table__value" id="leaderKalshiLast">--</td>
+                        <td class="stat-table__value" id="leaderKalshiMid">--</td>
+                        <td class="stat-table__value" id="leaderKalshiLiq">--</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="markets-archive-note">Manifold Markets stopped trading as polls closed. Final odds reflect Kalshi data only.</p>
+    </div>
+
+    <!-- Other Candidates — Final Aggregate -->
+    <div class="data-panel">
+        <p class="data-panel__label">Other Candidates &mdash; Final Aggregate</p>
+        <div class="big-odds-display" id="bigOddsDisplay">
+            <div class="big-odds-candidate">
+                <span class="big-percent">--</span>
+                <span class="big-name">Loading&hellip;</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Trends Chart -->
+    <div class="data-panel market-chart-section">
+        <div class="data-panel__header">
+            <p class="data-panel__label">Market Trends</p>
+            <div class="chart-toggle" id="chartToggle">
+                <button class="toggle-btn" data-period="1d">1 Day</button>
+                <button class="toggle-btn" data-period="7d">7 Days</button>
+                <button class="toggle-btn active" data-period="all">All Time</button>
+            </div>
+        </div>
+        <div class="chart-wrapper" style="position:relative;">
+            <div id="chartLoadingIndicator" style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none;opacity:1;transition:opacity 0.3s ease;">
+                <span style="color:var(--text-tertiary,#888);font-size:13px;letter-spacing:0.02em;">Loading chart data&hellip;</span>
+            </div>
+            <canvas id="marketTrendChart"></canvas>
+        </div>
+        <p class="chart-subtitle">
+            We have JSONL data upon request from Jan 15 to 30, but some AWS volume issues
+            prevented us from displaying it. The graph has data from Jan 30 and on.
+            All times displayed in Central Time (CT).
+        </p>
+        <div class="chart-actions">
+            <button id="shareButton" class="share-button">
+                <span class="share-text">Share Current Standings</span>
+            </button>
+        </div>
+        <p class="chart-method-note">
+            For detailed aggregation methodology, see the <a href="/methodology#foldout-pm">Prediction Markets Aggregation section</a> on the Methodology page.
+        </p>
+    </div>
+
+    <!-- Results Heatmap -->
+    <div class="data-panel heatmap-callout" id="heatmapSection">
+        <p class="data-panel__label">Results Heatmap</p>
+        <p class="heatmap-callout-desc">Derived probabilities for every 1st &amp; 2nd place finish combination</p>
+        <div class="heatmap-callout-body">
+            <div id="heatmapContent">
+                <p style="color: var(--text-secondary);">Loading market data&hellip;</p>
+            </div>
+            <p class="chart-method-note">
+                For the full methodology details, see the <a href="/methodology#heatmap-methodology">Results Heatmap section</a> on the Methodology page.
             </p>
+        </div>
+    </div>
 
-            <section class="big-odds-display" id="bigOddsDisplay">
-                <div class="big-odds-candidate">
-                    <span class="big-percent">--</span>
-                    <span class="big-name">Loading...</span>
+    <!-- Calculation Breakdown -->
+    <section class="calculation-breakdown method-foldout" id="calculationBreakdown">
+        <button class="foldout-trigger" onclick="toggleCalcFoldout()">
+            <div class="foldout-trigger-left">
+                <div>
+                    <h2>Calculation Breakdown</h2>
+                    <p class="foldout-desc">Formula application for each candidate</p>
                 </div>
-            </section>
-
-            <section class="market-chart-section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <h2 style="margin: 0;">Market Trends</h2>
-                    <div class="chart-toggle" id="chartToggle">
-                        <button class="toggle-btn" data-period="1d">1 Day</button>
-                        <button class="toggle-btn" data-period="7d">7 Days</button>
-                        <button class="toggle-btn active" data-period="all">All Time</button>
-                    </div>
-                </div>
-                <div class="chart-wrapper" style="position:relative;">
-                    <div id="chartLoadingIndicator" style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none;opacity:1;transition:opacity 0.3s ease;">
-                        <span style="color:var(--text-tertiary,#888);font-size:13px;letter-spacing:0.02em;">Loading chart data&hellip;</span>
-                    </div>
-                    <canvas id="marketTrendChart"></canvas>
-                </div>
-                <p class="chart-subtitle">
-                    We have JSONL data upon request from Jan 15 to 30, but some AWS volume issues
-                    prevented us from displaying it. The graph has data from Jan 30 and on.
-                    All times displayed in Central Time (CT).
+            </div>
+            <span class="foldout-arrow" id="calc-foldout-arrow">+</span>
+        </button>
+        <div class="foldout-body" id="calc-foldout-body">
+            <div class="foldout-inner">
+                <div id="breakdownContent"></div>
+                <p class="breakdown-desc" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-default);">
+                    <strong>*</strong> = No Kalshi market available. Uses 100% of Manifold probability. Probabilities are lightly normalized (30% strength) to prevent excessive drift while preserving raw market values for top candidates.
                 </p>
-                <div style="text-align: center; margin-top: 1.5rem;">
-                    <button id="shareButton" class="share-button">
-                        <span class="share-icon">📤</span>
-                        <span class="share-text">Share Current Standings</span>
-                    </button>
-                </div>
-                <p style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-default); font-size: 0.8rem; color: var(--text-tertiary); text-align: center;">
-                    For detailed aggregation methodology, see the <a href="/methodology#foldout-pm" style="color: var(--accent-blue); text-decoration: underline;">Prediction Markets Aggregation section</a> on the Methodology page.
-                </p>
-            </section>
+            </div>
+        </div>
+    </section>
 
-            <section class="heatmap-callout" id="heatmapSection">
-                <div class="heatmap-callout-header">
-                    <h2>Results Heatmap</h2>
-                    <p class="heatmap-callout-desc">Derived probabilities for every 1st &amp; 2nd place finish combination</p>
-                </div>
-                <div class="heatmap-callout-body">
-                    <div id="heatmapContent">
-                        <p style="color: var(--text-secondary);">Loading market data...</p>
-                    </div>
-                    <p style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-default); font-size: 0.9rem; color: var(--text-secondary);">
-                        For the full methodology details, see the <a href="/methodology#heatmap-methodology" style="color: var(--accent-blue); text-decoration: underline;">Results Heatmap section</a> on the Methodology page.
-                    </p>
-                </div>
-            </section>
+    <!-- Market Sources -->
+    <section class="additional-markets">
+        <p class="data-panel__label">Market Sources</p>
 
-            <section class="donation-section">
-                <p class="donation-text">
-                    Make a donation to line my pockets. No, to pay for server costs.
-                    <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="donation-link">Support IL9Cast</a>
-                </p>
-            </section>
-
-            <section class="calculation-breakdown method-foldout" id="calculationBreakdown">
-                <button class="foldout-trigger" onclick="toggleCalcFoldout()">
-                    <div class="foldout-trigger-left">
-                        <div>
-                            <h2>Calculation Breakdown</h2>
-                            <p class="foldout-desc">Live formula application for each candidate</p>
-                        </div>
-                    </div>
-                    <span class="foldout-arrow" id="calc-foldout-arrow">+</span>
+        <div class="expandable-market" id="manifoldMarket">
+            <div class="market-header-row">
+                <button class="expand-toggle" onclick="toggleMarket('manifoldMarket')">
+                    <span class="market-name">Manifold Markets</span>
+                    <span class="market-preview" id="manifoldPreview">Loading&hellip;</span>
+                    <span class="expand-icon">+</span>
                 </button>
-                <div class="foldout-body" id="calc-foldout-body">
-                    <div class="foldout-inner">
-                        <div id="breakdownContent"></div>
-                        <p class="breakdown-desc" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-default);">
-                            <strong>*</strong> = No Kalshi market available. Uses 100% of Manifold probability. Probabilities are lightly normalized (30% strength) to prevent excessive drift while preserving raw market values for top candidates.
-                        </p>
+                <a href="https://manifold.markets/JeromeHPowell/who-will-win-the-democratic-primary-RZdcps6dL9" target="_blank" class="market-header-link" title="View on Manifold Markets">&#8599;</a>
+            </div>
+            <div class="expand-content">
+                <div class="market-candidates" id="manifoldCandidates">
+                    <div class="market-candidate">
+                        <span class="candidate-name">Loading&hellip;</span>
+                        <span class="candidate-odds">--</span>
                     </div>
                 </div>
-            </section>
+                <div class="market-footer">
+                    <span class="last-updated" id="manifoldUpdated">Final archived snapshot</span>
+                    <a href="https://manifold.markets/JeromeHPowell/who-will-win-the-democratic-primary-RZdcps6dL9" target="_blank" class="market-link">View on Manifold</a>
+                </div>
+            </div>
+        </div>
 
-            <section class="additional-markets">
-                <h2>Market Sources</h2>
-
-                <div class="expandable-market" id="manifoldMarket">
-                    <div class="market-header-row">
-                        <button class="expand-toggle" onclick="toggleMarket('manifoldMarket')">
-                            <span class="market-name">
-                                Manifold Markets
-                            </span>
-                            <span class="market-preview" id="manifoldPreview">Loading...</span>
-                            <span class="expand-icon">+</span>
-                        </button>
-                        <a href="https://manifold.markets/JeromeHPowell/who-will-win-the-democratic-primary-RZdcps6dL9" target="_blank" class="market-header-link" title="View on Manifold Markets">↗</a>
-                    </div>
-                    <div class="expand-content">
-                        <div class="market-candidates" id="manifoldCandidates">
-                            <div class="market-candidate">
-                                <span class="candidate-name">Loading...</span>
-                                <span class="candidate-odds">--</span>
-                            </div>
-                        </div>
-                        <div class="market-footer">
-                            <span class="last-updated" id="manifoldUpdated">Final archived snapshot</span>
-                            <a href="https://manifold.markets/JeromeHPowell/who-will-win-the-democratic-primary-RZdcps6dL9" target="_blank" class="market-link">View on Manifold →</a>
-                        </div>
+        <div class="expandable-market" id="kalshiMarket">
+            <div class="market-header-row">
+                <button class="expand-toggle" onclick="toggleMarket('kalshiMarket')">
+                    <span class="market-name">Kalshi</span>
+                    <span class="market-preview" id="kalshiPreview">Loading&hellip;</span>
+                    <span class="expand-icon">+</span>
+                </button>
+                <a href="https://kalshi.com/markets/kxil9d/il-9-democratic-primary/kxil9d-26" target="_blank" class="market-header-link" title="View on Kalshi">&#8599;</a>
+            </div>
+            <div class="expand-content">
+                <div class="market-candidates" id="kalshiCandidates">
+                    <div class="market-candidate">
+                        <span class="candidate-name">Loading&hellip;</span>
+                        <span class="candidate-odds">--</span>
                     </div>
                 </div>
-
-                <div class="expandable-market" id="kalshiMarket">
-                    <div class="market-header-row">
-                        <button class="expand-toggle" onclick="toggleMarket('kalshiMarket')">
-                            <span class="market-name">
-                                Kalshi
-                            </span>
-                            <span class="market-preview" id="kalshiPreview">Loading...</span>
-                            <span class="expand-icon">+</span>
-                        </button>
-                        <a href="https://kalshi.com/markets/kxil9d/il-9-democratic-primary/kxil9d-26" target="_blank" class="market-header-link" title="View on Kalshi">↗</a>
-                    </div>
-                    <div class="expand-content">
-                        <div class="market-candidates" id="kalshiCandidates">
-                            <div class="market-candidate">
-                                <span class="candidate-name">Loading...</span>
-                                <span class="candidate-odds">--</span>
-                            </div>
-                        </div>
-                        <div class="market-footer">
-                            <span class="last-updated" id="kalshiUpdated">Final archived snapshot</span>
-                            <a href="https://kalshi.com/markets/kxil9d/il-9-democratic-primary/kxil9d-26" target="_blank" class="market-link">View on Kalshi →</a>
-                        </div>
-                    </div>
+                <div class="market-footer">
+                    <span class="last-updated" id="kalshiUpdated">Final archived snapshot</span>
+                    <a href="https://kalshi.com/markets/kxil9d/il-9-democratic-primary/kxil9d-26" target="_blank" class="market-link">View on Kalshi</a>
                 </div>
-            </section>
+            </div>
+        </div>
+    </section>
 
-            <!-- Email Alerts Section (archived) -->
-            <section class="email-alerts-section email-alerts-archived">
-                <h2>Email Alerts</h2>
-                <p class="alerts-description">Swing alerts and daily summaries are no longer sent &mdash; the race was called on March 17, 2026. Thanks to everyone who subscribed while the site was live.</p>
-            </section>
+    <!-- Email Alerts (archived) -->
+    <div class="data-panel">
+        <p class="data-panel__label">Email Alerts</p>
+        <p class="prose-block">Swing alerts and daily summaries are no longer sent &mdash; the race was called on March 17, 2026. Thanks to everyone who subscribed while the site was live.</p>
+    </div>
 
-            <!-- Download Data Section -->
-            <section class="download-data-section">
-                <h2>Download Historical Data</h2>
-                <p class="download-description">Download the complete historical snapshot data in your preferred format</p>
-                <div class="download-buttons">
-                    <a href="/api/download/snapshots/csv" class="download-button" download>
-                        <span class="download-icon">⬇</span>
-                        Download CSV
-                    </a>
-                    <a href="/api/download/snapshots" class="download-button download-button-secondary" download>
-                        <span class="download-icon">⬇</span>
-                        Download JSONL
-                    </a>
-                </div>
-            </section>
-        </section>
+    <!-- Download Historical Data -->
+    <div class="data-panel download-data-section">
+        <p class="data-panel__label">Download Historical Data</p>
+        <p class="download-description">Download the complete historical snapshot data in your preferred format.</p>
+        <div class="download-buttons">
+            <a href="/api/download/snapshots/csv" class="download-button" download>Download CSV</a>
+            <a href="/api/download/snapshots" class="download-button download-button-secondary" download>Download JSONL</a>
+        </div>
+    </div>
+
+</div>
 {% endblock %}
 
 {% block page_styles %}
