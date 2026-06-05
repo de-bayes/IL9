@@ -80,7 +80,9 @@ railway logs
 - `templates/odds.html` - Precinct Model page with interactive Leaflet map, Monte Carlo results, data tables
 - `templates/fundraising.html` - Fundraising data page (in development)
 - `templates/about.html` - About page
-- `static/style.css` (~2500 lines) - Complete styling with dark mode toggle
+- `static/landing-style.css` (~1500 lines) - Editorial design system (dark/light themes)
+- `static/css/components.css` - Shared foldouts, page-hero, data cards
+- `static/css/pages/*.css` - Per-page styles extracted from templates
 
 ### Data Collection Pipeline
 

@@ -11,6 +11,17 @@
 :root {
     --page-gutter: clamp(1rem, 4vw, 2.5rem);
     --page-max: 820px;
+    --width-editorial: 820px;
+    --width-data: 1100px;
+    --width-wide: 1200px;
+    /* Candidate colors — unified across charts, model, candidates pages */
+    --candidate-biss: #C41E3A;
+    --candidate-fine: #1E3A8A;
+    --candidate-abughazaleh: #2D6A4F;
+    --candidate-schakowsky: #6B4C9A;
+    --candidate-simmons: #B8860B;
+    --candidate-yassky: #C75B12;
+    --candidate-other: #6B6B6B;
     --accent-color: var(--accent-gold);
     --accent: var(--accent-blue);
     /* Dark editorial palette (default — election night) */

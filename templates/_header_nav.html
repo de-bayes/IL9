@@ -20,11 +20,11 @@
                 </button>
             </div>
             <nav class="mobile-nav" id="mobileNav">
-                <a href="/markets">Markets</a>
-                <a href="/odds">Model</a>
-                <a href="/money">Money</a>
-                <a href="/candidates">Candidates</a>
-                <a href="/methodology">Methodology</a>
-                <a href="/about">About</a>
+                <a href="/markets"{% if nav_active == 'markets' %} class="active"{% endif %}>Markets</a>
+                <a href="/odds"{% if nav_active == 'model' %} class="active"{% endif %}>Model</a>
+                <a href="/money"{% if nav_active == 'money' %} class="active"{% endif %}>Money</a>
+                <a href="/candidates"{% if nav_active == 'candidates' %} class="active"{% endif %}>Candidates</a>
+                <a href="/methodology"{% if nav_active == 'methodology' %} class="active"{% endif %}>Methodology</a>
+                <a href="/about"{% if nav_active == 'about' %} class="active"{% endif %}>About</a>
             </nav>
         </header>

@@ -1,0 +1,197 @@
+/* ============================================
+   IL9Cast — Shared UI components
+   ============================================ */
+
+/* Page hero — standard across content pages */
+.page-hero,
+section.hero {
+    max-width: var(--width-editorial);
+    margin: 0 auto;
+    padding: 3rem var(--page-gutter) 2rem;
+    text-align: center;
+}
+
+.page-hero__title,
+section.hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+}
+
+.page-hero__subtitle,
+section.hero .hero-subtitle,
+section.hero .subtitle,
+section.hero .page-hero__subtitle {
+    font-family: var(--sans);
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Foldout accordion — shared by methodology + markets */
+.foldout,
+.method-foldout {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+}
+
+.foldout.active,
+.method-foldout.active {
+    border-color: var(--border-hover);
+    border-left: 3px solid var(--accent-gold);
+}
+
+.foldout-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    color: inherit;
+    transition: background 0.2s ease;
+}
+
+.foldout-trigger:hover {
+    background: var(--bg-surface-hover);
+}
+
+.foldout-trigger-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.foldout-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.foldout-trigger h2 {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.foldout-desc {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    color: var(--text-tertiary);
+    margin: 0.2rem 0 0 0;
+    line-height: 1.4;
+}
+
+.foldout-arrow {
+    font-family: var(--sans);
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: var(--text-tertiary);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    width: 28px;
+    text-align: center;
+    line-height: 1;
+}
+
+.foldout-arrow.open {
+    transform: rotate(45deg);
+}
+
+.foldout-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.25s ease;
+    opacity: 0;
+}
+
+.foldout-body.open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+.foldout-inner {
+    overflow: hidden;
+    padding: 0 2rem;
+}
+
+.foldout-body .foldout-inner {
+    border-top: 1px solid var(--border-default);
+    padding-top: 0;
+    transition: padding-top 0.25s ease;
+}
+
+.foldout-body.open .foldout-inner {
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+}
+
+.foldout-inner h3 {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.foldout-inner p {
+    font-family: var(--sans);
+    margin-bottom: 1rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+}
+
+.foldout-inner a {
+    color: var(--accent-blue);
+    text-decoration: underline;
+}
+
+.foldout-inner a:hover {
+    opacity: 0.85;
+}
+
+/* Data card — flat surface, no lift/blur */
+.data-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    padding: 1.5rem;
+    transition: border-color 0.15s ease;
+}
+
+.data-card:hover {
+    border-color: var(--border-hover);
+}
+
+@media (max-width: 700px) {
+    .foldout-trigger {
+        padding: 1.25rem 1.25rem;
+    }
+    .foldout-inner {
+        padding: 0 1.25rem;
+    }
+    .foldout-trigger h2 {
+        font-size: 1.2rem;
+    }
+}

@@ -1,16 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+{% extends "landing_base.html" %}
 
-    <!-- Primary Meta Tags -->
+{% block meta %}
+<!-- Primary Meta Tags -->
     <title>IL9Cast &mdash; IL-9 Democratic Primary Forecast (Archive)</title>
     <meta name="title" content="IL9Cast &mdash; IL-9 Democratic Primary Forecast (Archive)">
     <meta name="description" content="Archive of IL9Cast, a forecasting hub for the March 17, 2026 Illinois 9th District Democratic primary. See how the precinct model's predictions compared to the actual results.">
     <meta name="keywords" content="IL9Cast, Illinois 9th District, Democratic Primary, primary election 2026, prediction markets, precinct model, election forecast, Daniel Biss, Jan Schakowsky, archive">
     <link rel="canonical" href="https://il9.org/">
-
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://il9.org/">
@@ -20,29 +16,16 @@
     <meta property="og:image" content="https://il9.org/static/og-image.png">
 
     <!-- Twitter -->
+    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://il9.org/">
     <meta property="twitter:title" content="IL9Cast &mdash; IL-9 Democratic Primary Forecast (Archive)">
     <meta property="twitter:description" content="Archive of IL9Cast: how the precinct model's predictions compared to the actual results of the March 17, 2026 IL-9 Democratic primary.">
     <meta property="twitter:image" content="https://il9.org/static/og-image.png">
+{% endblock %}
 
-    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='landing-style.css') }}">
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WVTWQBBG8S"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-WVTWQBBG8S');
-    </script>
-
-    <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json">
+{% block head_extra %}
+<script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "WebSite",
@@ -51,51 +34,14 @@
         "description": "Archive of IL9Cast, a forecasting hub for the March 17, 2026 Illinois 9th District Democratic primary."
     }
     </script>
-</head>
-<script>
-    // Apply saved theme BEFORE paint to prevent flash (dark is default)
-    (function() {
-        var t = localStorage.getItem('il9-theme');
-        if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
-    })();
-</script>
-<body>
+{% endblock %}
 
-    <div class="site-content">
-        <!-- ARCHIVE BANNER -->
-        <div class="archive-banner">Archive &middot; Live forecasting ended March 17, 2026</div>
+{% block site_banner %}
+<div class="archive-banner">Archive &middot; Live forecasting ended March 17, 2026</div>
+{% endblock %}
 
-        <!-- HEADER -->
-        <header>
-            <a href="/" class="logo">IL9<span>Cast</span></a>
-            <nav class="desktop-nav">
-                <a href="/markets">Markets</a>
-                <a href="/odds">Model</a>
-                <a href="/money">Money</a>
-                <a href="/candidates">Candidates</a>
-                <a href="/methodology">Methodology</a>
-                <a href="/about">About</a>
-            </nav>
-            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
-                <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-            </button>
-            <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav class="mobile-nav" id="mobileNav">
-                <a href="/markets">Markets</a>
-                <a href="/odds">Model</a>
-                <a href="/money">Money</a>
-                <a href="/candidates">Candidates</a>
-                <a href="/methodology">Methodology</a>
-                <a href="/about">About</a>
-            </nav>
-        </header>
-
-        <!-- HERO -->
+{% block content %}
+<!-- HERO -->
         <section class="hero" id="home">
             <h1>Illinois 9th District<br><em>Democratic Primary</em></h1>
             <p class="hero-subtitle">A retrospective of IL9Cast: how prediction markets, a precinct-level model, and campaign-finance data tracked the March 17, 2026 primary &mdash; and how the forecast compared to the actual result.</p>
@@ -245,133 +191,8 @@
                 <a href="/api/download/snapshots" class="btn-secondary">Download Data</a>
             </div>
         </section>
+{% endblock %}
 
-        <!-- FOOTER -->
-        <footer class="site-footer">
-            <hr class="footer-rule">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Navigate</h4>
-                    <ul>
-                        <li><a href="/markets">Markets</a></li>
-                        <li><a href="/candidates">Candidates</a></li>
-                        <li><a href="/money">Money</a></li>
-                        <li><a href="/methodology">Methodology</a></li>
-                        <li><a href="/about">About</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Resources</h4>
-                    <ul>
-                        <li><a href="https://www.mccomb.ca/writing/il9cast-postmortem" target="_blank" rel="noopener noreferrer">Postmortem</a></li>
-                        <li><a href="/api/download/snapshots">Download Data</a></li>
-                        <li><a href="https://github.com/de-bayes/IL9" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-                        <li><a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer">Support This Project</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Disclaimer</h4>
-                    <p>Prediction markets involve risk. Past performance does not guarantee future results. This platform aggregates public market data and presents model-based projections for informational purposes only.</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <span>&copy; 2026 IL9Cast. Built with open data.</span>
-                <a href="https://buy.stripe.com/4gMdR98o72FP77e7jX1sQ00" target="_blank" rel="noopener noreferrer" class="footer-support-link">Support This Project</a>
-            </div>
-        </footer>
-
-        <div class="flag-footer-image">
-            <img src="{{ url_for('static', filename='flag-footer.png') }}" alt="Illinois Flag Footer">
-        </div>
-    </div>
-
-    <script>
-        // Theme toggle with localStorage persistence
-        function toggleTheme() {
-            var isLight = document.documentElement.getAttribute('data-theme') === 'light';
-            if (isLight) {
-                document.documentElement.removeAttribute('data-theme');
-                localStorage.setItem('il9-theme', 'dark');
-            } else {
-                document.documentElement.setAttribute('data-theme', 'light');
-                localStorage.setItem('il9-theme', 'light');
-            }
-        }
-
-        // Mobile hamburger menu
-        function toggleMobileMenu() {
-            const hamburger = document.getElementById('hamburger');
-            const mobileNav = document.getElementById('mobileNav');
-            hamburger.classList.toggle('active');
-            mobileNav.classList.toggle('active');
-        }
-
-        document.querySelectorAll('#mobileNav a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('hamburger').classList.remove('active');
-                document.getElementById('mobileNav').classList.remove('active');
-            });
-        });
-
-        document.addEventListener('click', (e) => {
-            const hamburger = document.getElementById('hamburger');
-            const mobileNav = document.getElementById('mobileNav');
-            if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) {
-                hamburger.classList.remove('active');
-                mobileNav.classList.remove('active');
-            }
-        });
-
-        // Fetch snapshot count and data points
-        async function loadStats() {
-            try {
-                const resp = await fetch('/api/snapshots/count');
-                const data = await resp.json();
-                const snapshots = data.snapshots || data.count || 0;
-                const dataPoints = data.data_points || 0;
-
-                animateValue('dataPointCount', dataPoints);
-                const snapshotEl = document.getElementById('snapshotCount');
-                if (snapshotEl) {
-                    snapshotEl.textContent = snapshots.toLocaleString();
-                }
-            } catch (e) {
-                console.error('Failed to fetch stats:', e);
-            }
-        }
-
-        // Animate a number counting up
-        function animateValue(elementId, target) {
-            const el = document.getElementById(elementId);
-            if (!el || !target) return;
-
-            const duration = 1500;
-            const startTime = Date.now();
-
-            function easeOut(t) {
-                return 1 - Math.pow(1 - t, 3);
-            }
-
-            function update() {
-                const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const current = Math.floor(easeOut(progress) * target);
-                el.textContent = current.toLocaleString();
-
-                if (progress < 1) {
-                    requestAnimationFrame(update);
-                } else {
-                    el.textContent = target.toLocaleString();
-                }
-            }
-
-            update();
-        }
-
-        window.addEventListener('load', () => {
-            loadStats();
-        });
-    </script>
-    <script src="{{ url_for('static', filename='site.js') }}"></script>
-</body>
-</html>
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+{% endblock %}
