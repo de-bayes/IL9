@@ -7,8 +7,19 @@
    Replaces centered hero on data/doc pages
    ============================================ */
 
+/* Override the global `header { display: flex; position: sticky }` from landing-style.css */
+header.archive-page-header {
+    display: block;
+    position: static;
+    height: auto;
+    background: transparent;
+    z-index: auto;
+    border-bottom: none;
+    padding: 0;
+}
+
 .archive-page-header {
-    max-width: var(--width-editorial);
+    max-width: var(--width-wide);
     margin: 0 auto;
     padding: 2.5rem var(--page-gutter) 1.75rem;
     border-bottom: 1px solid var(--border-default);
@@ -41,6 +52,59 @@
     color: var(--text-secondary);
     line-height: 1.5;
     margin: 0;
+}
+
+/* stat-dl class aliases (used by candidate_fundraising & fundraising templates) */
+.stat-dl__label {
+    /* mirrors .stat-dl dt — keeps templates forward-compatible */
+}
+
+.stat-dl__value {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    text-align: right;
+}
+
+.stat-dl__value--text {
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+}
+
+/* ============================================
+   DATA REPORT SECTION — replaces card grids
+   Used in candidate finance detail page
+   ============================================ */
+
+.data-report-section {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.data-report-section .stat-dl {
+    margin-top: 0.75rem;
+}
+
+.data-report-section__title {
+    font-family: var(--sans);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin: 0 0 0.3rem;
+}
+
+.data-report-section__desc {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
 }
 
 /* ============================================

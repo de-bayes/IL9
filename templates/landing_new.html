@@ -41,154 +41,150 @@
 {% endblock %}
 
 {% block content %}
-<!-- HERO -->
-        <section class="hero" id="home">
-            <h1>Illinois 9th District<br><em>Democratic Primary</em></h1>
-            <p class="hero-subtitle">A retrospective of IL9Cast: how prediction markets, a precinct-level model, and campaign-finance data tracked the March 17, 2026 primary &mdash; and how the forecast compared to the actual result.</p>
-        </section>
-
-        <div class="hero-rule"><hr></div>
-
-        <!-- STAT BOXES -->
-        <div class="stat-strip">
-            <div class="stat-grid">
-                <div class="stat-box">
-                    <div class="stat-label">Primary Winner</div>
-                    <div class="stat-value">Biss</div>
-                    <div class="stat-detail">29.6% of the vote</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Model's Call</div>
-                    <div class="stat-value">77.2%</div>
-                    <div class="stat-detail">Win probability assigned to Biss</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Election Day</div>
-                    <div class="stat-value">Mar 17</div>
-                    <div class="stat-detail">Democratic Primary, 2026</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Snapshots Collected</div>
-                    <div class="stat-value" id="snapshotCount">--</div>
-                    <div class="stat-detail"><span id="dataPointCount">--</span> data points archived</div>
-                </div>
-            </div>
+        <!-- ARCHIVE PAGE HEADER -->
+        <div class="archive-page-header">
+            <p class="archive-page-header__kicker">IL-09 Democratic Primary &middot; Archive</p>
+            <h1 class="archive-page-header__title">Illinois 9th District Democratic Primary</h1>
+            <p class="archive-page-header__meta">Coverage: Jan 30 &ndash; Mar 17, 2026 &middot; IL9Cast prediction market and precinct model archive</p>
         </div>
 
-        <!-- HOW THE MODEL DID -->
+        <!-- KEY STATISTICS -->
         <section class="editorial-section">
-            <div class="section-label">How the model did</div>
-            <div class="accuracy-card">
-                <p class="accuracy-lede">The precinct model was published two weeks before the primary. It called the correct winner, put the top three candidates in the right order, and landed within about two points on every top-three vote share.</p>
+            <div class="section-label">Key statistics</div>
+            <table class="stat-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Detail</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Primary winner</td>
+                        <td class="stat-table__value">Daniel Biss</td>
+                        <td>29.6% of the vote</td>
+                    </tr>
+                    <tr>
+                        <td>Model win probability (Biss)</td>
+                        <td class="stat-table__value">77.2%</td>
+                        <td>Published two weeks before the primary</td>
+                    </tr>
+                    <tr>
+                        <td>Election date</td>
+                        <td class="stat-table__value">Mar 17, 2026</td>
+                        <td>IL-9 Democratic Primary</td>
+                    </tr>
+                    <tr>
+                        <td>Market snapshots archived</td>
+                        <td class="stat-table__value" id="snapshotCount">--</td>
+                        <td><span id="dataPointCount">--</span> data points</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- MODEL ACCURACY -->
+        <section class="editorial-section">
+            <div class="section-label">Model accuracy</div>
+            <div class="data-panel">
+                <p class="prose-block">The precinct model was published two weeks before the primary. It called the correct winner, put the top three candidates in the right order, and landed within about two points on every top-three vote share.</p>
                 <div class="accuracy-rows">
                     <div class="accuracy-row">
                         <span class="accuracy-name">Biss</span>
                         <span class="accuracy-pred">predicted <strong>31.6%</strong></span>
-                        <span class="accuracy-arrow">&rarr;</span>
                         <span class="accuracy-actual">actual <strong>29.6%</strong></span>
                         <span class="accuracy-err accuracy-err-good">&minus;2.0 pp</span>
                     </div>
                     <div class="accuracy-row">
                         <span class="accuracy-name">Abughazaleh</span>
                         <span class="accuracy-pred">predicted <strong>24.3%</strong></span>
-                        <span class="accuracy-arrow">&rarr;</span>
                         <span class="accuracy-actual">actual <strong>25.9%</strong></span>
                         <span class="accuracy-err accuracy-err-good">+1.6 pp</span>
                     </div>
                     <div class="accuracy-row">
                         <span class="accuracy-name">Fine</span>
                         <span class="accuracy-pred">predicted <strong>19.7%</strong></span>
-                        <span class="accuracy-arrow">&rarr;</span>
                         <span class="accuracy-actual">actual <strong>20.4%</strong></span>
                         <span class="accuracy-err accuracy-err-good">+0.7 pp</span>
                     </div>
                 </div>
-                <p class="accuracy-footnote">The model assigned Biss a <strong>77.2%</strong> win probability. He won. <a href="/odds" class="accuracy-link">See the full comparison on the Model page &rarr;</a></p>
+                <p class="accuracy-footnote">The model assigned Biss a <strong>77.2%</strong> win probability. He won. <a href="/odds" class="accuracy-link">See the full comparison on the Model page</a></p>
             </div>
         </section>
 
-        <!-- POSTMORTEM -->
+        <!-- ARCHIVE INDEX -->
         <section class="editorial-section">
-            <div class="section-label">Project Postmortem</div>
-            <a href="https://www.mccomb.ca/writing/il9cast-postmortem" target="_blank" rel="noopener noreferrer" class="featured-card featured-card--postmortem">
-                <div class="featured-card-inner">
-                    <span class="featured-card-tag">Essay</span>
-                    <h2 class="featured-card-title">IL9Cast: A Postmortem</h2>
-                    <p class="featured-card-desc">A look back at what the model got right, what the markets missed, and what it was like to run a one-person forecast for a 15-way primary.</p>
-                    <span class="featured-card-arrow">Read on mccomb.ca &rarr;</span>
-                </div>
-            </a>
-        </section>
-
-        <!-- EXPLORE SECTION -->
-        <section class="editorial-section">
-            <div class="section-label">Explore the archive</div>
-            <div class="nav-cards">
-                <a href="/markets" class="nav-card">
-                    <div class="nav-card-type">Aggregated Odds</div>
-                    <div class="nav-card-title">Prediction Markets</div>
-                    <div class="nav-card-desc">Weighted aggregation of Manifold Markets and Kalshi through election night &mdash; the full archived time series.</div>
-                    <div class="nav-card-arrow">View markets &rarr;</div>
+            <div class="section-label">Archive index</div>
+            <div class="archive-index">
+                <a href="/markets" class="archive-index__row">
+                    <span class="archive-index__label">Prediction Markets</span>
+                    <span class="archive-index__desc">Weighted aggregation of Manifold Markets and Kalshi through election night &mdash; the full archived time series.</span>
                 </a>
-                <a href="/candidates" class="nav-card">
-                    <div class="nav-card-type">Candidate Profiles</div>
-                    <div class="nav-card-title">The Candidates</div>
-                    <div class="nav-card-desc">Profiles, final vote shares, and a look back at every candidate who ran in the IL-9 Democratic primary.</div>
-                    <div class="nav-card-arrow">View candidates &rarr;</div>
+                <a href="/odds" class="archive-index__row">
+                    <span class="archive-index__label">Precinct Model</span>
+                    <span class="archive-index__desc">100,000-simulation Monte Carlo across 436 precincts &mdash; now paired with actual results so you can compare forecast to outcome.</span>
                 </a>
-                <a href="/odds" class="nav-card">
-                    <div class="nav-card-type">Precinct Simulation</div>
-                    <div class="nav-card-title">Precinct Model</div>
-                    <div class="nav-card-desc">100,000-simulation Monte Carlo across 436 precincts &mdash; now paired with actual results so you can see how the model performed.</div>
-                    <div class="nav-card-arrow">View model &rarr;</div>
+                <a href="/candidates" class="archive-index__row">
+                    <span class="archive-index__label">Candidate Directory</span>
+                    <span class="archive-index__desc">Profiles, final vote shares, and a look back at every candidate who ran in the IL-9 Democratic primary.</span>
+                </a>
+                <a href="/money" class="archive-index__row">
+                    <span class="archive-index__label">Fundraising Data</span>
+                    <span class="archive-index__desc">FEC campaign finance data for IL-9 candidates through the primary cycle.</span>
+                </a>
+                <a href="/api/download/snapshots" class="archive-index__row">
+                    <span class="archive-index__label">Download Dataset</span>
+                    <span class="archive-index__desc">Full historical JSONL snapshot file &mdash; all market data points from Jan 30 to Mar 17, 2026.</span>
                 </a>
             </div>
         </section>
 
-        <!-- FEATURED CASE STUDY -->
+        <!-- PROJECT POSTMORTEM -->
         <section class="editorial-section">
-            <div class="section-label">Featured Analysis</div>
-            <a href="/case-study/bid-ask-spreads" class="featured-card">
-                <div class="featured-card-inner">
-                    <span class="featured-card-tag">Case Study</span>
-                    <h2 class="featured-card-title">Bid-Ask Spreads Even Moses Can't Part</h2>
-                    <p class="featured-card-desc">A trader pushed Laura Fine to 30% on Kalshi. The spread said 14&ndash;16%. Every other tracker parroted the spike. Here's why IL9Cast didn't flinch.</p>
-                    <span class="featured-card-arrow">Read the full analysis &rarr;</span>
-                </div>
-            </a>
+            <div class="section-label">Project postmortem</div>
+            <div class="data-panel">
+                <div class="data-panel__label">Essay &middot; External</div>
+                <h2 style="font-family: var(--sans); font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.6rem;">IL9Cast: A Postmortem</h2>
+                <p class="prose-block">A look back at what the model got right, what the markets missed, and what it was like to run a one-person forecast for a 15-way primary.</p>
+                <a href="https://www.mccomb.ca/writing/il9cast-postmortem" target="_blank" rel="noopener noreferrer" class="text-link text-link--strong">Read on mccomb.ca</a>
+            </div>
         </section>
 
-        <!-- ABOUT SECTION -->
+        <!-- FEATURED ANALYSIS -->
         <section class="editorial-section">
-            <div class="section-label">About this project</div>
-            <div class="about-block">
-                <div class="about-block-text">
-                    <strong>IL9Cast</strong> was an independent hub for the Illinois 9th District Democratic Primary. From January through election day it aggregated prediction market data, published a precinct-level election model, tracked fundraising across every candidate, and on March 17 covered the race in real time. It now lives on as an archive.
-                </div>
-                <ul class="about-block-list">
-                    <li>
-                        <strong>Manifold Markets</strong>
-                        40% weight in aggregation formula
-                    </li>
-                    <li>
-                        <strong>Kalshi</strong>
-                        60% weight (last price, midpoint, liquidity-adjusted)
-                    </li>
-                    <li>
-                        <strong>Precinct-Level Model</strong>
-                        100,000 simulation runs across 436 precincts (<a href="/odds" style="color: var(--accent-blue); text-decoration: underline;">see how it performed</a>)
-                    </li>
-                    <li>
-                        <strong>Open Data</strong>
-                        Full historical dataset available for download
-                    </li>
-                </ul>
+            <div class="section-label">Featured analysis</div>
+            <div class="data-panel">
+                <div class="data-panel__label">Case Study</div>
+                <h2 style="font-family: var(--sans); font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.6rem;">Bid-Ask Spreads Even Moses Can&rsquo;t Part</h2>
+                <p class="prose-block">A trader pushed Laura Fine to 30% on Kalshi. The spread said 14&ndash;16%. Every other tracker parroted the spike. Here&rsquo;s why IL9Cast didn&rsquo;t flinch.</p>
+                <a href="/case-study/bid-ask-spreads" class="text-link text-link--strong">Read the full analysis</a>
             </div>
+        </section>
 
-            <div class="cta-row">
-                <a href="/odds" class="btn-primary">See model vs actual</a>
-                <a href="/markets" class="btn-secondary">Archived Markets</a>
-                <a href="/api/download/snapshots" class="btn-secondary">Download Data</a>
+        <!-- ABOUT -->
+        <section class="editorial-section">
+            <div class="section-label">About this archive</div>
+            <div class="data-panel">
+                <p class="prose-block"><strong style="color: var(--text-primary);">IL9Cast</strong> was an independent hub for the Illinois 9th District Democratic Primary. From January through election day it aggregated prediction market data, published a precinct-level election model, tracked fundraising across every candidate, and on March 17 covered the race in real time. It now lives on as an archive.</p>
+                <dl class="stat-dl">
+                    <div class="stat-dl__row">
+                        <dt>Manifold Markets</dt>
+                        <dd>40% weight in aggregation formula</dd>
+                    </div>
+                    <div class="stat-dl__row">
+                        <dt>Kalshi</dt>
+                        <dd>60% weight (last price, midpoint, liquidity-adjusted)</dd>
+                    </div>
+                    <div class="stat-dl__row">
+                        <dt>Precinct Model</dt>
+                        <dd>100,000 simulation runs across 436 precincts &mdash; <a href="/odds" class="text-link">see how it performed</a></dd>
+                    </div>
+                    <div class="stat-dl__row">
+                        <dt>Open Data</dt>
+                        <dd>Full historical dataset &mdash; <a href="/api/download/snapshots" class="text-link">download JSONL</a></dd>
+                    </div>
+                </dl>
             </div>
         </section>
 {% endblock %}
