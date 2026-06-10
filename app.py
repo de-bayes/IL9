@@ -1445,6 +1445,10 @@ def rjmc_preview():
 def odds():
     return render_template('odds.html')
 
+@app.route('/postmortem')
+def postmortem():
+    return render_template('postmortem.html')
+
 
 @app.route('/api/model/precincts')
 def api_model_precincts():
@@ -1467,7 +1471,6 @@ def api_model_precincts():
         resp.headers['Cache-Control'] = 'public, max-age=86400'
         return resp
     return jsonify({'error': 'Precinct GeoJSON not found'}), 404
-
 
 @app.route('/model/methodology')
 def model_methodology():
