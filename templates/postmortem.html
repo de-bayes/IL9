@@ -116,7 +116,7 @@
                 <figure class="pm-figure">
                     <div class="pm-seg" id="seg-scatter"></div>
                     <div class="pm-chartbox pm-chartbox-tall"><canvas id="chart-scatter"></canvas></div>
-                    <figcaption class="pm-figcaption">Each dot is a precinct, sized by votes cast; the dashed line is a perfect forecast. Pick a candidate and hover a dot to read it. The flatter the cloud, the more the model compressed toward the district average.</figcaption>
+                    <figcaption class="pm-figcaption" id="cap-scatter">Each dot is a precinct, sized by votes cast; the dashed line is a perfect forecast and the solid line is what the model actually did. Pick a candidate and hover a dot to read it.</figcaption>
                 </figure>
             </section>
 
@@ -609,26 +609,37 @@
             });
         }
 
-        /* 3. Scatter with candidate toggle */
+        /* 3. Scatter with candidate toggle + fitted "what the model did" line */
+        function linfit(pts) {
+            var n = pts.length, sx = 0, sy = 0, sxy = 0, sxx = 0;
+            pts.forEach(function (p) { sx += p.x; sy += p.y; sxy += p.x * p.y; sxx += p.x * p.x; });
+            var mx = sx / n, my = sy / n, b = (sxy - n * mx * my) / (sxx - n * mx * mx);
+            return { slope: b, intercept: my - b * mx };
+        }
         function buildScatter(D) {
             var seg = document.getElementById('seg-scatter');
+            var cap = document.getElementById('cap-scatter');
             var current = 'abughazaleh';
             var chart = new Chart(document.getElementById('chart-scatter'), {
                 data: { datasets: [
-                    { type: 'line', label: 'perfect', data: [], borderColor: TXT, borderDash: [5, 5],
-                      borderWidth: 1, pointRadius: 0, fill: false, order: 1 },
-                    { type: 'scatter', label: 'precincts', data: [], order: 2,
+                    { type: 'line', label: 'Perfect forecast', data: [], borderColor: TXT, borderDash: [6, 5],
+                      borderWidth: 1.5, pointRadius: 0, fill: false, order: 1 },
+                    { type: 'line', label: 'What the model did', data: [], borderColor: ACCENT,
+                      borderWidth: 3, pointRadius: 0, fill: false, order: 2 },
+                    { type: 'scatter', label: 'precincts', data: [], order: 3,
                       pointRadius: function (ctx) { var v = ctx.raw && ctx.raw.v; return v ? Math.min(11, 2 + 5 * Math.sqrt(v / 900)) : 3; },
                       pointHoverRadius: function (ctx) { var v = ctx.raw && ctx.raw.v; return (v ? Math.min(11, 2 + 5 * Math.sqrt(v / 900)) : 3) + 2; } }
                 ] },
                 options: {
-                    scales: { x: axis('Actual share (%)', { beginAtZero: true }), y: axis('Forecast share (%)', { beginAtZero: true }) },
+                    scales: { x: axis('Actual share (%)', { type: 'linear', min: 0 }), y: axis('Forecast share (%)', { type: 'linear', min: 0 }) },
                     plugins: {
-                        legend: { display: false },
-                        tooltip: { callbacks: {
-                            title: function (items) { return items[0].raw.p; },
-                            label: function (c) { return ['Actual ' + c.raw.x + '%', 'Forecast ' + c.raw.y + '%']; }
-                        } }
+                        legend: { display: true, position: 'top', align: 'end',
+                            labels: { filter: function (it) { return it.text !== 'precincts'; } } },
+                        tooltip: { filter: function (it) { return it.dataset.label === 'precincts'; },
+                            callbacks: {
+                                title: function (items) { return items[0].raw.p; },
+                                label: function (c) { return ['Actual ' + c.raw.x + '%', 'Forecast ' + c.raw.y + '%']; }
+                            } }
                     }
                 }
             });
@@ -639,13 +650,20 @@
                 var lim = 0;
                 pts.forEach(function (p) { lim = Math.max(lim, p.x, p.y); });
                 lim = Math.ceil(lim * 1.05);
+                var f = linfit(pts);
                 chart.data.datasets[0].data = [{ x: 0, y: 0 }, { x: lim, y: lim }];
-                chart.data.datasets[1].data = pts;
-                chart.data.datasets[1].backgroundColor = hexA(meta.color, 0.5);
-                chart.data.datasets[1].borderColor = hexA(meta.color, 0.0);
+                chart.data.datasets[1].data = [{ x: 0, y: f.intercept }, { x: lim, y: f.intercept + f.slope * lim }];
+                chart.data.datasets[1].borderColor = meta.color;
+                chart.data.datasets[2].data = pts;
+                chart.data.datasets[2].backgroundColor = hexA(meta.color, 0.45);
+                chart.data.datasets[2].borderColor = hexA(meta.color, 0);
                 chart.options.scales.x.max = lim;
                 chart.options.scales.y.max = lim;
                 chart.update();
+                if (cap) {
+                    var move = (f.slope * 10).toFixed(1);
+                    cap.innerHTML = 'Each dot is a precinct, sized by votes cast. The dashed line is a perfect forecast (45&deg;); the solid line is what the model actually did. For every 10-point swing in <strong>' + meta.name + '</strong>’s real precinct share, the model only moved its forecast <strong>' + move + ' points</strong> — a perfect forecast would move the full 10, so the gap is the compression.';
+                }
                 Array.prototype.forEach.call(seg.children, function (b) {
                     var on = b.dataset.k === k;
                     b.classList.toggle('active', on);
