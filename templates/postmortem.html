@@ -69,7 +69,7 @@
 
         <article class="pm-page">
 
-            <p class="pm-dek">The final precinct model called the order of a seven-way race correctly and landed every candidate's district share within two points, though a closer look at the map reveals where it saw the district a good deal more smoothly than the voters actually drew it.</p>
+            <p class="pm-dek">The final precinct model landed every candidate's district share within two points and got the finishing order right at the top, though a closer look at the map reveals where it saw the district a good deal more smoothly than the voters actually drew it.</p>
 
             <p class="pm-lead">When I built the IL9Cast precinct model the honest constraint was that there was almost nothing to anchor it to: the Ninth had not held a genuinely competitive Democratic primary in roughly twenty-five years, the public polling amounted to a single non-partisan survey, and most of what circulated in the final weeks was internal numbers of the sort that tend to flatter whoever paid for them. Forecasting a six-candidate field under those conditions is less a question of precision than of whether the model captures the basic shape of the race, and so the fairer way to grade it, now that the canvass is in, is to ask two separate questions, kept apart on purpose: did it get the district right, and did the precinct-level detail actually add anything beyond what a single district-wide guess would already have told you.</p>
 
@@ -94,9 +94,9 @@
 
             <section class="pm-section">
                 <h2 class="pm-h2">The district result, more or less</h2>
-                <p class="pm-body">On the topline the model did about as well as one could reasonably ask of it. The final simulation, run on the fifth of March and frozen there, put Daniel Biss at 32.4 percent of the six-candidate vote against an actual 31.2, Kat Abughazaleh at 27.1 against 28.0, and Laura Fine at 19.4 against 21.3, with the three minor candidates each missed by under two points as well; every contender, in other words, landed within two points of the forecast, and the full ordering of the field, including the Biss-over-Abughazaleh call that was the only real suspense of the night, came out exactly right. I would not want to oversell this, given that some of the precision is the ordinary good fortune of errors that partly cancel one another out, but a six-way forecast assembled with essentially no polling has no business being this close to the mark, and it was.</p>
+                <p class="pm-body">On the topline the model did about as well as one could reasonably ask of it. The final simulation, run on the fifth of March and frozen there, put Daniel Biss at 32.4 percent of the six-candidate vote against an actual 31.2, Kat Abughazaleh at 27.1 against 28.0, and Laura Fine at 19.4 against 21.3, with the three minor candidates each missed by under two points as well; every contender, in other words, landed within two points of the forecast, and the order of finish at the top of the field, including the Biss-over-Abughazaleh call that was the only real suspense of the night, came out exactly right, with only the two trailing minor candidates, Andrew and Amiwala, ending a point apart in the reverse of the predicted order. I would not want to oversell this, given that some of the precision is the ordinary good fortune of errors that partly cancel one another out, but a six-way forecast assembled with essentially no polling has no business being this close to the mark, and it was.</p>
                 <figure class="pm-figure">
-                    <div id="pm-topline"></div>
+                    <div id="pm-topline" role="img" aria-label="Dumbbell chart: forecast versus actual district vote share for each candidate"></div>
                     <figcaption class="pm-figcaption">Forecast versus actual district vote share, weighted by votes cast. Hollow markers are the forecast, filled markers the result; the gap between them is the miss.</figcaption>
                 </figure>
             </section>
@@ -105,7 +105,7 @@
                 <h2 class="pm-h2">Did the precinct map earn its keep?</h2>
                 <p class="pm-body">A district forecast and a precinct forecast are different animals, though, and the more searching test is whether the map carried real information or merely dressed up the district average in 435 different colours. The natural benchmark is what forecasters sometimes call the no-skill baseline: assign every precinct the district-wide share for each candidate, predict no geographic variation whatsoever, and see how far off that lands you. Measured against that baseline the model comes out modestly but genuinely ahead, cutting the average precinct error by about eleven percent across the six candidates pooled together, and the improvement is concentrated almost entirely where it mattered, with Fine's precinct error falling twenty-four percent, Abughazaleh's seventeen, and Biss's ten. For the three minor candidates the model knew next to nothing the district average did not already say, which is the expected result given how little signal there was to find for them; the point that survives is that the map was not decoration, but carried real, if modest, geographic information about the candidates who were actually contesting the race.</p>
                 <figure class="pm-figure">
-                    <div class="pm-chartbox"><canvas id="chart-skill"></canvas></div>
+                    <div class="pm-chartbox"><canvas id="chart-skill" role="img" aria-label="Bar chart: each candidate's precinct skill over the district-average baseline"></canvas></div>
                     <figcaption class="pm-figcaption">Reduction in mean precinct error against predicting the district average everywhere. Bars to the right of zero mean the map added real signal.</figcaption>
                 </figure>
             </section>
@@ -115,19 +115,19 @@
                 <p class="pm-body">Where the precinct forecast fell down is visible the moment you plot predicted share against actual share for each candidate, because in place of the diagonal smear you would hope for, what you get is a set of nearly flat vertical bands: the model placed almost every precinct close to the candidate's district average and badly understated how extreme individual precincts really were. This is a compression problem rather than a bias problem, which is to say the forecast was not systematically wrong about who was strong where so much as it was too timid about the magnitude of that strength, and the consequence is a respectable precinct correlation for the top three, between roughly 0.4 and 0.6, sitting beside a near-zero correlation for Bushra Amiwala, for whom the model genuinely had no usable geographic signal at all. If there is one thing I would change first in a second version it is this, because the simulation needs to let precincts wander further from the district baseline than it currently permits.</p>
                 <figure class="pm-figure">
                     <div class="pm-seg" id="seg-scatter"></div>
-                    <div class="pm-chartbox pm-chartbox-tall"><canvas id="chart-scatter"></canvas></div>
+                    <div class="pm-chartbox pm-chartbox-tall"><canvas id="chart-scatter" role="img" aria-label="Scatter plot: forecast versus actual precinct share, with a perfect-forecast line and the model's fitted line"></canvas></div>
                     <figcaption class="pm-figcaption" id="cap-scatter">Each dot is a precinct, sized by votes cast; the dashed line is a perfect forecast and the solid line is what the model actually did. Pick a candidate and hover a dot to read it.</figcaption>
                 </figure>
             </section>
 
             <section class="pm-section">
                 <h2 class="pm-h2">Were the probabilities honest?</h2>
-                <p class="pm-body">The precinct win probabilities are a separate matter, and a more reassuring one for Abughazaleh than for Fine. A well-calibrated forecast that gives a candidate a sixty percent chance of carrying a precinct should, taken across all the precincts it speaks of that way, carry about sixty percent of them, and Abughazaleh's probabilities track that diagonal closely from one end to the other, which is roughly what you want to see. Biss's are noisier, and Fine's are close to inverted at the low end, with a cluster of precincts the model gave her only a modest chance that she went on to carry more often than not, a pattern that follows directly from the same underlying flaw, since a model that compresses everyone toward the centre will hand out too few confident calls and misjudge the tails when it does.</p>
+                <p class="pm-body">The precinct win probabilities are a separate matter, and a more reassuring one for Abughazaleh than for Fine. A well-calibrated forecast that gives a candidate a sixty percent chance of carrying a precinct should, taken across all the precincts it speaks of that way, carry about sixty percent of them, and Abughazaleh's probabilities track that diagonal closely once you are past the very low end, where even she was handed rather too little chance in a sizable block of precincts she went on to carry, which is most of what you want to see. Biss's are noisier, and Fine's are close to inverted at the low end, with a cluster of precincts the model gave her only a modest chance that she went on to carry more often than not, a pattern that follows directly from the same underlying flaw, since a model that compresses everyone toward the centre will hand out too few confident calls and misjudge the tails when it does.</p>
                 <figure class="pm-figure">
-                    <div class="pm-chartbox"><canvas id="chart-calibration"></canvas></div>
+                    <div class="pm-chartbox"><canvas id="chart-calibration" role="img" aria-label="Calibration chart: forecast precinct win probability versus share of precincts actually won"></canvas></div>
                     <figcaption class="pm-figcaption">A perfectly calibrated forecast would sit on the dashed line. Hover a point for the share of precincts won and how many fell in that bucket.</figcaption>
                 </figure>
-                <p class="pm-body" style="margin-top:1.25rem">A single number summarizes all of this: the Brier score, the standard way of grading probabilistic forecasts, where zero is a perfect call sheet and lower is better. Scoring the precinct win probabilities across the four outcomes that mattered (Biss, Abughazaleh, Fine, and everyone else) gives a Brier of 0.566, against 0.631 for the honest climatological baseline of simply quoting each candidate's district-wide win rate in every precinct, so the probabilities were about ten percent sharper than knowing nothing precinct-specific at all, which is the same modest, real edge the vote-share errors showed.</p>
+                <p class="pm-body" style="margin-top:1.25rem">A single number summarises all of this: the Brier score, the standard way of grading probabilistic forecasts, where zero is a perfect call sheet and lower is better. Scoring the precinct win probabilities across the four outcomes that mattered (Biss, Abughazaleh, Fine, and everyone else) gives a Brier of 0.566, against 0.631 for the honest climatological baseline of simply quoting each candidate's district-wide win rate in every precinct, so the probabilities were about ten percent sharper than knowing nothing precinct-specific at all, which is the same modest, real edge the vote-share errors showed.</p>
                 <div class="pm-score" id="pm-score"></div>
             </section>
 
@@ -136,12 +136,12 @@
                 <p class="pm-body">Mapping the errors makes the one real structural failure jump out. Across most of the district the misses are the ordinary salt-and-pepper of precinct noise, but McHenry County, the exurban western end, is a block of solid red on the Abughazaleh error map, where she ran on the order of sixteen points ahead of what the model expected and the model called fewer than a third of the precincts correctly, against roughly three-quarters in Chicago and in Lake. The regional breakdown tells the same story from a different angle, since outside Chicago the model leaned consistently toward Mike Simmons and away from Abughazaleh, and in McHenry that lean hardened into a genuine blind spot, almost certainly a turnout or demographic-weighting problem specific to that end of the district rather than anything wrong with the model's basic structure. It is the first place I would look in a rebuild, because a sixteen-point county-level miss is the kind of thing that ought to be fixable once you know to go looking for it.</p>
                 <figure class="pm-figure">
                     <div class="pm-seg" id="seg-map"></div>
-                    <div id="pm-map"></div>
+                    <div id="pm-map" role="img" aria-label="Map of precinct forecast error across the district"></div>
                     <div class="pm-legend" id="pm-legend"></div>
                     <figcaption class="pm-figcaption">Hover any precinct to read the miss. Toggle between Abughazaleh's signed error and the total combined error across all six candidates.</figcaption>
                 </figure>
                 <figure class="pm-figure">
-                    <div id="pm-heatmap"></div>
+                    <div id="pm-heatmap" role="img" aria-label="Heatmap: mean forecast error by candidate and region"></div>
                     <figcaption class="pm-figcaption" id="cap-regional">Mean forecast error by region and candidate. Warm cells mean the model ran a candidate too high there; cool cells mean it ran them too low.</figcaption>
                 </figure>
             </section>
@@ -151,12 +151,12 @@
                 <p class="pm-body">The geography is really a stand-in for demography, and joining the precinct errors to census and turnout data makes the blind spot concrete. The model's miss on Abughazaleh tracks two variables more than any others: the median age of a precinct and its Hispanic share. She ran well ahead of the forecast in younger and more Hispanic precincts and behind it in older ones, which is to say the model under-weighted exactly the young, diverse coalition that a candidate like her was always likeliest to assemble, and which the sparse polling gave it almost no way to anticipate. The correlations are modest, as everything at the precinct level is, but they point in a single coherent direction, and they line up precisely with the McHenry miss, since the exurban west is the older, whiter, more competitive end of the district where the model was least accurate of all.</p>
                 <figure class="pm-figure">
                     <div class="pm-seg" id="seg-tornado"></div>
-                    <div class="pm-chartbox"><canvas id="chart-tornado"></canvas></div>
-                    <figcaption class="pm-figcaption">Correlation between each precinct characteristic and the model's error. Longer bars mean the characteristic explains more of where the forecast went wrong.</figcaption>
+                    <div class="pm-chartbox"><canvas id="chart-tornado" role="img" aria-label="Bar chart: correlation between precinct characteristics and forecast error"></canvas></div>
+                    <figcaption class="pm-figcaption">Correlation between each precinct characteristic and the model's error. Longer bars mean the characteristic tracks more closely with where the forecast went wrong, though even the strongest of these explains only a modest share of it.</figcaption>
                 </figure>
                 <figure class="pm-figure">
                     <div class="pm-seg" id="seg-demoscatter"></div>
-                    <div class="pm-chartbox pm-chartbox-tall"><canvas id="chart-demoscatter"></canvas></div>
+                    <div class="pm-chartbox pm-chartbox-tall"><canvas id="chart-demoscatter" role="img" aria-label="Scatter plot: a precinct demographic versus the model's Abughazaleh error, with trend line"></canvas></div>
                     <figcaption class="pm-figcaption" id="cap-demoscatter">Each dot is a precinct; the line is the trend. Above zero the model forecast Abughazaleh too high; below zero she beat the forecast.</figcaption>
                 </figure>
             </section>
@@ -165,7 +165,7 @@
                 <h2 class="pm-h2">Where the winner calls landed</h2>
                 <p class="pm-body">Pulling all of that together, the model's 435 precinct winner calls flowed mostly, though not entirely, to where they were meant to. It handed Biss a plurality in 346 precincts and Abughazaleh in 72, whereas the actual count was 215 for Biss and 131 for Abughazaleh, with Fine carrying 80, so a sizable band of precincts the model gave to Biss went in the event to Abughazaleh or to Fine, which is the visual signature of that same too-smooth map crediting the front-runner with a little more than the neighbourhoods owed him. Counted straight the model got 63 percent of precinct winners right, and weighting by the number of votes actually cast it got 72 percent, against 49 and 45 percent respectively for the naive baseline of simply calling Biss everywhere, so the map roughly halved the error of the dumb model, which is about where I would expect a first honest attempt to come down.</p>
                 <figure class="pm-figure">
-                    <div id="pm-sankey"></div>
+                    <div id="pm-sankey" role="img" aria-label="Flow diagram from forecast precinct winner to actual precinct winner"></div>
                     <figcaption class="pm-figcaption">Each ribbon traces precincts from the winner the model forecast (left) to the winner they actually elected (right). Hover a ribbon to read the count.</figcaption>
                 </figure>
             </section>
@@ -451,6 +451,9 @@
         .pm-link, .pm-method a { color: var(--accent-blue); text-decoration: underline; }
         @media (max-width: 720px) {
             .pm-stats { grid-template-columns: repeat(2, 1fr); }
+            .pm-score { grid-template-columns: repeat(2, 1fr); }
+            #pm-heatmap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .pm-hm { min-width: 440px; }
             .pm-section { padding: 1.5rem 1.25rem; }
             .pm-dek { font-size: 1.15rem; }
             .pm-body, .pm-lead { font-size: 1rem; }
@@ -530,10 +533,19 @@
             }, extra || {});
         }
 
-        Promise.all([fetch(DATA_URL).then(function (r) { return r.json(); }),
-                     fetch(GEO_URL).then(function (r) { return r.json(); })])
+        function getJSON(u, what) {
+            return fetch(u).then(function (r) {
+                if (!r.ok) throw new Error(what + ' ' + r.status);
+                return r.json();
+            });
+        }
+        Promise.all([getJSON(DATA_URL, 'data'), getJSON(GEO_URL, 'geo')])
             .then(function (res) { build(res[0], res[1]); })
-            .catch(function (e) { console.error('postmortem load failed', e); });
+            .catch(function (e) {
+                console.error('postmortem load failed', e);
+                var box = document.getElementById('pm-topline');
+                if (box) box.innerHTML = '<p style="color:var(--text-secondary);font-family:var(--sans);padding:1rem 0">The charts could not load just now. Please refresh the page.</p>';
+            });
 
         function build(D, GEO) {
             buildToplineDumbbell(D);
@@ -662,7 +674,7 @@
                 chart.update();
                 if (cap) {
                     var move = (f.slope * 10).toFixed(1);
-                    cap.innerHTML = 'Each dot is a precinct, sized by votes cast. The dashed line is a perfect forecast (45&deg;); the solid line is what the model actually did. For every 10-point swing in <strong>' + meta.name + '</strong>’s real precinct share, the model only moved its forecast <strong>' + move + ' points</strong> — a perfect forecast would move the full 10, so the gap is the compression.';
+                    cap.innerHTML = 'Each dot is a precinct, sized by votes cast. The dashed line is a perfect forecast (45&deg;); the solid line is what the model actually did. For every 10-point swing in <strong>' + meta.name + '</strong>’s real precinct share, the model only moved its forecast <strong>' + move + ' points</strong>, where a perfect forecast would have moved closer to the full 10, so the shortfall is the compression.';
                 }
                 Array.prototype.forEach.call(seg.children, function (b) {
                     var on = b.dataset.k === k;
@@ -682,11 +694,12 @@
         /* 4. Calibration line */
         function buildCalibration(D) {
             var keys = ['biss', 'fine', 'abughazaleh'];
+            var styleBy = { biss: { dash: [], pt: 'circle' }, fine: { dash: [2, 2], pt: 'rect' }, abughazaleh: { dash: [7, 4], pt: 'triangle' } };
             var ds = keys.map(function (k) {
-                var c = D.calibration[k];
+                var c = D.calibration[k], st = styleBy[k];
                 return { label: c.name, data: c.points.map(function (p) { return { x: p.x, y: p.y, n: p.n }; }),
-                    borderColor: c.color, backgroundColor: c.color, borderWidth: 2.5,
-                    pointRadius: 4, pointHoverRadius: 6, tension: 0.15, fill: false };
+                    borderColor: c.color, backgroundColor: c.color, borderWidth: 2.5, borderDash: st.dash,
+                    pointStyle: st.pt, pointRadius: 4.5, pointHoverRadius: 6.5, tension: 0.15, fill: false };
             });
             ds.push({ label: 'Perfect calibration', data: [{ x: 0, y: 0 }, { x: 100, y: 100 }],
                 borderColor: TXT, borderDash: [5, 5], borderWidth: 1, pointRadius: 0, fill: false });
