@@ -125,7 +125,7 @@
                 <p class="pm-body">The precinct win probabilities are a separate matter, and a more reassuring one for Abughazaleh than for Fine. A well-calibrated forecast that gives a candidate a sixty percent chance of carrying a precinct should, taken across all the precincts it speaks of that way, carry about sixty percent of them, and Abughazaleh's probabilities track that diagonal closely once you are past the very low end, where even she was handed rather too little chance in a sizable block of precincts she went on to carry, which is most of what you want to see. Biss's are noisier, and Fine's are close to inverted at the low end, with a cluster of precincts the model gave her only a modest chance that she went on to carry more often than not, a pattern that follows directly from the same underlying flaw, since a model that compresses everyone toward the centre will hand out too few confident calls and misjudge the tails when it does.</p>
                 <figure class="pm-figure">
                     <div class="pm-chartbox"><canvas id="chart-calibration" role="img" aria-label="Calibration chart: forecast precinct win probability versus share of precincts actually won"></canvas></div>
-                    <figcaption class="pm-figcaption">A perfectly calibrated forecast would sit on the dashed line. Hover a point for the share of precincts won and how many fell in that bucket.</figcaption>
+                    <figcaption class="pm-figcaption">A perfectly calibrated forecast would sit on the dashed line. The thick grey line pools all three contenders; the lone star is the combined minor field, which the model gave a zero percent chance in every precinct yet which still carried nine of them. Each label shows that series' Brier contribution, and the four candidate pieces add up to the overall 0.566. Click any name in the legend to add or remove its line.</figcaption>
                 </figure>
                 <p class="pm-body" style="margin-top:1.25rem">A single number summarises all of this: the Brier score, the standard way of grading probabilistic forecasts, where zero is a perfect call sheet and lower is better. Scoring the precinct win probabilities across the four outcomes that mattered (Biss, Abughazaleh, Fine, and everyone else) gives a Brier of 0.566, against 0.631 for the honest climatological baseline of simply quoting each candidate's district-wide win rate in every precinct, so the probabilities were about ten percent sharper than knowing nothing precinct-specific at all, which is the same modest, real edge the vote-share errors showed.</p>
                 <div class="pm-score" id="pm-score"></div>
@@ -693,16 +693,32 @@
 
         /* 4. Calibration line */
         function buildCalibration(D) {
-            var keys = ['biss', 'fine', 'abughazaleh'];
-            var styleBy = { biss: { dash: [], pt: 'circle' }, fine: { dash: [2, 2], pt: 'rect' }, abughazaleh: { dash: [7, 4], pt: 'triangle' } };
-            var ds = keys.map(function (k) {
-                var c = D.calibration[k], st = styleBy[k];
-                return { label: c.name, data: c.points.map(function (p) { return { x: p.x, y: p.y, n: p.n }; }),
-                    borderColor: c.color, backgroundColor: c.color, borderWidth: 2.5, borderDash: st.dash,
-                    pointStyle: st.pt, pointRadius: 4.5, pointHoverRadius: 6.5, tension: 0.15, fill: false };
+            var cal = D.calibration;
+            // per-series line style so the curves read without relying on colour
+            var styleBy = {
+                overall: { dash: [], pt: 'circle', w: 3.5 },
+                biss: { dash: [6, 4], pt: 'rect', w: 2 },
+                abughazaleh: { dash: [2, 3], pt: 'triangle', w: 2 },
+                fine: { dash: [8, 3, 2, 3], pt: 'rectRot', w: 2 },
+                minor: { dash: [], pt: 'star', w: 0 }
+            };
+            var ds = cal.order.map(function (k) {
+                var s = cal.series[k], st = styleBy[k];
+                var isPoint = s.kind === 'point';
+                return {
+                    label: s.name + '  ·  Brier ' + s.brier.toFixed(3),
+                    _name: s.name,
+                    data: s.points.map(function (p) { return { x: p.x, y: p.y, n: p.n }; }),
+                    borderColor: s.color, backgroundColor: s.color,
+                    borderWidth: isPoint ? 0 : st.w, borderDash: st.dash,
+                    showLine: !isPoint, pointStyle: st.pt,
+                    pointRadius: isPoint ? 9 : (k === 'overall' ? 5 : 4),
+                    pointHoverRadius: isPoint ? 11 : 6.5, tension: 0.15, fill: false
+                };
             });
-            ds.push({ label: 'Perfect calibration', data: [{ x: 0, y: 0 }, { x: 100, y: 100 }],
-                borderColor: TXT, borderDash: [5, 5], borderWidth: 1, pointRadius: 0, fill: false });
+            ds.push({ label: 'Perfect calibration', _name: 'Perfect calibration',
+                data: [{ x: 0, y: 0 }, { x: 100, y: 100 }],
+                borderColor: TXT, borderDash: [4, 4], borderWidth: 1, pointRadius: 0, fill: false });
             new Chart(document.getElementById('chart-calibration'), {
                 type: 'line',
                 data: { datasets: ds },
@@ -712,13 +728,18 @@
                         y: axis('Precincts actually won (%)', { min: 0, max: 100 })
                     },
                     plugins: {
-                        legend: { position: 'top', align: 'end' },
+                        legend: { position: 'top', align: 'start',
+                            labels: { boxWidth: 22, padding: 12 },
+                            onHover: function (e) { e.native.target.style.cursor = 'pointer'; },
+                            onLeave: function (e) { e.native.target.style.cursor = 'default'; } },
                         tooltip: { callbacks: {
                             title: function (items) { return 'Forecast ~' + items[0].parsed.x + '%'; },
                             label: function (c) {
-                                if (c.dataset.label === 'Perfect calibration') return null;
+                                if (c.dataset._name === 'Perfect calibration') return null;
+                                if (c.dataset._name.indexOf('/') > -1)
+                                    return 'Given ~0% everywhere, yet won ' + Math.round(c.raw.n * c.parsed.y / 100) + ' of ' + c.raw.n + ' precincts (' + c.parsed.y + '%)';
                                 var n = c.raw.n ? ' (' + c.raw.n + ' precincts)' : '';
-                                return c.dataset.label + ': won ' + c.parsed.y + '%' + n;
+                                return c.dataset._name + ': won ' + c.parsed.y + '%' + n;
                             }
                         } }
                     }
