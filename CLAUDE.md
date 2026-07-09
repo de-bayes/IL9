@@ -27,7 +27,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Install dependencies
 pip install -r requirements.txt
 
-# Run development server (with auto-reload)
+# Run development server (with auto-reload; default http://localhost:2223, override with PORT=)
 python app.py
 
 # Run production server locally (matches Railway)
@@ -390,7 +390,7 @@ python app.py
 
 # Production mode (Gunicorn, matches Railway)
 gunicorn app:app --preload
-# Visit http://localhost:8000
+# Flask dev: http://localhost:2223 — Gunicorn local default bind is still port 8000 unless PORT is set
 
 # Test data collection cycle
 python -c "from app import collect_market_data; collect_market_data()"

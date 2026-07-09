@@ -1434,7 +1434,15 @@ def healthz():
 
 
 @app.route('/')
+def home():
+    """The small model: the 2026 general-election forecast (site home)."""
+    return render_template('home_general.html')
+
+
+@app.route('/primary')
+@app.route('/primary/')
 def landing():
+    """The primary-season IL9Cast archive, preserved in full."""
     return render_template('landing_new.html')
 
 @app.route('/rjmc')

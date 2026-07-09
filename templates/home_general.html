@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Small Model | IL9Cast</title>
+  <meta name="description" content="A forecast of the 2026 general election in Illinois' 9th District in 155 lines of Python: an interactive precinct map, 10,000 simulations, and a two-page methods note.">
+  <link rel="canonical" href="https://il9.org/">
+  <link rel="stylesheet" href="/static/sm/sm.css">
+  <link rel="preload" href="/static/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/static/fonts/lora-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="icon" href="/static/favicon.png">
+  <meta name="theme-color" content="#fbfbfc">
+  <meta property="og:title" content="The Small Model | IL9Cast">
+  <meta property="og:description" content="A forecast of the 2026 general election in Illinois' 9th District in 155 lines of Python.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://il9.org/">
+  <meta property="og:image" content="https://il9.org/static/sm/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://il9.org/static/sm/og.jpg">
+  <meta name="author" content="Ryan McComb">
+</head>
+<body>
+  <main class="editorial" id="main-content">
+    <header class="sm-top">
+      <a class="sm-top__mark" href="/"><span>the small model</span> &middot; IL-9 2026</a>
+      <a class="sm-top__btn" href="/primary">primary archive &rarr;</a>
+    </header>
+
+    <section class="sm-hero" aria-label="The verdict">
+      <p class="sm-hero__line sm-hero__line--d">Biss wins more than 99 times out of 100</p>
+      <p class="sm-hero__line sm-hero__line--mid">in 10,000 simulations of Illinois&rsquo; 9th District.</p>
+      <p class="sm-hero__line sm-hero__line--r">Elleson&rsquo;s best night still loses by 33.8 points.</p>
+      <div class="sm-hero__tally">
+        <span class="sm-fivey-hero" tabindex="0" aria-label="Fivey Fox">
+          <span class="sm-fivey__say">Hey, I&rsquo;m Fivey. I was 538&rsquo;s mascot before Disney killed me, and <a href="https://mccomb.ca" target="_blank" rel="noopener">Ryan</a>&rsquo;s inspiration to build this model.</span>
+          <img src="/static/sm/fivey-flag.svg" alt="" width="58" height="55" decoding="async">
+        </span>
+        <div class="sm-hero__count">
+          <div><span>Biss</span><b class="sm-hero__n--d">10,000</b></div>
+          <div><span>Elleson</span><b class="sm-hero__n--r">0</b></div>
+          <div class="sm-hero__total"><span>simulations</span><b>10,000</b></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="editorial__intro focus-copy">
+      <p>
+        <span class="focus-copy__dim">This is </span><a class="sm-name" href="#fig1">the small model</a><span class="focus-copy__dim">, a forecast of the 2026 general election in Illinois&rsquo; 9th District, written in one night in 155 lines of Python: the most compact precinct-by-precinct model I could manage without giving up accuracy.</span>
+      </p>
+      <p>
+        <span class="focus-copy__dim">Every precinct starts from its 2024 baseline and takes three shocks each simulation, a national swing, a swing shared with precincts that resemble it, and a little noise of its own (the </span><em>&delta;<sub>env</sub></em><span class="focus-copy__dim">, </span><em>&delta;<sub>c(i)</sub></em><span class="focus-copy__dim">, and </span><em>&epsilon;<sub>i</sub></em><span class="focus-copy__dim"> of the methods note below), all applied in log-odds space so the safest precincts move the least.</span>
+      </p>
+      <p>
+        <span class="focus-copy__dim">For a more detailed model, and one that is actually useful rather than a one-night project, go to the </span><a href="https://votehub.com/2026-forecast/" target="_blank" rel="noopener"><em>VoteHub forecast</em></a><span class="focus-copy__dim">. Hover any of the 435 precincts below; click one for its full card.</span>
+      </p>
+    </div>
+
+    <div class="sm-q"><h2>Who&rsquo;s favored to win each precinct?</h2>
+      <p>Hover any of the 435 precincts for its forecast; click one for its full card.</p></div>
+    <figure class="fig sm-fig sm-wide" id="fig1" aria-labelledby="sm-fig1-cap">
+      <figcaption class="fig__cap" id="sm-fig1-cap"><b>fig 1.</b> Projected 2026 two-party margin. </figcaption>
+      <div class="fig__frame">
+        <div class="sm-map-wrap" id="sm-map" role="group" aria-label="Interactive precinct map of the projected 2026 margin in Illinois' 9th District. Hover or focus a precinct for its forecast; press Enter for its full card, Escape to dismiss."></div>
+      </div>
+      <div class="sm-legend"><span>R+50</span><span class="sm-legend__bar" aria-hidden="true"></span><span>D+50</span></div>
+    </figure>
+
+    <p class="sm-topline"><b>73.9%</b> median Biss two-party &middot; <b>71.3&ndash;76.2</b> 80% interval &middot; <b>&gt;99.9%</b> win probability &middot; <b>&asymp;287,000</b> ballots &middot; <b>155</b> lines of Python</p>
+
+    
+
+    <div class="sm-rule" aria-hidden="true"><span>&#9679;</span></div>
+    <div class="sm-q"><h2>Where does every precinct land?</h2>
+      <p>Each dot is one precinct, sized by expected ballots, stacked at its projected margin.</p></div>
+    <figure class="fig sm-fig sm-wide" id="fig2" aria-labelledby="sm-fig2-cap">
+      <figcaption class="fig__cap" id="sm-fig2-cap"><b>fig 2.</b> Every precinct as one dot, sized by expected ballots, arranged by projected margin. Hover a dot for its precinct.</figcaption>
+      <div class="fig__frame">
+        <div class="sm-map-wrap" id="sm-swarm-wrap"><canvas id="sm-swarm" width="2080" height="1320" role="img" aria-label="Beeswarm of 435 precincts arranged by projected 2026 margin, dot size proportional to expected ballots. The ballot-weighted median margin is D+47.8; a handful of precincts sit right of even.">435 precincts arranged by projected margin, from a few McHenry County precincts right of even to lakefront wards past D+80; the ballot-weighted median is D+47.8.</canvas></div>
+      </div>
+    </figure>
+
+    <div class="sm-rule" aria-hidden="true"><span>&#9679;</span></div>
+    <div class="sm-q"><h2>What do 10,000 simulations look like?</h2>
+      <p>Each dot is one simulated outcome. Hover a dot to see the district under it.</p></div>
+    <figure class="fig sm-fig sm-wide" id="fig3" aria-labelledby="sm-fig3-cap">
+      <figcaption class="fig__cap" id="sm-fig3-cap"><b>fig 3.</b> 10,000 runs, each dot one simulated outcome. The hard right shoulder is the elasticity at work: a district this blue has little room left to gain. Hover a dot to see the district under that outcome.</figcaption>
+      <div class="fig__frame">
+        <div class="sm-map-wrap" id="sm-sims-wrap"><canvas id="sm-sims" width="2080" height="900" role="img" aria-label="Dot histogram of 10,000 simulated outcomes by Biss two-party share, clustered between 71% and 76% with median 73.9%. Hover a dot to preview the district map under that outcome.">10,000 simulated outcomes cluster between 71% and 76% Biss two-party share; the median is 73.9%, and the distribution has a soft ceiling near 77%.</canvas></div>
+      </div>
+    </figure>
+
+    
+    <section class="sm-duo">
+      <div class="editorial__intro focus-copy sm-duo__copy">
+        <p>
+        <span class="focus-copy__dim">The swing is applied in log-odds space, so safe precincts move less than even ones; a shared draw per demographic cluster keeps the errors honest, because when one heavily Asian precinct moves right its cousins probably are too; and turnout comes from an ecological regression discounted by how much of its presidential electorate each group typically keeps in a midterm. The whole method fits on two pages: </span><a href="/static/sm/paper.pdf" target="_blank" rel="noopener"><em>read the methods note (PDF)</em></a><span class="focus-copy__dim">, or see the code on </span><a href="https://github.com/de-bayes/xxxm" target="_blank" rel="noopener"><em>GitHub</em></a><span class="focus-copy__dim">.</span>
+      </p>
+      </div>
+      <aside class="sm-scenario" id="sm-scenario" aria-live="polite">
+      <p class="sm-scenario__text">There is a <b id="sm-scenario-odds"></b> chance that <span id="sm-scenario-what"></span></p>
+      <button class="sm-scenario__btn" id="sm-scenario-btn" type="button">see a new scenario &#8635;</button>
+    </aside>
+    </section>
+
+    
+
+    <div class="sm-rule" aria-hidden="true"><span>&#9679;</span></div>
+    <div class="sm-q"><h2>What are the closest precincts?</h2>
+      <p>The knife-edge precincts, with the range each one covers across the simulations.</p></div>
+    <div class="sm-closest sm-wide" id="sm-closest" aria-label="Closest precincts"></div>
+
+    <div class="sm-rule" aria-hidden="true"><span>&#9679;</span></div>
+    <section class="sm-outcomes sm-wide" aria-label="Outcome probabilities">
+      <p class="fig__cap"><b>table 1.</b> Unusual and not-so-unusual outcomes, according to the simulations.</p>
+      <div class="sm-outcomes__list" id="sm-outcomes-list"></div>
+    </section>
+
+
+    
+
+    <figure class="fig sm-fig sm-wide" id="fig4" aria-labelledby="sm-fig4-cap">
+      <figcaption class="fig__cap" id="sm-fig4-cap"><b>fig 4.</b> The methods note, both pages. <a href="/static/sm/paper.pdf" target="_blank" rel="noopener">Open the PDF</a>.</figcaption>
+      <div class="sm-paper">
+        <img src="/static/sm/paper-1.png" alt="Page one of the methods note: abstract, data, and the vote-share model" loading="lazy" width="1402" height="1815">
+        <img src="/static/sm/paper-2.png" alt="Page two of the methods note: turnout model, results, limitations, and references" loading="lazy" width="1402" height="1815">
+      </div>
+    </figure>
+
+    
+  
+  </main>
+
+  <footer class="sm-foot editorial">
+    <p>a one-night model by <a href="https://mccomb.ca" target="_blank" rel="noopener">Ryan McComb</a> &middot; <a href="/primary">the primary archive</a> &middot; <a href="https://votehub.com/2026-forecast/" target="_blank" rel="noopener">the real forecast</a></p>
+  </footer>
+
+  <script defer src="/static/sm/sm.js"></script>
+</body>
+</html>

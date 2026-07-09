@@ -68,3 +68,4 @@ hompage img/
 
 # Timezone reset markers (deployment-specific)
 data/.timezone_reset*
+.venv/
