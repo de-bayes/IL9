@@ -145,7 +145,8 @@ footer.sm-foot a { color: var(--text-muted); }
     .sm-map-wrap path:hover { filter: brightness(0.86); }
     .sm-map-wrap path:focus { outline: none; }
     .sm-map-wrap path:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-    #sm-swarm { display: block; width: 100%; height: auto; }
+    #sm-swarm,
+    #sm-sims { display: block; width: 100%; height: auto; }
     .sm-tip {
       position: absolute; pointer-events: none; z-index: 4; min-width: 15.5rem;
       max-width: 20.5rem;
