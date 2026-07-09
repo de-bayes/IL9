@@ -572,9 +572,27 @@
       var q10 = 2 * draws[Math.floor(draws.length * 0.1)] - 100;
       var q90 = 2 * draws[Math.floor(draws.length * 0.9)] - 100;
       var med = 2 * p.s26 - 100;
-      function pct(m) {
-        return (50 + (Math.max(-DOM, Math.min(DOM, m)) / DOM) * 50).toFixed(1) + '%';
+      function pos(m) {
+        return 50 + (Math.max(-DOM, Math.min(DOM, m)) / DOM) * 50;
       }
+      /* 538-style: two solid rectangles meeting at the even line */
+      var lo = pos(Math.min(q10, q90)),
+        hi = pos(Math.max(q10, q90));
+      var bars = '';
+      if (lo < 50)
+        bars +=
+          '<span class="sm-close-row__bar" style="left:' +
+          lo.toFixed(1) +
+          '%;right:' +
+          (100 - Math.min(hi, 50)).toFixed(1) +
+          '%;background:#b4534f"></span>';
+      if (hi > 50)
+        bars +=
+          '<span class="sm-close-row__bar" style="left:' +
+          Math.max(lo, 50).toFixed(1) +
+          '%;right:' +
+          (100 - hi).toFixed(1) +
+          '%;background:#35618f"></span>';
       var lead = med >= 0 ? 'D+' + med.toFixed(1) : 'R+' + Math.abs(med).toFixed(1);
       var row = document.createElement('div');
       row.className = 'sm-close-row';
@@ -584,17 +602,13 @@
         '<small>' +
         p.c +
         ' County</small></span>' +
-        '<span class="sm-close-row__track"><span class="sm-close-row__axis"></span>' +
+        '<span class="sm-close-row__track">' +
+        bars +
         '<span class="sm-close-row__even"></span>' +
-        '<span class="sm-close-row__band" style="left:' +
-        pct(Math.min(q10, q90)) +
-        ';right:' +
-        (100 - parseFloat(pct(Math.max(q10, q90)))).toFixed(1) +
-        '%;background:linear-gradient(90deg,#b4534f22,#35618f55)"></span>' +
         '<span class="sm-close-row__dot" style="left:' +
-        pct(med) +
-        ';background:' +
-        ramp(med) +
+        pos(med).toFixed(1) +
+        '%;border-color:' +
+        (med >= 0 ? '#35618f' : '#b4534f') +
         '"></span></span>' +
         '<span class="sm-close-row__m" style="color:' +
         (med >= 0 ? '#35618f' : '#b4534f') +
