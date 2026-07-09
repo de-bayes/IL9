@@ -6,10 +6,10 @@
   <title>The Small Model | IL9Cast</title>
   <meta name="description" content="A forecast of the 2026 general election in Illinois' 9th District in 155 lines of Python: an interactive precinct map, 10,000 simulations, and a two-page methods note.">
   <link rel="canonical" href="https://il9.org/">
-  <link rel="stylesheet" href="/static/sm/sm.css">
+  <link rel="stylesheet" href="/static/sm/sm.css?v=7">
   <link rel="preload" href="/static/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/static/fonts/lora-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="icon" href="/static/favicon.png">
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <meta name="theme-color" content="#fbfbfc">
   <meta property="og:title" content="The Small Model | IL9Cast">
   <meta property="og:description" content="A forecast of the 2026 general election in Illinois' 9th District in 155 lines of Python.">
@@ -114,7 +114,7 @@
     <div class="sm-rule" aria-hidden="true"><span>&#9679;</span></div>
     <div class="sm-q"><h2>What are the closest precincts?</h2>
       <p>The knife-edge precincts, with the range each one covers across the simulations.</p></div>
-    <div class="sm-closest sm-wide" id="sm-closest" aria-label="Closest precincts"></div>
+    <div class="sm-closest" id="sm-closest" aria-label="Closest precincts"></div>
 
     <div class="sm-rule" aria-hidden="true"><span>&#9679;</span></div>
     <section class="sm-outcomes sm-wide" aria-label="Outcome probabilities">
@@ -141,6 +141,6 @@
     <p>a one-night model by <a href="https://mccomb.ca" target="_blank" rel="noopener">Ryan McComb</a> &middot; <a href="/primary">the primary archive</a> &middot; <a href="https://votehub.com/2026-forecast/" target="_blank" rel="noopener">the real forecast</a></p>
   </footer>
 
-  <script defer src="/static/sm/sm.js"></script>
+  <script defer src="/static/sm/sm.js?v=7"></script>
 </body>
 </html>

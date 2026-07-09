@@ -269,7 +269,8 @@ footer.sm-foot a { color: var(--text-muted); }
     .sm-simcard .sm-tip__place { margin-bottom: 0.1rem; }
   
 /* the closest precincts: 538's closest-races table, precinct edition */
-.sm-closest { max-width: 40rem; margin: 1.6rem auto 3rem; }
+.sm-closest { width: min(40rem, 92vw); margin: 1.6rem 0 3rem;
+  margin-left: 50%; translate: -50% 0; }
 .sm-close-row { display: grid; grid-template-columns: 11.5rem 1fr 4.2rem;
   gap: 1rem; align-items: center; padding: 0.5rem 0.15rem;
   border-bottom: 1px solid rgba(31, 119, 180, 0.25); }

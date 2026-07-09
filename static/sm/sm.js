@@ -42,7 +42,7 @@
     document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
 
   Promise.all([
-    fetch('/static/sm/il9-model.json').then(function (r) {
+    fetch('/static/sm/il9-model.json?v=7').then(function (r) {
       return r.json();
     }),
     fontsReady,
