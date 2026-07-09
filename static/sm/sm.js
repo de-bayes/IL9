@@ -42,7 +42,7 @@
     document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
 
   Promise.all([
-    fetch('/static/sm/il9-model.json?v=7').then(function (r) {
+    fetch('/static/sm/il9-model.json?v=8').then(function (r) {
       return r.json();
     }),
     fontsReady,
@@ -161,7 +161,6 @@
   }
 
   function cardDetail(p) {
-    var retention = Math.round((100 * p.t) / p.t24);
     return (
       cardBasics(p) +
       '<div class="sm-tip__detail">' +
@@ -169,9 +168,7 @@
       p.s24.toFixed(1) +
       '% D two-party on ' +
       p.t24.toLocaleString() +
-      ' ballots (' +
-      retention +
-      '% expected to return)<br>' +
+      ' ballots<br>' +
       'type: ' +
       p.cl +
       '<br>' +
@@ -479,7 +476,7 @@
       ctx.fillText('D+' + medianMargin.toFixed(1), cxx, 58);
       ctx.fillStyle = 'rgba(20,22,26,0.66)';
       ctx.font = 'italic 500 13px ' + SERIF;
-      ctx.fillText('median projected margin', cxx, 78);
+      ctx.fillText('district projected margin', cxx, 78);
     }
 
     draw();
@@ -640,7 +637,7 @@
     }
 
     var rows = [
-      { head: 'the chances, from 10,000 simulations' },
+      { head: 'the chances, from the model\'s simulations' },
       { label: 'Biss wins', odds: '>99 out of 100', tone: 'd' },
       {
         label: 'Biss clears three quarters of the two-party vote',

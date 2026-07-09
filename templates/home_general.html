@@ -6,7 +6,7 @@
   <title>The Small Model | IL9Cast</title>
   <meta name="description" content="A forecast of the 2026 general election in Illinois' 9th District in 155 lines of Python: an interactive precinct map, 10,000 simulations, and a two-page methods note.">
   <link rel="canonical" href="https://il9.org/">
-  <link rel="stylesheet" href="/static/sm/sm.css?v=7">
+  <link rel="stylesheet" href="/static/sm/sm.css?v=8">
   <link rel="preload" href="/static/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/static/fonts/lora-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
@@ -82,7 +82,7 @@
     <figure class="fig sm-fig sm-wide" id="fig2" aria-labelledby="sm-fig2-cap">
       <figcaption class="fig__cap" id="sm-fig2-cap"><b>fig 2.</b> Every precinct as one dot, sized by expected ballots, arranged by projected margin. Hover a dot for its precinct.</figcaption>
       <div class="fig__frame">
-        <div class="sm-map-wrap" id="sm-swarm-wrap"><canvas id="sm-swarm" width="2080" height="1320" role="img" aria-label="Beeswarm of 435 precincts arranged by projected 2026 margin, dot size proportional to expected ballots. The ballot-weighted median margin is D+47.8; a handful of precincts sit right of even.">435 precincts arranged by projected margin, from a few McHenry County precincts right of even to lakefront wards past D+80; the ballot-weighted median is D+47.8.</canvas></div>
+        <div class="sm-map-wrap" id="sm-swarm-wrap"><canvas id="sm-swarm" width="2080" height="1320" role="img" aria-label="Beeswarm of 435 precincts arranged by projected 2026 margin, dot size proportional to expected ballots. The district&rsquo;s projected margin is D+47.8; a handful of precincts sit right of even.">435 precincts arranged by projected margin, from a few McHenry County precincts right of even to lakefront wards past D+80; the district&rsquo;s projected margin is D+47.8.</canvas></div>
       </div>
     </figure>
 
@@ -90,9 +90,9 @@
     <div class="sm-q"><h2>What do 10,000 simulations look like?</h2>
       <p>Each dot is one simulated outcome. Hover a dot to see the district under it.</p></div>
     <figure class="fig sm-fig sm-wide" id="fig3" aria-labelledby="sm-fig3-cap">
-      <figcaption class="fig__cap" id="sm-fig3-cap"><b>fig 3.</b> 10,000 runs, each dot one simulated outcome. The hard right shoulder is the elasticity at work: a district this blue has little room left to gain. Hover a dot to see the district under that outcome.</figcaption>
+      <figcaption class="fig__cap" id="sm-fig3-cap"><b>fig 3.</b> Each dot is one of the model&rsquo;s simulated outcomes, a representative sample of its 10,000 runs. The hard right shoulder is the elasticity at work: a district this blue has little room left to gain. Hover a dot to see the district under that outcome.</figcaption>
       <div class="fig__frame">
-        <div class="sm-map-wrap" id="sm-sims-wrap"><canvas id="sm-sims" width="2080" height="900" role="img" aria-label="Dot histogram of 10,000 simulated outcomes by Biss two-party share, clustered between 71% and 76% with median 73.9%. Hover a dot to preview the district map under that outcome.">10,000 simulated outcomes cluster between 71% and 76% Biss two-party share; the median is 73.9%, and the distribution has a soft ceiling near 77%.</canvas></div>
+        <div class="sm-map-wrap" id="sm-sims-wrap"><canvas id="sm-sims" width="2080" height="900" role="img" aria-label="Dot histogram sampling the model&rsquo;s simulated outcomes by Biss two-party share, clustered between 71% and 76% with median 73.9%. Hover a dot to preview the district map under that outcome.">The model&rsquo;s simulated outcomes cluster between 71% and 76% Biss two-party share; the median is 73.9%, and the distribution has a soft ceiling near 77%.</canvas></div>
       </div>
     </figure>
 
@@ -141,6 +141,6 @@
     <p>a one-night model by <a href="https://mccomb.ca" target="_blank" rel="noopener">Ryan McComb</a> &middot; <a href="/primary">the primary archive</a> &middot; <a href="https://votehub.com/2026-forecast/" target="_blank" rel="noopener">the real forecast</a></p>
   </footer>
 
-  <script defer src="/static/sm/sm.js?v=7"></script>
+  <script defer src="/static/sm/sm.js?v=8"></script>
 </body>
 </html>
